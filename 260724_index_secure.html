@@ -1,0 +1,3970 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AZS 팀 플래너</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        /* ===== 헤더 ===== */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header h1 {
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        .header h1 i {
+            margin-right: 8px;
+        }
+
+        .week-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.15);
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        .week-selector button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px;
+        }
+
+        .week-selector button:hover {
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
+
+        .week-selector span {
+            font-size: 14px;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            background: rgba(255,255,255,0.15);
+        }
+
+        .connection-status.connected {
+            background: rgba(0,255,136,0.25);
+        }
+
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #888;
+        }
+
+        .connection-status.connected .connection-dot {
+            background: #00ff88;
+        }
+
+        .online-count {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        /* ===== 탭 네비게이션 ===== */
+        .tab-nav {
+            background: rgba(255,255,255,0.05);
+            padding: 0 30px;
+            display: flex;
+            gap: 5px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tab-btn {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: white;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tab-btn.active {
+            color: white;
+            border-bottom-color: #00d4ff;
+        }
+
+        .tab-btn i {
+            font-size: 16px;
+        }
+
+        .tab-badge {
+            background: #ff6b6b;
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
+
+        /* ===== 탭 컨텐츠 ===== */
+        .tab-content {
+            display: none;
+            padding: 20px 30px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== 공통 버튼 ===== */
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            color: #1a1a2e;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .btn-danger {
+            background: rgba(255,107,107,0.3);
+            color: #ff6b6b;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        /* ===== 섹션 헤더 ===== */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            font-size: 1.3em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ===== 업무관리 탭 ===== */
+        .weekly-grid {
+            display: grid;
+            grid-template-columns: 280px repeat(5, 1fr);
+            gap: 12px;
+            min-height: 450px;
+        }
+
+        .task-backlog {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            border: 2px dashed rgba(255,255,255,0.2);
+        }
+
+        .backlog-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        .task-count {
+            background: rgba(0,212,255,0.3);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: auto;
+        }
+
+        .day-column {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .day-column.today {
+            background: rgba(0,212,255,0.1);
+            border: 2px solid rgba(0,212,255,0.5);
+        }
+
+        .day-header {
+            text-align: center;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .day-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .day-column.today .day-name {
+            color: #00d4ff;
+        }
+
+        .day-date {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .today-badge {
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            color: #1a1a2e;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 300px;
+        }
+
+        .task-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: grab;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+            font-size: 13px;
+        }
+
+        .task-card:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+
+        .task-card.dragging {
+            opacity: 0.5;
+            transform: scale(1.02);
+        }
+
+        .task-card.priority-high { border-left-color: #ff6b6b; }
+        .task-card.priority-medium { border-left-color: #ffd93d; }
+        .task-card.priority-low { border-left-color: #00d4ff; }
+
+        .task-card.completed {
+            opacity: 0.5;
+            border-left-color: #00ff88;
+        }
+
+        .task-card.completed .task-title {
+            text-decoration: line-through;
+        }
+
+        .task-assignee {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 5px;
+        }
+
+        .task-title {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .task-checkbox.checked {
+            background: #00ff88;
+            border-color: #00ff88;
+            color: #1a1a2e;
+        }
+
+        .task-delete {
+            color: rgba(255,255,255,0.3);
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .task-delete:hover {
+            color: #ff6b6b;
+        }
+
+        /* 업무 추가 폼 */
+        .add-task-form {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 14px;
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .form-group select option {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        /* ===== ESHG 이슈 탭 ===== */
+        .issue-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .issue-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .issue-card.status-waiting { border-left-color: #888; }
+        .issue-card.status-doing { border-left-color: #ffd93d; }
+        .issue-card.status-done { border-left-color: #00ff88; }
+        .issue-card.status-unresolved { border-left-color: #ff6b6b; }
+
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .issue-category {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .issue-badge {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .issue-badge { background: rgba(102,126,234,0.3); color: #a5b4fc; }
+
+        .issue-status {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .status-waiting { background: rgba(136,136,136,0.3); color: #aaa; }
+        .status-doing { background: rgba(255,217,61,0.3); color: #ffd93d; }
+        .status-done { background: rgba(0,255,136,0.3); color: #00ff88; }
+        .status-unresolved { background: rgba(255,107,107,0.3); color: #ff6b6b; }
+
+        .issue-content {
+            margin-bottom: 15px;
+        }
+
+        .issue-content h4 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .issue-field {
+            margin-bottom: 12px;
+        }
+
+        .issue-field-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 5px;
+        }
+
+        .issue-field-value {
+            font-size: 14px;
+            line-height: 1.5;
+            padding: 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 6px;
+        }
+
+        .issue-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* 이슈 추가 폼 */
+        .issue-form {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .issue-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .issue-form-grid .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group textarea {
+            padding: 10px 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 14px;
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* ===== KPI 탭 ===== */
+        .kpi-table-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .kpi-table-header {
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.05);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .kpi-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .kpi-table th, .kpi-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 13px;
+        }
+
+        .kpi-table th {
+            background: rgba(255,255,255,0.08);
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .kpi-table th.member-col {
+            background: rgba(0,212,255,0.2);
+            color: #00d4ff;
+        }
+
+        .kpi-table td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .kpi-table tr:hover td {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .kpi-table td:first-child {
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .kpi-input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            background: transparent;
+            color: white;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .kpi-input:focus {
+            border-color: #00d4ff;
+            background: rgba(0,212,255,0.1);
+            outline: none;
+        }
+
+        .kpi-input.text-left {
+            text-align: left;
+        }
+
+        .kpi-delete-btn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.3);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .kpi-delete-btn:hover {
+            color: #ff6b6b;
+        }
+
+        /* ===== 캘린더 탭 ===== */
+        .calendar-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .calendar-title {
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-nav button {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .calendar-nav button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .calendar-weekday {
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .calendar-weekday.weekend {
+            color: #ff6b6b;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        .calendar-day {
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .calendar-day:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+
+        .calendar-day.today {
+            background: rgba(102,126,234,0.2);
+            border-color: #667eea;
+        }
+
+        .calendar-day-number {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .calendar-day.weekend .calendar-day-number {
+            color: #ff6b6b;
+        }
+
+        .calendar-task-count {
+            display: inline-block;
+            background: rgba(0,212,255,0.3);
+            color: #00d4ff;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+
+        .calendar-task-count.all-done {
+            background: rgba(0,255,136,0.3);
+            color: #00ff88;
+        }
+
+        /* ===== 과거이력 탭 ===== */
+        .history-week {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .history-week-header {
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .history-week-header:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .history-week-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-week-title i {
+            color: rgba(255,255,255,0.5);
+            transition: transform 0.2s;
+        }
+
+        .history-week.expanded .history-week-title i {
+            transform: rotate(90deg);
+        }
+
+        .history-week-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+        }
+
+        .history-week-content {
+            display: none;
+            padding: 15px 20px;
+        }
+
+        .history-week.expanded .history-week-content {
+            display: block;
+        }
+
+        .history-task-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+        }
+
+        .history-day {
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .history-day-title {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .history-task {
+            font-size: 12px;
+            padding: 6px 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+
+        .history-task.done { color: #00ff88; }
+        .history-task.incomplete { color: #ff6b6b; }
+
+        /* ===== Firebase 연결 바 ===== */
+        .firebase-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26,26,46,0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .firebase-bar input {
+            width: 400px;
+            padding: 10px 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 13px;
+        }
+
+        .firebase-bar input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .firebase-bar button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* 푸터 여백 */
+        .content-wrapper {
+            padding-bottom: 80px;
+        }
+
+        /* 빈 상태 */
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .empty-state i {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        /* 스크롤바 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+        }
+
+        /* ===== 오목 게임 ===== */
+        .game-container {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .game-board-wrapper {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .game-info {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .game-status {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .game-status h3 {
+            margin-bottom: 15px;
+            color: #00d4ff;
+        }
+
+        .current-turn {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .current-turn.black {
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+            color: white;
+        }
+
+        .current-turn.white {
+            background: linear-gradient(135deg, #eee 0%, #fff 100%);
+            color: #333;
+        }
+
+        .player-select {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .player-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .player-btn:hover {
+            border-color: #00d4ff;
+        }
+
+        .player-btn.selected {
+            border-color: #00ff88;
+            background: rgba(0,255,136,0.1);
+        }
+
+        .player-btn.black-stone::before {
+            content: '⚫ ';
+        }
+
+        .player-btn.white-stone::before {
+            content: '⚪ ';
+        }
+
+        #omokBoard {
+            display: grid;
+            grid-template-columns: repeat(15, 28px);
+            gap: 0;
+            background: #dcb35c;
+            padding: 14px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .board-cell {
+            width: 28px;
+            height: 28px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .board-cell::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #8b7355;
+        }
+
+        .board-cell::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: #8b7355;
+        }
+
+        .board-cell .stone {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            z-index: 10;
+        }
+
+        .board-cell .stone.black {
+            background: radial-gradient(circle at 30% 30%, #555, #000);
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+        }
+
+        .board-cell .stone.white {
+            background: radial-gradient(circle at 30% 30%, #fff, #ddd);
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .board-cell:hover .hover-stone {
+            opacity: 0.5;
+        }
+
+        .hover-stone {
+            opacity: 0;
+            transition: opacity 0.1s;
+        }
+
+        .game-log {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .game-log h3 {
+            margin-bottom: 10px;
+            color: #00d4ff;
+        }
+
+        .log-entry {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 13px;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .winner-banner {
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            color: #333;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        /* ===== 체스 게임 ===== */
+        #chessBoard {
+            display: grid;
+            grid-template-columns: repeat(8, 45px);
+            border: 3px solid #8b4513;
+            border-radius: 4px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .chess-cell {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .chess-cell.light { background: #f0d9b5; }
+        .chess-cell.dark { background: #b58863; }
+
+        .chess-cell.black-piece {
+            color: #000;
+            text-shadow: 0 0 2px #333;
+        }
+
+        .chess-cell.white-piece {
+            color: #fff;
+            text-shadow: 0 0 3px #000, 0 0 3px #000;
+        }
+
+        .chess-cell.selected {
+            background: #7fc97f !important;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .chess-cell.valid-move {
+            position: relative;
+        }
+
+        .chess-cell.valid-move::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: rgba(0, 150, 0, 0.5);
+            border-radius: 50%;
+        }
+
+        .chess-cell.valid-capture {
+            background: rgba(255, 100, 100, 0.5) !important;
+        }
+
+        .chess-cell:hover {
+            filter: brightness(1.1);
+        }
+
+        .captured-pieces {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .captured-pieces h4 {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 10px;
+        }
+
+        .captured-list {
+            font-size: 24px;
+            min-height: 30px;
+        }
+
+        .check-warning {
+            background: rgba(255, 100, 100, 0.3);
+            color: #ff6b6b;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 10px 0;
+            animation: blink 0.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* ===== 채팅 ===== */
+        .chat-container {
+            margin-top: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .chat-header h3 {
+            color: #00d4ff;
+            margin: 0;
+        }
+
+        .nickname-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nickname-input input {
+            padding: 8px 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 13px;
+            width: 100px;
+        }
+
+        .chat-messages {
+            height: 200px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .chat-message.mine {
+            background: rgba(102,126,234,0.3);
+            margin-left: 20%;
+        }
+
+        .chat-message .sender {
+            font-weight: bold;
+            color: #00d4ff;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .chat-message .text {
+            color: white;
+            font-size: 14px;
+            word-break: break-word;
+        }
+
+        .chat-message .time {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 4px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 14px;
+        }
+
+        .chat-input-area input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .chat-input-area button {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .chat-input-area button:hover {
+            opacity: 0.9;
+        }
+
+        /* ===== 모바일 반응형 ===== */
+        @media screen and (max-width: 768px) {
+            /* 헤더 */
+            .header {
+                flex-direction: column;
+                padding: 10px 15px;
+                gap: 10px;
+            }
+
+            .header-left {
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.2em;
+            }
+
+            .week-selector {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .week-selector span {
+                min-width: auto;
+                font-size: 12px;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* 탭 네비게이션 - 컴팩트 2줄 배치 */
+            .tab-nav {
+                padding: 8px 10px;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 6px;
+            }
+
+            .tab-btn {
+                padding: 8px 10px;
+                font-size: 11px;
+                white-space: nowrap;
+                flex: 0 0 auto;
+                border-radius: 8px;
+            }
+
+            .tab-btn i {
+                font-size: 12px;
+                margin-right: 3px;
+            }
+
+            /* 컨텐츠 */
+            .tab-content {
+                padding: 15px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+
+            .section-header h2 {
+                font-size: 1.1em;
+            }
+
+            /* 주간 그리드 - 가로 스크롤 컴팩트 카드 */
+            .weekly-grid {
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+                gap: 8px;
+                padding-bottom: 10px;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .weekly-grid::-webkit-scrollbar {
+                height: 4px;
+            }
+
+            .weekly-grid::-webkit-scrollbar-thumb {
+                background: #ccc;
+                border-radius: 2px;
+            }
+
+            .task-backlog {
+                order: -1;
+                min-width: 140px;
+                flex: 0 0 140px;
+            }
+
+            .day-column {
+                padding: 10px;
+                min-width: 130px;
+                flex: 0 0 130px;
+            }
+
+            .day-header {
+                padding-bottom: 6px;
+                margin-bottom: 8px;
+            }
+
+            .day-name {
+                font-size: 0.85em;
+            }
+
+            .day-date {
+                font-size: 11px;
+            }
+
+            .task-list {
+                min-height: 80px;
+            }
+
+            .task-card {
+                padding: 8px;
+                font-size: 11px;
+            }
+
+            .task-card .task-title {
+                font-size: 11px;
+                -webkit-line-clamp: 2;
+            }
+
+            /* 업무 추가 폼 */
+            .add-task-form {
+                padding: 15px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .form-group input,
+            .form-group select {
+                padding: 12px;
+            }
+
+            /* 이슈 카드 */
+            .issue-card {
+                padding: 15px;
+            }
+
+            .issue-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .issue-content h4 {
+                font-size: 14px;
+            }
+
+            /* 게임 컨테이너 */
+            .game-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .game-board-wrapper {
+                padding: 15px;
+                overflow-x: auto;
+            }
+
+            .game-info {
+                min-width: auto;
+                width: 100%;
+            }
+
+            /* 오목 보드 */
+            #omokBoard {
+                grid-template-columns: repeat(15, 22px);
+                padding: 11px;
+            }
+
+            .board-cell {
+                width: 22px;
+                height: 22px;
+            }
+
+            .board-cell .stone {
+                width: 18px;
+                height: 18px;
+            }
+
+            /* 체스 보드 */
+            #chessBoard {
+                grid-template-columns: repeat(8, 38px);
+            }
+
+            .chess-cell {
+                width: 38px;
+                height: 38px;
+                font-size: 26px;
+            }
+
+            /* 게임 상태 */
+            .game-status {
+                padding: 15px;
+            }
+
+            .current-turn {
+                font-size: 16px;
+                padding: 12px;
+            }
+
+            .player-select {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .player-btn {
+                padding: 10px;
+            }
+
+            /* 게임 로그 */
+            .game-log {
+                padding: 15px;
+                max-height: 200px;
+            }
+
+            /* 채팅 */
+            .chat-container {
+                padding: 15px;
+            }
+
+            .chat-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .chat-messages {
+                height: 200px;
+            }
+
+            .chat-input-area {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .chat-input-area input {
+                width: 100%;
+            }
+
+            .chat-input-area button {
+                width: 100%;
+            }
+
+            /* 캘린더 */
+            .calendar-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .calendar-grid {
+                font-size: 12px;
+            }
+
+            .calendar-day {
+                min-height: 60px;
+                padding: 5px;
+            }
+
+            /* KPI 테이블 */
+            .kpi-table {
+                font-size: 12px;
+                display: block;
+                overflow-x: auto;
+            }
+
+            .kpi-table th,
+            .kpi-table td {
+                padding: 8px 10px;
+                white-space: nowrap;
+            }
+
+            /* Firebase 바 */
+            .firebase-bar {
+                flex-direction: column;
+                padding: 10px 15px;
+                gap: 10px;
+            }
+
+            .firebase-bar input {
+                width: 100%;
+            }
+
+            .firebase-bar button {
+                width: 100%;
+            }
+
+            /* 버튼 */
+            .btn {
+                padding: 10px 15px;
+                font-size: 12px;
+            }
+
+            /* 잡힌 말 */
+            .captured-pieces {
+                padding: 10px;
+            }
+
+            .captured-list {
+                font-size: 20px;
+            }
+        }
+
+        /* 더 작은 화면 (모바일 세로) */
+        @media screen and (max-width: 480px) {
+            .header h1 {
+                font-size: 1em;
+            }
+
+            /* 탭 더 컴팩트하게 */
+            .tab-nav {
+                padding: 6px 8px;
+                gap: 4px;
+            }
+
+            .tab-btn {
+                padding: 6px 8px;
+                font-size: 10px;
+            }
+
+            .tab-btn i {
+                font-size: 11px;
+                margin-right: 2px;
+            }
+
+            /* 요일 카드 더 작게 */
+            .task-backlog {
+                min-width: 110px;
+                flex: 0 0 110px;
+            }
+
+            .day-column {
+                min-width: 100px;
+                flex: 0 0 100px;
+                padding: 8px;
+            }
+
+            .day-name {
+                font-size: 0.75em;
+            }
+
+            .day-date {
+                font-size: 10px;
+            }
+
+            .task-card {
+                padding: 6px;
+                font-size: 10px;
+            }
+
+            #omokBoard {
+                grid-template-columns: repeat(15, 18px);
+                padding: 9px;
+            }
+
+            .board-cell {
+                width: 18px;
+                height: 18px;
+            }
+
+            .board-cell .stone {
+                width: 14px;
+                height: 14px;
+            }
+
+            #chessBoard {
+                grid-template-columns: repeat(8, 32px);
+            }
+
+            .chess-cell {
+                width: 32px;
+                height: 32px;
+                font-size: 22px;
+            }
+
+            .current-turn {
+                font-size: 14px;
+            }
+
+            .winner-banner {
+                font-size: 16px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== 로그인 오버레이 ===== -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-box">
+            <div class="login-logo">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h2>AZS 팀 플래너</h2>
+            <p style="color: rgba(255,255,255,0.6); margin-bottom: 20px;">팀 전용 페이지입니다</p>
+            <div class="login-input-group">
+                <input type="password" id="teamPassword" placeholder="팀 비밀번호 입력" onkeypress="if(event.key==='Enter') checkPassword()">
+                <button onclick="checkPassword()"><i class="fas fa-sign-in-alt"></i></button>
+            </div>
+            <p id="loginError" style="color: #ff6b6b; font-size: 12px; margin-top: 10px; display: none;">
+                비밀번호가 틀렸습니다.
+            </p>
+            <p style="color: rgba(255,255,255,0.4); font-size: 11px; margin-top: 20px;">
+                ※ 비밀번호는 팀 담당자에게 문의하세요
+            </p>
+        </div>
+    </div>
+
+    <style>
+        /* ===== 로그인 오버레이 스타일 ===== */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+        .login-overlay.hidden {
+            display: none;
+        }
+        .login-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+        .login-logo {
+            font-size: 50px;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .login-box h2 {
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .login-input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .login-input-group input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+        .login-input-group input:focus {
+            border-color: #667eea;
+        }
+        .login-input-group button {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+        .login-input-group button:hover {
+            transform: scale(1.05);
+        }
+    </style>
+
+    <!-- 헤더 -->
+    <div class="header">
+        <div class="header-left">
+            <h1><i class="fas fa-rocket"></i> AZS 팀 플래너</h1>
+            <div class="week-selector">
+                <button onclick="prevWeek()"><i class="fas fa-chevron-left"></i></button>
+                <span id="weekDisplay">2026년 7월 4주차 (7/21 ~ 7/25)</span>
+                <button onclick="nextWeek()"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="connection-status" id="connectionStatus">
+                <span class="connection-dot"></span>
+                <span>오프라인</span>
+            </div>
+            <div class="online-count" id="onlineCount">
+                <i class="fas fa-users"></i> <span>0</span>명 접속
+            </div>
+            <button onclick="logout()" style="background: rgba(255,255,255,0.15); border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;" title="로그아웃">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 탭 네비게이션 -->
+    <div class="tab-nav">
+        <button class="tab-btn active" data-tab="tasks">
+            <i class="fas fa-tasks"></i> 업무관리
+        </button>
+        <button class="tab-btn" data-tab="issues">
+            <i class="fas fa-exclamation-circle"></i> ESHG 이슈
+        </button>
+        <button class="tab-btn" data-tab="kpi">
+            <i class="fas fa-chart-line"></i> KPI 현황
+        </button>
+        <button class="tab-btn" data-tab="calendar">
+            <i class="fas fa-calendar-alt"></i> 캘린더
+        </button>
+        <button class="tab-btn" data-tab="history">
+            <i class="fas fa-history"></i> 과거이력
+        </button>
+        <button class="tab-btn" data-tab="omok">
+            <i class="fas fa-circle"></i> 오목
+        </button>
+        <button class="tab-btn" data-tab="chess">
+            <i class="fas fa-chess"></i> 체스
+        </button>
+        <button class="tab-btn" data-tab="yield">
+            <i class="fas fa-industry"></i> 공장수율
+        </button>
+    </div>
+
+    <div class="content-wrapper">
+        <!-- ========== 업무관리 탭 ========== -->
+        <div class="tab-content active" id="tab-tasks">
+            <div class="section-header">
+                <h2><i class="fas fa-clipboard-list"></i> 주간 업무 관리</h2>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="archiveWeek()">
+                        <i class="fas fa-archive"></i> 주간 마감
+                    </button>
+                </div>
+            </div>
+
+            <div class="weekly-grid" id="weeklyGrid">
+                <!-- JavaScript로 생성 -->
+            </div>
+
+            <!-- 업무 추가 폼 -->
+            <div class="add-task-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>담당자</label>
+                        <select id="newTaskAssignee">
+                            <option value="장찬호">장찬호</option>
+                            <option value="정문세">정문세</option>
+                            <option value="김원근">김원근</option>
+                            <option value="권병진">권병진</option>
+                            <option value="고귀한">고귀한</option>
+                            <option value="박규태">박규태</option>
+                            <option value="최다영">최다영</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>업무 내용</label>
+                        <input type="text" id="newTaskTitle" placeholder="업무 내용을 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <label>우선순위</label>
+                        <select id="newTaskPriority">
+                            <option value="high">높음 🔴</option>
+                            <option value="medium" selected>중간 🟡</option>
+                            <option value="low">낮음 🟢</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>요일</label>
+                        <select id="newTaskDay">
+                            <option value="-1">📋 할 일</option>
+                            <option value="0">월요일</option>
+                            <option value="1">화요일</option>
+                            <option value="2">수요일</option>
+                            <option value="3">목요일</option>
+                            <option value="4">금요일</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="addTask()" style="margin-top: 20px;">
+                        <i class="fas fa-plus"></i> 추가
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== ESHG 이슈 탭 ========== -->
+        <div class="tab-content" id="tab-issues">
+            <div class="section-header">
+                <h2><i class="fas fa-exclamation-circle"></i> ESHG 이슈 사항</h2>
+                <button class="btn btn-primary" onclick="toggleIssueForm()">
+                    <i class="fas fa-plus"></i> 이슈 추가
+                </button>
+            </div>
+
+            <!-- 이슈 추가 폼 -->
+            <div class="issue-form" id="issueForm" style="display: none;">
+                <div class="issue-form-grid">
+                    <div class="form-group">
+                        <label>구분</label>
+                        <select id="newIssueCategory">
+                            <option value="TS">TS</option>
+                            <option value="어깨선">어깨선</option>
+                            <option value="표면">표면</option>
+                            <option value="탈리">탈리</option>
+                            <option value="얼라인">얼라인</option>
+                            <option value="비전">비전</option>
+                            <option value="금형">금형</option>
+                            <option value="탭이슈">탭이슈</option>
+                            <option value="타발유">타발유</option>
+                            <option value="기타">기타</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>진행상태</label>
+                        <select id="newIssueStatus">
+                            <option value="waiting">대기</option>
+                            <option value="doing">진행중</option>
+                            <option value="done">완료</option>
+                            <option value="unresolved">미해결</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>이슈 사항</label>
+                        <textarea id="newIssueContent" placeholder="이슈 내용을 입력하세요"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>논의 결과</label>
+                        <textarea id="newIssueDiscussion" placeholder="논의 결과를 입력하세요"></textarea>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="addIssue()">
+                        <i class="fas fa-check"></i> 저장
+                    </button>
+                    <button class="btn btn-secondary" onclick="toggleIssueForm()">
+                        <i class="fas fa-times"></i> 취소
+                    </button>
+                </div>
+            </div>
+
+            <div class="issue-list" id="issueList">
+                <!-- JavaScript로 생성 -->
+            </div>
+        </div>
+
+        <!-- ========== KPI 현황 탭 ========== -->
+        <div class="tab-content" id="tab-kpi">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-line"></i> 팀 KPI 현황</h2>
+                <button class="btn btn-primary" onclick="addKpiRow()">
+                    <i class="fas fa-plus"></i> KPI 항목 추가
+                </button>
+            </div>
+
+            <div class="kpi-table-container">
+                <table class="kpi-table" id="kpiTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 100px;">평가항목</th>
+                            <th style="width: 150px;">목표명</th>
+                            <th style="width: 100px;">평가기준</th>
+                            <th style="width: 150px;">세부사항</th>
+                            <th style="width: 80px;">실적</th>
+                            <th class="member-col">장찬호</th>
+                            <th class="member-col">정문세</th>
+                            <th class="member-col">김원근</th>
+                            <th class="member-col">권병진</th>
+                            <th class="member-col">고귀한</th>
+                            <th class="member-col">박규태</th>
+                            <th class="member-col">최다영</th>
+                            <th style="width: 50px;">삭제</th>
+                        </tr>
+                    </thead>
+                    <tbody id="kpiTableBody">
+                        <!-- JavaScript로 생성 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ========== 캘린더 탭 ========== -->
+        <div class="tab-content" id="tab-calendar">
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="calendar-title" id="calendarTitle">2026년 7월</div>
+                    <div class="calendar-nav">
+                        <button onclick="prevMonth()"><i class="fas fa-chevron-left"></i></button>
+                        <button onclick="goToday()">오늘</button>
+                        <button onclick="nextMonth()"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div class="calendar-weekdays">
+                    <div class="calendar-weekday weekend">일</div>
+                    <div class="calendar-weekday">월</div>
+                    <div class="calendar-weekday">화</div>
+                    <div class="calendar-weekday">수</div>
+                    <div class="calendar-weekday">목</div>
+                    <div class="calendar-weekday">금</div>
+                    <div class="calendar-weekday weekend">토</div>
+                </div>
+                <div class="calendar-days" id="calendarDays">
+                    <!-- JavaScript로 생성 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 과거이력 탭 ========== -->
+        <div class="tab-content" id="tab-history">
+            <div class="section-header">
+                <h2><i class="fas fa-history"></i> 과거 주간 이력</h2>
+            </div>
+            <div id="historyContainer">
+                <!-- JavaScript로 생성 -->
+            </div>
+        </div>
+
+        <!-- ========== 오목 탭 ========== -->
+        <div class="tab-content" id="tab-omok">
+            <div class="section-header">
+                <h2><i class="fas fa-circle"></i> 실시간 오목 대전</h2>
+                <button class="btn btn-primary" onclick="resetOmokGame()">
+                    <i class="fas fa-redo"></i> 새 게임
+                </button>
+            </div>
+
+            <div class="game-container">
+                <div class="game-board-wrapper">
+                    <div id="omokBoard"></div>
+                </div>
+
+                <div class="game-info">
+                    <div class="game-status">
+                        <h3><i class="fas fa-gamepad"></i> 게임 상태</h3>
+                        <div id="winnerBanner"></div>
+                        <p>내 돌 선택:</p>
+                        <div class="player-select">
+                            <button class="player-btn black-stone" onclick="selectMyStone('black')" id="btnBlack">흑돌</button>
+                            <button class="player-btn white-stone" onclick="selectMyStone('white')" id="btnWhite">백돌</button>
+                        </div>
+                        <div class="current-turn" id="currentTurn">
+                            게임 대기 중...
+                        </div>
+                        <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 10px;">
+                            ※ 흑돌이 먼저 시작합니다<br>
+                            ※ 5개를 연속으로 놓으면 승리!
+                        </p>
+                    </div>
+
+                    <div class="game-log">
+                        <h3><i class="fas fa-list"></i> 게임 로그</h3>
+                        <div id="gameLog">
+                            <div class="log-entry">게임을 시작하세요!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 실시간 채팅 -->
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h3><i class="fas fa-comments"></i> 실시간 채팅</h3>
+                    <div class="nickname-input">
+                        <span>닉네임:</span>
+                        <input type="text" id="chatNickname" placeholder="닉네임" maxlength="10">
+                    </div>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-message">
+                        <div class="sender">시스템</div>
+                        <div class="text">환영합니다! 채팅을 시작하세요.</div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="메시지를 입력하세요..." maxlength="200" onkeypress="if(event.key==='Enter') sendChatMessage()">
+                    <button onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i> 전송</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 체스 탭 ========== -->
+        <div class="tab-content" id="tab-chess">
+            <div class="section-header">
+                <h2><i class="fas fa-chess"></i> 실시간 체스 대전</h2>
+                <button class="btn btn-primary" onclick="resetChessGame()">
+                    <i class="fas fa-redo"></i> 새 게임
+                </button>
+            </div>
+
+            <div class="game-container">
+                <div class="game-board-wrapper">
+                    <div id="chessBoard"></div>
+                </div>
+
+                <div class="game-info">
+                    <div class="game-status">
+                        <h3><i class="fas fa-chess-king"></i> 게임 상태</h3>
+                        <div id="chessWinnerBanner"></div>
+                        <div id="chessCheckWarning"></div>
+                        <p>내 진영 선택:</p>
+                        <div class="player-select">
+                            <button class="player-btn" onclick="selectChessSide('white')" id="chessBtnWhite">⚪ 백</button>
+                            <button class="player-btn" onclick="selectChessSide('black')" id="chessBtnBlack">⚫ 흑</button>
+                        </div>
+                        <div class="current-turn" id="chessCurrentTurn">
+                            백 차례 (White)
+                        </div>
+                        <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 10px;">
+                            ※ 백이 먼저 시작합니다<br>
+                            ※ 말을 클릭하고 이동할 곳을 클릭하세요
+                        </p>
+                    </div>
+
+                    <div class="captured-pieces">
+                        <h4>잡힌 말 (백)</h4>
+                        <div class="captured-list" id="capturedWhite"></div>
+                    </div>
+
+                    <div class="captured-pieces">
+                        <h4>잡힌 말 (흑)</h4>
+                        <div class="captured-list" id="capturedBlack"></div>
+                    </div>
+
+                    <div class="game-log" style="margin-top: 15px;">
+                        <h3><i class="fas fa-list"></i> 기보</h3>
+                        <div id="chessGameLog">
+                            <div class="log-entry">게임을 시작하세요!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 공장수율 탭 ========== -->
+        <div class="tab-content" id="tab-yield">
+            <div class="section-header">
+                <h2><i class="fas fa-industry"></i> 공장별 수율 현황</h2>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span id="yieldLastUpdate" style="font-size: 12px; color: rgba(255,255,255,0.6);">최종 업데이트: -</span>
+                    <button class="btn btn-primary" onclick="refreshYieldData()">
+                        <i class="fas fa-sync-alt"></i> 새로고침
+                    </button>
+                </div>
+            </div>
+
+            <div class="yield-container" style="padding: 20px;">
+                <table class="yield-table" style="width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden;">
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <th style="padding: 15px; text-align: left; font-weight: 600;">공장</th>
+                            <th style="padding: 15px; text-align: center; font-weight: 600;">수율 (%)</th>
+                            <th style="padding: 15px; text-align: left; font-weight: 600;">주요 불량 원인 (Top 3)</th>
+                            <th style="padding: 15px; text-align: center; font-weight: 600;">업데이트</th>
+                        </tr>
+                    </thead>
+                    <tbody id="yieldTableBody">
+                        <tr>
+                            <td colspan="4" style="padding: 30px; text-align: center; color: rgba(255,255,255,0.5);">
+                                <i class="fas fa-spinner fa-spin"></i> 데이터 로딩 중...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase 연결 바 -->
+    <div class="firebase-bar">
+        <input type="text" id="firebaseConfig" placeholder="Firebase 설정을 붙여넣으세요...">
+        <button onclick="connectFirebase()"><i class="fas fa-plug"></i> 연결</button>
+    </div>
+
+    <script>
+        // =====================================================
+        // 전역 변수
+        // =====================================================
+        const TEAM_MEMBERS = ['장찬호', '정문세', '김원근', '권병진', '고귀한', '박규태', '최다영'];
+        const DAYS = ['월', '화', '수', '목', '금'];
+        
+        let db = null;
+        let isConnected = false;
+        let currentWeekStart = getWeekStart(new Date());
+        let currentMonth = new Date();
+        
+        let tasks = [];
+        let issues = [];
+        let kpiData = [];
+        let historyData = [];
+
+        // =====================================================
+        // 로그인 / 비밀번호 확인
+        // =====================================================
+        // ⚠️ 팀 비밀번호 설정 (원하는 값으로 변경하세요)
+        const TEAM_PASSWORD = "azs2026";  // 이 비밀번호를 변경하세요!
+        
+        function checkPassword() {
+            const input = document.getElementById('teamPassword').value;
+            const error = document.getElementById('loginError');
+            
+            if (input === TEAM_PASSWORD) {
+                // 로그인 성공
+                document.getElementById('loginOverlay').classList.add('hidden');
+                localStorage.setItem('azs_logged_in', 'true');
+                localStorage.setItem('azs_login_time', Date.now().toString());
+                error.style.display = 'none';
+            } else {
+                // 로그인 실패
+                error.style.display = 'block';
+                document.getElementById('teamPassword').value = '';
+                document.getElementById('teamPassword').focus();
+            }
+        }
+        
+        function checkLoginStatus() {
+            const loggedIn = localStorage.getItem('azs_logged_in');
+            const loginTime = parseInt(localStorage.getItem('azs_login_time') || '0');
+            const now = Date.now();
+            const oneDay = 24 * 60 * 60 * 1000; // 24시간
+            
+            // 24시간 이내에 로그인했으면 자동 진입
+            if (loggedIn === 'true' && (now - loginTime) < oneDay) {
+                document.getElementById('loginOverlay').classList.add('hidden');
+                return true;
+            }
+            
+            // 로그인 필요
+            localStorage.removeItem('azs_logged_in');
+            return false;
+        }
+        
+        function logout() {
+            localStorage.removeItem('azs_logged_in');
+            localStorage.removeItem('azs_login_time');
+            document.getElementById('loginOverlay').classList.remove('hidden');
+            document.getElementById('teamPassword').value = '';
+        }
+
+        // =====================================================
+        // 초기화
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // 로그인 상태 확인
+            checkLoginStatus();
+            
+            initTabs();
+            loadLocalData();
+            renderAll();
+            
+            // 저장된 Firebase 설정이 있으면 자동 연결
+            autoConnectFirebase();
+        });
+
+        function renderAll() {
+            renderWeeklyGrid();
+            renderIssues();
+            renderKpiTable();
+            renderCalendar();
+            renderHistory();
+        }
+
+        // =====================================================
+        // 탭 시스템
+        // =====================================================
+        function initTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabId = this.dataset.tab;
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById('tab-' + tabId).classList.add('active');
+                });
+            });
+        }
+
+        // =====================================================
+        // 주간 계산
+        // =====================================================
+        function getWeekStart(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(d.setDate(diff));
+        }
+
+        function formatDate(date) {
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+        }
+
+        function getWeekDates() {
+            const dates = [];
+            for (let i = 0; i < 5; i++) {
+                const d = new Date(currentWeekStart);
+                d.setDate(d.getDate() + i);
+                dates.push(d);
+            }
+            return dates;
+        }
+
+        function getWeekKey(date) {
+            const d = new Date(date);
+            return `${d.getFullYear()}-W${Math.ceil(d.getDate() / 7)}-${d.getMonth() + 1}`;
+        }
+
+        function updateWeekDisplay() {
+            const dates = getWeekDates();
+            const year = dates[0].getFullYear();
+            const month = dates[0].getMonth() + 1;
+            const weekNum = Math.ceil(dates[0].getDate() / 7);
+            document.getElementById('weekDisplay').textContent = 
+                `${year}년 ${month}월 ${weekNum}주차 (${formatDate(dates[0])} ~ ${formatDate(dates[4])})`;
+        }
+
+        function prevWeek() {
+            currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+            renderWeeklyGrid();
+        }
+
+        function nextWeek() {
+            currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+            renderWeeklyGrid();
+        }
+
+        // =====================================================
+        // 업무관리
+        // =====================================================
+        function renderWeeklyGrid() {
+            updateWeekDisplay();
+            const grid = document.getElementById('weeklyGrid');
+            const dates = getWeekDates();
+            const today = new Date();
+            const weekKey = getWeekKey(currentWeekStart);
+            
+            const backlogTasks = tasks.filter(t => t.weekKey === weekKey && t.day === -1);
+            
+            let html = `
+                <div class="task-backlog">
+                    <div class="backlog-header">
+                        <i class="fas fa-inbox"></i> 할 일 목록
+                        <span class="task-count">${backlogTasks.length}</span>
+                    </div>
+                    <div class="task-list" data-day="-1" ondrop="drop(event, -1)" ondragover="allowDrop(event)">
+                        ${backlogTasks.map(t => renderTaskCard(t)).join('')}
+                    </div>
+                </div>
+            `;
+
+            dates.forEach((date, index) => {
+                const isToday = date.toDateString() === today.toDateString();
+                const dayTasks = tasks.filter(t => t.weekKey === weekKey && t.day === index);
+                
+                html += `
+                    <div class="day-column ${isToday ? 'today' : ''}">
+                        <div class="day-header">
+                            <div class="day-name">${DAYS[index]}요일</div>
+                            <div class="day-date">${formatDate(date)}</div>
+                            ${isToday ? '<span class="today-badge">TODAY</span>' : ''}
+                        </div>
+                        <div class="task-list" data-day="${index}" ondrop="drop(event, ${index})" ondragover="allowDrop(event)">
+                            ${dayTasks.map(t => renderTaskCard(t)).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        function renderTaskCard(task) {
+            return `
+                <div class="task-card priority-${task.priority} ${task.completed ? 'completed' : ''}" 
+                     draggable="true" 
+                     ondragstart="drag(event, '${task.id}')"
+                     id="task-${task.id}">
+                    <div class="task-assignee">${task.assignee}</div>
+                    <div class="task-title">${task.title}</div>
+                    <div class="task-meta">
+                        <div class="task-checkbox ${task.completed ? 'checked' : ''}" 
+                             onclick="toggleTask('${task.id}')">
+                            ${task.completed ? '✓' : ''}
+                        </div>
+                        <span class="task-delete" onclick="deleteTask('${task.id}')">
+                            <i class="fas fa-trash"></i>
+                        </span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function addTask() {
+            const assignee = document.getElementById('newTaskAssignee').value;
+            const title = document.getElementById('newTaskTitle').value.trim();
+            const priority = document.getElementById('newTaskPriority').value;
+            const day = parseInt(document.getElementById('newTaskDay').value);
+
+            if (!title) {
+                alert('업무 내용을 입력해주세요.');
+                return;
+            }
+
+            const task = {
+                id: Date.now().toString(),
+                assignee,
+                title,
+                priority,
+                day,
+                completed: false,
+                weekKey: getWeekKey(currentWeekStart),
+                createdAt: new Date().toISOString()
+            };
+
+            tasks.push(task);
+            saveTasks();
+            renderWeeklyGrid();
+            renderCalendar();
+            
+            document.getElementById('newTaskTitle').value = '';
+        }
+
+        function toggleTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks();
+                renderWeeklyGrid();
+                renderCalendar();
+            }
+        }
+
+        function deleteTask(id) {
+            if (confirm('이 업무를 삭제하시겠습니까?')) {
+                tasks = tasks.filter(t => t.id !== id);
+                saveTasks();
+                renderWeeklyGrid();
+                renderCalendar();
+            }
+        }
+
+        // 드래그 앤 드롭
+        function allowDrop(e) {
+            e.preventDefault();
+        }
+
+        function drag(e, taskId) {
+            e.dataTransfer.setData('taskId', taskId);
+        }
+
+        function drop(e, day) {
+            e.preventDefault();
+            const taskId = e.dataTransfer.getData('taskId');
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.day = day;
+                saveTasks();
+                renderWeeklyGrid();
+            }
+        }
+
+        // =====================================================
+        // ESHG 이슈
+        // =====================================================
+        function toggleIssueForm() {
+            const form = document.getElementById('issueForm');
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+                // 폼 초기화
+                document.getElementById('newIssueCategory').selectedIndex = 0;
+                document.getElementById('newIssueStatus').selectedIndex = 0;
+                document.getElementById('newIssueContent').value = '';
+                document.getElementById('newIssueDiscussion').value = '';
+            }
+        }
+
+        function renderIssues() {
+            const container = document.getElementById('issueList');
+            
+            if (issues.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-check"></i>
+                        <p>등록된 이슈가 없습니다.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = issues.map(issue => `
+                <div class="issue-card status-${issue.status}">
+                    <div class="issue-header">
+                        <div class="issue-category">
+                            <span class="issue-badge">${issue.category}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <select class="issue-status status-${issue.status}" 
+                                    onchange="updateIssueStatus('${issue.id}', this.value)"
+                                    style="background: transparent; border: none; color: inherit; cursor: pointer;">
+                                <option value="waiting" ${issue.status === 'waiting' ? 'selected' : ''}>대기</option>
+                                <option value="doing" ${issue.status === 'doing' ? 'selected' : ''}>진행중</option>
+                                <option value="done" ${issue.status === 'done' ? 'selected' : ''}>완료</option>
+                                <option value="unresolved" ${issue.status === 'unresolved' ? 'selected' : ''}>미해결</option>
+                            </select>
+                            <button class="btn btn-danger" onclick="deleteIssue('${issue.id}')" style="padding: 5px 10px;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="issue-content">
+                        <div class="issue-field">
+                            <div class="issue-field-label">이슈 사항</div>
+                            <div class="issue-field-value">${issue.content}</div>
+                        </div>
+                        <div class="issue-field">
+                            <div class="issue-field-label">논의 결과</div>
+                            <div class="issue-field-value">${issue.discussion || '-'}</div>
+                        </div>
+                    </div>
+                    <div class="issue-footer">
+                        <span>등록일: ${new Date(issue.createdAt).toLocaleDateString()}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addIssue() {
+            const category = document.getElementById('newIssueCategory').value;
+            const status = document.getElementById('newIssueStatus').value;
+            const content = document.getElementById('newIssueContent').value.trim();
+            const discussion = document.getElementById('newIssueDiscussion').value.trim();
+
+            if (!content) {
+                alert('이슈 내용을 입력해주세요.');
+                return;
+            }
+
+            const issue = {
+                id: Date.now().toString(),
+                category,
+                status,
+                content,
+                discussion,
+                createdAt: new Date().toISOString()
+            };
+
+            issues.push(issue);
+            saveIssues();
+            renderIssues();
+            
+            // 폼 숨기고 초기화
+            document.getElementById('issueForm').style.display = 'none';
+            document.getElementById('newIssueCategory').selectedIndex = 0;
+            document.getElementById('newIssueStatus').selectedIndex = 0;
+            document.getElementById('newIssueContent').value = '';
+            document.getElementById('newIssueDiscussion').value = '';
+        }
+
+        function updateIssueStatus(id, status) {
+            const issue = issues.find(i => i.id === id);
+            if (issue) {
+                issue.status = status;
+                saveIssues();
+                renderIssues();
+            }
+        }
+
+        function deleteIssue(id) {
+            if (confirm('이 이슈를 삭제하시겠습니까?')) {
+                issues = issues.filter(i => i.id !== id);
+                saveIssues();
+                renderIssues();
+            }
+        }
+
+        // =====================================================
+        // KPI 현황
+        // =====================================================
+        function renderKpiTable() {
+            const tbody = document.getElementById('kpiTableBody');
+            
+            if (kpiData.length === 0) {
+                kpiData.push(createEmptyKpiRow());
+            }
+
+            tbody.innerHTML = kpiData.map((row, idx) => `
+                <tr>
+                    <td><input class="kpi-input text-left" value="${row.category || ''}" onchange="updateKpi(${idx}, 'category', this.value)"></td>
+                    <td><input class="kpi-input text-left" value="${row.target || ''}" onchange="updateKpi(${idx}, 'target', this.value)"></td>
+                    <td><input class="kpi-input" value="${row.criteria || ''}" onchange="updateKpi(${idx}, 'criteria', this.value)"></td>
+                    <td><input class="kpi-input text-left" value="${row.detail || ''}" onchange="updateKpi(${idx}, 'detail', this.value)"></td>
+                    <td><input class="kpi-input" value="${row.result || ''}" onchange="updateKpi(${idx}, 'result', this.value)"></td>
+                    ${TEAM_MEMBERS.map(member => `
+                        <td><input class="kpi-input" value="${row.members?.[member] || ''}" onchange="updateKpiMember(${idx}, '${member}', this.value)"></td>
+                    `).join('')}
+                    <td>
+                        <button class="kpi-delete-btn" onclick="deleteKpiRow(${idx})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function createEmptyKpiRow() {
+            return {
+                id: Date.now().toString(),
+                category: '항목',
+                target: '목표명',
+                criteria: '기준',
+                detail: '세부사항',
+                result: '0',
+                members: {}
+            };
+        }
+
+        function addKpiRow() {
+            kpiData.push(createEmptyKpiRow());
+            saveKpiData();
+            renderKpiTable();
+        }
+
+        function updateKpi(idx, field, value) {
+            kpiData[idx][field] = value;
+            saveKpiData();
+        }
+
+        function updateKpiMember(idx, member, value) {
+            if (!kpiData[idx].members) kpiData[idx].members = {};
+            kpiData[idx].members[member] = value;
+            saveKpiData();
+        }
+
+        function deleteKpiRow(idx) {
+            if (kpiData.length === 1) {
+                alert('최소 1개의 항목이 필요합니다.');
+                return;
+            }
+            kpiData.splice(idx, 1);
+            saveKpiData();
+            renderKpiTable();
+        }
+
+        // =====================================================
+        // 캘린더
+        // =====================================================
+        function renderCalendar() {
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth();
+            
+            document.getElementById('calendarTitle').textContent = `${year}년 ${month + 1}월`;
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDay = firstDay.getDay();
+            const totalDays = lastDay.getDate();
+            
+            const container = document.getElementById('calendarDays');
+            let html = '';
+            const today = new Date();
+            
+            const prevMonth = new Date(year, month, 0);
+            for (let i = startDay - 1; i >= 0; i--) {
+                html += `<div class="calendar-day other-month">
+                    <div class="calendar-day-number">${prevMonth.getDate() - i}</div>
+                </div>`;
+            }
+            
+            for (let day = 1; day <= totalDays; day++) {
+                const date = new Date(year, month, day);
+                const isToday = date.toDateString() === today.toDateString();
+                const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                
+                const weekStart = getWeekStart(date);
+                const weekKey = getWeekKey(weekStart);
+                const dayOfWeek = date.getDay() - 1;
+                
+                const dayTasks = tasks.filter(t => t.weekKey === weekKey && t.day === dayOfWeek);
+                const completedCount = dayTasks.filter(t => t.completed).length;
+                const totalCount = dayTasks.length;
+                
+                html += `
+                    <div class="calendar-day ${isToday ? 'today' : ''} ${isWeekend ? 'weekend' : ''}">
+                        <div class="calendar-day-number">${day}</div>
+                        ${totalCount > 0 ? `
+                            <div class="calendar-task-count ${completedCount === totalCount ? 'all-done' : ''}">
+                                ✓ ${completedCount}/${totalCount}건
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+            
+            const remaining = 42 - (startDay + totalDays);
+            for (let i = 1; i <= remaining; i++) {
+                html += `<div class="calendar-day other-month">
+                    <div class="calendar-day-number">${i}</div>
+                </div>`;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function prevMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function goToday() {
+            currentMonth = new Date();
+            renderCalendar();
+        }
+
+        // =====================================================
+        // 과거 이력
+        // =====================================================
+        function archiveWeek() {
+            const weekKey = getWeekKey(currentWeekStart);
+            const weekTasks = tasks.filter(t => t.weekKey === weekKey);
+            
+            if (weekTasks.length === 0) {
+                alert('이번 주에 업무가 없습니다.');
+                return;
+            }
+
+            if (!confirm('이번 주 업무를 마감하고 과거이력으로 이동하시겠습니까?')) {
+                return;
+            }
+
+            historyData.push({
+                weekKey,
+                weekDisplay: document.getElementById('weekDisplay').textContent,
+                tasks: [...weekTasks],
+                archivedAt: new Date().toISOString()
+            });
+
+            tasks = tasks.filter(t => t.weekKey !== weekKey);
+            
+            saveHistory();
+            saveTasks();
+            renderWeeklyGrid();
+            renderHistory();
+            renderCalendar();
+            
+            alert('주간 업무가 과거이력으로 이동되었습니다.');
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyContainer');
+            
+            if (historyData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>과거 이력이 없습니다.</p>
+                        <p style="font-size: 13px;">주간 마감 시 이곳에 기록됩니다.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = historyData.slice().reverse().map((week, idx) => {
+                const total = week.tasks.length;
+                const done = week.tasks.filter(t => t.completed).length;
+                const rate = total > 0 ? Math.round((done / total) * 100) : 0;
+
+                return `
+                    <div class="history-week ${idx === 0 ? 'expanded' : ''}" onclick="toggleHistoryWeek(this)">
+                        <div class="history-week-header">
+                            <div class="history-week-title">
+                                <i class="fas fa-chevron-right"></i>
+                                ${week.weekDisplay}
+                            </div>
+                            <div class="history-week-stats">
+                                <span><i class="fas fa-tasks"></i> ${total}건</span>
+                                <span style="color: #00ff88;"><i class="fas fa-check"></i> ${done}건 완료</span>
+                                <span>완료율 ${rate}%</span>
+                            </div>
+                        </div>
+                        <div class="history-week-content">
+                            <div class="history-task-grid">
+                                ${DAYS.map((day, dayIdx) => {
+                                    const dayTasks = week.tasks.filter(t => t.day === dayIdx);
+                                    return `
+                                        <div class="history-day">
+                                            <div class="history-day-title">${day}요일</div>
+                                            ${dayTasks.length > 0 ? dayTasks.map(t => `
+                                                <div class="history-task ${t.completed ? 'done' : 'incomplete'}">
+                                                    ${t.assignee}: ${t.title} ${t.completed ? '✓' : '✗'}
+                                                </div>
+                                            `).join('') : '<div style="color: rgba(255,255,255,0.3); font-size: 12px;">없음</div>'}
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleHistoryWeek(el) {
+            el.classList.toggle('expanded');
+        }
+
+        // =====================================================
+        // 데이터 저장/로드
+        // =====================================================
+        function saveTasks() {
+            if (isConnected && db) {
+                db.ref('tasks').set(tasks);
+            } else {
+                localStorage.setItem('planner_tasks', JSON.stringify(tasks));
+            }
+        }
+
+        function saveIssues() {
+            if (isConnected && db) {
+                db.ref('issues').set(issues);
+            } else {
+                localStorage.setItem('planner_issues', JSON.stringify(issues));
+            }
+        }
+
+        function saveKpiData() {
+            if (isConnected && db) {
+                db.ref('kpiData').set(kpiData);
+            } else {
+                localStorage.setItem('planner_kpi', JSON.stringify(kpiData));
+            }
+        }
+
+        function saveHistory() {
+            if (isConnected && db) {
+                db.ref('history').set(historyData);
+            } else {
+                localStorage.setItem('planner_history', JSON.stringify(historyData));
+            }
+        }
+
+        function loadLocalData() {
+            try {
+                const savedTasks = localStorage.getItem('planner_tasks');
+                const savedIssues = localStorage.getItem('planner_issues');
+                const savedKpi = localStorage.getItem('planner_kpi');
+                const savedHistory = localStorage.getItem('planner_history');
+                
+                if (savedTasks) tasks = JSON.parse(savedTasks);
+                if (savedIssues) issues = JSON.parse(savedIssues);
+                if (savedKpi) kpiData = JSON.parse(savedKpi);
+                if (savedHistory) historyData = JSON.parse(savedHistory);
+            } catch (e) {
+                console.error('로컬 데이터 로드 실패:', e);
+            }
+        }
+
+        // =====================================================
+        // Firebase 연결
+        // =====================================================
+        
+        // 하드코딩된 Firebase 설정 (배포용)
+        const FIREBASE_CONFIG = {
+            apiKey: "AIzaSyCryRCloKRT4xzi-JHbEDLIZMcGbmgJPgg",
+            authDomain: "azs-planner.firebaseapp.com",
+            projectId: "azs-planner",
+            storageBucket: "azs-planner.firebasestorage.app",
+            messagingSenderId: "625607724832",
+            appId: "1:625607724832:web:d8405f175db39040299145",
+            measurementId: "G-1QS17MK4NH",
+            databaseURL: "https://azs-planner-default-rtdb.firebaseio.com"
+        };
+        
+        // 페이지 로드 시 자동 연결
+        function autoConnectFirebase() {
+            try {
+                initFirebaseWithConfig(FIREBASE_CONFIG);
+                const configInput = document.getElementById('firebaseConfig');
+                if (configInput) {
+                    configInput.value = '✅ 자동 연결됨';
+                    configInput.disabled = true;
+                }
+                console.log('Firebase 자동 연결 완료');
+            } catch (e) {
+                console.error('Firebase 자동 연결 실패:', e);
+            }
+        }
+        
+        function connectFirebase() {
+            let configText = document.getElementById('firebaseConfig').value.trim();
+            
+            // 이미 연결된 경우 스킵
+            if (configText === '✅ 자동 연결됨') {
+                alert('이미 Firebase에 연결되어 있습니다.');
+                return;
+            }
+            
+            try {
+                if (configText.includes('const ') || configText.includes('var ') || configText.includes('let ')) {
+                    const match = configText.match(/\{[\s\S]*\}/);
+                    if (match) configText = match[0];
+                }
+                
+                let config;
+                try {
+                    config = (new Function('return ' + configText))();
+                } catch (e) {
+                    let jsonText = configText.replace(/'/g, '"');
+                    jsonText = jsonText.replace(/^\s*(\w+)\s*:/gm, '"$1":');
+                    jsonText = jsonText.replace(/,(\s*[\}\]])/g, '$1');
+                    config = JSON.parse(jsonText);
+                }
+                
+                if (!config.databaseURL && config.projectId) {
+                    config.databaseURL = `https://${config.projectId}-default-rtdb.firebaseio.com`;
+                }
+
+                // Firebase 설정 저장 (새로고침 후 자동 연결용)
+                localStorage.setItem('firebase_config', JSON.stringify(config));
+                
+                initFirebaseWithConfig(config);
+                
+                document.getElementById('firebaseConfig').value = '✅ 연결 완료';
+                alert('Firebase 연결 성공!\n\n※ 새로고침해도 자동으로 연결됩니다.');
+            } catch (e) {
+                console.error('Firebase 연결 오류:', e);
+                alert('Firebase 연결 실패: ' + e.message + '\n\n※ Firebase Console에서 Realtime Database 규칙을 확인하세요.');
+            }
+        }
+        
+        function initFirebaseWithConfig(config) {
+            // Firebase 앱 중복 초기화 방지
+            if (!firebase.apps.length) {
+                firebase.initializeApp(config);
+            }
+            
+            db = firebase.database();
+
+            // 연결 상태 실시간 감지
+            db.ref('.info/connected').on('value', (snapshot) => {
+                if (snapshot.val() === true) {
+                    isConnected = true;
+                    document.getElementById('connectionStatus').classList.add('connected');
+                    document.getElementById('connectionStatus').innerHTML = `
+                        <span class="connection-dot"></span>
+                        <span>연결됨</span>
+                    `;
+                    console.log('Firebase 연결됨');
+                } else {
+                    document.getElementById('connectionStatus').classList.remove('connected');
+                    document.getElementById('connectionStatus').innerHTML = `
+                        <span class="connection-dot"></span>
+                        <span>연결 끊김</span>
+                    `;
+                    console.log('Firebase 연결 끊김');
+                }
+            });
+
+            setupDataListeners();
+            setupPresence();
+        }
+
+        function setupDataListeners() {
+            // 기존 리스너 제거 후 새로 설정
+            db.ref('tasks').off();
+            db.ref('issues').off();
+            db.ref('kpiData').off();
+            db.ref('history').off();
+            
+            db.ref('tasks').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    tasks = Array.isArray(data) ? data : Object.values(data);
+                } else {
+                    tasks = [];
+                }
+                renderWeeklyGrid();
+                renderCalendar();
+                console.log('Tasks 동기화됨:', tasks.length);
+            });
+
+            db.ref('issues').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    issues = Array.isArray(data) ? data : Object.values(data);
+                } else {
+                    issues = [];
+                }
+                renderIssues();
+                console.log('Issues 동기화됨:', issues.length);
+            });
+
+            db.ref('kpiData').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    kpiData = Array.isArray(data) ? data : Object.values(data);
+                } else {
+                    kpiData = [];
+                }
+                renderKpiTable();
+                console.log('KPI 동기화됨:', kpiData.length);
+            });
+
+            db.ref('history').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    historyData = Array.isArray(data) ? data : Object.values(data);
+                } else {
+                    historyData = [];
+                }
+                renderHistory();
+                console.log('History 동기화됨:', historyData.length);
+            });
+        }
+
+        function setupPresence() {
+            const myId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            const myRef = db.ref('presence/' + myId);
+            
+            // 연결 시 presence 설정
+            db.ref('.info/connected').on('value', (snapshot) => {
+                if (snapshot.val() === true) {
+                    myRef.set({ 
+                        online: true, 
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP 
+                    });
+                    myRef.onDisconnect().remove();
+                }
+            });
+
+            db.ref('presence').on('value', (snapshot) => {
+                const users = snapshot.val();
+                const count = users ? Object.keys(users).length : 0;
+                document.getElementById('onlineCount').innerHTML = 
+                    `<i class="fas fa-users"></i> <span>${count}</span>명 접속`;
+            });
+        }
+
+        // =====================================================
+        // 오목 게임
+        // =====================================================
+        const BOARD_SIZE = 15;
+        let omokBoard = [];
+        let currentPlayer = 'black'; // black 먼저
+        let myStone = null; // 내가 선택한 돌
+        let gameOver = false;
+        let gameLog = [];
+
+        // 보드 초기화
+        function initOmokBoard() {
+            omokBoard = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
+            gameOver = false;
+            gameLog = [];
+            currentPlayer = 'black';
+            renderOmokBoard();
+            updateTurnDisplay();
+            document.getElementById('winnerBanner').innerHTML = '';
+            document.getElementById('gameLog').innerHTML = '<div class="log-entry">게임을 시작하세요!</div>';
+        }
+
+        // 보드 렌더링
+        function renderOmokBoard() {
+            const boardEl = document.getElementById('omokBoard');
+            if (!boardEl) return;
+            
+            // 보드가 초기화되지 않았으면 초기화
+            if (omokBoard.length === 0) {
+                omokBoard = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
+            }
+            
+            boardEl.innerHTML = '';
+            
+            for (let y = 0; y < BOARD_SIZE; y++) {
+                for (let x = 0; x < BOARD_SIZE; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'board-cell';
+                    cell.dataset.x = x;
+                    cell.dataset.y = y;
+                    
+                    if (omokBoard[y] && omokBoard[y][x]) {
+                        const stone = document.createElement('div');
+                        stone.className = `stone ${omokBoard[y][x]}`;
+                        cell.appendChild(stone);
+                    } else if (!gameOver && myStone === currentPlayer) {
+                        // 호버 효과용 돌
+                        const hoverStone = document.createElement('div');
+                        hoverStone.className = `stone ${currentPlayer} hover-stone`;
+                        cell.appendChild(hoverStone);
+                    }
+                    
+                    cell.onclick = () => placeStone(x, y);
+                    boardEl.appendChild(cell);
+                }
+            }
+        }
+
+        // 내 돌 선택
+        function selectMyStone(color) {
+            myStone = color;
+            document.getElementById('btnBlack').classList.toggle('selected', color === 'black');
+            document.getElementById('btnWhite').classList.toggle('selected', color === 'white');
+            renderOmokBoard();
+            addGameLog(`나는 ${color === 'black' ? '흑돌' : '백돌'}을 선택했습니다.`);
+        }
+
+        // 돌 놓기
+        function placeStone(x, y) {
+            if (gameOver) return;
+            if (!myStone) {
+                alert('먼저 위에서 내 돌(흑돌/백돌)을 선택하세요!');
+                return;
+            }
+            if (myStone !== currentPlayer) {
+                alert(`지금은 ${currentPlayer === 'black' ? '흑돌' : '백돌'} 차례입니다!\n당신은 ${myStone === 'black' ? '흑돌' : '백돌'}입니다.`);
+                return;
+            }
+            if (!omokBoard[y] || omokBoard[y][x]) {
+                return; // 이미 돌이 있음
+            }
+
+            // 돌 놓기
+            omokBoard[y][x] = currentPlayer;
+            
+            const moveInfo = {
+                x, y,
+                player: currentPlayer,
+                timestamp: Date.now()
+            };
+            
+            addGameLog(`${currentPlayer === 'black' ? '흑돌' : '백돌'}: (${x+1}, ${y+1})`);
+
+            // 승리 체크
+            if (checkWin(x, y, currentPlayer)) {
+                gameOver = true;
+                const winner = currentPlayer === 'black' ? '흑돌' : '백돌';
+                document.getElementById('winnerBanner').innerHTML = 
+                    `<div class="winner-banner">🎉 ${winner} 승리! 🎉</div>`;
+                addGameLog(`🏆 ${winner}이(가) 승리했습니다!`);
+            } else {
+                // 턴 변경
+                currentPlayer = currentPlayer === 'black' ? 'white' : 'black';
+            }
+
+            // Firebase에 저장 (배열을 JSON 문자열로)
+            if (db) {
+                db.ref('omok').set({
+                    boardJson: JSON.stringify(omokBoard),
+                    currentPlayer: currentPlayer,
+                    gameOver: gameOver,
+                    lastMove: moveInfo,
+                    log: gameLog
+                });
+            }
+
+            renderOmokBoard();
+            updateTurnDisplay();
+        }
+
+        // 승리 체크
+        function checkWin(x, y, player) {
+            const directions = [
+                [1, 0],  // 가로
+                [0, 1],  // 세로
+                [1, 1],  // 대각선 \
+                [1, -1]  // 대각선 /
+            ];
+
+            for (const [dx, dy] of directions) {
+                let count = 1;
+                
+                // 정방향
+                for (let i = 1; i < 5; i++) {
+                    const nx = x + dx * i;
+                    const ny = y + dy * i;
+                    if (nx < 0 || nx >= BOARD_SIZE || ny < 0 || ny >= BOARD_SIZE) break;
+                    if (omokBoard[ny][nx] !== player) break;
+                    count++;
+                }
+                
+                // 역방향
+                for (let i = 1; i < 5; i++) {
+                    const nx = x - dx * i;
+                    const ny = y - dy * i;
+                    if (nx < 0 || nx >= BOARD_SIZE || ny < 0 || ny >= BOARD_SIZE) break;
+                    if (omokBoard[ny][nx] !== player) break;
+                    count++;
+                }
+
+                if (count >= 5) return true;
+            }
+            
+            return false;
+        }
+
+        // 턴 표시 업데이트
+        function updateTurnDisplay() {
+            const turnEl = document.getElementById('currentTurn');
+            if (!turnEl) return;
+            
+            if (gameOver) {
+                turnEl.className = 'current-turn';
+                turnEl.textContent = '게임 종료';
+            } else {
+                turnEl.className = `current-turn ${currentPlayer}`;
+                const turnText = currentPlayer === 'black' ? '⚫ 흑돌' : '⚪ 백돌';
+                let statusText = `${turnText} 차례`;
+                
+                if (myStone) {
+                    if (myStone === currentPlayer) {
+                        statusText += '<br><span style="color:#00ff88; font-size:18px;">👆 내 차례! 돌을 놓으세요</span>';
+                    } else {
+                        statusText += '<br><span style="color:#ff6b6b;">⏳ 상대방 차례...</span>';
+                    }
+                } else {
+                    statusText += '<br><span style="color:#ffd700;">⚠️ 먼저 돌을 선택하세요!</span>';
+                }
+                
+                turnEl.innerHTML = statusText;
+            }
+        }
+
+        // 게임 로그 추가
+        function addGameLog(message) {
+            gameLog.push({
+                time: new Date().toLocaleTimeString(),
+                message: message
+            });
+            
+            const logEl = document.getElementById('gameLog');
+            if (logEl) {
+                logEl.innerHTML = gameLog.slice(-20).map(log => 
+                    `<div class="log-entry"><span style="color:#888">[${log.time}]</span> ${log.message}</div>`
+                ).join('');
+                logEl.scrollTop = logEl.scrollHeight;
+            }
+        }
+
+        // 게임 리셋
+        function resetOmokGame() {
+            if (!confirm('새 게임을 시작하시겠습니까?')) return;
+            
+            initOmokBoard();
+            
+            if (db) {
+                db.ref('omok').set({
+                    boardJson: JSON.stringify(omokBoard),
+                    currentPlayer: 'black',
+                    gameOver: false,
+                    lastMove: null,
+                    log: [{time: new Date().toLocaleTimeString(), message: '새 게임이 시작되었습니다!'}]
+                });
+            }
+        }
+
+        // Firebase에서 오목 데이터 동기화
+        function setupOmokListener() {
+            if (!db) return;
+            
+            db.ref('omok').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    // JSON 문자열로 저장된 보드 복원
+                    if (data.boardJson) {
+                        try {
+                            omokBoard = JSON.parse(data.boardJson);
+                        } catch (e) {
+                            omokBoard = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
+                        }
+                    } else if (data.board) {
+                        // 기존 방식 호환
+                        omokBoard = restoreBoard(data.board);
+                    } else {
+                        omokBoard = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
+                    }
+                    
+                    currentPlayer = data.currentPlayer || 'black';
+                    gameOver = data.gameOver || false;
+                    gameLog = data.log || [];
+                    
+                    renderOmokBoard();
+                    updateTurnDisplay();
+                    
+                    // 로그 업데이트
+                    const logEl = document.getElementById('gameLog');
+                    if (logEl && gameLog.length > 0) {
+                        logEl.innerHTML = gameLog.slice(-20).map(log => 
+                            `<div class="log-entry"><span style="color:#888">[${log.time}]</span> ${log.message}</div>`
+                        ).join('');
+                        logEl.scrollTop = logEl.scrollHeight;
+                    }
+                    
+                    // 승자 배너
+                    if (gameOver && data.lastMove) {
+                        const winner = data.lastMove.player === 'black' ? '흑돌' : '백돌';
+                        document.getElementById('winnerBanner').innerHTML = 
+                            `<div class="winner-banner">🎉 ${winner} 승리! 🎉</div>`;
+                    }
+                }
+            });
+        }
+        
+        // Firebase에서 받은 보드 데이터 복원
+        function restoreBoard(data) {
+            const board = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
+            if (data) {
+                for (let y = 0; y < BOARD_SIZE; y++) {
+                    if (data[y]) {
+                        for (let x = 0; x < BOARD_SIZE; x++) {
+                            if (data[y][x]) {
+                                board[y][x] = data[y][x];
+                            }
+                        }
+                    }
+                }
+            }
+            return board;
+        }
+
+        // 초기화 시 오목 보드도 초기화
+        const originalRenderAll = renderAll;
+        renderAll = function() {
+            originalRenderAll();
+            initOmokBoard();
+        };
+
+        // Firebase 연결 후 오목/체스 리스너 설정
+        const originalSetupDataListeners = setupDataListeners;
+        setupDataListeners = function() {
+            originalSetupDataListeners();
+            setupOmokListener();
+            setupChessListener();
+            setupChatListener();
+            setupYieldListener();
+        };
+
+        // =====================================================
+        // 체스 게임
+        // =====================================================
+        const CHESS_PIECES = {
+            white: { king: '♔', queen: '♕', rook: '♖', bishop: '♗', knight: '♘', pawn: '♙' },
+            black: { king: '♚', queen: '♛', rook: '♜', bishop: '♝', knight: '♞', pawn: '♟' }
+        };
+
+        let chessBoard = [];
+        let chessCurrentPlayer = 'white';
+        let chessSelectedCell = null;
+        let chessValidMoves = [];
+        let myChessSide = null;
+        let chessGameOver = false;
+        let chessCapturedPieces = { white: [], black: [] };
+        let chessMoveHistory = [];
+        let chessIsInCheck = false;
+
+        function initChessBoard() {
+            chessBoard = [
+                [
+                    {type: 'rook', color: 'black'}, {type: 'knight', color: 'black'}, 
+                    {type: 'bishop', color: 'black'}, {type: 'queen', color: 'black'},
+                    {type: 'king', color: 'black'}, {type: 'bishop', color: 'black'}, 
+                    {type: 'knight', color: 'black'}, {type: 'rook', color: 'black'}
+                ],
+                Array(8).fill(null).map(() => ({type: 'pawn', color: 'black'})),
+                Array(8).fill(null),
+                Array(8).fill(null),
+                Array(8).fill(null),
+                Array(8).fill(null),
+                Array(8).fill(null).map(() => ({type: 'pawn', color: 'white'})),
+                [
+                    {type: 'rook', color: 'white'}, {type: 'knight', color: 'white'}, 
+                    {type: 'bishop', color: 'white'}, {type: 'queen', color: 'white'},
+                    {type: 'king', color: 'white'}, {type: 'bishop', color: 'white'}, 
+                    {type: 'knight', color: 'white'}, {type: 'rook', color: 'white'}
+                ]
+            ];
+            
+            chessCurrentPlayer = 'white';
+            chessSelectedCell = null;
+            chessValidMoves = [];
+            chessGameOver = false;
+            chessCapturedPieces = { white: [], black: [] };
+            chessMoveHistory = [];
+            chessIsInCheck = false;
+            
+            renderChessBoard();
+            updateChessDisplay();
+        }
+
+        function renderChessBoard() {
+            const boardEl = document.getElementById('chessBoard');
+            if (!boardEl) return;
+            boardEl.innerHTML = '';
+            
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const cell = document.createElement('div');
+                    const isLight = (row + col) % 2 === 0;
+                    cell.className = `chess-cell ${isLight ? 'light' : 'dark'}`;
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    
+                    const piece = chessBoard[row] && chessBoard[row][col];
+                    if (piece) {
+                        cell.textContent = CHESS_PIECES[piece.color][piece.type];
+                        cell.classList.add(piece.color === 'black' ? 'black-piece' : 'white-piece');
+                    }
+                    
+                    if (chessSelectedCell && chessSelectedCell.row === row && chessSelectedCell.col === col) {
+                        cell.classList.add('selected');
+                    }
+                    
+                    const isValidMove = chessValidMoves.some(m => m.row === row && m.col === col);
+                    if (isValidMove) {
+                        if (piece) {
+                            cell.classList.add('valid-capture');
+                        } else {
+                            cell.classList.add('valid-move');
+                        }
+                    }
+                    
+                    cell.onclick = () => handleChessCellClick(row, col);
+                    boardEl.appendChild(cell);
+                }
+            }
+        }
+
+        function handleChessCellClick(row, col) {
+            if (chessGameOver) return;
+            
+            if (myChessSide && myChessSide !== chessCurrentPlayer) {
+                alert(`지금은 ${chessCurrentPlayer === 'white' ? '백' : '흑'} 차례입니다!`);
+                return;
+            }
+            
+            const piece = chessBoard[row] && chessBoard[row][col];
+            
+            if (chessSelectedCell && chessValidMoves.some(m => m.row === row && m.col === col)) {
+                moveChessPiece(chessSelectedCell.row, chessSelectedCell.col, row, col);
+                chessSelectedCell = null;
+                chessValidMoves = [];
+                renderChessBoard();
+                return;
+            }
+            
+            if (piece && piece.color === chessCurrentPlayer) {
+                chessSelectedCell = { row, col };
+                chessValidMoves = getChessValidMoves(row, col);
+                renderChessBoard();
+                return;
+            }
+            
+            chessSelectedCell = null;
+            chessValidMoves = [];
+            renderChessBoard();
+        }
+
+        function moveChessPiece(fromRow, fromCol, toRow, toCol) {
+            const piece = chessBoard[fromRow][fromCol];
+            const targetPiece = chessBoard[toRow][toCol];
+            
+            if (targetPiece) {
+                chessCapturedPieces[targetPiece.color].push(targetPiece);
+            }
+            
+            chessBoard[toRow][toCol] = piece;
+            chessBoard[fromRow][fromCol] = null;
+            
+            // 폰 프로모션
+            if (piece.type === 'pawn') {
+                if ((piece.color === 'white' && toRow === 0) || (piece.color === 'black' && toRow === 7)) {
+                    chessBoard[toRow][toCol] = { type: 'queen', color: piece.color };
+                    addChessLog(`${piece.color === 'white' ? '백' : '흑'} 폰 → 퀸 승격!`);
+                }
+            }
+            
+            const colNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+            const pieceName = getChessPieceName(piece.type);
+            addChessLog(`${piece.color === 'white' ? '백' : '흑'}: ${pieceName} ${colNames[fromCol]}${8-fromRow} → ${colNames[toCol]}${8-toRow}`);
+            
+            chessCurrentPlayer = chessCurrentPlayer === 'white' ? 'black' : 'white';
+            chessIsInCheck = isChessKingInCheck(chessCurrentPlayer);
+            
+            if (isChessCheckmate(chessCurrentPlayer)) {
+                chessGameOver = true;
+                const winner = chessCurrentPlayer === 'white' ? '흑' : '백';
+                document.getElementById('chessWinnerBanner').innerHTML = 
+                    `<div class="winner-banner">🎉 체크메이트! ${winner} 승리! 🎉</div>`;
+                addChessLog(`🏆 체크메이트! ${winner} 승리!`);
+            }
+            
+            // Firebase 동기화
+            if (db) {
+                db.ref('chess').set({
+                    boardJson: JSON.stringify(chessBoard),
+                    currentPlayer: chessCurrentPlayer,
+                    gameOver: chessGameOver,
+                    capturedPieces: chessCapturedPieces,
+                    isInCheck: chessIsInCheck
+                });
+            }
+            
+            updateChessDisplay();
+        }
+
+        function getChessValidMoves(row, col) {
+            const piece = chessBoard[row] && chessBoard[row][col];
+            if (!piece) return [];
+            
+            let moves = [];
+            switch (piece.type) {
+                case 'pawn': moves = getChessPawnMoves(row, col, piece.color); break;
+                case 'rook': moves = getChessRookMoves(row, col, piece.color); break;
+                case 'knight': moves = getChessKnightMoves(row, col, piece.color); break;
+                case 'bishop': moves = getChessBishopMoves(row, col, piece.color); break;
+                case 'queen': moves = [...getChessRookMoves(row, col, piece.color), ...getChessBishopMoves(row, col, piece.color)]; break;
+                case 'king': moves = getChessKingMoves(row, col, piece.color); break;
+            }
+            
+            return moves.filter(move => !wouldChessBeInCheck(row, col, move.row, move.col, piece.color));
+        }
+
+        function getChessPawnMoves(row, col, color) {
+            const moves = [];
+            const dir = color === 'white' ? -1 : 1;
+            const startRow = color === 'white' ? 6 : 1;
+            
+            // 전진
+            if (isChessInBounds(row + dir, col) && chessBoard[row + dir] && !chessBoard[row + dir][col]) {
+                moves.push({ row: row + dir, col });
+                // 처음 2칸 이동
+                if (row === startRow && chessBoard[row + 2 * dir] && !chessBoard[row + 2 * dir][col]) {
+                    moves.push({ row: row + 2 * dir, col });
+                }
+            }
+            
+            // 대각선 공격
+            [-1, 1].forEach(dc => {
+                const newRow = row + dir, newCol = col + dc;
+                if (isChessInBounds(newRow, newCol) && chessBoard[newRow]) {
+                    const target = chessBoard[newRow][newCol];
+                    if (target && target.color !== color) {
+                        moves.push({ row: newRow, col: newCol });
+                    }
+                }
+            });
+            return moves;
+        }
+
+        function getChessRookMoves(row, col, color) {
+            const moves = [];
+            [[0, 1], [0, -1], [1, 0], [-1, 0]].forEach(([dr, dc]) => {
+                for (let i = 1; i < 8; i++) {
+                    const newRow = row + dr * i, newCol = col + dc * i;
+                    if (!isChessInBounds(newRow, newCol) || !chessBoard[newRow]) break;
+                    const target = chessBoard[newRow][newCol];
+                    if (!target) { moves.push({ row: newRow, col: newCol }); }
+                    else { if (target.color !== color) moves.push({ row: newRow, col: newCol }); break; }
+                }
+            });
+            return moves;
+        }
+
+        function getChessKnightMoves(row, col, color) {
+            const moves = [];
+            [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]].forEach(([dr, dc]) => {
+                const newRow = row + dr, newCol = col + dc;
+                if (isChessInBounds(newRow, newCol) && chessBoard[newRow]) {
+                    const target = chessBoard[newRow][newCol];
+                    if (!target || target.color !== color) moves.push({ row: newRow, col: newCol });
+                }
+            });
+            return moves;
+        }
+
+        function getChessBishopMoves(row, col, color) {
+            const moves = [];
+            [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(([dr, dc]) => {
+                for (let i = 1; i < 8; i++) {
+                    const newRow = row + dr * i, newCol = col + dc * i;
+                    if (!isChessInBounds(newRow, newCol) || !chessBoard[newRow]) break;
+                    const target = chessBoard[newRow][newCol];
+                    if (!target) { moves.push({ row: newRow, col: newCol }); }
+                    else { if (target.color !== color) moves.push({ row: newRow, col: newCol }); break; }
+                }
+            });
+            return moves;
+        }
+
+        function getChessKingMoves(row, col, color) {
+            const moves = [];
+            [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]].forEach(([dr, dc]) => {
+                const newRow = row + dr, newCol = col + dc;
+                if (isChessInBounds(newRow, newCol) && chessBoard[newRow]) {
+                    const target = chessBoard[newRow][newCol];
+                    if (!target || target.color !== color) moves.push({ row: newRow, col: newCol });
+                }
+            });
+            return moves;
+        }
+
+        function isChessInBounds(row, col) { return row >= 0 && row < 8 && col >= 0 && col < 8; }
+
+        function findChessKing(color) {
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const piece = chessBoard[row] && chessBoard[row][col];
+                    if (piece && piece.type === 'king' && piece.color === color) return { row, col };
+                }
+            }
+            return null;
+        }
+
+        function isChessKingInCheck(color) {
+            const kingPos = findChessKing(color);
+            if (!kingPos) return false;
+            const enemyColor = color === 'white' ? 'black' : 'white';
+            
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const piece = chessBoard[row] && chessBoard[row][col];
+                    if (piece && piece.color === enemyColor) {
+                        const attacks = getChessAttackMoves(row, col, piece);
+                        if (attacks.some(m => m.row === kingPos.row && m.col === kingPos.col)) return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function getChessAttackMoves(row, col, piece) {
+            switch (piece.type) {
+                case 'pawn':
+                    const dir = piece.color === 'white' ? -1 : 1;
+                    const attacks = [];
+                    if (isChessInBounds(row + dir, col - 1)) attacks.push({ row: row + dir, col: col - 1 });
+                    if (isChessInBounds(row + dir, col + 1)) attacks.push({ row: row + dir, col: col + 1 });
+                    return attacks;
+                case 'rook': return getChessRookMoves(row, col, piece.color);
+                case 'knight': return getChessKnightMoves(row, col, piece.color);
+                case 'bishop': return getChessBishopMoves(row, col, piece.color);
+                case 'queen': return [...getChessRookMoves(row, col, piece.color), ...getChessBishopMoves(row, col, piece.color)];
+                case 'king': return getChessKingMoves(row, col, piece.color);
+                default: return [];
+            }
+        }
+
+        function wouldChessBeInCheck(fromRow, fromCol, toRow, toCol, color) {
+            const originalPiece = chessBoard[toRow][toCol];
+            const movingPiece = chessBoard[fromRow][fromCol];
+            chessBoard[toRow][toCol] = movingPiece;
+            chessBoard[fromRow][fromCol] = null;
+            const inCheck = isChessKingInCheck(color);
+            chessBoard[fromRow][fromCol] = movingPiece;
+            chessBoard[toRow][toCol] = originalPiece;
+            return inCheck;
+        }
+
+        function isChessCheckmate(color) {
+            if (!isChessKingInCheck(color)) return false;
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const piece = chessBoard[row] && chessBoard[row][col];
+                    if (piece && piece.color === color) {
+                        if (getChessValidMoves(row, col).length > 0) return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        function updateChessDisplay() {
+            const turnEl = document.getElementById('chessCurrentTurn');
+            if (turnEl) {
+                turnEl.className = `current-turn ${chessCurrentPlayer === 'white' ? 'white' : 'black'}`;
+                turnEl.textContent = `${chessCurrentPlayer === 'white' ? '백' : '흑'} 차례 (${chessCurrentPlayer === 'white' ? 'White' : 'Black'})`;
+            }
+            
+            const checkEl = document.getElementById('chessCheckWarning');
+            if (checkEl) {
+                checkEl.innerHTML = (chessIsInCheck && !chessGameOver) ? '<div class="check-warning">⚠️ 체크!</div>' : '';
+            }
+            
+            const capturedWhiteEl = document.getElementById('capturedWhite');
+            const capturedBlackEl = document.getElementById('capturedBlack');
+            const whiteCaptures = chessCapturedPieces && Array.isArray(chessCapturedPieces.white) ? chessCapturedPieces.white : [];
+            const blackCaptures = chessCapturedPieces && Array.isArray(chessCapturedPieces.black) ? chessCapturedPieces.black : [];
+            if (capturedWhiteEl) capturedWhiteEl.textContent = whiteCaptures.map(p => CHESS_PIECES.white[p.type]).join('');
+            if (capturedBlackEl) capturedBlackEl.textContent = blackCaptures.map(p => CHESS_PIECES.black[p.type]).join('');
+        }
+
+        function addChessLog(text) {
+            const logEl = document.getElementById('chessGameLog');
+            if (!logEl) return;
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = text;
+            logEl.insertBefore(entry, logEl.firstChild);
+        }
+
+        function getChessPieceName(type) {
+            const names = { king: '킹', queen: '퀸', rook: '룩', bishop: '비숍', knight: '나이트', pawn: '폰' };
+            return names[type] || type;
+        }
+
+        function selectChessSide(side) {
+            myChessSide = side;
+            document.getElementById('chessBtnWhite').classList.toggle('selected', side === 'white');
+            document.getElementById('chessBtnBlack').classList.toggle('selected', side === 'black');
+            addChessLog(`나는 ${side === 'white' ? '백' : '흑'}을 선택했습니다.`);
+        }
+
+        function resetChessGame() {
+            const banner = document.getElementById('chessWinnerBanner');
+            const log = document.getElementById('chessGameLog');
+            if (banner) banner.innerHTML = '';
+            if (log) log.innerHTML = '<div class="log-entry">새 게임 시작!</div>';
+            initChessBoard();
+            
+            if (db) {
+                db.ref('chess').set({
+                    boardJson: JSON.stringify(chessBoard),
+                    currentPlayer: 'white',
+                    gameOver: false,
+                    capturedPieces: { white: [], black: [] },
+                    isInCheck: false
+                });
+            }
+        }
+
+        function setupChessListener() {
+            if (!db) return;
+            db.ref('chess').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.boardJson) {
+                    chessBoard = JSON.parse(data.boardJson);
+                    chessCurrentPlayer = data.currentPlayer || 'white';
+                    chessGameOver = data.gameOver || false;
+                    // Firebase에서 배열 안전 처리
+                    const cap = data.capturedPieces || {};
+                    chessCapturedPieces = {
+                        white: Array.isArray(cap.white) ? cap.white : [],
+                        black: Array.isArray(cap.black) ? cap.black : []
+                    };
+                    chessIsInCheck = data.isInCheck || false;
+                    renderChessBoard();
+                    updateChessDisplay();
+                }
+            });
+        }
+
+        // 체스 보드 초기화
+        const originalRenderAllWithOmok = renderAll;
+        renderAll = function() {
+            originalRenderAllWithOmok();
+            initChessBoard();
+        };
+
+        // =====================================================
+        // 실시간 채팅
+        // =====================================================
+        let chatMessages = [];
+        let myNickname = localStorage.getItem('chat_nickname') || '';
+        
+        // 초기화 시 닉네임 복원
+        document.addEventListener('DOMContentLoaded', function() {
+            const nicknameInput = document.getElementById('chatNickname');
+            if (nicknameInput && myNickname) {
+                nicknameInput.value = myNickname;
+            }
+        });
+        
+        // 채팅 메시지 전송
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const nicknameInput = document.getElementById('chatNickname');
+            
+            const message = input.value.trim();
+            const nickname = nicknameInput.value.trim() || '익명';
+            
+            if (!message) return;
+            
+            // 닉네임 저장
+            if (nickname !== myNickname) {
+                myNickname = nickname;
+                localStorage.setItem('chat_nickname', nickname);
+            }
+            
+            const chatData = {
+                id: Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                sender: nickname,
+                text: message,
+                timestamp: Date.now(),
+                time: new Date().toLocaleTimeString()
+            };
+            
+            // Firebase에 저장
+            if (db) {
+                db.ref('chat').push(chatData);
+            } else {
+                // 로컬 모드
+                chatMessages.push(chatData);
+                renderChatMessages();
+            }
+            
+            // 입력창 초기화
+            input.value = '';
+            input.focus();
+        }
+        
+        // 채팅 메시지 렌더링
+        function renderChatMessages() {
+            const container = document.getElementById('chatMessages');
+            if (!container) return;
+            
+            if (chatMessages.length === 0) {
+                container.innerHTML = `
+                    <div class="chat-message">
+                        <div class="sender">시스템</div>
+                        <div class="text">환영합니다! 채팅을 시작하세요.</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 최근 50개만 표시
+            const recentMessages = chatMessages.slice(-50);
+            
+            container.innerHTML = recentMessages.map(msg => {
+                const isMine = msg.sender === myNickname;
+                return `
+                    <div class="chat-message ${isMine ? 'mine' : ''}">
+                        <div class="sender">${msg.sender}</div>
+                        <div class="text">${escapeHtml(msg.text)}</div>
+                        <div class="time">${msg.time}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            // 스크롤을 맨 아래로
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // HTML 이스케이프
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ========== 공장 수율 데이터 함수 ==========
+        function setupYieldListener() {
+            if (!db) return;
+            
+            db.ref('yield_data').on('value', (snapshot) => {
+                const data = snapshot.val();
+                renderYieldTable(data);
+            });
+        }
+        
+        function refreshYieldData() {
+            if (!db) {
+                alert('Firebase에 먼저 연결해주세요.');
+                return;
+            }
+            
+            db.ref('yield_data').once('value', (snapshot) => {
+                const data = snapshot.val();
+                renderYieldTable(data);
+            });
+        }
+        
+        function renderYieldTable(data) {
+            const tbody = document.getElementById('yieldTableBody');
+            const lastUpdateEl = document.getElementById('yieldLastUpdate');
+            
+            if (!data) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="padding: 30px; text-align: center; color: rgba(255,255,255,0.5);">
+                            <i class="fas fa-database"></i> 데이터가 없습니다.<br>
+                            <small>Python 스크립트로 데이터를 업로드하세요.</small>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            let latestUpdate = '';
+            
+            // 수율 기준 정렬 (낮은 순)
+            const sortedFactories = Object.keys(data).sort((a, b) => {
+                return (data[a].yield_rate || 0) - (data[b].yield_rate || 0);
+            });
+            
+            for (const key of sortedFactories) {
+                const factory = data[key];
+                const yieldRate = factory.yield_rate || 0;
+                const defects = factory.top_defects || [];
+                const updatedAt = factory.updated_at || '-';
+                
+                // 수율에 따른 색상
+                let yieldColor = '#00ff88'; // 녹색 (좋음)
+                if (yieldRate < 95) yieldColor = '#ff6b6b'; // 빨강 (나쁨)
+                else if (yieldRate < 98) yieldColor = '#ffd93d'; // 노랑 (주의)
+                
+                // 불량 원인 배지
+                let defectBadges = defects.slice(0, 3).map((d, i) => {
+                    const colors = ['#ff6b6b', '#ffd93d', '#4ecdc4'];
+                    return `<span style="background: ${colors[i]}; color: #1a1a2e; padding: 3px 8px; border-radius: 12px; font-size: 11px; margin-right: 5px;">${i+1}. ${d}</span>`;
+                }).join('');
+                
+                if (!defectBadges) defectBadges = '<span style="color: rgba(255,255,255,0.4);">-</span>';
+                
+                html += `
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <td style="padding: 15px; font-weight: 600;">
+                            <i class="fas fa-building" style="margin-right: 8px; color: #667eea;"></i>
+                            ${factory.factory || key}
+                        </td>
+                        <td style="padding: 15px; text-align: center;">
+                            <span style="font-size: 1.3em; font-weight: 700; color: ${yieldColor};">
+                                ${yieldRate.toFixed(1)}%
+                            </span>
+                        </td>
+                        <td style="padding: 15px;">
+                            ${defectBadges}
+                        </td>
+                        <td style="padding: 15px; text-align: center; font-size: 11px; color: rgba(255,255,255,0.5);">
+                            ${updatedAt}
+                        </td>
+                    </tr>
+                `;
+                
+                if (updatedAt > latestUpdate) latestUpdate = updatedAt;
+            }
+            
+            tbody.innerHTML = html;
+            lastUpdateEl.textContent = `최종 업데이트: ${latestUpdate || '-'}`;
+        }
+        
+        // Firebase 채팅 리스너
+        function setupChatListener() {
+            if (!db) return;
+            
+            // 기존 데이터 삭제 후 새로 구독 (최근 50개만)
+            db.ref('chat').orderByChild('timestamp').limitToLast(50).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    chatMessages = Object.values(data).sort((a, b) => a.timestamp - b.timestamp);
+                } else {
+                    chatMessages = [];
+                }
+                renderChatMessages();
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>체스 테스트</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+            color: #fff;
+            padding: 30px;
+        }
+        h1 { margin-bottom: 20px; color: #00d4ff; }
+        
+        .game-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .chess-board-wrapper {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        #chessBoard {
+            display: grid;
+            grid-template-columns: repeat(8, 60px);
+            border: 3px solid #8b4513;
+            border-radius: 4px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        
+        .chess-cell {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+        }
+        
+        .chess-cell.light { background: #f0d9b5; }
+        .chess-cell.dark { background: #b58863; }
+        
+        .chess-cell.selected {
+            background: #7fc97f !important;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+        }
+        
+        .chess-cell.valid-move {
+            position: relative;
+        }
+        
+        .chess-cell.valid-move::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 150, 0, 0.5);
+            border-radius: 50%;
+        }
+        
+        .chess-cell.valid-capture {
+            background: rgba(255, 100, 100, 0.5) !important;
+        }
+        
+        .chess-cell:hover {
+            filter: brightness(1.1);
+        }
+        
+        .game-info {
+            min-width: 250px;
+        }
+        
+        .status-panel {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .status-panel h3 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+        }
+        
+        .current-turn {
+            font-size: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .current-turn.white-turn {
+            background: linear-gradient(135deg, #eee, #fff);
+            color: #333;
+        }
+        
+        .current-turn.black-turn {
+            background: linear-gradient(135deg, #333, #555);
+            color: #fff;
+        }
+        
+        .player-select {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .player-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        
+        .player-btn:hover { border-color: #00d4ff; }
+        .player-btn.selected {
+            border-color: #00ff88;
+            background: rgba(0,255,136,0.1);
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            color: #1a1a2e;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .captured-pieces {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .captured-pieces h4 {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 10px;
+        }
+        
+        .captured-list {
+            font-size: 28px;
+            min-height: 35px;
+        }
+        
+        .game-log {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .game-log h4 { 
+            color: #00d4ff; 
+            margin-bottom: 10px;
+        }
+        
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 13px;
+        }
+        
+        .winner-banner {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #333;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        .check-warning {
+            background: rgba(255, 100, 100, 0.3);
+            color: #ff6b6b;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 10px 0;
+            animation: blink 0.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <h1>♟️ 체스 테스트</h1>
+    
+    <div class="game-container">
+        <div class="chess-board-wrapper">
+            <div id="chessBoard"></div>
+        </div>
+        
+        <div class="game-info">
+            <div class="status-panel">
+                <h3>🎮 게임 상태</h3>
+                <div id="winnerBanner"></div>
+                <div id="checkWarning"></div>
+                
+                <p>내 진영 선택:</p>
+                <div class="player-select">
+                    <button class="player-btn" onclick="selectMySide('white')" id="btnWhite">⚪ 백</button>
+                    <button class="player-btn" onclick="selectMySide('black')" id="btnBlack">⚫ 흑</button>
+                </div>
+                
+                <div class="current-turn white-turn" id="currentTurn">
+                    백 차례 (White)
+                </div>
+                
+                <button class="btn btn-primary" onclick="resetChessGame()">
+                    🔄 새 게임
+                </button>
+                
+                <p style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 15px;">
+                    ※ 백이 먼저 시작합니다<br>
+                    ※ 말을 클릭하고 이동할 곳을 클릭하세요
+                </p>
+            </div>
+            
+            <div class="captured-pieces">
+                <h4>잡힌 말 (백)</h4>
+                <div class="captured-list" id="capturedWhite"></div>
+            </div>
+            
+            <div class="captured-pieces">
+                <h4>잡힌 말 (흑)</h4>
+                <div class="captured-list" id="capturedBlack"></div>
+            </div>
+            
+            <div class="game-log" style="margin-top: 15px;">
+                <h4>📋 기보</h4>
+                <div id="gameLog">
+                    <div class="log-entry">게임을 시작하세요!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =====================================================
+        // 체스 게임 로직
+        // =====================================================
+        
+        // 말 유니코드
+        const PIECES = {
+            white: { king: '♔', queen: '♕', rook: '♖', bishop: '♗', knight: '♘', pawn: '♙' },
+            black: { king: '♚', queen: '♛', rook: '♜', bishop: '♝', knight: '♞', pawn: '♟' }
+        };
+        
+        // 게임 상태
+        let board = [];
+        let currentPlayer = 'white';
+        let selectedCell = null;
+        let validMoves = [];
+        let mySide = null;
+        let gameOver = false;
+        let capturedPieces = { white: [], black: [] };
+        let moveHistory = [];
+        let isInCheck = false;
+        
+        // 초기 보드 설정
+        function initBoard() {
+            board = [
+                // 흑 진영 (상단)
+                [
+                    {type: 'rook', color: 'black'}, {type: 'knight', color: 'black'}, 
+                    {type: 'bishop', color: 'black'}, {type: 'queen', color: 'black'},
+                    {type: 'king', color: 'black'}, {type: 'bishop', color: 'black'}, 
+                    {type: 'knight', color: 'black'}, {type: 'rook', color: 'black'}
+                ],
+                Array(8).fill(null).map(() => ({type: 'pawn', color: 'black'})),
+                Array(8).fill(null),
+                Array(8).fill(null),
+                Array(8).fill(null),
+                Array(8).fill(null),
+                Array(8).fill(null).map(() => ({type: 'pawn', color: 'white'})),
+                // 백 진영 (하단)
+                [
+                    {type: 'rook', color: 'white'}, {type: 'knight', color: 'white'}, 
+                    {type: 'bishop', color: 'white'}, {type: 'queen', color: 'white'},
+                    {type: 'king', color: 'white'}, {type: 'bishop', color: 'white'}, 
+                    {type: 'knight', color: 'white'}, {type: 'rook', color: 'white'}
+                ]
+            ];
+            
+            currentPlayer = 'white';
+            selectedCell = null;
+            validMoves = [];
+            gameOver = false;
+            capturedPieces = { white: [], black: [] };
+            moveHistory = [];
+            isInCheck = false;
+            
+            renderBoard();
+            updateDisplay();
+        }
+        
+        // 보드 렌더링
+        function renderBoard() {
+            const boardEl = document.getElementById('chessBoard');
+            boardEl.innerHTML = '';
+            
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const cell = document.createElement('div');
+                    const isLight = (row + col) % 2 === 0;
+                    cell.className = `chess-cell ${isLight ? 'light' : 'dark'}`;
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    
+                    const piece = board[row][col];
+                    if (piece) {
+                        cell.textContent = PIECES[piece.color][piece.type];
+                    }
+                    
+                    // 선택된 셀
+                    if (selectedCell && selectedCell.row === row && selectedCell.col === col) {
+                        cell.classList.add('selected');
+                    }
+                    
+                    // 이동 가능한 위치
+                    const isValidMove = validMoves.some(m => m.row === row && m.col === col);
+                    if (isValidMove) {
+                        if (piece) {
+                            cell.classList.add('valid-capture');
+                        } else {
+                            cell.classList.add('valid-move');
+                        }
+                    }
+                    
+                    cell.onclick = () => handleCellClick(row, col);
+                    boardEl.appendChild(cell);
+                }
+            }
+        }
+        
+        // 셀 클릭 처리
+        function handleCellClick(row, col) {
+            if (gameOver) return;
+            
+            // 멀티플레이어 모드에서 자기 차례가 아니면 무시
+            if (mySide && mySide !== currentPlayer) {
+                alert(`지금은 ${currentPlayer === 'white' ? '백' : '흑'} 차례입니다!`);
+                return;
+            }
+            
+            const piece = board[row][col];
+            
+            // 이미 선택된 말이 있고, 유효한 이동 위치를 클릭한 경우
+            if (selectedCell && validMoves.some(m => m.row === row && m.col === col)) {
+                movePiece(selectedCell.row, selectedCell.col, row, col);
+                selectedCell = null;
+                validMoves = [];
+                renderBoard();
+                return;
+            }
+            
+            // 자신의 말을 클릭한 경우
+            if (piece && piece.color === currentPlayer) {
+                selectedCell = { row, col };
+                validMoves = getValidMoves(row, col);
+                renderBoard();
+                return;
+            }
+            
+            // 빈 칸이나 상대 말을 클릭한 경우 선택 해제
+            selectedCell = null;
+            validMoves = [];
+            renderBoard();
+        }
+        
+        // 말 이동
+        function movePiece(fromRow, fromCol, toRow, toCol) {
+            const piece = board[fromRow][fromCol];
+            const targetPiece = board[toRow][toCol];
+            
+            // 잡힌 말 기록
+            if (targetPiece) {
+                capturedPieces[targetPiece.color].push(targetPiece);
+            }
+            
+            // 이동 실행
+            board[toRow][toCol] = piece;
+            board[fromRow][fromCol] = null;
+            
+            // 폰 프로모션 (마지막 줄 도달 시 퀸으로 승격)
+            if (piece.type === 'pawn') {
+                if ((piece.color === 'white' && toRow === 0) || 
+                    (piece.color === 'black' && toRow === 7)) {
+                    board[toRow][toCol] = { type: 'queen', color: piece.color };
+                    addLog(`${piece.color === 'white' ? '백' : '흑'} 폰 → 퀸 승격!`);
+                }
+            }
+            
+            // 기보 기록
+            const colNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+            const moveNotation = `${getPieceName(piece.type)} ${colNames[fromCol]}${8-fromRow} → ${colNames[toCol]}${8-toRow}`;
+            addLog(`${piece.color === 'white' ? '백' : '흑'}: ${moveNotation}`);
+            moveHistory.push({ from: {row: fromRow, col: fromCol}, to: {row: toRow, col: toCol}, piece, captured: targetPiece });
+            
+            // 턴 변경
+            currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+            
+            // 체크 확인
+            isInCheck = isKingInCheck(currentPlayer);
+            
+            // 체크메이트 확인
+            if (isCheckmate(currentPlayer)) {
+                gameOver = true;
+                const winner = currentPlayer === 'white' ? '흑' : '백';
+                document.getElementById('winnerBanner').innerHTML = 
+                    `<div class="winner-banner">🎉 체크메이트! ${winner} 승리! 🎉</div>`;
+                addLog(`🏆 체크메이트! ${winner} 승리!`);
+            }
+            
+            updateDisplay();
+        }
+        
+        // 유효한 이동 위치 계산
+        function getValidMoves(row, col) {
+            const piece = board[row][col];
+            if (!piece) return [];
+            
+            let moves = [];
+            
+            switch (piece.type) {
+                case 'pawn':
+                    moves = getPawnMoves(row, col, piece.color);
+                    break;
+                case 'rook':
+                    moves = getRookMoves(row, col, piece.color);
+                    break;
+                case 'knight':
+                    moves = getKnightMoves(row, col, piece.color);
+                    break;
+                case 'bishop':
+                    moves = getBishopMoves(row, col, piece.color);
+                    break;
+                case 'queen':
+                    moves = [...getRookMoves(row, col, piece.color), ...getBishopMoves(row, col, piece.color)];
+                    break;
+                case 'king':
+                    moves = getKingMoves(row, col, piece.color);
+                    break;
+            }
+            
+            // 체크 상태가 되는 이동은 제외
+            moves = moves.filter(move => {
+                return !wouldBeInCheck(row, col, move.row, move.col, piece.color);
+            });
+            
+            return moves;
+        }
+        
+        // 폰 이동
+        function getPawnMoves(row, col, color) {
+            const moves = [];
+            const direction = color === 'white' ? -1 : 1;
+            const startRow = color === 'white' ? 6 : 1;
+            
+            // 전진
+            if (isInBounds(row + direction, col) && !board[row + direction][col]) {
+                moves.push({ row: row + direction, col });
+                
+                // 첫 이동 시 2칸
+                if (row === startRow && !board[row + 2 * direction][col]) {
+                    moves.push({ row: row + 2 * direction, col });
+                }
+            }
+            
+            // 대각선 공격
+            [-1, 1].forEach(dc => {
+                const newRow = row + direction;
+                const newCol = col + dc;
+                if (isInBounds(newRow, newCol)) {
+                    const target = board[newRow][newCol];
+                    if (target && target.color !== color) {
+                        moves.push({ row: newRow, col: newCol });
+                    }
+                }
+            });
+            
+            return moves;
+        }
+        
+        // 룩 이동
+        function getRookMoves(row, col, color) {
+            const moves = [];
+            const directions = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+            
+            directions.forEach(([dr, dc]) => {
+                for (let i = 1; i < 8; i++) {
+                    const newRow = row + dr * i;
+                    const newCol = col + dc * i;
+                    
+                    if (!isInBounds(newRow, newCol)) break;
+                    
+                    const target = board[newRow][newCol];
+                    if (!target) {
+                        moves.push({ row: newRow, col: newCol });
+                    } else {
+                        if (target.color !== color) {
+                            moves.push({ row: newRow, col: newCol });
+                        }
+                        break;
+                    }
+                }
+            });
+            
+            return moves;
+        }
+        
+        // 나이트 이동
+        function getKnightMoves(row, col, color) {
+            const moves = [];
+            const offsets = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]];
+            
+            offsets.forEach(([dr, dc]) => {
+                const newRow = row + dr;
+                const newCol = col + dc;
+                
+                if (isInBounds(newRow, newCol)) {
+                    const target = board[newRow][newCol];
+                    if (!target || target.color !== color) {
+                        moves.push({ row: newRow, col: newCol });
+                    }
+                }
+            });
+            
+            return moves;
+        }
+        
+        // 비숍 이동
+        function getBishopMoves(row, col, color) {
+            const moves = [];
+            const directions = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
+            
+            directions.forEach(([dr, dc]) => {
+                for (let i = 1; i < 8; i++) {
+                    const newRow = row + dr * i;
+                    const newCol = col + dc * i;
+                    
+                    if (!isInBounds(newRow, newCol)) break;
+                    
+                    const target = board[newRow][newCol];
+                    if (!target) {
+                        moves.push({ row: newRow, col: newCol });
+                    } else {
+                        if (target.color !== color) {
+                            moves.push({ row: newRow, col: newCol });
+                        }
+                        break;
+                    }
+                }
+            });
+            
+            return moves;
+        }
+        
+        // 킹 이동
+        function getKingMoves(row, col, color) {
+            const moves = [];
+            const offsets = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
+            
+            offsets.forEach(([dr, dc]) => {
+                const newRow = row + dr;
+                const newCol = col + dc;
+                
+                if (isInBounds(newRow, newCol)) {
+                    const target = board[newRow][newCol];
+                    if (!target || target.color !== color) {
+                        moves.push({ row: newRow, col: newCol });
+                    }
+                }
+            });
+            
+            return moves;
+        }
+        
+        // 범위 체크
+        function isInBounds(row, col) {
+            return row >= 0 && row < 8 && col >= 0 && col < 8;
+        }
+        
+        // 킹 위치 찾기
+        function findKing(color) {
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const piece = board[row][col];
+                    if (piece && piece.type === 'king' && piece.color === color) {
+                        return { row, col };
+                    }
+                }
+            }
+            return null;
+        }
+        
+        // 체크 상태 확인
+        function isKingInCheck(color) {
+            const kingPos = findKing(color);
+            if (!kingPos) return false;
+            
+            const enemyColor = color === 'white' ? 'black' : 'white';
+            
+            // 모든 적 말의 공격 범위 확인
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const piece = board[row][col];
+                    if (piece && piece.color === enemyColor) {
+                        const attacks = getAttackMoves(row, col, piece);
+                        if (attacks.some(m => m.row === kingPos.row && m.col === kingPos.col)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            
+            return false;
+        }
+        
+        // 공격 범위 (체크 확인용)
+        function getAttackMoves(row, col, piece) {
+            switch (piece.type) {
+                case 'pawn':
+                    // 폰은 대각선만 공격
+                    const dir = piece.color === 'white' ? -1 : 1;
+                    const attacks = [];
+                    if (isInBounds(row + dir, col - 1)) attacks.push({ row: row + dir, col: col - 1 });
+                    if (isInBounds(row + dir, col + 1)) attacks.push({ row: row + dir, col: col + 1 });
+                    return attacks;
+                case 'rook':
+                    return getRookMoves(row, col, piece.color);
+                case 'knight':
+                    return getKnightMoves(row, col, piece.color);
+                case 'bishop':
+                    return getBishopMoves(row, col, piece.color);
+                case 'queen':
+                    return [...getRookMoves(row, col, piece.color), ...getBishopMoves(row, col, piece.color)];
+                case 'king':
+                    return getKingMoves(row, col, piece.color);
+                default:
+                    return [];
+            }
+        }
+        
+        // 이동 시 체크 상태가 되는지 확인
+        function wouldBeInCheck(fromRow, fromCol, toRow, toCol, color) {
+            // 임시로 이동 실행
+            const originalPiece = board[toRow][toCol];
+            const movingPiece = board[fromRow][fromCol];
+            
+            board[toRow][toCol] = movingPiece;
+            board[fromRow][fromCol] = null;
+            
+            const inCheck = isKingInCheck(color);
+            
+            // 복원
+            board[fromRow][fromCol] = movingPiece;
+            board[toRow][toCol] = originalPiece;
+            
+            return inCheck;
+        }
+        
+        // 체크메이트 확인
+        function isCheckmate(color) {
+            if (!isKingInCheck(color)) return false;
+            
+            // 모든 말의 가능한 이동을 확인
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const piece = board[row][col];
+                    if (piece && piece.color === color) {
+                        const moves = getValidMoves(row, col);
+                        if (moves.length > 0) return false;
+                    }
+                }
+            }
+            
+            return true;
+        }
+        
+        // 디스플레이 업데이트
+        function updateDisplay() {
+            const turnEl = document.getElementById('currentTurn');
+            turnEl.className = `current-turn ${currentPlayer}-turn`;
+            turnEl.textContent = `${currentPlayer === 'white' ? '백' : '흑'} 차례 (${currentPlayer === 'white' ? 'White' : 'Black'})`;
+            
+            // 체크 경고
+            const checkEl = document.getElementById('checkWarning');
+            if (isInCheck && !gameOver) {
+                checkEl.innerHTML = '<div class="check-warning">⚠️ 체크!</div>';
+            } else {
+                checkEl.innerHTML = '';
+            }
+            
+            // 잡힌 말 표시
+            document.getElementById('capturedWhite').textContent = 
+                capturedPieces.white.map(p => PIECES.white[p.type]).join('');
+            document.getElementById('capturedBlack').textContent = 
+                capturedPieces.black.map(p => PIECES.black[p.type]).join('');
+        }
+        
+        // 로그 추가
+        function addLog(text) {
+            const logEl = document.getElementById('gameLog');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = text;
+            logEl.insertBefore(entry, logEl.firstChild);
+        }
+        
+        // 말 이름
+        function getPieceName(type) {
+            const names = { king: '킹', queen: '퀸', rook: '룩', bishop: '비숍', knight: '나이트', pawn: '폰' };
+            return names[type] || type;
+        }
+        
+        // 내 진영 선택
+        function selectMySide(side) {
+            mySide = side;
+            document.getElementById('btnWhite').classList.toggle('selected', side === 'white');
+            document.getElementById('btnBlack').classList.toggle('selected', side === 'black');
+            addLog(`나는 ${side === 'white' ? '백' : '흑'}을 선택했습니다.`);
+        }
+        
+        // 게임 리셋
+        function resetChessGame() {
+            document.getElementById('winnerBanner').innerHTML = '';
+            document.getElementById('gameLog').innerHTML = '<div class="log-entry">새 게임 시작!</div>';
+            initBoard();
+        }
+        
+        // 초기화
+        initBoard();
+    </script>
+</body>
+</html>
