@@ -728,7 +728,7 @@
 
         .attendance-weekdays {
             display: grid;
-            grid-template-columns: 100px repeat(7, 1fr);
+            grid-template-columns: repeat(7, 1fr);
             background: rgba(255,255,255,0.05);
         }
 
@@ -744,66 +744,69 @@
             color: #ff6b6b;
         }
 
-        .attendance-weekday.member-header {
-            text-align: left;
-            color: #00d4ff;
-        }
-
         .attendance-grid {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .attendance-row {
             display: grid;
-            grid-template-columns: 100px repeat(7, 1fr);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .attendance-row:hover {
-            background: rgba(255,255,255,0.03);
-        }
-        
-        .my-attendance-row {
-            background: rgba(0, 255, 136, 0.05) !important;
-            border-left: 3px solid #00ff88;
-        }
-        
-        .my-member {
-            background: rgba(0, 255, 136, 0.1);
-        }
-
-        .attendance-member {
-            padding: 12px 15px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-right: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .member-avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
+            grid-template-columns: repeat(7, 1fr);
         }
 
         .attendance-cell {
             padding: 8px;
-            text-align: center;
             cursor: pointer;
             transition: all 0.2s;
-            min-height: 45px;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+        
+        .attendance-cell .day-number {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 5px;
+        }
+        
+        .attendance-cell.today .day-number {
+            background: #667eea;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-right: 1px solid rgba(255,255,255,0.03);
+        }
+        
+        .attendance-cell .attendance-entries {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .attendance-entry {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .attendance-entry .entry-name {
+            font-weight: 500;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .attendance-entry .entry-type {
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: 600;
         }
 
         .attendance-cell:hover {
@@ -812,6 +815,10 @@
 
         .attendance-cell.weekend {
             background: rgba(255,107,107,0.05);
+        }
+        
+        .attendance-cell.other-month {
+            opacity: 0.3;
         }
 
         .attendance-cell.today {
@@ -2350,7 +2357,6 @@
 
                 <!-- 요일 헤더 -->
                 <div class="attendance-weekdays">
-                    <div class="attendance-weekday member-header">팀원</div>
                     <div class="attendance-weekday weekend">일</div>
                     <div class="attendance-weekday">월</div>
                     <div class="attendance-weekday">화</div>
@@ -3545,140 +3551,58 @@
             
             const firstDay = new Date(year, month, 1);
             const lastDay = new Date(year, month + 1, 0);
-            const totalDays = lastDay.getDate();
             const today = new Date();
             
             const grid = document.getElementById('attendanceGrid');
             let html = '';
             
-            // 각 팀원별로 행 생성
-            TEAM_MEMBERS.forEach(member => {
-                html += `<div class="attendance-row">`;
+            // 첫 주 일요일부터 시작
+            let cellDate = new Date(year, month, 1);
+            cellDate.setDate(cellDate.getDate() - cellDate.getDay());
+            
+            // 6주 (42일) 렌더링
+            for (let i = 0; i < 42; i++) {
+                const isCurrentMonth = cellDate.getMonth() === month;
+                const isToday = cellDate.toDateString() === today.toDateString();
+                const isWeekend = cellDate.getDay() === 0 || cellDate.getDay() === 6;
+                const dateKey = formatDateKey(cellDate);
                 
-                // 팀원 이름 셀
+                // 해당 날짜의 모든 근태 정보 수집
+                const entries = [];
+                Object.keys(attendanceData).forEach(member => {
+                    if (attendanceData[member][dateKey]) {
+                        const type = attendanceData[member][dateKey];
+                        const typeInfo = ATTENDANCE_TYPES[type];
+                        entries.push({ member, type, typeInfo });
+                    }
+                });
+                
+                let cellClass = 'attendance-cell';
+                if (isWeekend) cellClass += ' weekend';
+                if (isToday) cellClass += ' today';
+                if (!isCurrentMonth) cellClass += ' other-month';
+                
                 html += `
-                    <div class="attendance-member">
-                        <div class="member-avatar">${member.charAt(0)}</div>
-                        <span>${member}</span>
+                    <div class="${cellClass}" onclick="openAttendanceModal('${dateKey}')" data-date="${dateKey}">
+                        <div class="day-number">${cellDate.getDate()}</div>
+                        <div class="attendance-entries">
+                            ${entries.map(e => `
+                                <div class="attendance-entry">
+                                    <span class="entry-name">${e.member.charAt(0)}</span>
+                                    <span class="entry-type" style="background: ${e.typeInfo.color}30; color: ${e.typeInfo.color};">${e.typeInfo.label}</span>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                 `;
                 
-                // 해당 월의 주별로 날짜 셀 생성
-                // 먼저 해당 월의 첫 주 시작일 찾기
-                const startDayOfWeek = firstDay.getDay(); // 0=일, 1=월, ...
+                cellDate.setDate(cellDate.getDate() + 1);
                 
-                // 해당 월의 모든 주를 렌더링
-                let currentWeekStart = new Date(year, month, 1 - startDayOfWeek);
-                
-                // 7일간 셀 생성 (일~토)
-                for (let i = 0; i < 7; i++) {
-                    const cellDate = new Date(currentWeekStart);
-                    cellDate.setDate(cellDate.getDate() + i);
-                    
-                    const isCurrentMonth = cellDate.getMonth() === month;
-                    const isToday = cellDate.toDateString() === today.toDateString();
-                    const isWeekend = cellDate.getDay() === 0 || cellDate.getDay() === 6;
-                    const dateKey = formatDateKey(cellDate);
-                    
-                    const attendanceType = getAttendance(member, dateKey);
-                    const typeInfo = ATTENDANCE_TYPES[attendanceType];
-                    
-                    let cellClass = 'attendance-cell';
-                    if (isWeekend) cellClass += ' weekend';
-                    if (isToday) cellClass += ' today';
-                    if (!isCurrentMonth) cellClass += ' other-month';
-                    
-                    html += `
-                        <div class="${cellClass}" 
-                             onclick="openAttendanceModal('${member}', '${dateKey}')"
-                             data-member="${member}" data-date="${dateKey}">
-                            ${isCurrentMonth ? `<span class="day-num" style="font-size:10px;color:rgba(255,255,255,0.3);position:absolute;top:2px;left:5px;">${cellDate.getDate()}</span>` : ''}
-                            ${typeInfo ? `<span class="attendance-badge ${attendanceType}">${typeInfo.label}</span>` : ''}
-                        </div>
-                    `;
-                }
-                
-                html += `</div>`;
-            });
-            
-            // 여러 주 표시 (최대 6주)
-            grid.innerHTML = '';
-            
-            // 주 단위로 반복
-            let weekStart = new Date(year, month, 1);
-            weekStart.setDate(weekStart.getDate() - weekStart.getDay()); // 첫 주 일요일로 이동
-            
-            for (let week = 0; week < 6; week++) {
-                const weekEnd = new Date(weekStart);
-                weekEnd.setDate(weekEnd.getDate() + 6);
-                
-                // 해당 주가 현재 월에 포함되는지 확인
-                if (weekStart.getMonth() > month && weekStart.getFullYear() >= year) break;
-                if (week > 0 && weekStart.getMonth() !== month && weekEnd.getMonth() !== month) break;
-                
-                // 주 구분선 추가
-                if (week > 0) {
-                    grid.innerHTML += `<div style="height: 1px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>`;
-                }
-                
-                // 현재 사용자 닉네임 가져오기
-                const currentNickname = localStorage.getItem('chat_nickname') || '';
-                
-                // 각 팀원별로 행 생성
-                TEAM_MEMBERS.forEach(member => {
-                    const isMyRow = member === currentNickname;
-                    let rowHtml = `<div class="attendance-row${isMyRow ? ' my-attendance-row' : ''}">`;
-                    
-                    // 팀원 이름 셀 (첫 주에만 표시)
-                    if (week === 0) {
-                        rowHtml += `
-                            <div class="attendance-member${isMyRow ? ' my-member' : ''}" style="position: relative;">
-                                <div class="member-avatar">${member.charAt(0)}</div>
-                                <span>${member}</span>
-                                ${isMyRow ? '<i class="fas fa-user-check" style="margin-left: 5px; color: #00ff88; font-size: 10px;"></i>' : ''}
-                            </div>
-                        `;
-                    } else {
-                        rowHtml += `<div class="attendance-member${isMyRow ? ' my-member' : ''}" style="border-right: 1px solid rgba(255,255,255,0.1);"></div>`;
-                    }
-                    
-                    // 7일간 셀 생성 (일~토)
-                    for (let i = 0; i < 7; i++) {
-                        const cellDate = new Date(weekStart);
-                        cellDate.setDate(cellDate.getDate() + i);
-                        
-                        const isCurrentMonth = cellDate.getMonth() === month;
-                        const isToday = cellDate.toDateString() === today.toDateString();
-                        const isWeekend = cellDate.getDay() === 0 || cellDate.getDay() === 6;
-                        const dateKey = formatDateKey(cellDate);
-                        
-                        const attendanceType = getAttendance(member, dateKey);
-                        const typeInfo = ATTENDANCE_TYPES[attendanceType];
-                        
-                        let cellClass = 'attendance-cell';
-                        if (isWeekend) cellClass += ' weekend';
-                        if (isToday) cellClass += ' today';
-                        
-                        const opacity = isCurrentMonth ? '1' : '0.3';
-                        
-                        rowHtml += `
-                            <div class="${cellClass}" style="position:relative; opacity:${opacity};"
-                                 onclick="openAttendanceModal('${member}', '${dateKey}')"
-                                 data-member="${member}" data-date="${dateKey}">
-                                ${week === 0 ? `<span style="font-size:9px;color:rgba(255,255,255,0.4);position:absolute;top:1px;left:3px;">${cellDate.getDate()}</span>` : 
-                                  `<span style="font-size:9px;color:rgba(255,255,255,0.4);position:absolute;top:1px;left:3px;">${cellDate.getDate()}</span>`}
-                                ${typeInfo ? `<span class="attendance-badge ${attendanceType}">${typeInfo.label}</span>` : ''}
-                            </div>
-                        `;
-                    }
-                    
-                    rowHtml += `</div>`;
-                    grid.innerHTML += rowHtml;
-                });
-                
-                // 다음 주로 이동
-                weekStart.setDate(weekStart.getDate() + 7);
+                // 6주 이후 현재 월이 아니면 중단
+                if (i >= 35 && cellDate.getMonth() !== month) break;
             }
+            
+            grid.innerHTML = html;
         }
 
         function formatDateKey(date) {
@@ -3707,14 +3631,22 @@
             saveAttendanceData();
         }
 
-        function openAttendanceModal(member, dateKey) {
-            selectedAttendanceCell = { member, dateKey };
+        function openAttendanceModal(dateKey) {
+            // 내 닉네임 자동 가져오기
+            const myName = localStorage.getItem('chat_nickname') || '';
+            
+            if (!myName) {
+                alert('먼저 상단에서 닉네임을 입력해주세요.');
+                return;
+            }
+            
+            selectedAttendanceCell = { member: myName, dateKey };
             
             const date = new Date(dateKey);
             const dateStr = `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
             
             document.getElementById('modalDateTitle').textContent = dateStr;
-            document.getElementById('modalMemberName').textContent = member;
+            document.getElementById('modalMemberName').textContent = myName;
             
             // 기존 선택 초기화
             document.querySelectorAll('.attendance-type-btn').forEach(btn => {
@@ -3722,7 +3654,7 @@
             });
             
             // 기존 값이 있으면 선택 표시
-            const currentType = getAttendance(member, dateKey);
+            const currentType = getAttendance(myName, dateKey);
             if (currentType) {
                 const btn = document.querySelector(`.attendance-type-btn[data-type="${currentType}"]`);
                 if (btn) btn.classList.add('selected');
