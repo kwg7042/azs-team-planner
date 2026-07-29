@@ -310,6 +310,11 @@
             border-bottom: 2px solid rgba(255,255,255,0.1);
         }
 
+        /* PC에서 아코디언 토글 아이콘 숨김 */
+        .day-header .toggle-icon {
+            display: none;
+        }
+
         .day-name {
             font-size: 1.1em;
             font-weight: bold;
@@ -638,8 +643,12 @@
         }
 
         .kpi-table th.member-col {
-            background: rgba(0,212,255,0.2);
-            color: #00d4ff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .kpi-table td.member-cell {
+            background: rgba(102,126,234,0.1);
         }
 
         .kpi-table td {
@@ -1696,23 +1705,60 @@
                 font-size: 12px;
             }
 
+            /* 모바일 아코디언 스타일 */
             .day-column {
-                padding: 8px;
+                padding: 0;
                 min-width: unset;
                 flex: unset;
                 width: 100%;
+                border-radius: 8px;
+                overflow: hidden;
             }
 
             .day-header {
-                padding-bottom: 5px;
-                margin-bottom: 6px;
+                padding: 12px 15px;
+                margin-bottom: 0;
                 display: flex;
                 align-items: center;
                 gap: 10px;
+                cursor: pointer;
+                background: rgba(255,255,255,0.08);
+                transition: background 0.2s;
+            }
+
+            .day-header:hover {
+                background: rgba(255,255,255,0.12);
+            }
+
+            .day-header .toggle-icon {
+                margin-left: auto;
+                transition: transform 0.3s;
+            }
+
+            .day-column.collapsed .day-header .toggle-icon {
+                transform: rotate(-90deg);
+            }
+
+            .day-column .task-list {
+                max-height: 500px;
+                overflow: hidden;
+                transition: max-height 0.3s ease, padding 0.3s ease;
+                padding: 8px;
+            }
+
+            .day-column.collapsed .task-list {
+                max-height: 0;
+                padding: 0 8px;
+            }
+
+            /* 모바일에서 토글 아이콘 표시 */
+            .day-header .toggle-icon {
+                display: inline-block;
             }
 
             .day-name {
-                font-size: 0.8em;
+                font-size: 0.9em;
+                font-weight: 600;
             }
 
             .day-date {
@@ -2241,9 +2287,7 @@
         <button class="tab-btn" data-tab="kpi">
             <i class="fas fa-chart-line"></i> KPI 현황
         </button>
-        <button class="tab-btn" data-tab="calendar">
-            <i class="fas fa-calendar-alt"></i> 캘린더
-        </button>
+
         <button class="tab-btn" data-tab="omok">
             <i class="fas fa-circle"></i> 오목
         </button>
@@ -2501,11 +2545,10 @@
                 <table class="kpi-table" id="kpiTable">
                     <thead>
                         <tr>
-                            <th style="width: 100px;">평가항목</th>
-                            <th style="width: 150px;">목표명</th>
-                            <th style="width: 100px;">평가기준</th>
-                            <th style="width: 150px;">세부사항</th>
-                            <th style="width: 80px;">실적</th>
+                            <th style="width: 120px;">평가항목</th>
+                            <th style="width: 180px;">목표명</th>
+                            <th style="width: 120px;">평가기준</th>
+                            <th style="width: 100px;">실적</th>
                             <th class="member-col">장찬호</th>
                             <th class="member-col">정문세</th>
                             <th class="member-col">김원근</th>
@@ -2520,32 +2563,6 @@
                         <!-- JavaScript로 생성 -->
                     </tbody>
                 </table>
-            </div>
-        </div>
-
-        <!-- ========== 캘린더 탭 ========== -->
-        <div class="tab-content" id="tab-calendar">
-            <div class="calendar-container">
-                <div class="calendar-header">
-                    <div class="calendar-title" id="calendarTitle">2026년 7월</div>
-                    <div class="calendar-nav">
-                        <button onclick="prevMonth()"><i class="fas fa-chevron-left"></i></button>
-                        <button onclick="goToday()">오늘</button>
-                        <button onclick="nextMonth()"><i class="fas fa-chevron-right"></i></button>
-                    </div>
-                </div>
-                <div class="calendar-weekdays">
-                    <div class="calendar-weekday weekend">일</div>
-                    <div class="calendar-weekday">월</div>
-                    <div class="calendar-weekday">화</div>
-                    <div class="calendar-weekday">수</div>
-                    <div class="calendar-weekday">목</div>
-                    <div class="calendar-weekday">금</div>
-                    <div class="calendar-weekday weekend">토</div>
-                </div>
-                <div class="calendar-days" id="calendarDays">
-                    <!-- JavaScript로 생성 -->
-                </div>
             </div>
         </div>
 
@@ -2892,13 +2909,16 @@
             dates.forEach((date, index) => {
                 const isToday = date.toDateString() === today.toDateString();
                 const dayTasks = inProgressTasks.filter(t => t.day === index);
+                const isCollapsed = !isToday; // 오늘이 아니면 기본 접힘
                 
                 html += `
-                    <div class="day-column ${isToday ? 'today' : ''}">
-                        <div class="day-header">
+                    <div class="day-column ${isToday ? 'today' : ''} ${isCollapsed ? 'collapsed' : ''}" id="day-col-${index}">
+                        <div class="day-header" onclick="toggleDayColumn(${index})">
                             <div class="day-name">${DAYS[index]}요일</div>
                             <div class="day-date">${formatDate(date)}</div>
                             ${isToday ? '<span class="today-badge">TODAY</span>' : ''}
+                            <span class="task-count" style="background: rgba(0,212,255,0.3); padding: 2px 8px; border-radius: 10px; font-size: 11px;">${dayTasks.length}</span>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
                         </div>
                         <div class="task-list" data-day="${index}" ondrop="drop(event, ${index})" ondragover="allowDrop(event)">
                             ${dayTasks.map(t => renderTaskCard(t)).join('')}
@@ -3065,6 +3085,14 @@
                 saveTasks();
                 renderWeeklyGrid();
                 renderCalendar();
+            }
+        }
+
+        // 모바일 요일 아코디언 토글
+        function toggleDayColumn(dayIndex) {
+            const col = document.getElementById('day-col-' + dayIndex);
+            if (col) {
+                col.classList.toggle('collapsed');
             }
         }
 
@@ -3275,10 +3303,9 @@
                     <td><input class="kpi-input text-left" value="${row.category || ''}" onchange="updateKpi(${idx}, 'category', this.value)"></td>
                     <td><input class="kpi-input text-left" value="${row.target || ''}" onchange="updateKpi(${idx}, 'target', this.value)"></td>
                     <td><input class="kpi-input" value="${row.criteria || ''}" onchange="updateKpi(${idx}, 'criteria', this.value)"></td>
-                    <td><input class="kpi-input text-left" value="${row.detail || ''}" onchange="updateKpi(${idx}, 'detail', this.value)"></td>
                     <td><input class="kpi-input" value="${row.result || ''}" onchange="updateKpi(${idx}, 'result', this.value)"></td>
                     ${TEAM_MEMBERS.map(member => `
-                        <td><input class="kpi-input" value="${row.members?.[member] || ''}" onchange="updateKpiMember(${idx}, '${member}', this.value)"></td>
+                        <td class="member-cell"><input class="kpi-input" value="${row.members?.[member] || ''}" onchange="updateKpiMember(${idx}, '${member}', this.value)"></td>
                     `).join('')}
                     <td>
                         <button class="kpi-delete-btn" onclick="deleteKpiRow(${idx})">
@@ -3295,7 +3322,6 @@
                 category: '항목',
                 target: '목표명',
                 criteria: '기준',
-                detail: '세부사항',
                 result: '0',
                 members: {}
             };
