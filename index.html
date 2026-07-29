@@ -655,6 +655,252 @@
             color: #ff6b6b;
         }
 
+        /* ===== 근태관리 탭 ===== */
+        .attendance-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .attendance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .attendance-title {
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        .attendance-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .attendance-nav button {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .attendance-nav button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .attendance-weekdays {
+            display: grid;
+            grid-template-columns: 100px repeat(7, 1fr);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .attendance-weekday {
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .attendance-weekday.weekend {
+            color: #ff6b6b;
+        }
+
+        .attendance-weekday.member-header {
+            text-align: left;
+            color: #00d4ff;
+        }
+
+        .attendance-grid {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .attendance-row {
+            display: grid;
+            grid-template-columns: 100px repeat(7, 1fr);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .attendance-row:hover {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .attendance-member {
+            padding: 12px 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .member-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .attendance-cell {
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .attendance-cell:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .attendance-cell.weekend {
+            background: rgba(255,107,107,0.05);
+        }
+
+        .attendance-cell.today {
+            background: rgba(102,126,234,0.2);
+            border: 2px solid #667eea;
+        }
+
+        .attendance-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .attendance-badge.work { background: rgba(0,212,255,0.3); color: #00d4ff; }
+        .attendance-badge.remote { background: rgba(0,255,136,0.3); color: #00ff88; }
+        .attendance-badge.vacation { background: rgba(255,107,107,0.3); color: #ff6b6b; }
+        .attendance-badge.half-am { background: rgba(255,217,61,0.3); color: #ffd93d; }
+        .attendance-badge.half-pm { background: rgba(255,170,61,0.3); color: #ffaa3d; }
+        .attendance-badge.business { background: rgba(118,75,162,0.3); color: #a855f7; }
+        .attendance-badge.training { background: rgba(102,126,234,0.3); color: #667eea; }
+        .attendance-badge.sick { background: rgba(156,163,175,0.3); color: #9ca3af; }
+
+        /* 근태 입력 모달 */
+        .attendance-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .attendance-modal.show {
+            display: flex;
+        }
+
+        .attendance-modal-content {
+            background: #1a1a2e;
+            border-radius: 16px;
+            padding: 30px;
+            min-width: 350px;
+            max-width: 90%;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+
+        .attendance-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .attendance-modal-header h3 {
+            margin: 0;
+            color: #00d4ff;
+        }
+
+        .attendance-modal-close {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.5);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .attendance-modal-close:hover {
+            color: #ff6b6b;
+        }
+
+        .attendance-type-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .attendance-type-btn {
+            padding: 15px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .attendance-type-btn:hover {
+            border-color: #667eea;
+            background: rgba(102,126,234,0.1);
+        }
+
+        .attendance-type-btn.selected {
+            border-color: #00ff88;
+            background: rgba(0,255,136,0.1);
+        }
+
+        .attendance-type-btn i {
+            font-size: 20px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .attendance-type-btn span {
+            font-size: 12px;
+        }
+
+        .attendance-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+
         /* ===== 캘린더 탭 ===== */
         .calendar-container {
             background: rgba(255,255,255,0.05);
@@ -1920,6 +2166,9 @@
         <button class="tab-btn active" data-tab="tasks">
             <i class="fas fa-tasks"></i> 업무관리
         </button>
+        <button class="tab-btn" data-tab="attendance">
+            <i class="fas fa-user-clock"></i> 근태관리
+        </button>
         <button class="tab-btn" data-tab="yield">
             <i class="fas fa-cog"></i> 설비수율
         </button>
@@ -2015,6 +2264,113 @@
                     </div>
                     <button class="btn btn-primary" onclick="addTask()" style="margin-top: 20px;">
                         <i class="fas fa-plus"></i> 추가
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 근태관리 탭 ========== -->
+        <div class="tab-content" id="tab-attendance">
+            <div class="section-header">
+                <h2><i class="fas fa-user-clock"></i> 팀원 근태 관리</h2>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="exportAttendance()">
+                        <i class="fas fa-download"></i> 내보내기
+                    </button>
+                </div>
+            </div>
+
+            <!-- 범례 -->
+            <div class="attendance-legend">
+                <div class="legend-item"><span class="attendance-badge work">출근</span></div>
+                <div class="legend-item"><span class="attendance-badge remote">재택</span></div>
+                <div class="legend-item"><span class="attendance-badge vacation">휴가</span></div>
+                <div class="legend-item"><span class="attendance-badge half-am">오전반차</span></div>
+                <div class="legend-item"><span class="attendance-badge half-pm">오후반차</span></div>
+                <div class="legend-item"><span class="attendance-badge business">외근</span></div>
+                <div class="legend-item"><span class="attendance-badge training">교육</span></div>
+                <div class="legend-item"><span class="attendance-badge sick">병가</span></div>
+            </div>
+
+            <div class="attendance-container">
+                <div class="attendance-header">
+                    <div class="attendance-title" id="attendanceTitle">2026년 7월</div>
+                    <div class="attendance-nav">
+                        <button onclick="prevAttendanceMonth()"><i class="fas fa-chevron-left"></i></button>
+                        <button onclick="goAttendanceToday()">오늘</button>
+                        <button onclick="nextAttendanceMonth()"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- 요일 헤더 -->
+                <div class="attendance-weekdays">
+                    <div class="attendance-weekday member-header">팀원</div>
+                    <div class="attendance-weekday weekend">일</div>
+                    <div class="attendance-weekday">월</div>
+                    <div class="attendance-weekday">화</div>
+                    <div class="attendance-weekday">수</div>
+                    <div class="attendance-weekday">목</div>
+                    <div class="attendance-weekday">금</div>
+                    <div class="attendance-weekday weekend">토</div>
+                </div>
+
+                <!-- 근태 그리드 (JavaScript로 생성) -->
+                <div class="attendance-grid" id="attendanceGrid">
+                    <!-- JavaScript로 생성 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 근태 입력 모달 -->
+        <div class="attendance-modal" id="attendanceModal">
+            <div class="attendance-modal-content">
+                <div class="attendance-modal-header">
+                    <h3><i class="fas fa-calendar-check"></i> <span id="modalDateTitle">근태 입력</span></h3>
+                    <button class="attendance-modal-close" onclick="closeAttendanceModal()">&times;</button>
+                </div>
+                <p style="color: rgba(255,255,255,0.6); margin-bottom: 15px;">
+                    <i class="fas fa-user"></i> <span id="modalMemberName">팀원</span>
+                </p>
+                <div class="attendance-type-grid" id="attendanceTypeGrid">
+                    <button class="attendance-type-btn" data-type="work" onclick="selectAttendanceType('work')">
+                        <i class="fas fa-briefcase" style="color: #00d4ff;"></i>
+                        <span>출근</span>
+                    </button>
+                    <button class="attendance-type-btn" data-type="remote" onclick="selectAttendanceType('remote')">
+                        <i class="fas fa-home" style="color: #00ff88;"></i>
+                        <span>재택</span>
+                    </button>
+                    <button class="attendance-type-btn" data-type="vacation" onclick="selectAttendanceType('vacation')">
+                        <i class="fas fa-umbrella-beach" style="color: #ff6b6b;"></i>
+                        <span>휴가</span>
+                    </button>
+                    <button class="attendance-type-btn" data-type="half-am" onclick="selectAttendanceType('half-am')">
+                        <i class="fas fa-sun" style="color: #ffd93d;"></i>
+                        <span>오전반차</span>
+                    </button>
+                    <button class="attendance-type-btn" data-type="half-pm" onclick="selectAttendanceType('half-pm')">
+                        <i class="fas fa-moon" style="color: #ffaa3d;"></i>
+                        <span>오후반차</span>
+                    </button>
+                    <button class="attendance-type-btn" data-type="business" onclick="selectAttendanceType('business')">
+                        <i class="fas fa-car" style="color: #a855f7;"></i>
+                        <span>외근</span>
+                    </button>
+                    <button class="attendance-type-btn" data-type="training" onclick="selectAttendanceType('training')">
+                        <i class="fas fa-graduation-cap" style="color: #667eea;"></i>
+                        <span>교육</span>
+                    </button>
+                    <button class="attendance-type-btn" data-type="sick" onclick="selectAttendanceType('sick')">
+                        <i class="fas fa-procedures" style="color: #9ca3af;"></i>
+                        <span>병가</span>
+                    </button>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="saveAttendance()" style="flex: 1;">
+                        <i class="fas fa-check"></i> 저장
+                    </button>
+                    <button class="btn btn-danger" onclick="clearAttendance()" style="flex: 1;">
+                        <i class="fas fa-eraser"></i> 삭제
                     </button>
                 </div>
             </div>
@@ -2328,6 +2684,9 @@
         let issues = [];
         let kpiData = [];
         let historyData = [];
+        let attendanceData = {}; // 근태 데이터
+        let attendanceMonth = new Date(); // 근태 캘린더 월
+        let selectedAttendanceCell = null; // 선택된 근태 셀 정보
 
         // =====================================================
         // 로그인 / 비밀번호 확인
@@ -2398,6 +2757,7 @@
             renderKpiTable();
             renderCalendar();
             renderHistory();
+            renderAttendance();
         }
 
         // =====================================================
@@ -3134,17 +3494,324 @@
             }
         }
 
+        // =====================================================
+        // 근태관리
+        // =====================================================
+        const ATTENDANCE_TYPES = {
+            'work': { label: '출근', icon: 'briefcase', color: '#00d4ff' },
+            'remote': { label: '재택', icon: 'home', color: '#00ff88' },
+            'vacation': { label: '휴가', icon: 'umbrella-beach', color: '#ff6b6b' },
+            'half-am': { label: '오전반차', icon: 'sun', color: '#ffd93d' },
+            'half-pm': { label: '오후반차', icon: 'moon', color: '#ffaa3d' },
+            'business': { label: '외근', icon: 'car', color: '#a855f7' },
+            'training': { label: '교육', icon: 'graduation-cap', color: '#667eea' },
+            'sick': { label: '병가', icon: 'procedures', color: '#9ca3af' }
+        };
+
+        function renderAttendance() {
+            const year = attendanceMonth.getFullYear();
+            const month = attendanceMonth.getMonth();
+            
+            document.getElementById('attendanceTitle').textContent = `${year}년 ${month + 1}월`;
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const totalDays = lastDay.getDate();
+            const today = new Date();
+            
+            const grid = document.getElementById('attendanceGrid');
+            let html = '';
+            
+            // 각 팀원별로 행 생성
+            TEAM_MEMBERS.forEach(member => {
+                html += `<div class="attendance-row">`;
+                
+                // 팀원 이름 셀
+                html += `
+                    <div class="attendance-member">
+                        <div class="member-avatar">${member.charAt(0)}</div>
+                        <span>${member}</span>
+                    </div>
+                `;
+                
+                // 해당 월의 주별로 날짜 셀 생성
+                // 먼저 해당 월의 첫 주 시작일 찾기
+                const startDayOfWeek = firstDay.getDay(); // 0=일, 1=월, ...
+                
+                // 해당 월의 모든 주를 렌더링
+                let currentWeekStart = new Date(year, month, 1 - startDayOfWeek);
+                
+                // 7일간 셀 생성 (일~토)
+                for (let i = 0; i < 7; i++) {
+                    const cellDate = new Date(currentWeekStart);
+                    cellDate.setDate(cellDate.getDate() + i);
+                    
+                    const isCurrentMonth = cellDate.getMonth() === month;
+                    const isToday = cellDate.toDateString() === today.toDateString();
+                    const isWeekend = cellDate.getDay() === 0 || cellDate.getDay() === 6;
+                    const dateKey = formatDateKey(cellDate);
+                    
+                    const attendanceType = getAttendance(member, dateKey);
+                    const typeInfo = ATTENDANCE_TYPES[attendanceType];
+                    
+                    let cellClass = 'attendance-cell';
+                    if (isWeekend) cellClass += ' weekend';
+                    if (isToday) cellClass += ' today';
+                    if (!isCurrentMonth) cellClass += ' other-month';
+                    
+                    html += `
+                        <div class="${cellClass}" 
+                             onclick="openAttendanceModal('${member}', '${dateKey}')"
+                             data-member="${member}" data-date="${dateKey}">
+                            ${isCurrentMonth ? `<span class="day-num" style="font-size:10px;color:rgba(255,255,255,0.3);position:absolute;top:2px;left:5px;">${cellDate.getDate()}</span>` : ''}
+                            ${typeInfo ? `<span class="attendance-badge ${attendanceType}">${typeInfo.label}</span>` : ''}
+                        </div>
+                    `;
+                }
+                
+                html += `</div>`;
+            });
+            
+            // 여러 주 표시 (최대 6주)
+            grid.innerHTML = '';
+            
+            // 주 단위로 반복
+            let weekStart = new Date(year, month, 1);
+            weekStart.setDate(weekStart.getDate() - weekStart.getDay()); // 첫 주 일요일로 이동
+            
+            for (let week = 0; week < 6; week++) {
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+                
+                // 해당 주가 현재 월에 포함되는지 확인
+                if (weekStart.getMonth() > month && weekStart.getFullYear() >= year) break;
+                if (week > 0 && weekStart.getMonth() !== month && weekEnd.getMonth() !== month) break;
+                
+                // 주 구분선 추가
+                if (week > 0) {
+                    grid.innerHTML += `<div style="height: 1px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>`;
+                }
+                
+                // 각 팀원별로 행 생성
+                TEAM_MEMBERS.forEach(member => {
+                    let rowHtml = `<div class="attendance-row">`;
+                    
+                    // 팀원 이름 셀 (첫 주에만 표시)
+                    if (week === 0) {
+                        rowHtml += `
+                            <div class="attendance-member" style="position: relative;">
+                                <div class="member-avatar">${member.charAt(0)}</div>
+                                <span>${member}</span>
+                            </div>
+                        `;
+                    } else {
+                        rowHtml += `<div class="attendance-member" style="border-right: 1px solid rgba(255,255,255,0.1);"></div>`;
+                    }
+                    
+                    // 7일간 셀 생성 (일~토)
+                    for (let i = 0; i < 7; i++) {
+                        const cellDate = new Date(weekStart);
+                        cellDate.setDate(cellDate.getDate() + i);
+                        
+                        const isCurrentMonth = cellDate.getMonth() === month;
+                        const isToday = cellDate.toDateString() === today.toDateString();
+                        const isWeekend = cellDate.getDay() === 0 || cellDate.getDay() === 6;
+                        const dateKey = formatDateKey(cellDate);
+                        
+                        const attendanceType = getAttendance(member, dateKey);
+                        const typeInfo = ATTENDANCE_TYPES[attendanceType];
+                        
+                        let cellClass = 'attendance-cell';
+                        if (isWeekend) cellClass += ' weekend';
+                        if (isToday) cellClass += ' today';
+                        
+                        const opacity = isCurrentMonth ? '1' : '0.3';
+                        
+                        rowHtml += `
+                            <div class="${cellClass}" style="position:relative; opacity:${opacity};"
+                                 onclick="openAttendanceModal('${member}', '${dateKey}')"
+                                 data-member="${member}" data-date="${dateKey}">
+                                ${week === 0 ? `<span style="font-size:9px;color:rgba(255,255,255,0.4);position:absolute;top:1px;left:3px;">${cellDate.getDate()}</span>` : 
+                                  `<span style="font-size:9px;color:rgba(255,255,255,0.4);position:absolute;top:1px;left:3px;">${cellDate.getDate()}</span>`}
+                                ${typeInfo ? `<span class="attendance-badge ${attendanceType}">${typeInfo.label}</span>` : ''}
+                            </div>
+                        `;
+                    }
+                    
+                    rowHtml += `</div>`;
+                    grid.innerHTML += rowHtml;
+                });
+                
+                // 다음 주로 이동
+                weekStart.setDate(weekStart.getDate() + 7);
+            }
+        }
+
+        function formatDateKey(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function getAttendance(member, dateKey) {
+            if (attendanceData[member] && attendanceData[member][dateKey]) {
+                return attendanceData[member][dateKey];
+            }
+            return null;
+        }
+
+        function setAttendance(member, dateKey, type) {
+            if (!attendanceData[member]) {
+                attendanceData[member] = {};
+            }
+            if (type) {
+                attendanceData[member][dateKey] = type;
+            } else {
+                delete attendanceData[member][dateKey];
+            }
+            saveAttendanceData();
+        }
+
+        function openAttendanceModal(member, dateKey) {
+            selectedAttendanceCell = { member, dateKey };
+            
+            const date = new Date(dateKey);
+            const dateStr = `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+            
+            document.getElementById('modalDateTitle').textContent = dateStr;
+            document.getElementById('modalMemberName').textContent = member;
+            
+            // 기존 선택 초기화
+            document.querySelectorAll('.attendance-type-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // 기존 값이 있으면 선택 표시
+            const currentType = getAttendance(member, dateKey);
+            if (currentType) {
+                const btn = document.querySelector(`.attendance-type-btn[data-type="${currentType}"]`);
+                if (btn) btn.classList.add('selected');
+            }
+            
+            document.getElementById('attendanceModal').classList.add('show');
+        }
+
+        function closeAttendanceModal() {
+            document.getElementById('attendanceModal').classList.remove('show');
+            selectedAttendanceCell = null;
+        }
+
+        function selectAttendanceType(type) {
+            document.querySelectorAll('.attendance-type-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`.attendance-type-btn[data-type="${type}"]`).classList.add('selected');
+        }
+
+        function saveAttendance() {
+            if (!selectedAttendanceCell) return;
+            
+            const selectedBtn = document.querySelector('.attendance-type-btn.selected');
+            if (!selectedBtn) {
+                alert('근태 유형을 선택해주세요.');
+                return;
+            }
+            
+            const type = selectedBtn.dataset.type;
+            setAttendance(selectedAttendanceCell.member, selectedAttendanceCell.dateKey, type);
+            
+            closeAttendanceModal();
+            renderAttendance();
+        }
+
+        function clearAttendance() {
+            if (!selectedAttendanceCell) return;
+            
+            setAttendance(selectedAttendanceCell.member, selectedAttendanceCell.dateKey, null);
+            
+            closeAttendanceModal();
+            renderAttendance();
+        }
+
+        function prevAttendanceMonth() {
+            attendanceMonth.setMonth(attendanceMonth.getMonth() - 1);
+            renderAttendance();
+        }
+
+        function nextAttendanceMonth() {
+            attendanceMonth.setMonth(attendanceMonth.getMonth() + 1);
+            renderAttendance();
+        }
+
+        function goAttendanceToday() {
+            attendanceMonth = new Date();
+            renderAttendance();
+        }
+
+        function saveAttendanceData() {
+            if (isConnected && db) {
+                db.ref('attendance').set(attendanceData);
+            } else {
+                localStorage.setItem('planner_attendance', JSON.stringify(attendanceData));
+            }
+        }
+
+        function exportAttendance() {
+            const year = attendanceMonth.getFullYear();
+            const month = attendanceMonth.getMonth() + 1;
+            
+            let csv = '팀원,';
+            const lastDay = new Date(year, month, 0).getDate();
+            for (let d = 1; d <= lastDay; d++) {
+                csv += `${d}일,`;
+            }
+            csv += '출근,재택,휴가,반차,외근,교육,병가\n';
+            
+            TEAM_MEMBERS.forEach(member => {
+                csv += `${member},`;
+                let counts = { work: 0, remote: 0, vacation: 0, half: 0, business: 0, training: 0, sick: 0 };
+                
+                for (let d = 1; d <= lastDay; d++) {
+                    const dateKey = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                    const type = getAttendance(member, dateKey);
+                    const typeInfo = ATTENDANCE_TYPES[type];
+                    csv += `${typeInfo ? typeInfo.label : ''},`;
+                    
+                    if (type === 'work') counts.work++;
+                    else if (type === 'remote') counts.remote++;
+                    else if (type === 'vacation') counts.vacation++;
+                    else if (type === 'half-am' || type === 'half-pm') counts.half++;
+                    else if (type === 'business') counts.business++;
+                    else if (type === 'training') counts.training++;
+                    else if (type === 'sick') counts.sick++;
+                }
+                
+                csv += `${counts.work},${counts.remote},${counts.vacation},${counts.half},${counts.business},${counts.training},${counts.sick}\n`;
+            });
+            
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `근태현황_${year}년${month}월.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
         function loadLocalData() {
             try {
                 const savedTasks = localStorage.getItem('planner_tasks');
                 const savedIssues = localStorage.getItem('planner_issues');
                 const savedKpi = localStorage.getItem('planner_kpi');
                 const savedHistory = localStorage.getItem('planner_history');
+                const savedAttendance = localStorage.getItem('planner_attendance');
                 
                 if (savedTasks) tasks = JSON.parse(savedTasks);
                 if (savedIssues) issues = JSON.parse(savedIssues);
                 if (savedKpi) kpiData = JSON.parse(savedKpi);
                 if (savedHistory) historyData = JSON.parse(savedHistory);
+                if (savedAttendance) attendanceData = JSON.parse(savedAttendance);
             } catch (e) {
                 console.error('로컬 데이터 로드 실패:', e);
             }
@@ -3261,6 +3928,7 @@
             db.ref('issues').off();
             db.ref('kpiData').off();
             db.ref('history').off();
+            db.ref('attendance').off();
             
             db.ref('tasks').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -3305,6 +3973,17 @@
                 }
                 renderHistory();
                 console.log('History 동기화됨:', historyData.length);
+            });
+
+            db.ref('attendance').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    attendanceData = data;
+                } else {
+                    attendanceData = {};
+                }
+                renderAttendance();
+                console.log('Attendance 동기화됨');
             });
         }
 
