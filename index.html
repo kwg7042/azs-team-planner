@@ -2539,9 +2539,43 @@
         <div class="tab-content" id="tab-issues">
             <div class="section-header">
                 <h2><i class="fas fa-exclamation-circle"></i> ESHG 이슈 사항</h2>
-                <button class="btn btn-primary" onclick="toggleIssueForm()">
-                    <i class="fas fa-plus"></i> 이슈 추가
-                </button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="toggleIssueForm()">
+                        <i class="fas fa-plus"></i> 이슈 추가
+                    </button>
+                    <button class="btn btn-secondary" onclick="openTextParseModal()">
+                        <i class="fas fa-paste"></i> 텍스트 붙여넣기
+                    </button>
+                </div>
+            </div>
+
+            <!-- 텍스트 파싱 모달 -->
+            <div id="textParseModal" class="modal-overlay" style="display: none;">
+                <div class="modal-content" style="max-width: 700px; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column;">
+                    <h3 style="margin-bottom: 15px;"><i class="fas fa-paste"></i> 텍스트에서 이슈 추출</h3>
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 15px;">
+                        ESHG 이슈 텍스트를 붙여넣으면 자동으로 파싱하여 등록합니다.<br>
+                        각 이슈는 빈 줄로 구분하거나, 번호(1., 2.)로 시작하면 됩니다.
+                    </p>
+                    <textarea id="parseInputText" placeholder="여기에 텍스트를 붙여넣으세요...\n\n예시:\n1. [TS] 저전압 불량 증가 - 진행중\n   논의: 금형 점검 예정\n\n2. [표면] 스크래치 발생 - 대기\n   논의: 원인 분석 중" style="width: 100%; height: 150px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; font-size: 13px; resize: vertical;"></textarea>
+                    <div style="display: flex; gap: 10px; margin: 15px 0;">
+                        <button class="btn btn-primary" onclick="parseIssueText()">
+                            <i class="fas fa-search"></i> 파싱하기
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearParseInput()">
+                            <i class="fas fa-eraser"></i> 지우기
+                        </button>
+                    </div>
+                    <div id="parsePreview" style="flex: 1; overflow-y: auto; max-height: 250px;"></div>
+                    <div style="display: flex; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <button id="addParsedIssuesBtn" class="btn btn-primary" onclick="addParsedIssues()" style="display: none;">
+                            <i class="fas fa-check"></i> 전체 등록
+                        </button>
+                        <button class="btn btn-secondary" onclick="closeTextParseModal()">
+                            <i class="fas fa-times"></i> 닫기
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- 이슈 추가 폼 -->
@@ -3410,6 +3444,190 @@
                 saveIssues();
                 renderIssues();
             }
+        }
+
+        // =====================================================
+        // 텍스트 파싱 기능
+        // =====================================================
+        let parsedIssues = [];
+        
+        function openTextParseModal() {
+            document.getElementById('textParseModal').style.display = 'flex';
+            document.getElementById('parseInputText').value = '';
+            document.getElementById('parsePreview').innerHTML = '';
+            document.getElementById('addParsedIssuesBtn').style.display = 'none';
+            parsedIssues = [];
+        }
+        
+        function closeTextParseModal() {
+            document.getElementById('textParseModal').style.display = 'none';
+        }
+        
+        function clearParseInput() {
+            document.getElementById('parseInputText').value = '';
+            document.getElementById('parsePreview').innerHTML = '';
+            document.getElementById('addParsedIssuesBtn').style.display = 'none';
+            parsedIssues = [];
+        }
+        
+        function parseIssueText() {
+            const text = document.getElementById('parseInputText').value.trim();
+            if (!text) {
+                alert('텍스트를 입력해주세요.');
+                return;
+            }
+            
+            // 카테고리 키워드
+            const categories = ['TS', '어깨선', '표면', '탈리', '얼라인', '비전', '금형', '탭이슈', '타발유', '기타'];
+            // 상태 키워드
+            const statusMap = {
+                '대기': 'waiting', '진행중': 'doing', '진행': 'doing', 
+                '완료': 'done', '조치완료': 'done', '해결': 'done',
+                '미해결': 'unresolved', '미완료': 'unresolved'
+            };
+            
+            parsedIssues = [];
+            
+            // 이슈 블록 분리 (빈 줄 또는 번호로 구분)
+            const blocks = text.split(/\n(?=\d+[.\)]|\n)/).filter(b => b.trim());
+            
+            blocks.forEach(block => {
+                const lines = block.split('\n').filter(l => l.trim());
+                if (lines.length === 0) return;
+                
+                let category = '기타';
+                let status = 'waiting';
+                let content = '';
+                let discussion = '';
+                
+                // 첫 줄에서 카테고리와 상태 추출
+                let firstLine = lines[0];
+                
+                // 번호 제거 (1. 2. 등)
+                firstLine = firstLine.replace(/^\d+[.\)]\s*/, '');
+                
+                // 카테고리 추출 [TS], (표면), TS:, 표면- 등
+                for (const cat of categories) {
+                    const patterns = [
+                        new RegExp(`\\[${cat}\\]`, 'i'),
+                        new RegExp(`\\(${cat}\\)`, 'i'),
+                        new RegExp(`^${cat}[:\\-\\s]`, 'i'),
+                        new RegExp(`${cat}`, 'i')
+                    ];
+                    for (const pattern of patterns) {
+                        if (pattern.test(firstLine)) {
+                            category = cat;
+                            firstLine = firstLine.replace(pattern, '').trim();
+                            break;
+                        }
+                    }
+                    if (category !== '기타') break;
+                }
+                
+                // 상태 추출 - 진행중, 완료, 대기 등
+                for (const [keyword, value] of Object.entries(statusMap)) {
+                    const patterns = [
+                        new RegExp(`-\\s*${keyword}\\s*$`, 'i'),
+                        new RegExp(`\\[${keyword}\\]`, 'i'),
+                        new RegExp(`\\(${keyword}\\)`, 'i')
+                    ];
+                    for (const pattern of patterns) {
+                        if (pattern.test(firstLine)) {
+                            status = value;
+                            firstLine = firstLine.replace(pattern, '').trim();
+                            break;
+                        }
+                    }
+                }
+                
+                // 내용 정리
+                content = firstLine.replace(/^[-:]\s*/, '').trim();
+                
+                // 나머지 줄에서 논의/대응 내용 추출
+                for (let i = 1; i < lines.length; i++) {
+                    let line = lines[i].trim();
+                    if (/^(논의|대응|조치|결과|비고)[:\-]?\s*/i.test(line)) {
+                        discussion += line.replace(/^(논의|대응|조치|결과|비고)[:\-]?\s*/i, '') + ' ';
+                    } else if (line.startsWith('-') || line.startsWith('•')) {
+                        discussion += line.substring(1).trim() + ' ';
+                    } else {
+                        // 첫 줄 이후 내용도 content에 추가
+                        content += ' ' + line;
+                    }
+                }
+                
+                content = content.trim();
+                discussion = discussion.trim();
+                
+                if (content) {
+                    parsedIssues.push({ category, status, content, discussion });
+                }
+            });
+            
+            // 미리보기 표시
+            renderParsePreview();
+        }
+        
+        function renderParsePreview() {
+            const preview = document.getElementById('parsePreview');
+            const addBtn = document.getElementById('addParsedIssuesBtn');
+            
+            if (parsedIssues.length === 0) {
+                preview.innerHTML = `<div style="color: rgba(255,255,255,0.5); text-align: center; padding: 20px;">파싱된 이슈가 없습니다. 텍스트 형식을 확인해주세요.</div>`;
+                addBtn.style.display = 'none';
+                return;
+            }
+            
+            const statusLabels = { waiting: '대기', doing: '진행중', done: '완료', unresolved: '미해결' };
+            const statusColors = { waiting: '#ffa500', doing: '#00d4ff', done: '#00ff88', unresolved: '#ff6b6b' };
+            
+            let html = `<div style="font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 10px;">파싱된 이슈: ${parsedIssues.length}건</div>`;
+            
+            parsedIssues.forEach((issue, idx) => {
+                html += `
+                    <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 8px; border-left: 3px solid ${statusColors[issue.status]};">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="background: rgba(0,212,255,0.2); padding: 2px 8px; border-radius: 4px; font-size: 11px;">${issue.category}</span>
+                            <span style="color: ${statusColors[issue.status]}; font-size: 11px;">${statusLabels[issue.status]}</span>
+                            <button onclick="removeParsedIssue(${idx})" style="background: none; border: none; color: #ff6b6b; cursor: pointer; font-size: 12px;"><i class="fas fa-times"></i></button>
+                        </div>
+                        <div style="font-size: 13px; color: white; margin-bottom: 4px;">${issue.content}</div>
+                        ${issue.discussion ? `<div style="font-size: 11px; color: rgba(255,255,255,0.5);">논의: ${issue.discussion}</div>` : ''}
+                    </div>
+                `;
+            });
+            
+            preview.innerHTML = html;
+            addBtn.style.display = parsedIssues.length > 0 ? 'inline-flex' : 'none';
+        }
+        
+        function removeParsedIssue(idx) {
+            parsedIssues.splice(idx, 1);
+            renderParsePreview();
+        }
+        
+        function addParsedIssues() {
+            if (parsedIssues.length === 0) {
+                alert('등록할 이슈가 없습니다.');
+                return;
+            }
+            
+            parsedIssues.forEach(issue => {
+                issues.push({
+                    id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+                    category: issue.category,
+                    status: issue.status,
+                    content: issue.content,
+                    discussion: issue.discussion,
+                    createdAt: new Date().toISOString()
+                });
+            });
+            
+            saveIssues();
+            renderIssues();
+            closeTextParseModal();
+            alert(`${parsedIssues.length}건의 이슈가 등록되었습니다.`);
+            parsedIssues = [];
         }
 
         // =====================================================
