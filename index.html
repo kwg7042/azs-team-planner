@@ -3308,8 +3308,10 @@
                     <td><input class="kpi-input text-left" value="${row.target || ''}" onchange="updateKpi(${idx}, 'target', this.value)"></td>
                     <td><input class="kpi-input" value="${row.criteria || ''}" onchange="updateKpi(${idx}, 'criteria', this.value)"></td>
                     <td><input class="kpi-input" value="${row.result || ''}" onchange="updateKpi(${idx}, 'result', this.value)"></td>
-                    ${TEAM_MEMBERS.map(member => `
-                        <td class="member-cell"><input class="kpi-input" value="${row.members?.[member] || ''}" onchange="updateKpiMember(${idx}, '${member}', this.value)"></td>
+                    ${TEAM_MEMBERS.map((member, memberIdx) => `
+                        <td class="member-cell" style="background: ${memberIdx % 2 === 0 ? 'rgba(255,217,61,0.15)' : 'rgba(0,255,136,0.15)'};">
+                            <input class="kpi-input" value="${row.members?.[member] || ''}" onchange="updateKpiMember(${idx}, '${member}', this.value)">
+                        </td>
                     `).join('')}
                     <td>
                         <button class="kpi-delete-btn" onclick="deleteKpiRow(${idx})">
