@@ -436,7 +436,7 @@
 
         .form-row {
             display: grid;
-            grid-template-columns: 1fr 2fr 1fr 1fr auto;
+            grid-template-columns: 1fr 120px 100px 70px;
             gap: 10px;
             align-items: end;
         }
@@ -2354,8 +2354,8 @@
                             <option value="4">금요일</option>
                         </select>
                     </div>
-                    <button class="btn btn-primary" onclick="addTask()" style="margin-top: 20px;">
-                        <i class="fas fa-plus"></i> 추가
+                    <button class="btn btn-primary" onclick="addTask()" style="padding: 10px 15px; min-width: 50px;" title="업무 추가">
+                        <i class="fas fa-plus"></i>
                     </button>
                 </div>
             </div>
@@ -2553,13 +2553,13 @@
                             <th style="width: 180px;">목표명</th>
                             <th style="width: 120px;">평가기준</th>
                             <th style="width: 100px;">실적</th>
-                            <th class="member-col">장찬호</th>
-                            <th class="member-col">정문세</th>
-                            <th class="member-col">김원근</th>
-                            <th class="member-col">권병진</th>
-                            <th class="member-col">고귀한</th>
-                            <th class="member-col">박규태</th>
-                            <th class="member-col">최다영</th>
+                            <th class="member-col" style="background: linear-gradient(135deg, #ffd93d 0%, #f9a825 100%); color: #1a1a2e;">장찬호</th>
+                            <th class="member-col" style="background: linear-gradient(135deg, #00ff88 0%, #00b894 100%); color: #1a1a2e;">정문세</th>
+                            <th class="member-col" style="background: linear-gradient(135deg, #ffd93d 0%, #f9a825 100%); color: #1a1a2e;">김원근</th>
+                            <th class="member-col" style="background: linear-gradient(135deg, #00ff88 0%, #00b894 100%); color: #1a1a2e;">권병진</th>
+                            <th class="member-col" style="background: linear-gradient(135deg, #ffd93d 0%, #f9a825 100%); color: #1a1a2e;">고귀한</th>
+                            <th class="member-col" style="background: linear-gradient(135deg, #00ff88 0%, #00b894 100%); color: #1a1a2e;">박규태</th>
+                            <th class="member-col" style="background: linear-gradient(135deg, #ffd93d 0%, #f9a825 100%); color: #1a1a2e;">최다영</th>
                             <th style="width: 50px;">삭제</th>
                         </tr>
                     </thead>
