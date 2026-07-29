@@ -2585,6 +2585,7 @@
                         <label>구분</label>
                         <select id="newIssueCategory">
                             <option value="TS">TS</option>
+                            <option value="저전압(이물)">저전압(이물)</option>
                             <option value="어깨선">어깨선</option>
                             <option value="표면">표면</option>
                             <option value="탈리">탈리</option>
@@ -3478,7 +3479,7 @@
             }
             
             // 카테고리 키워드
-            const categories = ['TS', '어깨선', '표면', '탈리', '얼라인', '비전', '금형', '탭이슈', '타발유', '기타'];
+            const categories = ['TS', '저전압(이물)', '저전압', '어깨선', '표면', '탈리', '얼라인', '비전', '금형', '탭이슈', '타발유', '기타'];
             // 상태 키워드
             const statusMap = {
                 '대기': 'waiting', '진행중': 'doing', '진행': 'doing', 
