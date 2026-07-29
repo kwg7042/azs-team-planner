@@ -1657,6 +1657,22 @@
         .weapon-icon { font-size: 28px; }
         .weapon-level { font-size: 24px; font-weight: bold; color: #ff6b6b; }
 
+        .coin-guide {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.2));
+            border: 1px solid rgba(255,215,0,0.4);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .coin-guide-icon { font-size: 18px; }
+        .coin-guide-text { color: rgba(255,255,255,0.9); }
+        .coin-guide-text strong { color: #ffd700; }
+
         .minigame-tabs {
             display: flex;
             justify-content: center;
@@ -3126,6 +3142,12 @@
                         <span class="weapon-icon" id="myWeaponIcon">🗡️</span>
                         <span class="weapon-level" id="myWeaponLevel">+0</span>
                     </div>
+                </div>
+
+                <!-- 코인 획득 방법 안내 -->
+                <div class="coin-guide">
+                    <span class="coin-guide-icon">💡</span>
+                    <span class="coin-guide-text">업무를 완료하면 <strong>1코인</strong>을 받아요!</span>
                 </div>
 
                 <!-- 게임 선택 -->
