@@ -3006,48 +3006,89 @@
                     </div>
                 `;
             } else {
-                // 요일별로 완료된 업무 분리 표시 (아코디언 형태)
-                let completedHtml = `<div class="completed-accordion-container">`;
+                // PC/모바일 구분
+                const isMobile = window.innerWidth <= 768;
                 
-                // 할 일 목록의 완료된 업무
-                completedHtml += `
-                    <div class="completed-day-column collapsed" id="completed-col-backlog">
-                        <div class="completed-day-header" onclick="toggleCompletedDayColumn('backlog')">
-                            <i class="fas fa-inbox"></i>
-                            <span>할 일 목록</span>
-                            <span class="task-count" style="background: rgba(0,255,136,0.3); padding: 2px 8px; border-radius: 10px; font-size: 11px; color: #00ff88;">${completedBacklogTasks.length}</span>
-                            <i class="fas fa-chevron-down toggle-icon"></i>
-                        </div>
-                        <div class="completed-task-list">
-                            ${completedBacklogTasks.map(t => renderCompletedTaskCard(t)).join('')}
-                        </div>
-                    </div>
-                `;
-                
-                // 각 요일별 완료된 업무
-                dates.forEach((date, index) => {
-                    const dayCompletedTasks = completedTasks.filter(t => t.day === index);
-                    const isToday = date.toDateString() === today.toDateString();
+                if (isMobile) {
+                    // 모바일: 요일별로 완료된 업무 분리 표시 (아코디언 형태)
+                    let completedHtml = `<div class="completed-accordion-container">`;
                     
+                    // 할 일 목록의 완료된 업무
                     completedHtml += `
-                        <div class="completed-day-column collapsed ${isToday ? 'today' : ''}" id="completed-col-${index}">
-                            <div class="completed-day-header" onclick="toggleCompletedDayColumn(${index})">
-                                <i class="fas fa-calendar-check"></i>
-                                <span>${DAYS[index]}요일</span>
-                                <span class="day-date">${formatDate(date)}</span>
-                                ${isToday ? '<span class="today-badge">TODAY</span>' : ''}
-                                <span class="task-count" style="background: rgba(0,255,136,0.3); padding: 2px 8px; border-radius: 10px; font-size: 11px; color: #00ff88;">${dayCompletedTasks.length}</span>
+                        <div class="completed-day-column collapsed" id="completed-col-backlog">
+                            <div class="completed-day-header" onclick="toggleCompletedDayColumn('backlog')">
+                                <i class="fas fa-inbox"></i>
+                                <span>할 일 목록</span>
+                                <span class="task-count" style="background: rgba(0,255,136,0.3); padding: 2px 8px; border-radius: 10px; font-size: 11px; color: #00ff88;">${completedBacklogTasks.length}</span>
                                 <i class="fas fa-chevron-down toggle-icon"></i>
                             </div>
                             <div class="completed-task-list">
-                                ${dayCompletedTasks.length > 0 ? dayCompletedTasks.map(t => renderCompletedTaskCard(t)).join('') : '<div style="color: rgba(255,255,255,0.2); font-size: 11px; text-align: center; padding: 10px;">-</div>'}
+                                ${completedBacklogTasks.map(t => renderCompletedTaskCard(t)).join('')}
                             </div>
                         </div>
                     `;
-                });
-                
-                completedHtml += `</div>`;
-                completedGrid.innerHTML = completedHtml;
+                    
+                    // 각 요일별 완료된 업무
+                    dates.forEach((date, index) => {
+                        const dayCompletedTasks = completedTasks.filter(t => t.day === index);
+                        const isToday = date.toDateString() === today.toDateString();
+                        
+                        completedHtml += `
+                            <div class="completed-day-column collapsed ${isToday ? 'today' : ''}" id="completed-col-${index}">
+                                <div class="completed-day-header" onclick="toggleCompletedDayColumn(${index})">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <span>${DAYS[index]}요일</span>
+                                    <span class="day-date">${formatDate(date)}</span>
+                                    ${isToday ? '<span class="today-badge">TODAY</span>' : ''}
+                                    <span class="task-count" style="background: rgba(0,255,136,0.3); padding: 2px 8px; border-radius: 10px; font-size: 11px; color: #00ff88;">${dayCompletedTasks.length}</span>
+                                    <i class="fas fa-chevron-down toggle-icon"></i>
+                                </div>
+                                <div class="completed-task-list">
+                                    ${dayCompletedTasks.length > 0 ? dayCompletedTasks.map(t => renderCompletedTaskCard(t)).join('') : '<div style="color: rgba(255,255,255,0.2); font-size: 11px; text-align: center; padding: 10px;">-</div>'}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    completedHtml += `</div>`;
+                    completedGrid.innerHTML = completedHtml;
+                } else {
+                    // PC: 기존 가로 그리드 형태
+                    let completedHtml = `<div style="display: grid; grid-template-columns: 280px repeat(5, 1fr); gap: 12px;">`;
+                    
+                    // 할 일 목록의 완료된 업무
+                    completedHtml += `
+                        <div style="background: rgba(255,255,255,0.03); border-radius: 8px; padding: 10px;">
+                            <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 8px; display: flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-inbox"></i> 할 일
+                                ${completedBacklogTasks.length > 0 ? `<span style="background: rgba(0,255,136,0.3); padding: 1px 6px; border-radius: 8px; font-size: 10px;">${completedBacklogTasks.length}</span>` : ''}
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                ${completedBacklogTasks.map(t => renderCompletedTaskCard(t)).join('')}
+                            </div>
+                        </div>
+                    `;
+                    
+                    // 각 요일별 완료된 업무
+                    dates.forEach((date, index) => {
+                        const dayCompletedTasks = completedTasks.filter(t => t.day === index);
+                        const isToday = date.toDateString() === today.toDateString();
+                        
+                        completedHtml += `
+                            <div style="background: ${isToday ? 'rgba(0,212,255,0.08)' : 'rgba(255,255,255,0.03)'}; border-radius: 8px; padding: 10px; ${isToday ? 'border: 1px solid rgba(0,212,255,0.3);' : ''}">
+                                <div style="font-size: 12px; color: ${isToday ? '#00d4ff' : 'rgba(255,255,255,0.5)'}; margin-bottom: 8px; display: flex; align-items: center; gap: 5px;">
+                                    <i class="fas fa-calendar-check"></i> ${DAYS[index]}
+                                    ${dayCompletedTasks.length > 0 ? `<span style="background: rgba(0,255,136,0.3); padding: 1px 6px; border-radius: 8px; font-size: 10px; color: #00ff88;">${dayCompletedTasks.length}</span>` : ''}
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                    ${dayCompletedTasks.length > 0 ? dayCompletedTasks.map(t => renderCompletedTaskCard(t)).join('') : '<div style="color: rgba(255,255,255,0.2); font-size: 11px; text-align: center; padding: 10px;">-</div>'}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    completedHtml += `</div>`;
+                    completedGrid.innerHTML = completedHtml;
             }
         }
         
