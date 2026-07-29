@@ -2811,7 +2811,7 @@
         const TEAM_PASSWORD = "azs2026";
         
         function checkPassword() {
-            const input = document.getElementById('teamPassword').value;
+            const input = document.getElementById('teamPassword').value.trim();
             const error = document.getElementById('loginError');
             
             if (input === TEAM_PASSWORD) {
