@@ -850,7 +850,7 @@
         .attendance-badge.half-pm { background: rgba(255,170,61,0.3); color: #ffaa3d; }
         .attendance-badge.business { background: rgba(118,75,162,0.3); color: #a855f7; }
         .attendance-badge.training { background: rgba(102,126,234,0.3); color: #667eea; }
-        .attendance-badge.sick { background: rgba(156,163,175,0.3); color: #9ca3af; }
+        .attendance-badge.official { background: rgba(156,163,175,0.3); color: #9ca3af; }
 
         /* 근태 입력 모달 */
         .attendance-modal {
@@ -2379,9 +2379,9 @@
                 <div class="legend-item"><span class="attendance-badge vacation">휴가</span></div>
                 <div class="legend-item"><span class="attendance-badge half-am">오전반차</span></div>
                 <div class="legend-item"><span class="attendance-badge half-pm">오후반차</span></div>
-                <div class="legend-item"><span class="attendance-badge business">외근</span></div>
+                <div class="legend-item"><span class="attendance-badge business">출장</span></div>
                 <div class="legend-item"><span class="attendance-badge training">교육</span></div>
-                <div class="legend-item"><span class="attendance-badge sick">병가</span></div>
+                <div class="legend-item"><span class="attendance-badge official">공가</span></div>
             </div>
 
             <div class="attendance-container">
@@ -2444,17 +2444,21 @@
                         <span>오후반차</span>
                     </button>
                     <button class="attendance-type-btn" data-type="business" onclick="selectAttendanceType('business')">
-                        <i class="fas fa-car" style="color: #a855f7;"></i>
-                        <span>외근</span>
+                        <i class="fas fa-plane" style="color: #a855f7;"></i>
+                        <span>출장</span>
                     </button>
                     <button class="attendance-type-btn" data-type="training" onclick="selectAttendanceType('training')">
                         <i class="fas fa-graduation-cap" style="color: #667eea;"></i>
                         <span>교육</span>
                     </button>
-                    <button class="attendance-type-btn" data-type="sick" onclick="selectAttendanceType('sick')">
-                        <i class="fas fa-procedures" style="color: #9ca3af;"></i>
-                        <span>병가</span>
+                    <button class="attendance-type-btn" data-type="official" onclick="selectAttendanceType('official')">
+                        <i class="fas fa-building" style="color: #9ca3af;"></i>
+                        <span>공가</span>
                     </button>
+                </div>
+                <div class="form-group" style="margin: 15px 0;">
+                    <label style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 8px; display: block;">비고 (예: 예비군, 건강검진 등)</label>
+                    <input type="text" id="attendanceNote" placeholder="비고 입력 (선택사항)" style="width: 100%; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; background: rgba(255,255,255,0.1); color: white; font-size: 14px;">
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn btn-primary" onclick="saveAttendance()" style="flex: 1;">
@@ -3565,9 +3569,9 @@
             'vacation': { label: '휴가', icon: 'umbrella-beach', color: '#ff6b6b' },
             'half-am': { label: '오전반차', icon: 'sun', color: '#ffd93d' },
             'half-pm': { label: '오후반차', icon: 'moon', color: '#ffaa3d' },
-            'business': { label: '외근', icon: 'car', color: '#a855f7' },
+            'business': { label: '출장', icon: 'plane', color: '#a855f7' },
             'training': { label: '교육', icon: 'graduation-cap', color: '#667eea' },
-            'sick': { label: '병가', icon: 'procedures', color: '#9ca3af' }
+            'official': { label: '공가', icon: 'building', color: '#9ca3af' }
         };
 
         function renderAttendance() {
@@ -3598,9 +3602,14 @@
                 const entries = [];
                 Object.keys(attendanceData).forEach(member => {
                     if (attendanceData[member][dateKey]) {
-                        const type = attendanceData[member][dateKey];
+                        const data = attendanceData[member][dateKey];
+                        // 기존 데이터 호환 (문자열인 경우)
+                        const type = typeof data === 'string' ? data : data.type;
+                        const note = typeof data === 'string' ? '' : (data.note || '');
                         const typeInfo = ATTENDANCE_TYPES[type];
-                        entries.push({ member, type, typeInfo });
+                        if (typeInfo) {
+                            entries.push({ member, type, typeInfo, note });
+                        }
                     }
                 });
                 
@@ -3616,7 +3625,7 @@
                             ${entries.map(e => `
                                 <div class="attendance-entry">
                                     <span class="entry-name">${e.member}</span>
-                                    <span class="entry-type" style="background: ${e.typeInfo.color}30; color: ${e.typeInfo.color};">${e.typeInfo.label}</span>
+                                    <span class="entry-type" style="background: ${e.typeInfo.color}30; color: ${e.typeInfo.color};">${e.typeInfo.label}${e.note ? ' (' + e.note + ')' : ''}</span>
                                 </div>
                             `).join('')}
                         </div>
@@ -3641,17 +3650,22 @@
 
         function getAttendance(member, dateKey) {
             if (attendanceData[member] && attendanceData[member][dateKey]) {
-                return attendanceData[member][dateKey];
+                const data = attendanceData[member][dateKey];
+                // 기존 데이터 호환 (문자열인 경우)
+                if (typeof data === 'string') {
+                    return { type: data, note: '' };
+                }
+                return data;
             }
             return null;
         }
 
-        function setAttendance(member, dateKey, type) {
+        function setAttendance(member, dateKey, type, note) {
             if (!attendanceData[member]) {
                 attendanceData[member] = {};
             }
             if (type) {
-                attendanceData[member][dateKey] = type;
+                attendanceData[member][dateKey] = { type, note: note || '' };
             } else {
                 delete attendanceData[member][dateKey];
             }
@@ -3679,12 +3693,14 @@
             document.querySelectorAll('.attendance-type-btn').forEach(btn => {
                 btn.classList.remove('selected');
             });
+            document.getElementById('attendanceNote').value = '';
             
             // 기존 값이 있으면 선택 표시
-            const currentType = getAttendance(myName, dateKey);
-            if (currentType) {
-                const btn = document.querySelector(`.attendance-type-btn[data-type="${currentType}"]`);
+            const currentData = getAttendance(myName, dateKey);
+            if (currentData) {
+                const btn = document.querySelector(`.attendance-type-btn[data-type="${currentData.type}"]`);
                 if (btn) btn.classList.add('selected');
+                document.getElementById('attendanceNote').value = currentData.note || '';
             }
             
             document.getElementById('attendanceModal').classList.add('show');
@@ -3712,7 +3728,8 @@
             }
             
             const type = selectedBtn.dataset.type;
-            setAttendance(selectedAttendanceCell.member, selectedAttendanceCell.dateKey, type);
+            const note = document.getElementById('attendanceNote').value.trim();
+            setAttendance(selectedAttendanceCell.member, selectedAttendanceCell.dateKey, type, note);
             
             closeAttendanceModal();
             renderAttendance();
@@ -3759,17 +3776,19 @@
             for (let d = 1; d <= lastDay; d++) {
                 csv += `${d}일,`;
             }
-            csv += '출근,재택,휴가,반차,외근,교육,병가\n';
+            csv += '출근,재택,휴가,반차,출장,교육,공가\n';
             
             TEAM_MEMBERS.forEach(member => {
                 csv += `${member},`;
-                let counts = { work: 0, remote: 0, vacation: 0, half: 0, business: 0, training: 0, sick: 0 };
+                let counts = { work: 0, remote: 0, vacation: 0, half: 0, business: 0, training: 0, official: 0 };
                 
                 for (let d = 1; d <= lastDay; d++) {
                     const dateKey = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                    const type = getAttendance(member, dateKey);
-                    const typeInfo = ATTENDANCE_TYPES[type];
-                    csv += `${typeInfo ? typeInfo.label : ''},`;
+                    const data = getAttendance(member, dateKey);
+                    const type = data ? data.type : null;
+                    const note = data ? data.note : '';
+                    const typeInfo = type ? ATTENDANCE_TYPES[type] : null;
+                    csv += `${typeInfo ? typeInfo.label + (note ? '(' + note + ')' : '') : ''},`;
                     
                     if (type === 'work') counts.work++;
                     else if (type === 'remote') counts.remote++;
@@ -3777,10 +3796,10 @@
                     else if (type === 'half-am' || type === 'half-pm') counts.half++;
                     else if (type === 'business') counts.business++;
                     else if (type === 'training') counts.training++;
-                    else if (type === 'sick') counts.sick++;
+                    else if (type === 'official') counts.official++;
                 }
                 
-                csv += `${counts.work},${counts.remote},${counts.vacation},${counts.half},${counts.business},${counts.training},${counts.sick}\n`;
+                csv += `${counts.work},${counts.remote},${counts.vacation},${counts.half},${counts.business},${counts.training},${counts.official}\n`;
             });
             
             const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
