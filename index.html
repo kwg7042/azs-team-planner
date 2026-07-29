@@ -5944,8 +5944,8 @@
 
         function initMinigame() {
             const myName = localStorage.getItem('chat_nickname') || '익명';
-            if (database) {
-                database.ref(`minigame/${myName}`).on('value', (snapshot) => {
+            if (db) {
+                db.ref(`minigame/${myName}`).on('value', (snapshot) => {
                     const data = snapshot.val();
                     if (data) {
                         gameData = data;
@@ -5960,8 +5960,8 @@
 
         function saveGameData() {
             const myName = localStorage.getItem('chat_nickname') || '익명';
-            if (database && myName) {
-                database.ref(`minigame/${myName}`).set(gameData);
+            if (db && myName) {
+                db.ref(`minigame/${myName}`).set(gameData);
             }
         }
 
@@ -6139,9 +6139,9 @@
         }
 
         function loadLeaderboard() {
-            if (!database) return;
+            if (!db) return;
 
-            database.ref('minigame').orderByChild('weaponLevel').limitToLast(10).once('value', (snapshot) => {
+            db.ref('minigame').orderByChild('weaponLevel').limitToLast(10).once('value', (snapshot) => {
                 const data = snapshot.val() || {};
                 const leaderboard = Object.entries(data)
                     .map(([name, d]) => ({ name, level: d.weaponLevel || 0 }))
