@@ -1751,6 +1751,64 @@
                 padding: 0 8px;
             }
 
+            /* 완료된 업무 아코디언 스타일 */
+            .completed-accordion-container {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .completed-day-column {
+                background: rgba(0,184,148,0.05);
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            .completed-day-column.today {
+                background: rgba(0,212,255,0.08);
+                border: 1px solid rgba(0,212,255,0.3);
+            }
+
+            .completed-day-header {
+                padding: 12px 15px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                cursor: pointer;
+                background: rgba(0,184,148,0.1);
+                transition: background 0.2s;
+                font-size: 12px;
+                color: rgba(255,255,255,0.7);
+            }
+
+            .completed-day-header:hover {
+                background: rgba(0,184,148,0.15);
+            }
+
+            .completed-day-header .toggle-icon {
+                margin-left: auto;
+                transition: transform 0.3s;
+            }
+
+            .completed-day-column.collapsed .completed-day-header .toggle-icon {
+                transform: rotate(-90deg);
+            }
+
+            .completed-task-list {
+                max-height: 500px;
+                overflow: hidden;
+                transition: max-height 0.3s ease, padding 0.3s ease;
+                padding: 8px;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .completed-day-column.collapsed .completed-task-list {
+                max-height: 0;
+                padding: 0 8px;
+            }
+
             /* 모바일에서 토글 아이콘 표시 */
             .day-header .toggle-icon {
                 display: inline-block;
@@ -2913,7 +2971,7 @@
             dates.forEach((date, index) => {
                 const isToday = date.toDateString() === today.toDateString();
                 const dayTasks = inProgressTasks.filter(t => t.day === index);
-                const isCollapsed = !isToday; // 오늘이 아니면 기본 접힘
+                const isCollapsed = true; // 모든 요일 초기 접힘 상태
                 
                 html += `
                     <div class="day-column ${isToday ? 'today' : ''} ${isCollapsed ? 'collapsed' : ''}" id="day-col-${index}">
@@ -2942,17 +3000,19 @@
                     </div>
                 `;
             } else {
-                // 요일별로 완료된 업무 분리 표시
-                let completedHtml = `<div style="display: grid; grid-template-columns: 280px repeat(5, 1fr); gap: 12px;">`;
+                // 요일별로 완료된 업무 분리 표시 (아코디언 형태)
+                let completedHtml = `<div class="completed-accordion-container">`;
                 
                 // 할 일 목록의 완료된 업무
                 completedHtml += `
-                    <div style="background: rgba(255,255,255,0.03); border-radius: 8px; padding: 10px;">
-                        <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 8px; display: flex; align-items: center; gap: 5px;">
-                            <i class="fas fa-inbox"></i> 할 일
-                            ${completedBacklogTasks.length > 0 ? `<span style="background: rgba(0,255,136,0.3); padding: 1px 6px; border-radius: 8px; font-size: 10px;">${completedBacklogTasks.length}</span>` : ''}
+                    <div class="completed-day-column collapsed" id="completed-col-backlog">
+                        <div class="completed-day-header" onclick="toggleCompletedDayColumn('backlog')">
+                            <i class="fas fa-inbox"></i>
+                            <span>할 일 목록</span>
+                            <span class="task-count" style="background: rgba(0,255,136,0.3); padding: 2px 8px; border-radius: 10px; font-size: 11px; color: #00ff88;">${completedBacklogTasks.length}</span>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
                         </div>
-                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <div class="completed-task-list">
                             ${completedBacklogTasks.map(t => renderCompletedTaskCard(t)).join('')}
                         </div>
                     </div>
@@ -2964,12 +3024,16 @@
                     const isToday = date.toDateString() === today.toDateString();
                     
                     completedHtml += `
-                        <div style="background: ${isToday ? 'rgba(0,212,255,0.08)' : 'rgba(255,255,255,0.03)'}; border-radius: 8px; padding: 10px; ${isToday ? 'border: 1px solid rgba(0,212,255,0.3);' : ''}">
-                            <div style="font-size: 12px; color: ${isToday ? '#00d4ff' : 'rgba(255,255,255,0.5)'}; margin-bottom: 8px; display: flex; align-items: center; gap: 5px;">
-                                <i class="fas fa-calendar-check"></i> ${DAYS[index]}
-                                ${dayCompletedTasks.length > 0 ? `<span style="background: rgba(0,255,136,0.3); padding: 1px 6px; border-radius: 8px; font-size: 10px; color: #00ff88;">${dayCompletedTasks.length}</span>` : ''}
+                        <div class="completed-day-column collapsed ${isToday ? 'today' : ''}" id="completed-col-${index}">
+                            <div class="completed-day-header" onclick="toggleCompletedDayColumn(${index})">
+                                <i class="fas fa-calendar-check"></i>
+                                <span>${DAYS[index]}요일</span>
+                                <span class="day-date">${formatDate(date)}</span>
+                                ${isToday ? '<span class="today-badge">TODAY</span>' : ''}
+                                <span class="task-count" style="background: rgba(0,255,136,0.3); padding: 2px 8px; border-radius: 10px; font-size: 11px; color: #00ff88;">${dayCompletedTasks.length}</span>
+                                <i class="fas fa-chevron-down toggle-icon"></i>
                             </div>
-                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                            <div class="completed-task-list">
                                 ${dayCompletedTasks.length > 0 ? dayCompletedTasks.map(t => renderCompletedTaskCard(t)).join('') : '<div style="color: rgba(255,255,255,0.2); font-size: 11px; text-align: center; padding: 10px;">-</div>'}
                             </div>
                         </div>
@@ -3095,6 +3159,14 @@
         // 모바일 요일 아코디언 토글
         function toggleDayColumn(dayIndex) {
             const col = document.getElementById('day-col-' + dayIndex);
+            if (col) {
+                col.classList.toggle('collapsed');
+            }
+        }
+
+        // 완료된 업무 아코디언 토글
+        function toggleCompletedDayColumn(dayIndex) {
+            const col = document.getElementById('completed-col-' + dayIndex);
             if (col) {
                 col.classList.toggle('collapsed');
             }
