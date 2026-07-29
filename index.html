@@ -473,16 +473,23 @@
 
         /* ===== ESHG 이슈 탭 ===== */
         .issue-list {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
         }
 
         .issue-card {
             background: rgba(255,255,255,0.05);
             border-radius: 12px;
-            padding: 20px;
+            padding: 15px;
             border-left: 4px solid #667eea;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .issue-card:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-2px);
         }
 
         .issue-card.status-waiting { border-left-color: #888; }
@@ -524,7 +531,7 @@
         .status-unresolved { background: rgba(255,107,107,0.3); color: #ff6b6b; }
 
         .issue-content {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .issue-content h4 {
@@ -533,21 +540,24 @@
         }
 
         .issue-field {
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .issue-field-label {
-            font-size: 12px;
+            font-size: 11px;
             color: rgba(255,255,255,0.5);
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
 
         .issue-field-value {
-            font-size: 14px;
-            line-height: 1.5;
-            padding: 10px;
+            font-size: 12px;
+            line-height: 1.4;
+            padding: 6px 8px;
             background: rgba(255,255,255,0.03);
-            border-radius: 6px;
+            border-radius: 4px;
+            max-height: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .issue-footer {
@@ -1900,6 +1910,11 @@
                 padding: 12px;
             }
 
+            /* 이슈 그리드 - 모바일 1열 */
+            .issue-list {
+                grid-template-columns: 1fr;
+            }
+
             /* 이슈 카드 */
             .issue-card {
                 padding: 15px;
@@ -2621,8 +2636,16 @@
                         <textarea id="newIssueContent" placeholder="이슈 내용을 입력하세요"></textarea>
                     </div>
                     <div class="form-group full-width">
-                        <label>논의 결과</label>
-                        <textarea id="newIssueDiscussion" placeholder="논의 결과를 입력하세요"></textarea>
+                        <label>원인</label>
+                        <textarea id="newIssueCause" placeholder="원인을 입력하세요"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>즉시 조치 사항</label>
+                        <textarea id="newIssueAction" placeholder="즉시 조치 사항을 입력하세요"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>논의 필요 항목</label>
+                        <textarea id="newIssueDiscussion" placeholder="논의 필요 항목을 입력하세요"></textarea>
                     </div>
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
@@ -3306,7 +3329,7 @@
         
         function renderCategoryFilters() {
             const container = document.getElementById('issueCategoryFilters');
-            const categories = ['TS', '어깨선', '표면', '탈리', '얼라인', '비전', '금형', '탭이슈', '타발유', '기타'];
+            const categories = ['TS', '저전압(이물)', '저전압', '어깨선', '표면', '탈리', '얼라인', '비전', '금형', '탭이슈', '타발유', '기타'];
             
             const categoryStats = {};
             categories.forEach(cat => {
@@ -3372,21 +3395,21 @@
             }
 
             container.innerHTML = filteredIssues.map(issue => `
-                <div class="issue-card status-${issue.status}">
+                <div class="issue-card status-${issue.status}" ondblclick="editIssueCard('${issue.id}')" title="더블클릭으로 수정">
                     <div class="issue-header">
                         <div class="issue-category">
-                            <span class="issue-badge">${issue.category}</span>
+                            <span class="issue-badge" style="font-size: 11px; padding: 3px 8px;">${issue.category}</span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
                             <select class="issue-status status-${issue.status}" 
-                                    onchange="updateIssueStatus('${issue.id}', this.value)"
-                                    style="background: transparent; border: none; color: inherit; cursor: pointer;">
+                                    onchange="updateIssueStatus('${issue.id}', this.value)" onclick="event.stopPropagation()"
+                                    style="background: transparent; border: none; color: inherit; cursor: pointer; font-size: 11px; padding: 2px;">
                                 <option value="waiting" ${issue.status === 'waiting' ? 'selected' : ''}>대기</option>
                                 <option value="doing" ${issue.status === 'doing' ? 'selected' : ''}>진행중</option>
                                 <option value="done" ${issue.status === 'done' ? 'selected' : ''}>완료</option>
                                 <option value="unresolved" ${issue.status === 'unresolved' ? 'selected' : ''}>미해결</option>
                             </select>
-                            <button class="btn btn-danger" onclick="deleteIssue('${issue.id}')" style="padding: 5px 10px;">
+                            <button class="btn btn-danger" onclick="event.stopPropagation(); deleteIssue('${issue.id}')" style="padding: 3px 6px; font-size: 10px;">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -3394,14 +3417,22 @@
                     <div class="issue-content">
                         <div class="issue-field">
                             <div class="issue-field-label">이슈 사항</div>
-                            <div class="issue-field-value">${issue.content}</div>
+                            <div class="issue-field-value">${issue.content || '-'}</div>
                         </div>
                         <div class="issue-field">
-                            <div class="issue-field-label">논의 결과</div>
+                            <div class="issue-field-label">원인</div>
+                            <div class="issue-field-value">${issue.cause || '-'}</div>
+                        </div>
+                        <div class="issue-field">
+                            <div class="issue-field-label">즉시 조치 사항</div>
+                            <div class="issue-field-value">${issue.action || '-'}</div>
+                        </div>
+                        <div class="issue-field">
+                            <div class="issue-field-label">논의 필요 항목</div>
                             <div class="issue-field-value">${issue.discussion || '-'}</div>
                         </div>
                     </div>
-                    <div class="issue-footer">
+                    <div class="issue-footer" style="font-size: 10px; padding-top: 8px;">
                         <span>등록일: ${new Date(issue.createdAt).toLocaleDateString()}</span>
                     </div>
                 </div>
@@ -3412,6 +3443,8 @@
             const category = document.getElementById('newIssueCategory').value;
             const status = document.getElementById('newIssueStatus').value;
             const content = document.getElementById('newIssueContent').value.trim();
+            const cause = document.getElementById('newIssueCause').value.trim();
+            const action = document.getElementById('newIssueAction').value.trim();
             const discussion = document.getElementById('newIssueDiscussion').value.trim();
 
             if (!content) {
@@ -3424,6 +3457,8 @@
                 category,
                 status,
                 content,
+                cause,
+                action,
                 discussion,
                 createdAt: new Date().toISOString()
             };
@@ -3437,7 +3472,106 @@
             document.getElementById('newIssueCategory').selectedIndex = 0;
             document.getElementById('newIssueStatus').selectedIndex = 0;
             document.getElementById('newIssueContent').value = '';
+            document.getElementById('newIssueCause').value = '';
+            document.getElementById('newIssueAction').value = '';
             document.getElementById('newIssueDiscussion').value = '';
+        }
+
+        // 이슈 수정 모달
+        let editingIssueId = null;
+        
+        function editIssueCard(id) {
+            const issue = issues.find(i => i.id === id);
+            if (!issue) return;
+            
+            editingIssueId = id;
+            
+            // 모달 HTML 생성
+            const modal = document.createElement('div');
+            modal.id = 'editIssueModal';
+            modal.className = 'modal-overlay';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                    <h3 style="margin-bottom: 15px;"><i class="fas fa-edit"></i> 이슈 수정</h3>
+                    <div class="issue-form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div class="form-group">
+                            <label>구분</label>
+                            <select id="editIssueCategory">
+                                <option value="TS" ${issue.category === 'TS' ? 'selected' : ''}>TS</option>
+                                <option value="저전압(이물)" ${issue.category === '저전압(이물)' ? 'selected' : ''}>저전압(이물)</option>
+                                <option value="저전압" ${issue.category === '저전압' ? 'selected' : ''}>저전압</option>
+                                <option value="어깨선" ${issue.category === '어깨선' ? 'selected' : ''}>어깨선</option>
+                                <option value="표면" ${issue.category === '표면' ? 'selected' : ''}>표면</option>
+                                <option value="탈리" ${issue.category === '탈리' ? 'selected' : ''}>탈리</option>
+                                <option value="얼라인" ${issue.category === '얼라인' ? 'selected' : ''}>얼라인</option>
+                                <option value="비전" ${issue.category === '비전' ? 'selected' : ''}>비전</option>
+                                <option value="금형" ${issue.category === '금형' ? 'selected' : ''}>금형</option>
+                                <option value="탭이슈" ${issue.category === '탭이슈' ? 'selected' : ''}>탭이슈</option>
+                                <option value="타발유" ${issue.category === '타발유' ? 'selected' : ''}>타발유</option>
+                                <option value="기타" ${issue.category === '기타' ? 'selected' : ''}>기타</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>진행상태</label>
+                            <select id="editIssueStatus">
+                                <option value="waiting" ${issue.status === 'waiting' ? 'selected' : ''}>대기</option>
+                                <option value="doing" ${issue.status === 'doing' ? 'selected' : ''}>진행중</option>
+                                <option value="done" ${issue.status === 'done' ? 'selected' : ''}>완료</option>
+                                <option value="unresolved" ${issue.status === 'unresolved' ? 'selected' : ''}>미해결</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>이슈 사항</label>
+                            <textarea id="editIssueContent" style="width: 100%; min-height: 60px;">${issue.content || ''}</textarea>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>원인</label>
+                            <textarea id="editIssueCause" style="width: 100%; min-height: 60px;">${issue.cause || ''}</textarea>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>즉시 조치 사항</label>
+                            <textarea id="editIssueAction" style="width: 100%; min-height: 60px;">${issue.action || ''}</textarea>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>논의 필요 항목</label>
+                            <textarea id="editIssueDiscussion" style="width: 100%; min-height: 60px;">${issue.discussion || ''}</textarea>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn btn-primary" onclick="saveIssueEdit()">
+                            <i class="fas fa-check"></i> 저장
+                        </button>
+                        <button class="btn btn-secondary" onclick="closeIssueEditModal()">
+                            <i class="fas fa-times"></i> 취소
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+        
+        function saveIssueEdit() {
+            const issue = issues.find(i => i.id === editingIssueId);
+            if (!issue) return;
+            
+            issue.category = document.getElementById('editIssueCategory').value;
+            issue.status = document.getElementById('editIssueStatus').value;
+            issue.content = document.getElementById('editIssueContent').value.trim();
+            issue.cause = document.getElementById('editIssueCause').value.trim();
+            issue.action = document.getElementById('editIssueAction').value.trim();
+            issue.discussion = document.getElementById('editIssueDiscussion').value.trim();
+            
+            saveIssues();
+            renderIssues();
+            closeIssueEditModal();
+        }
+        
+        function closeIssueEditModal() {
+            const modal = document.getElementById('editIssueModal');
+            if (modal) modal.remove();
+            editingIssueId = null;
         }
 
         function updateIssueStatus(id, status) {
