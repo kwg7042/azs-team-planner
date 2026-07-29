@@ -1742,13 +1742,16 @@
             .day-column .task-list {
                 max-height: 500px;
                 overflow: hidden;
-                transition: max-height 0.3s ease, padding 0.3s ease;
+                transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease;
                 padding: 8px;
+                opacity: 1;
             }
 
             .day-column.collapsed .task-list {
                 max-height: 0;
                 padding: 0 8px;
+                opacity: 0;
+                overflow: hidden;
             }
 
             /* 완료된 업무 아코디언 스타일 */
@@ -1797,16 +1800,19 @@
             .completed-task-list {
                 max-height: 500px;
                 overflow: hidden;
-                transition: max-height 0.3s ease, padding 0.3s ease;
+                transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease;
                 padding: 8px;
                 display: flex;
                 flex-direction: column;
                 gap: 6px;
+                opacity: 1;
             }
 
             .completed-day-column.collapsed .completed-task-list {
                 max-height: 0;
                 padding: 0 8px;
+                opacity: 0;
+                overflow: hidden;
             }
 
             /* 모바일에서 토글 아이콘 표시 */
