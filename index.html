@@ -1689,8 +1689,9 @@
             .weekly-grid {
                 display: flex;
                 flex-direction: column;
-                gap: 8px;
+                gap: 6px;
                 padding-bottom: 10px;
+                min-height: unset;
             }
 
             .task-backlog {
@@ -1698,11 +1699,19 @@
                 min-width: unset;
                 flex: unset;
                 width: 100%;
+                padding: 10px;
+            }
+
+            .task-backlog .task-list {
+                min-height: unset;
+                gap: 6px;
             }
 
             .backlog-header {
                 padding: 8px 10px;
                 font-size: 12px;
+                margin-bottom: 8px;
+                padding-bottom: 8px;
             }
 
             /* 모바일 아코디언 스타일 */
@@ -1745,6 +1754,7 @@
                 transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease;
                 padding: 8px;
                 opacity: 1;
+                min-height: unset;
             }
 
             .day-column.collapsed .task-list {
@@ -1758,7 +1768,7 @@
             .completed-accordion-container {
                 display: flex;
                 flex-direction: column;
-                gap: 8px;
+                gap: 6px;
             }
 
             .completed-day-column {
