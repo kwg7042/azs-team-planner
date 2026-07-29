@@ -79,6 +79,39 @@
             align-items: center;
             gap: 15px;
         }
+        
+        .nickname-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+        
+        .nickname-box label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .nickname-box input {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            width: 80px;
+            outline: none;
+        }
+        
+        .nickname-box input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .nickname-box input:focus {
+            background: rgba(255,255,255,0.3);
+        }
 
         .connection-status {
             display: flex;
@@ -2157,6 +2190,10 @@
             </div>
         </div>
         <div class="header-right">
+            <div class="nickname-box">
+                <label><i class="fas fa-user"></i></label>
+                <input type="text" id="headerNickname" placeholder="내 이름" maxlength="10">
+            </div>
             <div class="connection-status" id="connectionStatus">
                 <span class="connection-dot"></span>
                 <span>오프라인</span>
@@ -4787,26 +4824,55 @@
         
         // 초기화 시 닉네임 복원 및 이벤트 설정
         document.addEventListener('DOMContentLoaded', function() {
-            const nicknameInput = document.getElementById('chatNickname');
-            if (nicknameInput) {
-                // 저장된 닉네임 복원
-                if (myNickname) {
-                    nicknameInput.value = myNickname;
-                    // 담당자 자동 선택
-                    setTimeout(() => setDefaultAssignee(myNickname), 100);
-                }
-                
-                // 닉네임 변경 시 실시간 업데이트
-                nicknameInput.addEventListener('blur', function() {
+            const headerNicknameInput = document.getElementById('headerNickname');
+            const chatNicknameInput = document.getElementById('chatNickname');
+            
+            // 저장된 닉네임 복원
+            if (myNickname) {
+                if (headerNicknameInput) headerNicknameInput.value = myNickname;
+                if (chatNicknameInput) chatNicknameInput.value = myNickname;
+                // 담당자 자동 선택
+                setTimeout(() => setDefaultAssignee(myNickname), 100);
+            }
+            
+            // 헤더 닉네임 입력창 이벤트
+            if (headerNicknameInput) {
+                headerNicknameInput.addEventListener('blur', function() {
                     const newNickname = this.value.trim();
-                    if (newNickname && newNickname !== myNickname) {
+                    if (newNickname !== myNickname) {
                         myNickname = newNickname;
                         localStorage.setItem('chat_nickname', newNickname);
                         updateMyPresence(newNickname);
+                        // 채팅 닉네임 동기화
+                        if (chatNicknameInput) chatNicknameInput.value = newNickname;
+                        // 근태관리 렌더링 새로고침
+                        renderAttendance();
                     }
                 });
                 
-                nicknameInput.addEventListener('keypress', function(e) {
+                headerNicknameInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        this.blur();
+                    }
+                });
+            }
+            
+            // 채팅 닉네임 입력창 이벤트 (동기화)
+            if (chatNicknameInput) {
+                chatNicknameInput.addEventListener('blur', function() {
+                    const newNickname = this.value.trim();
+                    if (newNickname !== myNickname) {
+                        myNickname = newNickname;
+                        localStorage.setItem('chat_nickname', newNickname);
+                        updateMyPresence(newNickname);
+                        // 헤더 닉네임 동기화
+                        if (headerNicknameInput) headerNicknameInput.value = newNickname;
+                        // 근태관리 렌더링 새로고침
+                        renderAttendance();
+                    }
+                });
+                
+                chatNicknameInput.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
                         this.blur();
                     }
@@ -4817,10 +4883,13 @@
         // 채팅 메시지 전송
         function sendChatMessage() {
             const input = document.getElementById('chatInput');
-            const nicknameInput = document.getElementById('chatNickname');
+            const headerNicknameInput = document.getElementById('headerNickname');
+            const chatNicknameInput = document.getElementById('chatNickname');
             
             const message = input.value.trim();
-            const nickname = nicknameInput.value.trim() || '익명';
+            const nickname = (headerNicknameInput && headerNicknameInput.value.trim()) || 
+                             (chatNicknameInput && chatNicknameInput.value.trim()) || 
+                             localStorage.getItem('chat_nickname') || '익명';
             
             if (!message) return;
             
