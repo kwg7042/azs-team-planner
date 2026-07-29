@@ -730,6 +730,15 @@
         .attendance-row:hover {
             background: rgba(255,255,255,0.03);
         }
+        
+        .my-attendance-row {
+            background: rgba(0, 255, 136, 0.05) !important;
+            border-left: 3px solid #00ff88;
+        }
+        
+        .my-member {
+            background: rgba(0, 255, 136, 0.1);
+        }
 
         .attendance-member {
             padding: 12px 15px;
@@ -3575,20 +3584,25 @@
                     grid.innerHTML += `<div style="height: 1px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>`;
                 }
                 
+                // 현재 사용자 닉네임 가져오기
+                const currentNickname = localStorage.getItem('chat_nickname') || '';
+                
                 // 각 팀원별로 행 생성
                 TEAM_MEMBERS.forEach(member => {
-                    let rowHtml = `<div class="attendance-row">`;
+                    const isMyRow = member === currentNickname;
+                    let rowHtml = `<div class="attendance-row${isMyRow ? ' my-attendance-row' : ''}">`;
                     
                     // 팀원 이름 셀 (첫 주에만 표시)
                     if (week === 0) {
                         rowHtml += `
-                            <div class="attendance-member" style="position: relative;">
+                            <div class="attendance-member${isMyRow ? ' my-member' : ''}" style="position: relative;">
                                 <div class="member-avatar">${member.charAt(0)}</div>
                                 <span>${member}</span>
+                                ${isMyRow ? '<i class="fas fa-user-check" style="margin-left: 5px; color: #00ff88; font-size: 10px;"></i>' : ''}
                             </div>
                         `;
                     } else {
-                        rowHtml += `<div class="attendance-member" style="border-right: 1px solid rgba(255,255,255,0.1);"></div>`;
+                        rowHtml += `<div class="attendance-member${isMyRow ? ' my-member' : ''}" style="border-right: 1px solid rgba(255,255,255,0.1);"></div>`;
                     }
                     
                     // 7일간 셀 생성 (일~토)
@@ -3966,10 +3980,12 @@
         }
 
         let onlineUsers = [];
+        let myPresenceRef = null;
+        let myPresenceId = null;
         
         function setupPresence() {
-            const myId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            const myRef = db.ref('presence/' + myId);
+            myPresenceId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            myPresenceRef = db.ref('presence/' + myPresenceId);
             
             // 닉네임 가져오기 (채팅 닉네임 또는 기본값)
             const myName = localStorage.getItem('chat_nickname') || '익명';
@@ -3977,12 +3993,12 @@
             // 연결 시 presence 설정
             db.ref('.info/connected').on('value', (snapshot) => {
                 if (snapshot.val() === true) {
-                    myRef.set({ 
+                    myPresenceRef.set({ 
                         online: true, 
                         name: myName,
                         lastSeen: firebase.database.ServerValue.TIMESTAMP 
                     });
-                    myRef.onDisconnect().remove();
+                    myPresenceRef.onDisconnect().remove();
                 }
             });
 
@@ -4002,6 +4018,31 @@
                         : '<div style="color: rgba(255,255,255,0.5);">접속자 없음</div>';
                 }
             });
+        }
+        
+        // 닉네임 변경 시 presence 업데이트
+        function updateMyPresence(newName) {
+            if (myPresenceRef && db) {
+                myPresenceRef.update({
+                    name: newName || '익명',
+                    lastSeen: firebase.database.ServerValue.TIMESTAMP
+                });
+            }
+            // 업무관리 담당자 자동 선택
+            setDefaultAssignee(newName);
+        }
+        
+        // 업무관리 담당자 자동 선택
+        function setDefaultAssignee(nickname) {
+            if (!nickname) return;
+            const taskSelect = document.getElementById('newTaskAssignee');
+            if (taskSelect) {
+                // TEAM_MEMBERS에 해당 닉네임이 있는지 확인
+                const option = Array.from(taskSelect.options).find(opt => opt.value === nickname);
+                if (option) {
+                    taskSelect.value = nickname;
+                }
+            }
         }
         
         function toggleOnlineList() {
@@ -4744,11 +4785,32 @@
         let chatMessages = [];
         let myNickname = localStorage.getItem('chat_nickname') || '';
         
-        // 초기화 시 닉네임 복원
+        // 초기화 시 닉네임 복원 및 이벤트 설정
         document.addEventListener('DOMContentLoaded', function() {
             const nicknameInput = document.getElementById('chatNickname');
-            if (nicknameInput && myNickname) {
-                nicknameInput.value = myNickname;
+            if (nicknameInput) {
+                // 저장된 닉네임 복원
+                if (myNickname) {
+                    nicknameInput.value = myNickname;
+                    // 담당자 자동 선택
+                    setTimeout(() => setDefaultAssignee(myNickname), 100);
+                }
+                
+                // 닉네임 변경 시 실시간 업데이트
+                nicknameInput.addEventListener('blur', function() {
+                    const newNickname = this.value.trim();
+                    if (newNickname && newNickname !== myNickname) {
+                        myNickname = newNickname;
+                        localStorage.setItem('chat_nickname', newNickname);
+                        updateMyPresence(newNickname);
+                    }
+                });
+                
+                nicknameInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        this.blur();
+                    }
+                });
             }
         });
         
