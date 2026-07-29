@@ -2152,8 +2152,11 @@
                 <span class="connection-dot"></span>
                 <span>오프라인</span>
             </div>
-            <div class="online-count" id="onlineCount">
+            <div class="online-count" id="onlineCount" style="cursor: pointer; position: relative;" onclick="toggleOnlineList()">
                 <i class="fas fa-users"></i> <span>0</span>명 접속
+                <div id="onlineList" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 5px; background: rgba(26,26,46,0.95); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 10px; min-width: 150px; z-index: 1000; font-size: 12px;">
+                    <!-- 접속자 목록 -->
+                </div>
             </div>
             <button onclick="logout()" style="background: rgba(255,255,255,0.15); border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;" title="로그아웃">
                 <i class="fas fa-sign-out-alt"></i>
@@ -2180,9 +2183,6 @@
         </button>
         <button class="tab-btn" data-tab="calendar">
             <i class="fas fa-calendar-alt"></i> 캘린더
-        </button>
-        <button class="tab-btn" data-tab="history">
-            <i class="fas fa-history"></i> 과거이력
         </button>
         <button class="tab-btn" data-tab="omok">
             <i class="fas fa-circle"></i> 오목
@@ -2502,16 +2502,6 @@
             </div>
         </div>
 
-        <!-- ========== 과거이력 탭 ========== -->
-        <div class="tab-content" id="tab-history">
-            <div class="section-header">
-                <h2><i class="fas fa-history"></i> 과거 주간 이력</h2>
-            </div>
-            <div id="historyContainer">
-                <!-- JavaScript로 생성 -->
-            </div>
-        </div>
-
         <!-- ========== 오목 탭 ========== -->
         <div class="tab-content" id="tab-omok">
             <div class="section-header">
@@ -2660,12 +2650,6 @@
                 </table>
             </div>
         </div>
-    </div>
-
-    <!-- Firebase 연결 바 -->
-    <div class="firebase-bar">
-        <input type="text" id="firebaseConfig" placeholder="Firebase 설정을 붙여넣으세요...">
-        <button onclick="connectFirebase()"><i class="fas fa-plug"></i> 연결</button>
     </div>
 
     <script>
@@ -3987,15 +3971,21 @@
             });
         }
 
+        let onlineUsers = [];
+        
         function setupPresence() {
             const myId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             const myRef = db.ref('presence/' + myId);
+            
+            // 닉네임 가져오기 (채팅 닉네임 또는 기본값)
+            const myName = localStorage.getItem('chat_nickname') || '익명';
             
             // 연결 시 presence 설정
             db.ref('.info/connected').on('value', (snapshot) => {
                 if (snapshot.val() === true) {
                     myRef.set({ 
                         online: true, 
+                        name: myName,
                         lastSeen: firebase.database.ServerValue.TIMESTAMP 
                     });
                     myRef.onDisconnect().remove();
@@ -4005,10 +3995,36 @@
             db.ref('presence').on('value', (snapshot) => {
                 const users = snapshot.val();
                 const count = users ? Object.keys(users).length : 0;
-                document.getElementById('onlineCount').innerHTML = 
-                    `<i class="fas fa-users"></i> <span>${count}</span>명 접속`;
+                onlineUsers = users ? Object.values(users).map(u => u.name || '익명') : [];
+                
+                const countEl = document.getElementById('onlineCount');
+                const listEl = document.getElementById('onlineList');
+                
+                countEl.querySelector('span').textContent = count;
+                
+                if (listEl) {
+                    listEl.innerHTML = onlineUsers.length > 0 
+                        ? onlineUsers.map(name => `<div style="padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-user" style="margin-right: 6px; color: #00ff88;"></i>${name}</div>`).join('')
+                        : '<div style="color: rgba(255,255,255,0.5);">접속자 없음</div>';
+                }
             });
         }
+        
+        function toggleOnlineList() {
+            const listEl = document.getElementById('onlineList');
+            if (listEl) {
+                listEl.style.display = listEl.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+        
+        // 클릭 외부 시 닫기
+        document.addEventListener('click', function(e) {
+            const onlineCount = document.getElementById('onlineCount');
+            const listEl = document.getElementById('onlineList');
+            if (onlineCount && listEl && !onlineCount.contains(e.target)) {
+                listEl.style.display = 'none';
+            }
+        });
 
         // =====================================================
         // 오목 게임
