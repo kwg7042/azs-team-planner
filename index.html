@@ -2740,7 +2740,6 @@
             renderIssues();
             renderKpiTable();
             renderCalendar();
-            renderHistory();
             renderAttendance();
         }
 
@@ -3821,11 +3820,6 @@
         function autoConnectFirebase() {
             try {
                 initFirebaseWithConfig(FIREBASE_CONFIG);
-                const configInput = document.getElementById('firebaseConfig');
-                if (configInput) {
-                    configInput.value = '✅ 자동 연결됨';
-                    configInput.disabled = true;
-                }
                 console.log('Firebase 자동 연결 완료');
             } catch (e) {
                 console.error('Firebase 자동 연결 실패:', e);
