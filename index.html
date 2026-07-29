@@ -1757,6 +1757,13 @@
                 max-width: unset !important;
                 flex: unset !important;
             }
+            
+            /* 완료된 업무 요일별 그리드 - 세로 배치 */
+            .completed-grid > div {
+                display: flex !important;
+                flex-direction: column !important;
+                grid-template-columns: unset !important;
+            }
 
             /* 업무 추가 폼 */
             .add-task-form {
@@ -2280,18 +2287,6 @@
             <!-- 업무 추가 폼 -->
             <div class="add-task-form">
                 <div class="form-row">
-                    <div class="form-group">
-                        <label>담당자</label>
-                        <select id="newTaskAssignee">
-                            <option value="장찬호">장찬호</option>
-                            <option value="정문세">정문세</option>
-                            <option value="김원근">김원근</option>
-                            <option value="권병진">권병진</option>
-                            <option value="고귀한">고귀한</option>
-                            <option value="박규태">박규태</option>
-                            <option value="최다영">최다영</option>
-                        </select>
-                    </div>
                     <div class="form-group">
                         <label>업무 내용</label>
                         <input type="text" id="newTaskTitle" placeholder="업무 내용을 입력하세요">
@@ -3019,11 +3014,17 @@
         }
 
         function addTask() {
-            const assignee = document.getElementById('newTaskAssignee').value;
+            // 내 닉네임 자동 입력
+            const assignee = localStorage.getItem('chat_nickname') || '미지정';
             const title = document.getElementById('newTaskTitle').value.trim();
             const priority = document.getElementById('newTaskPriority').value;
             const day = parseInt(document.getElementById('newTaskDay').value);
 
+            if (!assignee || assignee === '미지정') {
+                alert('먼저 상단에서 닉네임을 입력해주세요.');
+                return;
+            }
+            
             if (!title) {
                 alert('업무 내용을 입력해주세요.');
                 return;
@@ -3588,7 +3589,7 @@
                         <div class="attendance-entries">
                             ${entries.map(e => `
                                 <div class="attendance-entry">
-                                    <span class="entry-name">${e.member.charAt(0)}</span>
+                                    <span class="entry-name">${e.member}</span>
                                     <span class="entry-type" style="background: ${e.typeInfo.color}30; color: ${e.typeInfo.color};">${e.typeInfo.label}</span>
                                 </div>
                             `).join('')}
@@ -3997,21 +3998,13 @@
                     lastSeen: firebase.database.ServerValue.TIMESTAMP
                 });
             }
-            // 업무관리 담당자 자동 선택
-            setDefaultAssignee(newName);
+            // 근태관리 새로고침 (내 이름 업데이트)
+            renderAttendance();
         }
         
-        // 업무관리 담당자 자동 선택
+        // 업무관리 담당자 자동 선택 (더 이상 사용 안함 - 추가 시 자동 입력)
         function setDefaultAssignee(nickname) {
-            if (!nickname) return;
-            const taskSelect = document.getElementById('newTaskAssignee');
-            if (taskSelect) {
-                // TEAM_MEMBERS에 해당 닉네임이 있는지 확인
-                const option = Array.from(taskSelect.options).find(opt => opt.value === nickname);
-                if (option) {
-                    taskSelect.value = nickname;
-                }
-            }
+            // 담당자 필드 제거로 더 이상 필요 없음
         }
         
         function toggleOnlineList() {
