@@ -3362,6 +3362,10 @@
         // 캘린더
         // =====================================================
         function renderCalendar() {
+            // 캘린더 탭이 제거되었으므로 바로 리턴
+            const container = document.getElementById('calendarDays');
+            if (!container) return;
+            
             const year = currentMonth.getFullYear();
             const month = currentMonth.getMonth();
             
