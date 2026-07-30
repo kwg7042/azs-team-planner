@@ -5427,11 +5427,26 @@
         
         // 페이지 로드 시 자동 연결
         function autoConnectFirebase() {
+            // Firebase SDK 로드 확인
+            if (typeof firebase === 'undefined') {
+                console.error('Firebase SDK가 로드되지 않았습니다. 1초 후 재시도...');
+                setTimeout(autoConnectFirebase, 1000);
+                return;
+            }
+            
             try {
                 initFirebaseWithConfig(FIREBASE_CONFIG);
                 console.log('Firebase 자동 연결 완료');
+                
+                // 연결 성공 표시
+                const configInput = document.getElementById('firebaseConfig');
+                if (configInput) {
+                    configInput.value = '✅ 자동 연결됨';
+                }
             } catch (e) {
                 console.error('Firebase 자동 연결 실패:', e);
+                // 1초 후 재시도
+                setTimeout(autoConnectFirebase, 1000);
             }
         }
         
