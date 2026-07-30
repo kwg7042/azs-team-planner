@@ -7,6 +7,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -2833,7 +2834,7 @@
 
     <!-- 학습자료 추가 모달 -->
     <div id="studyModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center;">
-        <div style="background: #1a1a2e; border-radius: 15px; padding: 25px; width: 90%; max-width: 500px; border: 1px solid rgba(255,255,255,0.1);">
+        <div style="background: #1a1a2e; border-radius: 15px; padding: 25px; width: 90%; max-width: 500px; border: 1px solid rgba(255,255,255,0.1); max-height: 90vh; overflow-y: auto;">
             <h3 style="margin: 0 0 20px 0;"><i class="fas fa-plus-circle"></i> 학습 자료 추가</h3>
             <div style="display: grid; gap: 15px;">
                 <div>
@@ -2849,10 +2850,51 @@
                     <label style="display: block; margin-bottom: 5px; font-size: 14px;">제목</label>
                     <input type="text" id="newStudyTitle" placeholder="자료 제목" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white;">
                 </div>
+                
+                <!-- 자료 유형 선택 -->
                 <div>
+                    <label style="display: block; margin-bottom: 5px; font-size: 14px;">자료 유형</label>
+                    <div style="display: flex; gap: 10px;">
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; padding: 8px 15px; background: rgba(255,255,255,0.1); border-radius: 6px;">
+                            <input type="radio" name="studyType" value="link" checked onchange="toggleStudyInputType()">
+                            <i class="fas fa-link"></i> 링크
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; padding: 8px 15px; background: rgba(255,255,255,0.1); border-radius: 6px;">
+                            <input type="radio" name="studyType" value="file" onchange="toggleStudyInputType()">
+                            <i class="fas fa-file-upload"></i> 파일 업로드
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- 링크 입력 -->
+                <div id="studyLinkInput">
                     <label style="display: block; margin-bottom: 5px; font-size: 14px;">링크 (URL)</label>
                     <input type="text" id="newStudyLink" placeholder="https://..." style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white;">
                 </div>
+                
+                <!-- 파일 업로드 -->
+                <div id="studyFileInput" style="display: none;">
+                    <label style="display: block; margin-bottom: 5px; font-size: 14px;">파일 선택</label>
+                    <div style="position: relative;">
+                        <input type="file" id="newStudyFile" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip,.png,.jpg,.jpeg" style="display: none;" onchange="handleStudyFileSelect(this)">
+                        <button onclick="document.getElementById('newStudyFile').click()" style="width: 100%; padding: 15px; background: rgba(102,126,234,0.2); border: 2px dashed rgba(102,126,234,0.5); border-radius: 8px; color: white; cursor: pointer; text-align: center;">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 24px; margin-bottom: 5px; display: block;"></i>
+                            <span id="studyFileName">클릭하여 파일 선택</span>
+                        </button>
+                    </div>
+                    <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 5px;">지원: PDF, Word, PPT, Excel, 이미지, ZIP (최대 10MB)</p>
+                    <!-- 업로드 진행바 -->
+                    <div id="uploadProgress" style="display: none; margin-top: 10px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;">
+                            <span>업로드 중...</span>
+                            <span id="uploadPercent">0%</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden;">
+                            <div id="uploadProgressBar" style="background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div>
                     <label style="display: block; margin-bottom: 5px; font-size: 14px;">설명</label>
                     <textarea id="newStudyDesc" placeholder="간단한 설명" rows="3" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white; resize: vertical;"></textarea>
@@ -2860,7 +2902,7 @@
             </div>
             <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end;">
                 <button onclick="closeStudyModal()" style="padding: 10px 20px; background: rgba(255,255,255,0.1); border: none; border-radius: 6px; color: white; cursor: pointer;">취소</button>
-                <button onclick="addStudyMaterial()" style="padding: 10px 20px; background: linear-gradient(135deg, #667eea, #764ba2); border: none; border-radius: 6px; color: white; cursor: pointer;">추가</button>
+                <button id="addStudyBtn" onclick="addStudyMaterial()" style="padding: 10px 20px; background: linear-gradient(135deg, #667eea, #764ba2); border: none; border-radius: 6px; color: white; cursor: pointer;">추가</button>
             </div>
         </div>
     </div>
@@ -3738,8 +3780,10 @@
                 const entries = [];
                 Object.keys(attendanceData).forEach(member => {
                     if (attendanceData[member][dateKey]) {
-                        const type = attendanceData[member][dateKey];
-                        const typeInfo = ATTENDANCE_TYPES[type];
+                        let rawType = attendanceData[member][dateKey];
+                        // 객체인 경우 type 속성 추출, 문자열이면 그대로 사용
+                        const type = typeof rawType === 'object' ? (rawType.type || rawType.status || JSON.stringify(rawType)) : rawType;
+                        const typeInfo = ATTENDANCE_TYPES[type] || { label: type, icon: 'question', color: '#888' };
                         entries.push({ member, type, typeInfo });
                     }
                 });
@@ -3756,7 +3800,7 @@
                             ${entries.map(e => `
                                 <div class="attendance-entry">
                                     <span class="entry-name">${e.member}</span>
-                                    <span class="entry-type" style="background: ${e.typeInfo.color}30; color: ${e.typeInfo.color};">${e.typeInfo.label}</span>
+                                    <span class="entry-type" style="background: ${e.typeInfo?.color || '#888'}30; color: ${e.typeInfo?.color || '#888'};">${e.typeInfo?.label || e.type}</span>
                                 </div>
                             `).join('')}
                         </div>
