@@ -7173,13 +7173,22 @@
         function deleteStudyMaterial(id) {
             if (!confirm('이 자료를 삭제하시겠습니까?')) return;
             
+            // ID를 문자열로 변환 (숫자 ID도 처리)
+            const strId = String(id);
+            
             if (db) {
-                db.ref('studyMaterials/' + id).remove();
-                // 로컬 배열에서도 제거하고 리렌더링
-                studyMaterials = studyMaterials.filter(m => m.id !== id);
+                db.ref('studyMaterials/' + strId).remove()
+                    .then(() => {
+                        console.log('Firebase 삭제 성공:', strId);
+                    })
+                    .catch((err) => {
+                        console.error('Firebase 삭제 실패:', err);
+                    });
+                // 로컬 배열에서도 제거 (타입 무관 비교)
+                studyMaterials = studyMaterials.filter(m => String(m.id) !== strId);
                 renderStudyMaterials();
             } else {
-                studyMaterials = studyMaterials.filter(m => m.id !== id);
+                studyMaterials = studyMaterials.filter(m => String(m.id) !== strId);
                 renderStudyMaterials();
             }
         }
