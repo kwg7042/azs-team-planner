@@ -5681,8 +5681,10 @@
             currentPlayer = 'black';
             renderOmokBoard();
             updateTurnDisplay();
-            document.getElementById('winnerBanner').innerHTML = '';
-            document.getElementById('gameLog').innerHTML = '<div class="log-entry">게임을 시작하세요!</div>';
+            const winnerBanner = document.getElementById('winnerBanner');
+            const gameLogEl = document.getElementById('gameLog');
+            if (winnerBanner) winnerBanner.innerHTML = '';
+            if (gameLogEl) gameLogEl.innerHTML = '<div class="log-entry">게임을 시작하세요!</div>';
         }
 
         // 보드 렌더링
