@@ -310,11 +310,6 @@
             border-bottom: 2px solid rgba(255,255,255,0.1);
         }
 
-        /* PC에서 아코디언 토글 아이콘 숨김 */
-        .day-header .toggle-icon {
-            display: none;
-        }
-
         .day-name {
             font-size: 1.1em;
             font-weight: bold;
@@ -436,7 +431,7 @@
 
         .form-row {
             display: grid;
-            grid-template-columns: 1fr 120px 100px 70px;
+            grid-template-columns: 1fr 2fr 1fr 1fr auto;
             gap: 10px;
             align-items: end;
         }
@@ -473,23 +468,16 @@
 
         /* ===== ESHG 이슈 탭 ===== */
         .issue-list {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            display: flex;
+            flex-direction: column;
             gap: 15px;
         }
 
         .issue-card {
             background: rgba(255,255,255,0.05);
             border-radius: 12px;
-            padding: 15px;
+            padding: 20px;
             border-left: 4px solid #667eea;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .issue-card:hover {
-            background: rgba(255,255,255,0.08);
-            transform: translateY(-2px);
         }
 
         .issue-card.status-waiting { border-left-color: #888; }
@@ -531,7 +519,7 @@
         .status-unresolved { background: rgba(255,107,107,0.3); color: #ff6b6b; }
 
         .issue-content {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .issue-content h4 {
@@ -540,24 +528,21 @@
         }
 
         .issue-field {
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .issue-field-label {
-            font-size: 11px;
+            font-size: 12px;
             color: rgba(255,255,255,0.5);
-            margin-bottom: 3px;
+            margin-bottom: 5px;
         }
 
         .issue-field-value {
-            font-size: 12px;
-            line-height: 1.4;
-            padding: 6px 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            padding: 10px;
             background: rgba(255,255,255,0.03);
-            border-radius: 4px;
-            max-height: 60px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            border-radius: 6px;
         }
 
         .issue-footer {
@@ -653,12 +638,8 @@
         }
 
         .kpi-table th.member-col {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .kpi-table td.member-cell {
-            background: rgba(102,126,234,0.1);
+            background: rgba(0,212,255,0.2);
+            color: #00d4ff;
         }
 
         .kpi-table td {
@@ -860,7 +841,7 @@
         .attendance-badge.half-pm { background: rgba(255,170,61,0.3); color: #ffaa3d; }
         .attendance-badge.business { background: rgba(118,75,162,0.3); color: #a855f7; }
         .attendance-badge.training { background: rgba(102,126,234,0.3); color: #667eea; }
-        .attendance-badge.official { background: rgba(156,163,175,0.3); color: #9ca3af; }
+        .attendance-badge.sick { background: rgba(156,163,175,0.3); color: #9ca3af; }
 
         /* 근태 입력 모달 */
         .attendance-modal {
@@ -1625,290 +1606,6 @@
             opacity: 0.9;
         }
 
-        /* ===== 미니게임 탭 ===== */
-        .minigame-container {
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .minigame-header {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            padding: 20px;
-            background: linear-gradient(135deg, rgba(102,126,234,0.3), rgba(118,75,162,0.3));
-            border-radius: 15px;
-            margin-bottom: 20px;
-        }
-
-        .coin-display, .weapon-display {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(0,0,0,0.3);
-            padding: 15px 25px;
-            border-radius: 30px;
-        }
-
-        .coin-icon { font-size: 28px; }
-        .coin-count { font-size: 24px; font-weight: bold; color: #ffd700; }
-        .coin-label { font-size: 14px; color: rgba(255,255,255,0.7); }
-        .weapon-icon { font-size: 28px; }
-        .weapon-level { font-size: 24px; font-weight: bold; color: #ff6b6b; }
-
-        .coin-guide {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 20px;
-            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.2));
-            border: 1px solid rgba(255,215,0,0.4);
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        .coin-guide-icon { font-size: 18px; }
-        .coin-guide-text { color: rgba(255,255,255,0.9); }
-        .coin-guide-text strong { color: #ffd700; }
-
-        .minigame-tabs {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .minigame-tab {
-            padding: 12px 25px;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            border-radius: 25px;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-
-        .minigame-tab:hover { background: rgba(255,255,255,0.2); }
-        .minigame-tab.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            box-shadow: 0 4px 15px rgba(102,126,234,0.4);
-        }
-
-        .minigame-panel { display: none; }
-        .minigame-panel.active { display: block; }
-
-        /* 인형뽑기 */
-        .gacha-machine {
-            text-align: center;
-            padding: 30px;
-            background: linear-gradient(180deg, #2a2a4a, #1a1a3a);
-            border-radius: 20px;
-            border: 3px solid rgba(255,215,0,0.3);
-        }
-
-        .gacha-display {
-            width: 200px;
-            height: 200px;
-            margin: 0 auto 30px;
-            background: radial-gradient(circle, #3a3a6a, #2a2a4a);
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border: 4px solid rgba(255,215,0,0.5);
-            box-shadow: 0 0 30px rgba(255,215,0,0.2);
-        }
-
-        .gacha-placeholder { font-size: 60px; }
-        .gacha-text { font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 10px; }
-
-        .gacha-result {
-            animation: gachaReveal 0.5s ease-out;
-        }
-
-        @keyframes gachaReveal {
-            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
-        }
-
-        .gacha-btn {
-            padding: 15px 40px;
-            font-size: 18px;
-            background: linear-gradient(135deg, #ffd700, #ff8c00);
-            border: none;
-            border-radius: 30px;
-            color: #1a1a2e;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 0 auto;
-            transition: all 0.3s;
-        }
-
-        .gacha-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(255,215,0,0.4); }
-        .gacha-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-        .gacha-btn-icon { font-size: 24px; }
-
-        .gacha-history {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-        }
-
-        .gacha-history h4 { margin-bottom: 10px; color: rgba(255,255,255,0.7); }
-
-        /* 검 강화 */
-        .enhance-area {
-            text-align: center;
-            padding: 30px;
-            background: linear-gradient(180deg, #2a1a1a, #1a1a2a);
-            border-radius: 20px;
-            border: 3px solid rgba(255,107,107,0.3);
-        }
-
-        .weapon-showcase {
-            position: relative;
-            margin-bottom: 30px;
-        }
-
-        .weapon-glow {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 150px;
-            height: 150px;
-            background: radial-gradient(circle, rgba(255,107,107,0.3), transparent);
-            border-radius: 50%;
-            animation: weaponPulse 2s infinite;
-        }
-
-        @keyframes weaponPulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
-            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
-        }
-
-        .weapon-big {
-            font-size: 80px;
-            position: relative;
-            z-index: 1;
-            text-shadow: 0 0 30px rgba(255,107,107,0.5);
-        }
-
-        .weapon-name {
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 15px;
-            color: #ff6b6b;
-        }
-
-        .enhance-info {
-            margin: 20px 0;
-        }
-
-        .enhance-rate {
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-
-        .enhance-rate span { color: #00ff88; font-weight: bold; }
-
-        .enhance-warning {
-            color: #ff6b6b;
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        .enhance-btn {
-            padding: 15px 40px;
-            font-size: 18px;
-            background: linear-gradient(135deg, #ff6b6b, #ff4757);
-            border: none;
-            border-radius: 30px;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .enhance-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(255,107,107,0.4); }
-        .enhance-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-        .enhance-history {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-
-        .enhance-success { color: #00ff88; }
-        .enhance-fail { color: #ff6b6b; }
-
-        /* 컬렉션 */
-        .collection-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 15px;
-            padding: 20px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            margin-bottom: 20px;
-        }
-
-        .collection-item {
-            width: 80px;
-            height: 80px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            border: 2px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .collection-item.owned {
-            border-color: #ffd700;
-            box-shadow: 0 0 15px rgba(255,215,0,0.3);
-        }
-
-        .collection-item.locked {
-            filter: grayscale(100%) brightness(0.3);
-        }
-
-        .leaderboard {
-            padding: 20px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-        }
-
-        .leaderboard h4 { margin-bottom: 15px; }
-
-        .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 15px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            margin-bottom: 8px;
-        }
-
-        .leaderboard-rank { font-weight: bold; margin-right: 10px; }
-        .leaderboard-name { flex: 1; }
-        .leaderboard-level { color: #ff6b6b; font-weight: bold; }
-
         /* ===== 모바일 반응형 ===== */
         @media screen and (max-width: 768px) {
             /* 헤더 */
@@ -1983,9 +1680,8 @@
             .weekly-grid {
                 display: flex;
                 flex-direction: column;
-                gap: 6px;
+                gap: 8px;
                 padding-bottom: 10px;
-                min-height: unset;
             }
 
             .task-backlog {
@@ -1993,140 +1689,30 @@
                 min-width: unset;
                 flex: unset;
                 width: 100%;
-                padding: 10px;
-            }
-
-            .task-backlog .task-list {
-                min-height: unset;
-                gap: 6px;
             }
 
             .backlog-header {
                 padding: 8px 10px;
                 font-size: 12px;
-                margin-bottom: 8px;
-                padding-bottom: 8px;
             }
 
-            /* 모바일 아코디언 스타일 */
             .day-column {
-                padding: 0;
+                padding: 8px;
                 min-width: unset;
                 flex: unset;
                 width: 100%;
-                border-radius: 8px;
-                overflow: hidden;
             }
 
             .day-header {
-                padding: 12px 15px;
-                margin-bottom: 0;
+                padding-bottom: 5px;
+                margin-bottom: 6px;
                 display: flex;
                 align-items: center;
                 gap: 10px;
-                cursor: pointer;
-                background: rgba(255,255,255,0.08);
-                transition: background 0.2s;
-            }
-
-            .day-header:hover {
-                background: rgba(255,255,255,0.12);
-            }
-
-            .day-header .toggle-icon {
-                margin-left: auto;
-                transition: transform 0.3s;
-            }
-
-            .day-column.collapsed .day-header .toggle-icon {
-                transform: rotate(-90deg);
-            }
-
-            .day-column .task-list {
-                max-height: 500px;
-                overflow: hidden;
-                transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease;
-                padding: 8px;
-                opacity: 1;
-                min-height: unset;
-            }
-
-            .day-column.collapsed .task-list {
-                max-height: 0;
-                padding: 0 8px;
-                opacity: 0;
-                overflow: hidden;
-            }
-
-            /* 완료된 업무 아코디언 스타일 */
-            .completed-accordion-container {
-                display: flex;
-                flex-direction: column;
-                gap: 6px;
-            }
-
-            .completed-day-column {
-                background: rgba(0,184,148,0.05);
-                border-radius: 8px;
-                overflow: hidden;
-            }
-
-            .completed-day-column.today {
-                background: rgba(0,212,255,0.08);
-                border: 1px solid rgba(0,212,255,0.3);
-            }
-
-            .completed-day-header {
-                padding: 12px 15px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                cursor: pointer;
-                background: rgba(0,184,148,0.1);
-                transition: background 0.2s;
-                font-size: 12px;
-                color: rgba(255,255,255,0.7);
-            }
-
-            .completed-day-header:hover {
-                background: rgba(0,184,148,0.15);
-            }
-
-            .completed-day-header .toggle-icon {
-                margin-left: auto;
-                transition: transform 0.3s;
-            }
-
-            .completed-day-column.collapsed .completed-day-header .toggle-icon {
-                transform: rotate(-90deg);
-            }
-
-            .completed-task-list {
-                max-height: 500px;
-                overflow: hidden;
-                transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease;
-                padding: 8px;
-                display: flex;
-                flex-direction: column;
-                gap: 6px;
-                opacity: 1;
-            }
-
-            .completed-day-column.collapsed .completed-task-list {
-                max-height: 0;
-                padding: 0 8px;
-                opacity: 0;
-                overflow: hidden;
-            }
-
-            /* 모바일에서 토글 아이콘 표시 */
-            .day-header .toggle-icon {
-                display: inline-block;
             }
 
             .day-name {
-                font-size: 0.9em;
-                font-weight: 600;
+                font-size: 0.8em;
             }
 
             .day-date {
@@ -2192,11 +1778,6 @@
             .form-group input,
             .form-group select {
                 padding: 12px;
-            }
-
-            /* 이슈 그리드 - 모바일 1열 */
-            .issue-list {
-                grid-template-columns: 1fr;
             }
 
             /* 이슈 카드 */
@@ -2321,29 +1902,6 @@
             .calendar-day {
                 min-height: 60px;
                 padding: 5px;
-            }
-
-            /* 근태관리 모바일 */
-            .attendance-cell {
-                min-height: 70px;
-                padding: 4px;
-            }
-
-            .attendance-entry {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1px;
-                padding: 2px 4px;
-            }
-
-            .attendance-entry .entry-name {
-                font-size: 9px;
-                font-weight: 600;
-            }
-
-            .attendance-entry .entry-type {
-                font-size: 8px;
-                padding: 1px 4px;
             }
 
             /* KPI 테이블 */
@@ -2652,7 +2210,7 @@
             </div>
             <div class="connection-status" id="connectionStatus">
                 <span class="connection-dot"></span>
-                <span>연결 중...</span>
+                <span>오프라인</span>
             </div>
             <div class="online-count" id="onlineCount" style="cursor: pointer; position: relative;" onclick="toggleOnlineList()">
                 <i class="fas fa-users"></i> <span>0</span>명 접속
@@ -2683,15 +2241,17 @@
         <button class="tab-btn" data-tab="kpi">
             <i class="fas fa-chart-line"></i> KPI 현황
         </button>
-
+        <button class="tab-btn" data-tab="calendar">
+            <i class="fas fa-calendar-alt"></i> 캘린더
+        </button>
         <button class="tab-btn" data-tab="omok">
             <i class="fas fa-circle"></i> 오목
         </button>
         <button class="tab-btn" data-tab="chess">
             <i class="fas fa-chess"></i> 체스
         </button>
-        <button class="tab-btn" data-tab="minigame">
-            <i class="fas fa-gamepad"></i> 🎮게임
+        <button class="tab-btn" data-tab="study">
+            <i class="fas fa-graduation-cap"></i> 학습
         </button>
     </div>
 
@@ -2753,8 +2313,8 @@
                             <option value="4">금요일</option>
                         </select>
                     </div>
-                    <button class="btn btn-primary" onclick="addTask()" style="padding: 10px 15px; min-width: 50px;" title="업무 추가">
-                        <i class="fas fa-plus"></i>
+                    <button class="btn btn-primary" onclick="addTask()" style="margin-top: 20px;">
+                        <i class="fas fa-plus"></i> 추가
                     </button>
                 </div>
             </div>
@@ -2778,9 +2338,9 @@
                 <div class="legend-item"><span class="attendance-badge vacation">휴가</span></div>
                 <div class="legend-item"><span class="attendance-badge half-am">오전반차</span></div>
                 <div class="legend-item"><span class="attendance-badge half-pm">오후반차</span></div>
-                <div class="legend-item"><span class="attendance-badge business">출장</span></div>
+                <div class="legend-item"><span class="attendance-badge business">외근</span></div>
                 <div class="legend-item"><span class="attendance-badge training">교육</span></div>
-                <div class="legend-item"><span class="attendance-badge official">공가</span></div>
+                <div class="legend-item"><span class="attendance-badge sick">병가</span></div>
             </div>
 
             <div class="attendance-container">
@@ -2843,21 +2403,17 @@
                         <span>오후반차</span>
                     </button>
                     <button class="attendance-type-btn" data-type="business" onclick="selectAttendanceType('business')">
-                        <i class="fas fa-plane" style="color: #a855f7;"></i>
-                        <span>출장</span>
+                        <i class="fas fa-car" style="color: #a855f7;"></i>
+                        <span>외근</span>
                     </button>
                     <button class="attendance-type-btn" data-type="training" onclick="selectAttendanceType('training')">
                         <i class="fas fa-graduation-cap" style="color: #667eea;"></i>
                         <span>교육</span>
                     </button>
-                    <button class="attendance-type-btn" data-type="official" onclick="selectAttendanceType('official')">
-                        <i class="fas fa-building" style="color: #9ca3af;"></i>
-                        <span>공가</span>
+                    <button class="attendance-type-btn" data-type="sick" onclick="selectAttendanceType('sick')">
+                        <i class="fas fa-procedures" style="color: #9ca3af;"></i>
+                        <span>병가</span>
                     </button>
-                </div>
-                <div class="form-group" style="margin: 15px 0;">
-                    <label style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 8px; display: block;">비고 (예: 예비군, 건강검진 등)</label>
-                    <input type="text" id="attendanceNote" placeholder="비고 입력 (선택사항)" style="width: 100%; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; background: rgba(255,255,255,0.1); color: white; font-size: 14px;">
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn btn-primary" onclick="saveAttendance()" style="flex: 1;">
@@ -2874,43 +2430,9 @@
         <div class="tab-content" id="tab-issues">
             <div class="section-header">
                 <h2><i class="fas fa-exclamation-circle"></i> ESHG 이슈 사항</h2>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-primary" onclick="toggleIssueForm()">
-                        <i class="fas fa-plus"></i> 이슈 추가
-                    </button>
-                    <button class="btn btn-secondary" onclick="openTextParseModal()">
-                        <i class="fas fa-paste"></i> 텍스트 붙여넣기
-                    </button>
-                </div>
-            </div>
-
-            <!-- 텍스트 파싱 모달 -->
-            <div id="textParseModal" class="modal-overlay" style="display: none;">
-                <div class="modal-content" style="max-width: 700px; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column;">
-                    <h3 style="margin-bottom: 15px;"><i class="fas fa-paste"></i> 텍스트에서 이슈 추출</h3>
-                    <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 15px;">
-                        ESHG 이슈 텍스트를 붙여넣으면 자동으로 파싱하여 등록합니다.<br>
-                        각 이슈는 빈 줄로 구분하거나, 번호(1., 2.)로 시작하면 됩니다.
-                    </p>
-                    <textarea id="parseInputText" placeholder="여기에 텍스트를 붙여넣으세요...\n\n예시:\n1. [TS] 저전압 불량 증가 - 진행중\n   논의: 금형 점검 예정\n\n2. [표면] 스크래치 발생 - 대기\n   논의: 원인 분석 중" style="width: 100%; height: 150px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; font-size: 13px; resize: vertical;"></textarea>
-                    <div style="display: flex; gap: 10px; margin: 15px 0;">
-                        <button class="btn btn-primary" onclick="parseIssueText()">
-                            <i class="fas fa-search"></i> 파싱하기
-                        </button>
-                        <button class="btn btn-secondary" onclick="clearParseInput()">
-                            <i class="fas fa-eraser"></i> 지우기
-                        </button>
-                    </div>
-                    <div id="parsePreview" style="flex: 1; overflow-y: auto; max-height: 250px;"></div>
-                    <div style="display: flex; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
-                        <button id="addParsedIssuesBtn" class="btn btn-primary" onclick="addParsedIssues()" style="display: none;">
-                            <i class="fas fa-check"></i> 전체 등록
-                        </button>
-                        <button class="btn btn-secondary" onclick="closeTextParseModal()">
-                            <i class="fas fa-times"></i> 닫기
-                        </button>
-                    </div>
-                </div>
+                <button class="btn btn-primary" onclick="toggleIssueForm()">
+                    <i class="fas fa-plus"></i> 이슈 추가
+                </button>
             </div>
 
             <!-- 이슈 추가 폼 -->
@@ -2920,7 +2442,6 @@
                         <label>구분</label>
                         <select id="newIssueCategory">
                             <option value="TS">TS</option>
-                            <option value="저전압(이물)">저전압(이물)</option>
                             <option value="어깨선">어깨선</option>
                             <option value="표면">표면</option>
                             <option value="탈리">탈리</option>
@@ -2946,16 +2467,8 @@
                         <textarea id="newIssueContent" placeholder="이슈 내용을 입력하세요"></textarea>
                     </div>
                     <div class="form-group full-width">
-                        <label>원인</label>
-                        <textarea id="newIssueCause" placeholder="원인을 입력하세요"></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>즉시 조치 사항</label>
-                        <textarea id="newIssueAction" placeholder="즉시 조치 사항을 입력하세요"></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>논의 필요 항목</label>
-                        <textarea id="newIssueDiscussion" placeholder="논의 필요 항목을 입력하세요"></textarea>
+                        <label>논의 결과</label>
+                        <textarea id="newIssueDiscussion" placeholder="논의 결과를 입력하세요"></textarea>
                     </div>
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
@@ -2991,17 +2504,18 @@
                 <table class="kpi-table" id="kpiTable">
                     <thead>
                         <tr>
-                            <th style="width: 120px;">평가항목</th>
-                            <th style="width: 180px;">목표명</th>
-                            <th style="width: 120px;">평가기준</th>
-                            <th style="width: 100px;">실적</th>
-                            <th class="member-col" style="background: linear-gradient(135deg, #ffd93d 0%, #f9a825 100%); color: #1a1a2e;">장찬호</th>
-                            <th class="member-col" style="background: linear-gradient(135deg, #00ff88 0%, #00b894 100%); color: #1a1a2e;">정문세</th>
-                            <th class="member-col" style="background: linear-gradient(135deg, #ffd93d 0%, #f9a825 100%); color: #1a1a2e;">김원근</th>
-                            <th class="member-col" style="background: linear-gradient(135deg, #00ff88 0%, #00b894 100%); color: #1a1a2e;">권병진</th>
-                            <th class="member-col" style="background: linear-gradient(135deg, #ffd93d 0%, #f9a825 100%); color: #1a1a2e;">고귀한</th>
-                            <th class="member-col" style="background: linear-gradient(135deg, #00ff88 0%, #00b894 100%); color: #1a1a2e;">박규태</th>
-                            <th class="member-col" style="background: linear-gradient(135deg, #ffd93d 0%, #f9a825 100%); color: #1a1a2e;">최다영</th>
+                            <th style="width: 100px;">평가항목</th>
+                            <th style="width: 150px;">목표명</th>
+                            <th style="width: 100px;">평가기준</th>
+                            <th style="width: 150px;">세부사항</th>
+                            <th style="width: 80px;">실적</th>
+                            <th class="member-col">장찬호</th>
+                            <th class="member-col">정문세</th>
+                            <th class="member-col">김원근</th>
+                            <th class="member-col">권병진</th>
+                            <th class="member-col">고귀한</th>
+                            <th class="member-col">박규태</th>
+                            <th class="member-col">최다영</th>
                             <th style="width: 50px;">삭제</th>
                         </tr>
                     </thead>
@@ -3009,6 +2523,32 @@
                         <!-- JavaScript로 생성 -->
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- ========== 캘린더 탭 ========== -->
+        <div class="tab-content" id="tab-calendar">
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="calendar-title" id="calendarTitle">2026년 7월</div>
+                    <div class="calendar-nav">
+                        <button onclick="prevMonth()"><i class="fas fa-chevron-left"></i></button>
+                        <button onclick="goToday()">오늘</button>
+                        <button onclick="nextMonth()"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div class="calendar-weekdays">
+                    <div class="calendar-weekday weekend">일</div>
+                    <div class="calendar-weekday">월</div>
+                    <div class="calendar-weekday">화</div>
+                    <div class="calendar-weekday">수</div>
+                    <div class="calendar-weekday">목</div>
+                    <div class="calendar-weekday">금</div>
+                    <div class="calendar-weekday weekend">토</div>
+                </div>
+                <div class="calendar-days" id="calendarDays">
+                    <!-- JavaScript로 생성 -->
+                </div>
             </div>
         </div>
 
@@ -3128,89 +2668,6 @@
             </div>
         </div>
 
-        <!-- ========== 🎮 미니게임 탭 ========== -->
-        <div class="tab-content" id="tab-minigame">
-            <div class="minigame-container">
-                <!-- 내 정보 -->
-                <div class="minigame-header">
-                    <div class="coin-display">
-                        <span class="coin-icon">🪙</span>
-                        <span class="coin-count" id="myCoinCount">0</span>
-                        <span class="coin-label">코인</span>
-                    </div>
-                    <div class="weapon-display">
-                        <span class="weapon-icon" id="myWeaponIcon">🗡️</span>
-                        <span class="weapon-level" id="myWeaponLevel">+0</span>
-                    </div>
-                </div>
-
-                <!-- 코인 획득 방법 안내 -->
-                <div class="coin-guide">
-                    <span class="coin-guide-icon">💡</span>
-                    <span class="coin-guide-text">업무를 완료하면 <strong>1코인</strong>을 받아요!</span>
-                </div>
-
-                <!-- 게임 선택 -->
-                <div class="minigame-tabs">
-                    <button class="minigame-tab active" onclick="switchMinigame('gacha')">🎰 인형뽑기</button>
-                    <button class="minigame-tab" onclick="switchMinigame('enhance')">⚔️ 검 강화</button>
-                    <button class="minigame-tab" onclick="switchMinigame('collection')">🏆 컬렉션</button>
-                </div>
-
-                <!-- 인형뽑기 -->
-                <div class="minigame-panel active" id="panel-gacha">
-                    <div class="gacha-machine">
-                        <div class="gacha-display" id="gachaDisplay">
-                            <div class="gacha-placeholder">🎁</div>
-                            <div class="gacha-text">1코인으로 뽑기!</div>
-                        </div>
-                        <button class="gacha-btn" onclick="doGacha()">
-                            <span class="gacha-btn-icon">🎰</span>
-                            <span>뽑기! (1🪙)</span>
-                        </button>
-                    </div>
-                    <div class="gacha-history">
-                        <h4>최근 뽑기 내역</h4>
-                        <div id="gachaHistory"></div>
-                    </div>
-                </div>
-
-                <!-- 검 강화 -->
-                <div class="minigame-panel" id="panel-enhance">
-                    <div class="enhance-area">
-                        <div class="weapon-showcase">
-                            <div class="weapon-glow" id="weaponGlow"></div>
-                            <div class="weapon-big" id="weaponBig">🗡️</div>
-                            <div class="weapon-name" id="weaponName">일반 검 +0</div>
-                        </div>
-                        <div class="enhance-info">
-                            <div class="enhance-rate">
-                                성공 확률: <span id="enhanceRate">90%</span>
-                            </div>
-                            <div class="enhance-warning" id="enhanceWarning">
-                                ⚠️ 실패 시 파괴됩니다!
-                            </div>
-                        </div>
-                        <button class="enhance-btn" onclick="doEnhance()">
-                            <span>⚔️ 강화하기 (3🪙)</span>
-                        </button>
-                        <div class="enhance-history" id="enhanceHistory"></div>
-                    </div>
-                </div>
-
-                <!-- 컬렉션 -->
-                <div class="minigame-panel" id="panel-collection">
-                    <div class="collection-grid" id="collectionGrid">
-                        <!-- 컬렉션 아이템들 -->
-                    </div>
-                    <div class="leaderboard">
-                        <h4>🏆 강화 랭킹</h4>
-                        <div id="enhanceLeaderboard"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- ========== 설비수율 탭 ========== -->
         <div class="tab-content" id="tab-yield">
             <div class="section-header">
@@ -3243,6 +2700,169 @@
                 </table>
             </div>
         </div>
+
+        <!-- ========== 학습 탭 ========== -->
+        <div class="tab-content" id="tab-study">
+            <div class="section-header">
+                <h2><i class="fas fa-graduation-cap"></i> 학습 자료실</h2>
+                <div style="display: flex; gap: 10px;">
+                    <select id="studyCategory" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 15px; border-radius: 6px; cursor: pointer;">
+                        <option value="all">전체</option>
+                        <option value="sqld">SQLD</option>
+                        <option value="python">Python</option>
+                        <option value="excel">Excel/VBA</option>
+                        <option value="etc">기타</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="openStudyModal()">
+                        <i class="fas fa-plus"></i> 자료 추가
+                    </button>
+                </div>
+            </div>
+
+            <!-- SQLD 시험 정보 배너 -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        <h3 style="margin: 0 0 5px 0;"><i class="fas fa-database"></i> SQLD 시험 준비</h3>
+                        <p style="margin: 0; opacity: 0.9; font-size: 14px;">SQL 개발자 자격증 - 함께 공부해요!</p>
+                    </div>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <div style="background: rgba(255,255,255,0.2); padding: 10px 15px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 12px; opacity: 0.8;">참여 인원</div>
+                            <div style="font-size: 20px; font-weight: bold;" id="studyParticipants">0명</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 10px 15px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 12px; opacity: 0.8;">공유 자료</div>
+                            <div style="font-size: 20px; font-weight: bold;" id="studyMaterialCount">0개</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 학습 자료 목록 -->
+            <div id="studyMaterials" style="display: grid; gap: 15px;">
+                <!-- 기본 SQLD 자료 -->
+                <div class="study-card" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <span style="background: #667eea; padding: 4px 10px; border-radius: 15px; font-size: 11px;">SQLD</span>
+                                <span style="font-size: 12px; color: rgba(255,255,255,0.5);">2026.07.30</span>
+                            </div>
+                            <h4 style="margin: 0 0 8px 0; font-size: 16px;"><i class="fas fa-link"></i> SQLD 기출문제 모음 (노랭이)</h4>
+                            <p style="margin: 0; font-size: 14px; color: rgba(255,255,255,0.7);">SQL 자격검정 실전문제 - 가장 많이 보는 기출문제집</p>
+                        </div>
+                        <a href="https://www.yes24.com/Product/Goods/107125708" target="_blank" style="background: rgba(102,126,234,0.3); color: #667eea; padding: 8px 15px; border-radius: 6px; text-decoration: none; font-size: 13px;">
+                            <i class="fas fa-external-link-alt"></i> 링크
+                        </a>
+                    </div>
+                </div>
+
+                <div class="study-card" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <span style="background: #667eea; padding: 4px 10px; border-radius: 15px; font-size: 11px;">SQLD</span>
+                                <span style="font-size: 12px; color: rgba(255,255,255,0.5);">2026.07.30</span>
+                            </div>
+                            <h4 style="margin: 0 0 8px 0; font-size: 16px;"><i class="fas fa-youtube" style="color: #ff0000;"></i> SQLD 무료 강의 (유튜브)</h4>
+                            <p style="margin: 0; font-size: 14px; color: rgba(255,255,255,0.7);">홍쌤의 데이터랩 - SQLD 핵심정리 무료 강의</p>
+                        </div>
+                        <a href="https://www.youtube.com/results?search_query=SQLD+강의" target="_blank" style="background: rgba(255,0,0,0.2); color: #ff6b6b; padding: 8px 15px; border-radius: 6px; text-decoration: none; font-size: 13px;">
+                            <i class="fas fa-play"></i> 보기
+                        </a>
+                    </div>
+                </div>
+
+                <div class="study-card" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <span style="background: #667eea; padding: 4px 10px; border-radius: 15px; font-size: 11px;">SQLD</span>
+                                <span style="font-size: 12px; color: rgba(255,255,255,0.5);">2026.07.30</span>
+                            </div>
+                            <h4 style="margin: 0 0 8px 0; font-size: 16px;"><i class="fas fa-file-pdf" style="color: #ff6b6b;"></i> SQLD 요약 정리본</h4>
+                            <p style="margin: 0; font-size: 14px; color: rgba(255,255,255,0.7);">시험 직전 빠르게 보기 좋은 핵심 요약</p>
+                        </div>
+                        <a href="#" onclick="alert('팀원이 자료를 공유하면 여기에 표시됩니다!'); return false;" style="background: rgba(255,107,107,0.2); color: #ff6b6b; padding: 8px 15px; border-radius: 6px; text-decoration: none; font-size: 13px;">
+                            <i class="fas fa-download"></i> 다운로드
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 학습 진도 체크 -->
+            <div style="margin-top: 30px; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px;">
+                <h3 style="margin: 0 0 15px 0;"><i class="fas fa-tasks"></i> SQLD 학습 체크리스트</h3>
+                <div id="studyChecklist" style="display: grid; gap: 10px;">
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" id="chk1" onchange="saveStudyProgress()" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span>1과목: 데이터 모델링의 이해</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" id="chk2" onchange="saveStudyProgress()" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span>2과목: SQL 기본 (SELECT, WHERE, GROUP BY)</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" id="chk3" onchange="saveStudyProgress()" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span>2과목: SQL 활용 (JOIN, 서브쿼리)</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" id="chk4" onchange="saveStudyProgress()" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span>2과목: SQL 최적화 (인덱스, 실행계획)</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" id="chk5" onchange="saveStudyProgress()" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span>기출문제 1회독 완료</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" id="chk6" onchange="saveStudyProgress()" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span>기출문제 2회독 완료</span>
+                    </label>
+                </div>
+                <div style="margin-top: 15px; padding: 10px 15px; background: rgba(102,126,234,0.2); border-radius: 8px;">
+                    <span>진도율: </span>
+                    <strong id="studyProgressPercent">0%</strong>
+                    <div style="background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; margin-top: 8px; overflow: hidden;">
+                        <div id="studyProgressBar" style="background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 학습자료 추가 모달 -->
+    <div id="studyModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center;">
+        <div style="background: #1a1a2e; border-radius: 15px; padding: 25px; width: 90%; max-width: 500px; border: 1px solid rgba(255,255,255,0.1);">
+            <h3 style="margin: 0 0 20px 0;"><i class="fas fa-plus-circle"></i> 학습 자료 추가</h3>
+            <div style="display: grid; gap: 15px;">
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-size: 14px;">카테고리</label>
+                    <select id="newStudyCategory" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white;">
+                        <option value="sqld">SQLD</option>
+                        <option value="python">Python</option>
+                        <option value="excel">Excel/VBA</option>
+                        <option value="etc">기타</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-size: 14px;">제목</label>
+                    <input type="text" id="newStudyTitle" placeholder="자료 제목" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white;">
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-size: 14px;">링크 (URL)</label>
+                    <input type="text" id="newStudyLink" placeholder="https://..." style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white;">
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-size: 14px;">설명</label>
+                    <textarea id="newStudyDesc" placeholder="간단한 설명" rows="3" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white; resize: vertical;"></textarea>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end;">
+                <button onclick="closeStudyModal()" style="padding: 10px 20px; background: rgba(255,255,255,0.1); border: none; border-radius: 6px; color: white; cursor: pointer;">취소</button>
+                <button onclick="addStudyMaterial()" style="padding: 10px 20px; background: linear-gradient(135deg, #667eea, #764ba2); border: none; border-radius: 6px; color: white; cursor: pointer;">추가</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -3272,7 +2892,7 @@
         const TEAM_PASSWORD = "azs2026";
         
         function checkPassword() {
-            const input = document.getElementById('teamPassword').value.trim();
+            const input = document.getElementById('teamPassword').value;
             const error = document.getElementById('loginError');
             
             if (input === TEAM_PASSWORD) {
@@ -3438,16 +3058,13 @@
             dates.forEach((date, index) => {
                 const isToday = date.toDateString() === today.toDateString();
                 const dayTasks = inProgressTasks.filter(t => t.day === index);
-                const isCollapsed = true; // 모든 요일 초기 접힘 상태
                 
                 html += `
-                    <div class="day-column ${isToday ? 'today' : ''} ${isCollapsed ? 'collapsed' : ''}" id="day-col-${index}">
-                        <div class="day-header" onclick="toggleDayColumn(${index})">
+                    <div class="day-column ${isToday ? 'today' : ''}">
+                        <div class="day-header">
                             <div class="day-name">${DAYS[index]}요일</div>
                             <div class="day-date">${formatDate(date)}</div>
                             ${isToday ? '<span class="today-badge">TODAY</span>' : ''}
-                            <span class="task-count" style="background: rgba(0,212,255,0.3); padding: 2px 8px; border-radius: 10px; font-size: 11px;">${dayTasks.length}</span>
-                            <i class="fas fa-chevron-down toggle-icon"></i>
                         </div>
                         <div class="task-list" data-day="${index}" ondrop="drop(event, ${index})" ondragover="allowDrop(event)">
                             ${dayTasks.map(t => renderTaskCard(t)).join('')}
@@ -3467,90 +3084,42 @@
                     </div>
                 `;
             } else {
-                // PC/모바일 구분
-                const isMobile = window.innerWidth <= 768;
+                // 요일별로 완료된 업무 분리 표시
+                let completedHtml = `<div style="display: grid; grid-template-columns: 280px repeat(5, 1fr); gap: 12px;">`;
                 
-                if (isMobile) {
-                    // 모바일: 요일별로 완료된 업무 분리 표시 (아코디언 형태)
-                    let completedHtml = `<div class="completed-accordion-container">`;
-                    
-                    // 할 일 목록의 완료된 업무
-                    completedHtml += `
-                        <div class="completed-day-column collapsed" id="completed-col-backlog">
-                            <div class="completed-day-header" onclick="toggleCompletedDayColumn('backlog')">
-                                <i class="fas fa-inbox"></i>
-                                <span>할 일 목록</span>
-                                <span class="task-count" style="background: rgba(0,255,136,0.3); padding: 2px 8px; border-radius: 10px; font-size: 11px; color: #00ff88;">${completedBacklogTasks.length}</span>
-                                <i class="fas fa-chevron-down toggle-icon"></i>
-                            </div>
-                            <div class="completed-task-list">
-                                ${completedBacklogTasks.map(t => renderCompletedTaskCard(t)).join('')}
-                            </div>
+                // 할 일 목록의 완료된 업무
+                completedHtml += `
+                    <div style="background: rgba(255,255,255,0.03); border-radius: 8px; padding: 10px;">
+                        <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 8px; display: flex; align-items: center; gap: 5px;">
+                            <i class="fas fa-inbox"></i> 할 일
+                            ${completedBacklogTasks.length > 0 ? `<span style="background: rgba(0,255,136,0.3); padding: 1px 6px; border-radius: 8px; font-size: 10px;">${completedBacklogTasks.length}</span>` : ''}
                         </div>
-                    `;
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                            ${completedBacklogTasks.map(t => renderCompletedTaskCard(t)).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                // 각 요일별 완료된 업무
+                dates.forEach((date, index) => {
+                    const dayCompletedTasks = completedTasks.filter(t => t.day === index);
+                    const isToday = date.toDateString() === today.toDateString();
                     
-                    // 각 요일별 완료된 업무
-                    dates.forEach((date, index) => {
-                        const dayCompletedTasks = completedTasks.filter(t => t.day === index);
-                        const isToday = date.toDateString() === today.toDateString();
-                        
-                        completedHtml += `
-                            <div class="completed-day-column collapsed ${isToday ? 'today' : ''}" id="completed-col-${index}">
-                                <div class="completed-day-header" onclick="toggleCompletedDayColumn(${index})">
-                                    <i class="fas fa-calendar-check"></i>
-                                    <span>${DAYS[index]}요일</span>
-                                    <span class="day-date">${formatDate(date)}</span>
-                                    ${isToday ? '<span class="today-badge">TODAY</span>' : ''}
-                                    <span class="task-count" style="background: rgba(0,255,136,0.3); padding: 2px 8px; border-radius: 10px; font-size: 11px; color: #00ff88;">${dayCompletedTasks.length}</span>
-                                    <i class="fas fa-chevron-down toggle-icon"></i>
-                                </div>
-                                <div class="completed-task-list">
-                                    ${dayCompletedTasks.length > 0 ? dayCompletedTasks.map(t => renderCompletedTaskCard(t)).join('') : '<div style="color: rgba(255,255,255,0.2); font-size: 11px; text-align: center; padding: 10px;">-</div>'}
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    completedHtml += `</div>`;
-                    completedGrid.innerHTML = completedHtml;
-                } else {
-                    // PC: 기존 가로 그리드 형태
-                    let completedHtml = `<div style="display: grid; grid-template-columns: 280px repeat(5, 1fr); gap: 12px;">`;
-                    
-                    // 할 일 목록의 완료된 업무
                     completedHtml += `
-                        <div style="background: rgba(255,255,255,0.03); border-radius: 8px; padding: 10px;">
-                            <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 8px; display: flex; align-items: center; gap: 5px;">
-                                <i class="fas fa-inbox"></i> 할 일
-                                ${completedBacklogTasks.length > 0 ? `<span style="background: rgba(0,255,136,0.3); padding: 1px 6px; border-radius: 8px; font-size: 10px;">${completedBacklogTasks.length}</span>` : ''}
+                        <div style="background: ${isToday ? 'rgba(0,212,255,0.08)' : 'rgba(255,255,255,0.03)'}; border-radius: 8px; padding: 10px; ${isToday ? 'border: 1px solid rgba(0,212,255,0.3);' : ''}">
+                            <div style="font-size: 12px; color: ${isToday ? '#00d4ff' : 'rgba(255,255,255,0.5)'}; margin-bottom: 8px; display: flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-calendar-check"></i> ${DAYS[index]}
+                                ${dayCompletedTasks.length > 0 ? `<span style="background: rgba(0,255,136,0.3); padding: 1px 6px; border-radius: 8px; font-size: 10px; color: #00ff88;">${dayCompletedTasks.length}</span>` : ''}
                             </div>
                             <div style="display: flex; flex-direction: column; gap: 6px;">
-                                ${completedBacklogTasks.map(t => renderCompletedTaskCard(t)).join('')}
+                                ${dayCompletedTasks.length > 0 ? dayCompletedTasks.map(t => renderCompletedTaskCard(t)).join('') : '<div style="color: rgba(255,255,255,0.2); font-size: 11px; text-align: center; padding: 10px;">-</div>'}
                             </div>
                         </div>
                     `;
-                    
-                    // 각 요일별 완료된 업무
-                    dates.forEach((date, index) => {
-                        const dayCompletedTasks = completedTasks.filter(t => t.day === index);
-                        const isToday = date.toDateString() === today.toDateString();
-                        
-                        completedHtml += `
-                            <div style="background: ${isToday ? 'rgba(0,212,255,0.08)' : 'rgba(255,255,255,0.03)'}; border-radius: 8px; padding: 10px; ${isToday ? 'border: 1px solid rgba(0,212,255,0.3);' : ''}">
-                                <div style="font-size: 12px; color: ${isToday ? '#00d4ff' : 'rgba(255,255,255,0.5)'}; margin-bottom: 8px; display: flex; align-items: center; gap: 5px;">
-                                    <i class="fas fa-calendar-check"></i> ${DAYS[index]}
-                                    ${dayCompletedTasks.length > 0 ? `<span style="background: rgba(0,255,136,0.3); padding: 1px 6px; border-radius: 8px; font-size: 10px; color: #00ff88;">${dayCompletedTasks.length}</span>` : ''}
-                                </div>
-                                <div style="display: flex; flex-direction: column; gap: 6px;">
-                                    ${dayCompletedTasks.length > 0 ? dayCompletedTasks.map(t => renderCompletedTaskCard(t)).join('') : '<div style="color: rgba(255,255,255,0.2); font-size: 11px; text-align: center; padding: 10px;">-</div>'}
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    completedHtml += `</div>`;
-                    completedGrid.innerHTML = completedHtml;
-                }
+                });
+                
+                completedHtml += `</div>`;
+                completedGrid.innerHTML = completedHtml;
             }
         }
         
@@ -3665,22 +3234,6 @@
             }
         }
 
-        // 모바일 요일 아코디언 토글
-        function toggleDayColumn(dayIndex) {
-            const col = document.getElementById('day-col-' + dayIndex);
-            if (col) {
-                col.classList.toggle('collapsed');
-            }
-        }
-
-        // 완료된 업무 아코디언 토글
-        function toggleCompletedDayColumn(dayIndex) {
-            const col = document.getElementById('completed-col-' + dayIndex);
-            if (col) {
-                col.classList.toggle('collapsed');
-            }
-        }
-
         // 드래그 앤 드롭
         function allowDrop(e) {
             e.preventDefault();
@@ -3722,7 +3275,7 @@
         
         function renderCategoryFilters() {
             const container = document.getElementById('issueCategoryFilters');
-            const categories = ['TS', '저전압(이물)', '저전압', '어깨선', '표면', '탈리', '얼라인', '비전', '금형', '탭이슈', '타발유', '기타'];
+            const categories = ['TS', '어깨선', '표면', '탈리', '얼라인', '비전', '금형', '탭이슈', '타발유', '기타'];
             
             const categoryStats = {};
             categories.forEach(cat => {
@@ -3788,21 +3341,21 @@
             }
 
             container.innerHTML = filteredIssues.map(issue => `
-                <div class="issue-card status-${issue.status}" ondblclick="editIssueCard('${issue.id}')" title="더블클릭으로 수정">
+                <div class="issue-card status-${issue.status}">
                     <div class="issue-header">
                         <div class="issue-category">
-                            <span class="issue-badge" style="font-size: 11px; padding: 3px 8px;">${issue.category}</span>
+                            <span class="issue-badge">${issue.category}</span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 5px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
                             <select class="issue-status status-${issue.status}" 
-                                    onchange="updateIssueStatus('${issue.id}', this.value)" onclick="event.stopPropagation()"
-                                    style="background: transparent; border: none; color: inherit; cursor: pointer; font-size: 11px; padding: 2px;">
+                                    onchange="updateIssueStatus('${issue.id}', this.value)"
+                                    style="background: transparent; border: none; color: inherit; cursor: pointer;">
                                 <option value="waiting" ${issue.status === 'waiting' ? 'selected' : ''}>대기</option>
                                 <option value="doing" ${issue.status === 'doing' ? 'selected' : ''}>진행중</option>
                                 <option value="done" ${issue.status === 'done' ? 'selected' : ''}>완료</option>
                                 <option value="unresolved" ${issue.status === 'unresolved' ? 'selected' : ''}>미해결</option>
                             </select>
-                            <button class="btn btn-danger" onclick="event.stopPropagation(); deleteIssue('${issue.id}')" style="padding: 3px 6px; font-size: 10px;">
+                            <button class="btn btn-danger" onclick="deleteIssue('${issue.id}')" style="padding: 5px 10px;">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -3810,22 +3363,14 @@
                     <div class="issue-content">
                         <div class="issue-field">
                             <div class="issue-field-label">이슈 사항</div>
-                            <div class="issue-field-value">${issue.content || '-'}</div>
+                            <div class="issue-field-value">${issue.content}</div>
                         </div>
                         <div class="issue-field">
-                            <div class="issue-field-label">원인</div>
-                            <div class="issue-field-value">${issue.cause || '-'}</div>
-                        </div>
-                        <div class="issue-field">
-                            <div class="issue-field-label">즉시 조치 사항</div>
-                            <div class="issue-field-value">${issue.action || '-'}</div>
-                        </div>
-                        <div class="issue-field">
-                            <div class="issue-field-label">논의 필요 항목</div>
+                            <div class="issue-field-label">논의 결과</div>
                             <div class="issue-field-value">${issue.discussion || '-'}</div>
                         </div>
                     </div>
-                    <div class="issue-footer" style="font-size: 10px; padding-top: 8px;">
+                    <div class="issue-footer">
                         <span>등록일: ${new Date(issue.createdAt).toLocaleDateString()}</span>
                     </div>
                 </div>
@@ -3836,8 +3381,6 @@
             const category = document.getElementById('newIssueCategory').value;
             const status = document.getElementById('newIssueStatus').value;
             const content = document.getElementById('newIssueContent').value.trim();
-            const cause = document.getElementById('newIssueCause').value.trim();
-            const action = document.getElementById('newIssueAction').value.trim();
             const discussion = document.getElementById('newIssueDiscussion').value.trim();
 
             if (!content) {
@@ -3850,8 +3393,6 @@
                 category,
                 status,
                 content,
-                cause,
-                action,
                 discussion,
                 createdAt: new Date().toISOString()
             };
@@ -3865,106 +3406,7 @@
             document.getElementById('newIssueCategory').selectedIndex = 0;
             document.getElementById('newIssueStatus').selectedIndex = 0;
             document.getElementById('newIssueContent').value = '';
-            document.getElementById('newIssueCause').value = '';
-            document.getElementById('newIssueAction').value = '';
             document.getElementById('newIssueDiscussion').value = '';
-        }
-
-        // 이슈 수정 모달
-        let editingIssueId = null;
-        
-        function editIssueCard(id) {
-            const issue = issues.find(i => i.id === id);
-            if (!issue) return;
-            
-            editingIssueId = id;
-            
-            // 모달 HTML 생성
-            const modal = document.createElement('div');
-            modal.id = 'editIssueModal';
-            modal.className = 'modal-overlay';
-            modal.style.display = 'flex';
-            modal.innerHTML = `
-                <div class="modal-content" style="width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; padding: 25px;">
-                    <h3 style="margin-bottom: 20px; font-size: 18px;"><i class="fas fa-edit"></i> 이슈 수정</h3>
-                    <div class="issue-form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div class="form-group">
-                            <label style="font-size: 14px; margin-bottom: 8px; display: block;">구분</label>
-                            <select id="editIssueCategory" style="width: 100%; padding: 12px; font-size: 14px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
-                                <option value="TS" ${issue.category === 'TS' ? 'selected' : ''}>TS</option>
-                                <option value="저전압(이물)" ${issue.category === '저전압(이물)' ? 'selected' : ''}>저전압(이물)</option>
-                                <option value="저전압" ${issue.category === '저전압' ? 'selected' : ''}>저전압</option>
-                                <option value="어깨선" ${issue.category === '어깨선' ? 'selected' : ''}>어깨선</option>
-                                <option value="표면" ${issue.category === '표면' ? 'selected' : ''}>표면</option>
-                                <option value="탈리" ${issue.category === '탈리' ? 'selected' : ''}>탈리</option>
-                                <option value="얼라인" ${issue.category === '얼라인' ? 'selected' : ''}>얼라인</option>
-                                <option value="비전" ${issue.category === '비전' ? 'selected' : ''}>비전</option>
-                                <option value="금형" ${issue.category === '금형' ? 'selected' : ''}>금형</option>
-                                <option value="탭이슈" ${issue.category === '탭이슈' ? 'selected' : ''}>탭이슈</option>
-                                <option value="타발유" ${issue.category === '타발유' ? 'selected' : ''}>타발유</option>
-                                <option value="기타" ${issue.category === '기타' ? 'selected' : ''}>기타</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label style="font-size: 14px; margin-bottom: 8px; display: block;">진행상태</label>
-                            <select id="editIssueStatus" style="width: 100%; padding: 12px; font-size: 14px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
-                                <option value="waiting" ${issue.status === 'waiting' ? 'selected' : ''}>대기</option>
-                                <option value="doing" ${issue.status === 'doing' ? 'selected' : ''}>진행중</option>
-                                <option value="done" ${issue.status === 'done' ? 'selected' : ''}>완료</option>
-                                <option value="unresolved" ${issue.status === 'unresolved' ? 'selected' : ''}>미해결</option>
-                            </select>
-                        </div>
-                        <div class="form-group" style="grid-column: 1 / -1;">
-                            <label style="font-size: 14px; margin-bottom: 8px; display: block;">이슈 사항</label>
-                            <textarea id="editIssueContent" style="width: 100%; min-height: 100px; padding: 12px; font-size: 14px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; resize: vertical;">${issue.content || ''}</textarea>
-                        </div>
-                        <div class="form-group" style="grid-column: 1 / -1;">
-                            <label style="font-size: 14px; margin-bottom: 8px; display: block;">원인</label>
-                            <textarea id="editIssueCause" style="width: 100%; min-height: 100px; padding: 12px; font-size: 14px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; resize: vertical;">${issue.cause || ''}</textarea>
-                        </div>
-                        <div class="form-group" style="grid-column: 1 / -1;">
-                            <label style="font-size: 14px; margin-bottom: 8px; display: block;">즉시 조치 사항</label>
-                            <textarea id="editIssueAction" style="width: 100%; min-height: 100px; padding: 12px; font-size: 14px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; resize: vertical;">${issue.action || ''}</textarea>
-                        </div>
-                        <div class="form-group" style="grid-column: 1 / -1;">
-                            <label style="font-size: 14px; margin-bottom: 8px; display: block;">논의 필요 항목</label>
-                            <textarea id="editIssueDiscussion" style="width: 100%; min-height: 100px; padding: 12px; font-size: 14px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; resize: vertical;">${issue.discussion || ''}</textarea>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 15px; margin-top: 20px; justify-content: center;">
-                        <button class="btn btn-primary" onclick="saveIssueEdit()" style="padding: 12px 30px; font-size: 14px;">
-                            <i class="fas fa-check"></i> 저장
-                        </button>
-                        <button class="btn btn-secondary" onclick="closeIssueEditModal()" style="padding: 12px 30px; font-size: 14px;">
-                            <i class="fas fa-times"></i> 취소
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        }
-        
-        function saveIssueEdit() {
-            const issue = issues.find(i => i.id === editingIssueId);
-            if (!issue) return;
-            
-            issue.category = document.getElementById('editIssueCategory').value;
-            issue.status = document.getElementById('editIssueStatus').value;
-            issue.content = document.getElementById('editIssueContent').value.trim();
-            issue.cause = document.getElementById('editIssueCause').value.trim();
-            issue.action = document.getElementById('editIssueAction').value.trim();
-            issue.discussion = document.getElementById('editIssueDiscussion').value.trim();
-            
-            saveIssues();
-            renderIssues();
-            closeIssueEditModal();
-        }
-        
-        function closeIssueEditModal() {
-            const modal = document.getElementById('editIssueModal');
-            if (modal) modal.remove();
-            editingIssueId = null;
         }
 
         function updateIssueStatus(id, status) {
@@ -3985,190 +3427,6 @@
         }
 
         // =====================================================
-        // 텍스트 파싱 기능
-        // =====================================================
-        let parsedIssues = [];
-        
-        function openTextParseModal() {
-            document.getElementById('textParseModal').style.display = 'flex';
-            document.getElementById('parseInputText').value = '';
-            document.getElementById('parsePreview').innerHTML = '';
-            document.getElementById('addParsedIssuesBtn').style.display = 'none';
-            parsedIssues = [];
-        }
-        
-        function closeTextParseModal() {
-            document.getElementById('textParseModal').style.display = 'none';
-        }
-        
-        function clearParseInput() {
-            document.getElementById('parseInputText').value = '';
-            document.getElementById('parsePreview').innerHTML = '';
-            document.getElementById('addParsedIssuesBtn').style.display = 'none';
-            parsedIssues = [];
-        }
-        
-        function parseIssueText() {
-            const text = document.getElementById('parseInputText').value.trim();
-            if (!text) {
-                alert('텍스트를 입력해주세요.');
-                return;
-            }
-            
-            // 카테고리 키워드
-            const categories = ['TS', '저전압(이물)', '저전압', '어깨선', '표면', '탈리', '얼라인', '비전', '금형', '탭이슈', '타발유', '기타'];
-            // 상태 키워드
-            const statusMap = {
-                '대기': 'waiting', '진행중': 'doing', '진행': 'doing', 
-                '완료': 'done', '조치완료': 'done', '해결': 'done',
-                '미해결': 'unresolved', '미완료': 'unresolved'
-            };
-            
-            parsedIssues = [];
-            
-            // 이슈 블록 분리 (빈 줄 또는 번호로 구분)
-            const blocks = text.split(/\n(?=\d+[.\)]|\n)/).filter(b => b.trim());
-            
-            blocks.forEach(block => {
-                const lines = block.split('\n').filter(l => l.trim());
-                if (lines.length === 0) return;
-                
-                let category = '기타';
-                let status = 'waiting';
-                let content = '';
-                let discussion = '';
-                
-                // 첫 줄에서 카테고리와 상태 추출
-                let firstLine = lines[0];
-                
-                // 번호 제거 (1. 2. 등)
-                firstLine = firstLine.replace(/^\d+[.\)]\s*/, '');
-                
-                // 카테고리 추출 [TS], (표면), TS:, 표면- 등
-                for (const cat of categories) {
-                    const patterns = [
-                        new RegExp(`\\[${cat}\\]`, 'i'),
-                        new RegExp(`\\(${cat}\\)`, 'i'),
-                        new RegExp(`^${cat}[:\\-\\s]`, 'i'),
-                        new RegExp(`${cat}`, 'i')
-                    ];
-                    for (const pattern of patterns) {
-                        if (pattern.test(firstLine)) {
-                            category = cat;
-                            firstLine = firstLine.replace(pattern, '').trim();
-                            break;
-                        }
-                    }
-                    if (category !== '기타') break;
-                }
-                
-                // 상태 추출 - 진행중, 완료, 대기 등
-                for (const [keyword, value] of Object.entries(statusMap)) {
-                    const patterns = [
-                        new RegExp(`-\\s*${keyword}\\s*$`, 'i'),
-                        new RegExp(`\\[${keyword}\\]`, 'i'),
-                        new RegExp(`\\(${keyword}\\)`, 'i')
-                    ];
-                    for (const pattern of patterns) {
-                        if (pattern.test(firstLine)) {
-                            status = value;
-                            firstLine = firstLine.replace(pattern, '').trim();
-                            break;
-                        }
-                    }
-                }
-                
-                // 내용 정리
-                content = firstLine.replace(/^[-:]\s*/, '').trim();
-                
-                // 나머지 줄에서 논의/대응 내용 추출
-                for (let i = 1; i < lines.length; i++) {
-                    let line = lines[i].trim();
-                    if (/^(논의|대응|조치|결과|비고)[:\-]?\s*/i.test(line)) {
-                        discussion += line.replace(/^(논의|대응|조치|결과|비고)[:\-]?\s*/i, '') + ' ';
-                    } else if (line.startsWith('-') || line.startsWith('•')) {
-                        discussion += line.substring(1).trim() + ' ';
-                    } else {
-                        // 첫 줄 이후 내용도 content에 추가
-                        content += ' ' + line;
-                    }
-                }
-                
-                content = content.trim();
-                discussion = discussion.trim();
-                
-                if (content) {
-                    parsedIssues.push({ category, status, content, discussion });
-                }
-            });
-            
-            // 미리보기 표시
-            renderParsePreview();
-        }
-        
-        function renderParsePreview() {
-            const preview = document.getElementById('parsePreview');
-            const addBtn = document.getElementById('addParsedIssuesBtn');
-            
-            if (parsedIssues.length === 0) {
-                preview.innerHTML = `<div style="color: rgba(255,255,255,0.5); text-align: center; padding: 20px;">파싱된 이슈가 없습니다. 텍스트 형식을 확인해주세요.</div>`;
-                addBtn.style.display = 'none';
-                return;
-            }
-            
-            const statusLabels = { waiting: '대기', doing: '진행중', done: '완료', unresolved: '미해결' };
-            const statusColors = { waiting: '#ffa500', doing: '#00d4ff', done: '#00ff88', unresolved: '#ff6b6b' };
-            
-            let html = `<div style="font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 10px;">파싱된 이슈: ${parsedIssues.length}건</div>`;
-            
-            parsedIssues.forEach((issue, idx) => {
-                html += `
-                    <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 8px; border-left: 3px solid ${statusColors[issue.status]};">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <span style="background: rgba(0,212,255,0.2); padding: 2px 8px; border-radius: 4px; font-size: 11px;">${issue.category}</span>
-                            <span style="color: ${statusColors[issue.status]}; font-size: 11px;">${statusLabels[issue.status]}</span>
-                            <button onclick="removeParsedIssue(${idx})" style="background: none; border: none; color: #ff6b6b; cursor: pointer; font-size: 12px;"><i class="fas fa-times"></i></button>
-                        </div>
-                        <div style="font-size: 13px; color: white; margin-bottom: 4px;">${issue.content}</div>
-                        ${issue.discussion ? `<div style="font-size: 11px; color: rgba(255,255,255,0.5);">논의: ${issue.discussion}</div>` : ''}
-                    </div>
-                `;
-            });
-            
-            preview.innerHTML = html;
-            addBtn.style.display = parsedIssues.length > 0 ? 'inline-flex' : 'none';
-        }
-        
-        function removeParsedIssue(idx) {
-            parsedIssues.splice(idx, 1);
-            renderParsePreview();
-        }
-        
-        function addParsedIssues() {
-            if (parsedIssues.length === 0) {
-                alert('등록할 이슈가 없습니다.');
-                return;
-            }
-            
-            parsedIssues.forEach(issue => {
-                issues.push({
-                    id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
-                    category: issue.category,
-                    status: issue.status,
-                    content: issue.content,
-                    discussion: issue.discussion,
-                    createdAt: new Date().toISOString()
-                });
-            });
-            
-            saveIssues();
-            renderIssues();
-            closeTextParseModal();
-            alert(`${parsedIssues.length}건의 이슈가 등록되었습니다.`);
-            parsedIssues = [];
-        }
-
-        // =====================================================
         // KPI 현황
         // =====================================================
         function renderKpiTable() {
@@ -4183,11 +3441,10 @@
                     <td><input class="kpi-input text-left" value="${row.category || ''}" onchange="updateKpi(${idx}, 'category', this.value)"></td>
                     <td><input class="kpi-input text-left" value="${row.target || ''}" onchange="updateKpi(${idx}, 'target', this.value)"></td>
                     <td><input class="kpi-input" value="${row.criteria || ''}" onchange="updateKpi(${idx}, 'criteria', this.value)"></td>
+                    <td><input class="kpi-input text-left" value="${row.detail || ''}" onchange="updateKpi(${idx}, 'detail', this.value)"></td>
                     <td><input class="kpi-input" value="${row.result || ''}" onchange="updateKpi(${idx}, 'result', this.value)"></td>
-                    ${TEAM_MEMBERS.map((member, memberIdx) => `
-                        <td class="member-cell" style="background: ${memberIdx % 2 === 0 ? 'rgba(255,217,61,0.15)' : 'rgba(0,255,136,0.15)'};">
-                            <input class="kpi-input" value="${row.members?.[member] || ''}" onchange="updateKpiMember(${idx}, '${member}', this.value)">
-                        </td>
+                    ${TEAM_MEMBERS.map(member => `
+                        <td><input class="kpi-input" value="${row.members?.[member] || ''}" onchange="updateKpiMember(${idx}, '${member}', this.value)"></td>
                     `).join('')}
                     <td>
                         <button class="kpi-delete-btn" onclick="deleteKpiRow(${idx})">
@@ -4204,6 +3461,7 @@
                 category: '항목',
                 target: '목표명',
                 criteria: '기준',
+                detail: '세부사항',
                 result: '0',
                 members: {}
             };
@@ -4240,10 +3498,6 @@
         // 캘린더
         // =====================================================
         function renderCalendar() {
-            // 캘린더 탭이 제거되었으므로 바로 리턴
-            const container = document.getElementById('calendarDays');
-            if (!container) return;
-            
             const year = currentMonth.getFullYear();
             const month = currentMonth.getMonth();
             
@@ -4254,6 +3508,7 @@
             const startDay = firstDay.getDay();
             const totalDays = lastDay.getDate();
             
+            const container = document.getElementById('calendarDays');
             let html = '';
             const today = new Date();
             
@@ -4450,9 +3705,9 @@
             'vacation': { label: '휴가', icon: 'umbrella-beach', color: '#ff6b6b' },
             'half-am': { label: '오전반차', icon: 'sun', color: '#ffd93d' },
             'half-pm': { label: '오후반차', icon: 'moon', color: '#ffaa3d' },
-            'business': { label: '출장', icon: 'plane', color: '#a855f7' },
+            'business': { label: '외근', icon: 'car', color: '#a855f7' },
             'training': { label: '교육', icon: 'graduation-cap', color: '#667eea' },
-            'official': { label: '공가', icon: 'building', color: '#9ca3af' }
+            'sick': { label: '병가', icon: 'procedures', color: '#9ca3af' }
         };
 
         function renderAttendance() {
@@ -4483,14 +3738,9 @@
                 const entries = [];
                 Object.keys(attendanceData).forEach(member => {
                     if (attendanceData[member][dateKey]) {
-                        const data = attendanceData[member][dateKey];
-                        // 기존 데이터 호환 (문자열인 경우)
-                        const type = typeof data === 'string' ? data : data.type;
-                        const note = typeof data === 'string' ? '' : (data.note || '');
+                        const type = attendanceData[member][dateKey];
                         const typeInfo = ATTENDANCE_TYPES[type];
-                        if (typeInfo) {
-                            entries.push({ member, type, typeInfo, note });
-                        }
+                        entries.push({ member, type, typeInfo });
                     }
                 });
                 
@@ -4506,7 +3756,7 @@
                             ${entries.map(e => `
                                 <div class="attendance-entry">
                                     <span class="entry-name">${e.member}</span>
-                                    <span class="entry-type" style="background: ${e.typeInfo.color}30; color: ${e.typeInfo.color};">${e.typeInfo.label}${e.note ? ' (' + e.note + ')' : ''}</span>
+                                    <span class="entry-type" style="background: ${e.typeInfo.color}30; color: ${e.typeInfo.color};">${e.typeInfo.label}</span>
                                 </div>
                             `).join('')}
                         </div>
@@ -4531,22 +3781,17 @@
 
         function getAttendance(member, dateKey) {
             if (attendanceData[member] && attendanceData[member][dateKey]) {
-                const data = attendanceData[member][dateKey];
-                // 기존 데이터 호환 (문자열인 경우)
-                if (typeof data === 'string') {
-                    return { type: data, note: '' };
-                }
-                return data;
+                return attendanceData[member][dateKey];
             }
             return null;
         }
 
-        function setAttendance(member, dateKey, type, note) {
+        function setAttendance(member, dateKey, type) {
             if (!attendanceData[member]) {
                 attendanceData[member] = {};
             }
             if (type) {
-                attendanceData[member][dateKey] = { type, note: note || '' };
+                attendanceData[member][dateKey] = type;
             } else {
                 delete attendanceData[member][dateKey];
             }
@@ -4574,14 +3819,12 @@
             document.querySelectorAll('.attendance-type-btn').forEach(btn => {
                 btn.classList.remove('selected');
             });
-            document.getElementById('attendanceNote').value = '';
             
             // 기존 값이 있으면 선택 표시
-            const currentData = getAttendance(myName, dateKey);
-            if (currentData) {
-                const btn = document.querySelector(`.attendance-type-btn[data-type="${currentData.type}"]`);
+            const currentType = getAttendance(myName, dateKey);
+            if (currentType) {
+                const btn = document.querySelector(`.attendance-type-btn[data-type="${currentType}"]`);
                 if (btn) btn.classList.add('selected');
-                document.getElementById('attendanceNote').value = currentData.note || '';
             }
             
             document.getElementById('attendanceModal').classList.add('show');
@@ -4609,8 +3852,7 @@
             }
             
             const type = selectedBtn.dataset.type;
-            const note = document.getElementById('attendanceNote').value.trim();
-            setAttendance(selectedAttendanceCell.member, selectedAttendanceCell.dateKey, type, note);
+            setAttendance(selectedAttendanceCell.member, selectedAttendanceCell.dateKey, type);
             
             closeAttendanceModal();
             renderAttendance();
@@ -4657,19 +3899,17 @@
             for (let d = 1; d <= lastDay; d++) {
                 csv += `${d}일,`;
             }
-            csv += '출근,재택,휴가,반차,출장,교육,공가\n';
+            csv += '출근,재택,휴가,반차,외근,교육,병가\n';
             
             TEAM_MEMBERS.forEach(member => {
                 csv += `${member},`;
-                let counts = { work: 0, remote: 0, vacation: 0, half: 0, business: 0, training: 0, official: 0 };
+                let counts = { work: 0, remote: 0, vacation: 0, half: 0, business: 0, training: 0, sick: 0 };
                 
                 for (let d = 1; d <= lastDay; d++) {
                     const dateKey = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                    const data = getAttendance(member, dateKey);
-                    const type = data ? data.type : null;
-                    const note = data ? data.note : '';
-                    const typeInfo = type ? ATTENDANCE_TYPES[type] : null;
-                    csv += `${typeInfo ? typeInfo.label + (note ? '(' + note + ')' : '') : ''},`;
+                    const type = getAttendance(member, dateKey);
+                    const typeInfo = ATTENDANCE_TYPES[type];
+                    csv += `${typeInfo ? typeInfo.label : ''},`;
                     
                     if (type === 'work') counts.work++;
                     else if (type === 'remote') counts.remote++;
@@ -4677,10 +3917,10 @@
                     else if (type === 'half-am' || type === 'half-pm') counts.half++;
                     else if (type === 'business') counts.business++;
                     else if (type === 'training') counts.training++;
-                    else if (type === 'official') counts.official++;
+                    else if (type === 'sick') counts.sick++;
                 }
                 
-                csv += `${counts.work},${counts.remote},${counts.vacation},${counts.half},${counts.business},${counts.training},${counts.official}\n`;
+                csv += `${counts.work},${counts.remote},${counts.vacation},${counts.half},${counts.business},${counts.training},${counts.sick}\n`;
             });
             
             const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
@@ -5263,6 +4503,11 @@
         let chessCapturedPieces = { white: [], black: [] };
         let chessMoveHistory = [];
         let chessIsInCheck = false;
+        // 캐슬링 권리 추적
+        let chessCastlingRights = {
+            white: { kingSide: true, queenSide: true },
+            black: { kingSide: true, queenSide: true }
+        };
 
         function initChessBoard() {
             chessBoard = [
@@ -5293,6 +4538,11 @@
             chessCapturedPieces = { white: [], black: [] };
             chessMoveHistory = [];
             chessIsInCheck = false;
+            // 캐슬링 권리 초기화
+            chessCastlingRights = {
+                white: { kingSide: true, queenSide: true },
+                black: { kingSide: true, queenSide: true }
+            };
             
             renderChessBoard();
             updateChessDisplay();
@@ -5347,7 +4597,10 @@
             const piece = chessBoard[row] && chessBoard[row][col];
             
             if (chessSelectedCell && chessValidMoves.some(m => m.row === row && m.col === col)) {
-                moveChessPiece(chessSelectedCell.row, chessSelectedCell.col, row, col);
+                // 캐슬링 이동인지 확인
+                const move = chessValidMoves.find(m => m.row === row && m.col === col);
+                const castlingType = move && move.castling ? move.castling : null;
+                moveChessPiece(chessSelectedCell.row, chessSelectedCell.col, row, col, castlingType);
                 chessSelectedCell = null;
                 chessValidMoves = [];
                 renderChessBoard();
@@ -5366,9 +4619,10 @@
             renderChessBoard();
         }
 
-        function moveChessPiece(fromRow, fromCol, toRow, toCol) {
+        function moveChessPiece(fromRow, fromCol, toRow, toCol, castlingType = null) {
             const piece = chessBoard[fromRow][fromCol];
             const targetPiece = chessBoard[toRow][toCol];
+            const colNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
             
             if (targetPiece) {
                 chessCapturedPieces[targetPiece.color].push(targetPiece);
@@ -5377,6 +4631,39 @@
             chessBoard[toRow][toCol] = piece;
             chessBoard[fromRow][fromCol] = null;
             
+            // 캐슬링 처리 - 룩도 이동
+            if (castlingType === 'kingSide') {
+                // 킹사이드 캐슬링: 룩을 h열(7)에서 f열(5)로 이동
+                const rook = chessBoard[toRow][7];
+                chessBoard[toRow][5] = rook;
+                chessBoard[toRow][7] = null;
+                addChessLog(`${piece.color === 'white' ? '백' : '흑'}: 킹사이드 캐슬링 (O-O) 🏰`);
+            } else if (castlingType === 'queenSide') {
+                // 퀸사이드 캐슬링: 룩을 a열(0)에서 d열(3)로 이동
+                const rook = chessBoard[toRow][0];
+                chessBoard[toRow][3] = rook;
+                chessBoard[toRow][0] = null;
+                addChessLog(`${piece.color === 'white' ? '백' : '흑'}: 퀸사이드 캐슬링 (O-O-O) 🏰`);
+            } else {
+                const pieceName = getChessPieceName(piece.type);
+                addChessLog(`${piece.color === 'white' ? '백' : '흑'}: ${pieceName} ${colNames[fromCol]}${8-fromRow} → ${colNames[toCol]}${8-toRow}`);
+            }
+            
+            // 캐슬링 권리 업데이트
+            if (piece.type === 'king') {
+                chessCastlingRights[piece.color].kingSide = false;
+                chessCastlingRights[piece.color].queenSide = false;
+            }
+            if (piece.type === 'rook') {
+                if (fromCol === 0) chessCastlingRights[piece.color].queenSide = false;
+                if (fromCol === 7) chessCastlingRights[piece.color].kingSide = false;
+            }
+            // 룩이 잡히면 캐슬링 권리 상실
+            if (targetPiece && targetPiece.type === 'rook') {
+                if (toCol === 0) chessCastlingRights[targetPiece.color].queenSide = false;
+                if (toCol === 7) chessCastlingRights[targetPiece.color].kingSide = false;
+            }
+            
             // 폰 프로모션
             if (piece.type === 'pawn') {
                 if ((piece.color === 'white' && toRow === 0) || (piece.color === 'black' && toRow === 7)) {
@@ -5384,10 +4671,6 @@
                     addChessLog(`${piece.color === 'white' ? '백' : '흑'} 폰 → 퀸 승격!`);
                 }
             }
-            
-            const colNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-            const pieceName = getChessPieceName(piece.type);
-            addChessLog(`${piece.color === 'white' ? '백' : '흑'}: ${pieceName} ${colNames[fromCol]}${8-fromRow} → ${colNames[toCol]}${8-toRow}`);
             
             chessCurrentPlayer = chessCurrentPlayer === 'white' ? 'black' : 'white';
             chessIsInCheck = isChessKingInCheck(chessCurrentPlayer);
@@ -5407,7 +4690,8 @@
                     currentPlayer: chessCurrentPlayer,
                     gameOver: chessGameOver,
                     capturedPieces: chessCapturedPieces,
-                    isInCheck: chessIsInCheck
+                    isInCheck: chessIsInCheck,
+                    castlingRights: chessCastlingRights
                 });
             }
             
@@ -5428,7 +4712,8 @@
                 case 'king': moves = getChessKingMoves(row, col, piece.color); break;
             }
             
-            return moves.filter(move => !wouldChessBeInCheck(row, col, move.row, move.col, piece.color));
+            // 캐슬링은 이미 getChessKingMoves에서 검증됨, 일반 이동만 체크 필터링
+            return moves.filter(move => move.castling || !wouldChessBeInCheck(row, col, move.row, move.col, piece.color));
         }
 
         function getChessPawnMoves(row, col, color) {
@@ -5507,7 +4792,54 @@
                     if (!target || target.color !== color) moves.push({ row: newRow, col: newCol });
                 }
             });
+            
+            // 캐슬링 체크
+            if (!chessIsInCheck) {
+                const kingRow = color === 'white' ? 7 : 0;
+                
+                // 킹사이드 캐슬링 (O-O)
+                if (chessCastlingRights[color].kingSide && row === kingRow && col === 4) {
+                    // 킹과 룩 사이가 비어있고, 룩이 제자리에 있는지 확인
+                    const rook = chessBoard[kingRow][7];
+                    if (rook && rook.type === 'rook' && rook.color === color &&
+                        !chessBoard[kingRow][5] && !chessBoard[kingRow][6]) {
+                        // 킹이 지나가는 칸(5, 6)이 공격받지 않는지 확인
+                        if (!isSquareAttacked(kingRow, 5, color) && !isSquareAttacked(kingRow, 6, color)) {
+                            moves.push({ row: kingRow, col: 6, castling: 'kingSide' });
+                        }
+                    }
+                }
+                
+                // 퀸사이드 캐슬링 (O-O-O)
+                if (chessCastlingRights[color].queenSide && row === kingRow && col === 4) {
+                    // 킹과 룩 사이가 비어있고, 룩이 제자리에 있는지 확인
+                    const rook = chessBoard[kingRow][0];
+                    if (rook && rook.type === 'rook' && rook.color === color &&
+                        !chessBoard[kingRow][1] && !chessBoard[kingRow][2] && !chessBoard[kingRow][3]) {
+                        // 킹이 지나가는 칸(2, 3)이 공격받지 않는지 확인
+                        if (!isSquareAttacked(kingRow, 2, color) && !isSquareAttacked(kingRow, 3, color)) {
+                            moves.push({ row: kingRow, col: 2, castling: 'queenSide' });
+                        }
+                    }
+                }
+            }
+            
             return moves;
+        }
+        
+        // 특정 칸이 적에게 공격받는지 확인
+        function isSquareAttacked(row, col, myColor) {
+            const enemyColor = myColor === 'white' ? 'black' : 'white';
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const piece = chessBoard[r] && chessBoard[r][c];
+                    if (piece && piece.color === enemyColor) {
+                        const attacks = getChessAttackMoves(r, c, piece);
+                        if (attacks.some(m => m.row === row && m.col === col)) return true;
+                    }
+                }
+            }
+            return false;
         }
 
         function isChessInBounds(row, col) { return row >= 0 && row < 8 && col >= 0 && col < 8; }
@@ -5654,6 +4986,10 @@
                         black: Array.isArray(cap.black) ? cap.black : []
                     };
                     chessIsInCheck = data.isInCheck || false;
+                    // 캐슬링 권리 복원
+                    if (data.castlingRights) {
+                        chessCastlingRights = data.castlingRights;
+                    }
                     renderChessBoard();
                     updateChessDisplay();
                 }
@@ -5919,322 +5255,195 @@
             });
         }
 
-        // ===== 미니게임 시스템 =====
-        let gameData = {
-            coins: 0,
-            weaponLevel: 0,
-            collection: [],
-            gachaHistory: []
-        };
+        // =====================================================
+        // 학습 탭 기능
+        // =====================================================
+        let studyMaterials = [];
 
-        // 뽑기 아이템 목록
-        const GACHA_ITEMS = [
-            // 일반 (60%)
-            { emoji: '🐻', name: '곰돌이', rarity: 'normal', rate: 15 },
-            { emoji: '🐰', name: '토끼', rarity: 'normal', rate: 15 },
-            { emoji: '🐱', name: '고양이', rarity: 'normal', rate: 15 },
-            { emoji: '🐶', name: '강아지', rarity: 'normal', rate: 15 },
-            // 레어 (25%)
-            { emoji: '🦊', name: '여우', rarity: 'rare', rate: 8 },
-            { emoji: '🐼', name: '판다', rarity: 'rare', rate: 8 },
-            { emoji: '🦁', name: '사자', rarity: 'rare', rate: 5 },
-            { emoji: '🐯', name: '호랑이', rarity: 'rare', rate: 4 },
-            // 에픽 (12%)
-            { emoji: '🦄', name: '유니콘', rarity: 'epic', rate: 5 },
-            { emoji: '🐉', name: '용', rarity: 'epic', rate: 4 },
-            { emoji: '🦋', name: '나비', rarity: 'epic', rate: 3 },
-            // 전설 (3%)
-            { emoji: '🌟', name: '황금별', rarity: 'legendary', rate: 1.5 },
-            { emoji: '👑', name: '왕관', rarity: 'legendary', rate: 1 },
-            { emoji: '💎', name: '다이아몬드', rarity: 'legendary', rate: 0.5 }
-        ];
+        function openStudyModal() {
+            document.getElementById('studyModal').style.display = 'flex';
+        }
 
-        const RARITY_COLORS = {
-            normal: '#aaa',
-            rare: '#00d4ff',
-            epic: '#a855f7',
-            legendary: '#ffd700'
-        };
+        function closeStudyModal() {
+            document.getElementById('studyModal').style.display = 'none';
+            document.getElementById('newStudyTitle').value = '';
+            document.getElementById('newStudyLink').value = '';
+            document.getElementById('newStudyDesc').value = '';
+        }
 
-        const ENHANCE_RATES = [90, 90, 90, 70, 70, 70, 50, 50, 50, 30, 15, 5];
+        function addStudyMaterial() {
+            const category = document.getElementById('newStudyCategory').value;
+            const title = document.getElementById('newStudyTitle').value.trim();
+            const link = document.getElementById('newStudyLink').value.trim();
+            const desc = document.getElementById('newStudyDesc').value.trim();
 
-        const WEAPON_NAMES = [
-            '일반 검', '강화 검', '숙련자의 검', '전사의 검', '영웅의 검',
-            '전설의 검', '신비한 검', '용사의 검', '마검', '신검',
-            '천상의 검', '전설의 마검', '신의 검'
-        ];
+            if (!title) {
+                alert('제목을 입력해주세요.');
+                return;
+            }
 
-        function initMinigame() {
-            const myName = localStorage.getItem('chat_nickname') || '익명';
+            const material = {
+                id: Date.now(),
+                category: category,
+                title: title,
+                link: link,
+                desc: desc,
+                date: new Date().toLocaleDateString('ko-KR'),
+                author: document.getElementById('headerNickname').value || '익명'
+            };
+
+            // Firebase에 저장
             if (db) {
-                db.ref(`minigame/${myName}`).on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    if (data) {
-                        gameData = data;
+                db.ref('studyMaterials').push(material);
+            } else {
+                // 로컬 저장
+                studyMaterials.push(material);
+                renderStudyMaterials();
+            }
+
+            closeStudyModal();
+            updateStudyStats();
+        }
+
+        function renderStudyMaterials() {
+            const container = document.getElementById('studyMaterials');
+            const categoryFilter = document.getElementById('studyCategory').value;
+
+            // 기존 기본 자료 유지 + 추가된 자료 렌더링
+            let html = '';
+            
+            const filteredMaterials = studyMaterials.filter(m => 
+                categoryFilter === 'all' || m.category === categoryFilter
+            );
+
+            filteredMaterials.forEach(m => {
+                const categoryColors = {
+                    sqld: '#667eea',
+                    python: '#3776ab',
+                    excel: '#217346',
+                    etc: '#888'
+                };
+                const color = categoryColors[m.category] || '#667eea';
+
+                html += `
+                <div class="study-card" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <span style="background: ${color}; padding: 4px 10px; border-radius: 15px; font-size: 11px;">${m.category.toUpperCase()}</span>
+                                <span style="font-size: 12px; color: rgba(255,255,255,0.5);">${m.date} · ${m.author}</span>
+                            </div>
+                            <h4 style="margin: 0 0 8px 0; font-size: 16px;"><i class="fas fa-file-alt"></i> ${m.title}</h4>
+                            <p style="margin: 0; font-size: 14px; color: rgba(255,255,255,0.7);">${m.desc || '설명 없음'}</p>
+                        </div>
+                        ${m.link ? `
+                        <a href="${m.link}" target="_blank" style="background: rgba(102,126,234,0.3); color: #667eea; padding: 8px 15px; border-radius: 6px; text-decoration: none; font-size: 13px;">
+                            <i class="fas fa-external-link-alt"></i> 링크
+                        </a>
+                        ` : ''}
+                    </div>
+                </div>
+                `;
+            });
+
+            // 기본 SQLD 자료 카드들은 유지하고 뒤에 추가
+            if (html) {
+                container.insertAdjacentHTML('beforeend', html);
+            }
+        }
+
+        function saveStudyProgress() {
+            const checkboxes = document.querySelectorAll('#studyChecklist input[type="checkbox"]');
+            const progress = {};
+            let checked = 0;
+            
+            checkboxes.forEach(cb => {
+                progress[cb.id] = cb.checked;
+                if (cb.checked) checked++;
+            });
+
+            const percent = Math.round((checked / checkboxes.length) * 100);
+            document.getElementById('studyProgressPercent').textContent = percent + '%';
+            document.getElementById('studyProgressBar').style.width = percent + '%';
+
+            localStorage.setItem('azs_study_progress', JSON.stringify(progress));
+
+            // Firebase에도 저장 (닉네임별)
+            const nickname = document.getElementById('headerNickname').value;
+            if (db && nickname) {
+                db.ref('studyProgress/' + nickname).set({
+                    progress: progress,
+                    percent: percent,
+                    updated: Date.now()
+                });
+            }
+        }
+
+        function loadStudyProgress() {
+            // 로컬 진도 불러오기
+            const saved = localStorage.getItem('azs_study_progress');
+            if (saved) {
+                const progress = JSON.parse(saved);
+                let checked = 0;
+                const total = Object.keys(progress).length;
+
+                Object.keys(progress).forEach(id => {
+                    const cb = document.getElementById(id);
+                    if (cb) {
+                        cb.checked = progress[id];
+                        if (progress[id]) checked++;
                     }
-                    updateMinigameUI();
                 });
 
-                // 리더보드 로드
-                loadLeaderboard();
+                const percent = total > 0 ? Math.round((checked / total) * 100) : 0;
+                document.getElementById('studyProgressPercent').textContent = percent + '%';
+                document.getElementById('studyProgressBar').style.width = percent + '%';
             }
         }
 
-        function saveGameData() {
-            const myName = localStorage.getItem('chat_nickname') || '익명';
-            if (db && myName) {
-                db.ref(`minigame/${myName}`).set(gameData);
+        function updateStudyStats() {
+            // 참여 인원 및 자료 수 업데이트
+            if (db) {
+                db.ref('studyProgress').once('value', (snapshot) => {
+                    const data = snapshot.val();
+                    const count = data ? Object.keys(data).length : 0;
+                    document.getElementById('studyParticipants').textContent = count + '명';
+                });
+
+                db.ref('studyMaterials').once('value', (snapshot) => {
+                    const data = snapshot.val();
+                    const count = data ? Object.keys(data).length : 0;
+                    document.getElementById('studyMaterialCount').textContent = (count + 3) + '개'; // 기본 3개 + 추가
+                });
             }
         }
 
-        function updateMinigameUI() {
-            document.getElementById('myCoinCount').textContent = gameData.coins || 0;
-            document.getElementById('myWeaponLevel').textContent = `+${gameData.weaponLevel || 0}`;
-
-            // 강화 UI 업데이트
-            const level = gameData.weaponLevel || 0;
-            document.getElementById('weaponBig').textContent = level >= 10 ? '⚔️' : '🗡️';
-            document.getElementById('weaponName').textContent = `${WEAPON_NAMES[Math.min(level, 12)]} +${level}`;
-            document.getElementById('enhanceRate').textContent = `${ENHANCE_RATES[Math.min(level, 11)]}%`;
-
-            // 글로우 색상 변경
-            const glow = document.getElementById('weaponGlow');
-            if (level >= 10) {
-                glow.style.background = 'radial-gradient(circle, rgba(255,215,0,0.5), transparent)';
-            } else if (level >= 7) {
-                glow.style.background = 'radial-gradient(circle, rgba(168,85,247,0.4), transparent)';
-            } else if (level >= 4) {
-                glow.style.background = 'radial-gradient(circle, rgba(0,212,255,0.3), transparent)';
-            }
-
-            // 경고 메시지
-            const warning = document.getElementById('enhanceWarning');
-            if (level >= 7) {
-                warning.textContent = '⚠️ 실패 시 +0으로 파괴됩니다!';
-                warning.style.display = 'block';
-            } else if (level >= 4) {
-                warning.textContent = '⚠️ 실패 확률이 높습니다!';
-                warning.style.display = 'block';
-            } else {
-                warning.style.display = 'none';
-            }
-
-            // 컬렉션 업데이트
-            renderCollection();
-        }
-
-        function switchMinigame(panel) {
-            document.querySelectorAll('.minigame-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.minigame-panel').forEach(p => p.classList.remove('active'));
-
-            event.target.classList.add('active');
-            document.getElementById(`panel-${panel}`).classList.add('active');
-        }
-
-        function doGacha() {
-            if (gameData.coins < 1) {
-                alert('코인이 부족합니다! 업무를 완료하면 코인을 얻을 수 있어요.');
-                return;
-            }
-
-            gameData.coins -= 1;
-
-            // 확률 기반 뽑기
-            const rand = Math.random() * 100;
-            let cumulative = 0;
-            let result = GACHA_ITEMS[0];
-
-            for (const item of GACHA_ITEMS) {
-                cumulative += item.rate;
-                if (rand <= cumulative) {
-                    result = item;
-                    break;
-                }
-            }
-
-            // 컬렉션에 추가
-            if (!gameData.collection) gameData.collection = [];
-            if (!gameData.collection.includes(result.emoji)) {
-                gameData.collection.push(result.emoji);
-            }
-
-            // 히스토리에 추가
-            if (!gameData.gachaHistory) gameData.gachaHistory = [];
-            gameData.gachaHistory.unshift({
-                emoji: result.emoji,
-                name: result.name,
-                rarity: result.rarity,
-                time: Date.now()
-            });
-            if (gameData.gachaHistory.length > 10) {
-                gameData.gachaHistory = gameData.gachaHistory.slice(0, 10);
-            }
-
-            saveGameData();
-
-            // 애니메이션 표시
-            const display = document.getElementById('gachaDisplay');
-            display.innerHTML = `
-                <div class="gacha-result" style="font-size: 80px;">${result.emoji}</div>
-                <div style="color: ${RARITY_COLORS[result.rarity]}; font-weight: bold; margin-top: 10px;">
-                    ${result.name}
-                    <br><small>${result.rarity.toUpperCase()}</small>
-                </div>
-            `;
-
-            // 전설 등급이면 특별 효과
-            if (result.rarity === 'legendary') {
-                display.style.boxShadow = '0 0 50px rgba(255,215,0,0.8)';
-                setTimeout(() => {
-                    display.style.boxShadow = '0 0 30px rgba(255,215,0,0.2)';
-                }, 2000);
-            }
-
-            renderGachaHistory();
-            updateMinigameUI();
-        }
-
-        function renderGachaHistory() {
-            const container = document.getElementById('gachaHistory');
-            const history = gameData.gachaHistory || [];
-
-            container.innerHTML = history.map(item => `
-                <span style="margin-right: 5px; padding: 3px 8px; background: rgba(255,255,255,0.1); border-radius: 15px; display: inline-block; margin-bottom: 5px;">
-                    ${item.emoji} <small style="color: ${RARITY_COLORS[item.rarity]}">${item.name}</small>
-                </span>
-            `).join('');
-        }
-
-        function doEnhance() {
-            if (gameData.coins < 3) {
-                alert('코인이 부족합니다! (3코인 필요)');
-                return;
-            }
-
-            const level = gameData.weaponLevel || 0;
-            const rate = ENHANCE_RATES[Math.min(level, 11)];
-
-            gameData.coins -= 3;
-
-            const success = Math.random() * 100 < rate;
-            const historyDiv = document.getElementById('enhanceHistory');
-
-            if (success) {
-                gameData.weaponLevel = level + 1;
-                historyDiv.innerHTML = `<div class="enhance-success">✅ +${level} → +${level + 1} 강화 성공!</div>` + historyDiv.innerHTML;
-
-                // 강화 성공 효과
-                const weaponBig = document.getElementById('weaponBig');
-                weaponBig.style.animation = 'none';
-                setTimeout(() => {
-                    weaponBig.style.animation = 'weaponPulse 0.5s ease 3';
-                }, 10);
-
-            } else {
-                gameData.weaponLevel = 0;
-                historyDiv.innerHTML = `<div class="enhance-fail">💥 +${level} 강화 실패... 파괴됨!</div>` + historyDiv.innerHTML;
-
-                // 파괴 효과
-                const weaponBig = document.getElementById('weaponBig');
-                weaponBig.style.transform = 'scale(0)';
-                setTimeout(() => {
-                    weaponBig.style.transform = 'scale(1)';
-                }, 500);
-            }
-
-            saveGameData();
-            updateMinigameUI();
-            loadLeaderboard();
-        }
-
-        function renderCollection() {
-            const grid = document.getElementById('collectionGrid');
-            const owned = gameData.collection || [];
-
-            grid.innerHTML = GACHA_ITEMS.map(item => `
-                <div class="collection-item ${owned.includes(item.emoji) ? 'owned' : 'locked'}" 
-                     style="border-color: ${owned.includes(item.emoji) ? RARITY_COLORS[item.rarity] : 'transparent'}"
-                     title="${item.name} (${item.rarity})">
-                    ${item.emoji}
-                </div>
-            `).join('');
-        }
-
-        function loadLeaderboard() {
+        function setupStudyListener() {
             if (!db) return;
 
-            db.ref('minigame').orderByChild('weaponLevel').limitToLast(10).once('value', (snapshot) => {
-                const data = snapshot.val() || {};
-                const leaderboard = Object.entries(data)
-                    .map(([name, d]) => ({ name, level: d.weaponLevel || 0 }))
-                    .sort((a, b) => b.level - a.level)
-                    .slice(0, 5);
-
-                const container = document.getElementById('enhanceLeaderboard');
-                container.innerHTML = leaderboard.map((item, i) => `
-                    <div class="leaderboard-item">
-                        <span class="leaderboard-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`}</span>
-                        <span class="leaderboard-name">${item.name}</span>
-                        <span class="leaderboard-level">+${item.level}</span>
-                    </div>
-                `).join('');
+            db.ref('studyMaterials').on('value', (snapshot) => {
+                const data = snapshot.val();
+                studyMaterials = data ? Object.values(data) : [];
+                renderStudyMaterials();
+                updateStudyStats();
             });
         }
 
-        // 코인 획득 함수 (업무 완료 시 호출)
-        function earnCoin(amount = 1, reason = '활동') {
-            const myName = localStorage.getItem('chat_nickname') || '익명';
-            if (!myName) return;
+        // 카테고리 필터 변경 시
+        document.getElementById('studyCategory')?.addEventListener('change', () => {
+            document.getElementById('studyMaterials').innerHTML = '';
+            // 기본 카드 다시 표시 로직 필요시 추가
+            renderStudyMaterials();
+        });
 
-            if (!gameData.coins) gameData.coins = 0;
-            gameData.coins += amount;
-            saveGameData();
-            updateMinigameUI();
-
-            // 알림 표시
-            showCoinNotification(amount, reason);
-        }
-
-        function showCoinNotification(amount, reason) {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 80px;
-                right: 20px;
-                background: linear-gradient(135deg, #ffd700, #ff8c00);
-                color: #1a1a2e;
-                padding: 15px 25px;
-                border-radius: 30px;
-                font-weight: bold;
-                z-index: 10000;
-                animation: slideIn 0.5s ease, slideOut 0.5s ease 2s forwards;
-            `;
-            notification.innerHTML = `🪙 +${amount} 코인 획득! (${reason})`;
-            document.body.appendChild(notification);
-
-            setTimeout(() => notification.remove(), 2500);
-
-            // 애니메이션 CSS 추가
-            if (!document.getElementById('coinNotifStyle')) {
-                const style = document.createElement('style');
-                style.id = 'coinNotifStyle';
-                style.textContent = `
-                    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-                    @keyframes slideOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-20px); } }
-                `;
-                document.head.appendChild(style);
-            }
-        }
-
-        // 기존 업무 완료 함수에 코인 추가 연동
-        const originalMoveToCompleted = window.moveToCompleted;
-        window.moveToCompleted = function(taskId) {
-            if (originalMoveToCompleted) originalMoveToCompleted(taskId);
-            earnCoin(2, '업무 완료');
-        };
-
-        // 초기화
-        setTimeout(initMinigame, 1000);
+        // 페이지 로드 시 학습 진도 불러오기
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                loadStudyProgress();
+                updateStudyStats();
+                if (db) setupStudyListener();
+            }, 1000);
+        });
     </script>
 </body>
 </html>
