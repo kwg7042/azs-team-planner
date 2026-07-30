@@ -3450,6 +3450,18 @@
                                 • 크레딧 소진 없음!
                             </div>
                         </div>
+                        
+                        <!-- CORS 프록시 설정 -->
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px;">
+                                <i class="fas fa-server" style="color: #f97316;"></i> CORS 프록시 URL (선택)
+                            </label>
+                            <input type="text" id="groqProxyUrl" placeholder="https://your-proxy.workers.dev" 
+                                   style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 14px;">
+                            <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 8px;">
+                                💡 회사 네트워크에서 CORS 차단 시 Cloudflare Workers 프록시를 사용하세요.
+                            </p>
+                        </div>
                     </div>
                     
                     <!-- Gemini API 설정 (숨김) -->
@@ -4889,6 +4901,7 @@
         function openAiSettingsModal() {
             document.getElementById('aiSettingsModal').style.display = 'flex';
             document.getElementById('groqApiKey').value = localStorage.getItem('groqApiKey') || '';
+            document.getElementById('groqProxyUrl').value = localStorage.getItem('groqProxyUrl') || '';
             document.getElementById('geminiApiKey').value = localStorage.getItem('geminiApiKey') || '';
             // Groq가 설정되어 있으면 Groq 탭, 아니면 저장된 선호 탭
             const preferredApi = localStorage.getItem('preferredAiApi') || 'groq';
@@ -4907,6 +4920,7 @@
         function saveAiSettings() {
             const groqKey = document.getElementById('groqApiKey').value.trim();
             const geminiKey = document.getElementById('geminiApiKey').value.trim();
+            const proxyUrl = document.getElementById('groqProxyUrl').value.trim();
             
             if (groqKey) {
                 localStorage.setItem('groqApiKey', groqKey);
@@ -4920,6 +4934,12 @@
                 localStorage.removeItem('geminiApiKey');
             }
             
+            if (proxyUrl) {
+                localStorage.setItem('groqProxyUrl', proxyUrl);
+            } else {
+                localStorage.removeItem('groqProxyUrl');
+            }
+            
             localStorage.setItem('preferredAiApi', currentApiTab);
             
             alert('AI 설정이 저장되었습니다.');
@@ -4929,6 +4949,7 @@
         // Groq API 연결 테스트
         async function testGroqApi() {
             const apiKey = document.getElementById('groqApiKey').value.trim();
+            const proxyUrl = document.getElementById('groqProxyUrl').value.trim();
             const resultDiv = document.getElementById('groqTestResult');
             
             if (!apiKey) {
@@ -4936,10 +4957,14 @@
                 return;
             }
             
-            resultDiv.innerHTML = '<span style="color: #ffa500;"><i class="fas fa-spinner fa-spin"></i> 테스트 중...</span>';
+            // 프록시 URL 또는 직접 호출
+            const apiUrl = proxyUrl || 'https://api.groq.com/openai/v1/chat/completions';
+            const usingProxy = !!proxyUrl;
+            
+            resultDiv.innerHTML = `<span style="color: #ffa500;"><i class="fas fa-spinner fa-spin"></i> ${usingProxy ? '프록시 경유 ' : ''}테스트 중...</span>`;
             
             try {
-                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -4953,13 +4978,17 @@
                 });
                 
                 if (response.ok) {
-                    resultDiv.innerHTML = '<span style="color: #00ff88;"><i class="fas fa-check-circle"></i> 연결 성공! Groq API 정상 작동합니다.</span>';
+                    resultDiv.innerHTML = `<span style="color: #00ff88;"><i class="fas fa-check-circle"></i> 연결 성공! ${usingProxy ? '(프록시 경유) ' : ''}Groq API 정상 작동합니다.</span>`;
                 } else {
                     const error = await response.json();
                     resultDiv.innerHTML = `<span style="color: #ff6b6b;"><i class="fas fa-times-circle"></i> 오류: ${error.error?.message || '알 수 없는 오류'}</span>`;
                 }
             } catch (err) {
-                resultDiv.innerHTML = `<span style="color: #ff6b6b;"><i class="fas fa-times-circle"></i> 네트워크 오류: ${err.message}</span>`;
+                if (!usingProxy) {
+                    resultDiv.innerHTML = `<span style="color: #ff6b6b;"><i class="fas fa-times-circle"></i> CORS 차단됨. 프록시 URL을 설정해주세요.</span>`;
+                } else {
+                    resultDiv.innerHTML = `<span style="color: #ff6b6b;"><i class="fas fa-times-circle"></i> 프록시 오류: ${err.message}</span>`;
+                }
             }
         }
         
@@ -5100,7 +5129,11 @@ ${text}
         
         // Groq API 호출
         async function callGroqApi(apiKey, prompt) {
-            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            // 프록시 URL 확인
+            const proxyUrl = localStorage.getItem('groqProxyUrl');
+            const apiUrl = proxyUrl || 'https://api.groq.com/openai/v1/chat/completions';
+            
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
