@@ -7175,6 +7175,9 @@
             
             if (db) {
                 db.ref('studyMaterials/' + id).remove();
+                // 로컬 배열에서도 제거하고 리렌더링
+                studyMaterials = studyMaterials.filter(m => m.id !== id);
+                renderStudyMaterials();
             } else {
                 studyMaterials = studyMaterials.filter(m => m.id !== id);
                 renderStudyMaterials();
