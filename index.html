@@ -3409,33 +3409,78 @@
 
             <!-- AI API 설정 모달 -->
             <div id="aiSettingsModal" class="modal-overlay" style="display: none;">
-                <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-content" style="max-width: 550px; max-height: 85vh; overflow-y: auto;">
                     <h3 style="margin-bottom: 20px;"><i class="fas fa-robot" style="color: #667eea;"></i> AI 분석 설정</h3>
-                    <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 20px;">
-                        Google Gemini API를 사용하여 텍스트를 자동으로 분류합니다.<br>
-                        <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #00d4ff;">Google AI Studio</a>에서 무료 API 키를 발급받으세요.
-                    </p>
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; font-size: 14px;">Gemini API Key</label>
-                        <input type="password" id="geminiApiKey" placeholder="API 키를 입력하세요" 
-                               style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 14px;">
-                        <div style="display: flex; gap: 10px; margin-top: 10px;">
-                            <button class="btn btn-secondary" onclick="toggleApiKeyVisibility()" style="flex: 1;">
-                                <i class="fas fa-eye"></i> 보기/숨기기
-                            </button>
-                            <button class="btn btn-secondary" onclick="testGeminiApi()" style="flex: 1;">
-                                <i class="fas fa-vial"></i> 연결 테스트
-                            </button>
-                        </div>
-                        <div id="apiTestResult" style="margin-top: 10px; font-size: 12px;"></div>
+                    
+                    <!-- API 선택 -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <button id="tabGroq" class="btn" style="flex: 1; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);" onclick="switchApiTab('groq')">
+                            <i class="fas fa-bolt"></i> Groq (추천)
+                        </button>
+                        <button id="tabGemini" class="btn btn-secondary" style="flex: 1;" onclick="switchApiTab('gemini')">
+                            <i class="fas fa-gem"></i> Gemini
+                        </button>
                     </div>
-                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                        <div style="font-size: 12px; color: rgba(255,255,255,0.7);">
-                            <i class="fas fa-info-circle" style="color: #00d4ff;"></i> <strong>무료 사용량</strong><br>
-                            • 분당 60회 / 일 1,500회 호출 가능<br>
-                            • API 키는 브라우저에 안전하게 저장됩니다
+                    
+                    <!-- Groq API 설정 -->
+                    <div id="groqSettings">
+                        <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 15px;">
+                            <strong style="color: #f97316;">⚡ Groq - 완전 무료 & 초고속!</strong><br>
+                            <a href="https://console.groq.com/keys" target="_blank" style="color: #00d4ff;">Groq Console</a>에서 API 키를 발급받으세요 (무료 회원가입).
+                        </p>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px;">Groq API Key</label>
+                            <input type="password" id="groqApiKey" placeholder="gsk_..." 
+                                   style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 14px;">
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button class="btn btn-secondary" onclick="toggleApiKeyVisibility('groq')" style="flex: 1;">
+                                    <i class="fas fa-eye"></i> 보기/숨기기
+                                </button>
+                                <button class="btn" style="flex: 1; background: #f97316;" onclick="testGroqApi()">
+                                    <i class="fas fa-vial"></i> 연결 테스트
+                                </button>
+                            </div>
+                            <div id="groqTestResult" style="margin-top: 10px; font-size: 12px;"></div>
+                        </div>
+                        <div style="background: rgba(249, 115, 22, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(249, 115, 22, 0.3);">
+                            <div style="font-size: 12px; color: rgba(255,255,255,0.8);">
+                                <i class="fas fa-fire" style="color: #f97316;"></i> <strong>Groq 장점</strong><br>
+                                • 완전 무료 (분당 30회, 일 14,400회)<br>
+                                • 초고속 응답 (Llama 3.3 70B 모델)<br>
+                                • 크레딧 소진 없음!
+                            </div>
                         </div>
                     </div>
+                    
+                    <!-- Gemini API 설정 (숨김) -->
+                    <div id="geminiSettings" style="display: none;">
+                        <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 15px;">
+                            Google Gemini API를 사용합니다.<br>
+                            <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #00d4ff;">Google AI Studio</a>에서 API 키를 발급받으세요.
+                        </p>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px;">Gemini API Key</label>
+                            <input type="password" id="geminiApiKey" placeholder="API 키를 입력하세요" 
+                                   style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 14px;">
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button class="btn btn-secondary" onclick="toggleApiKeyVisibility('gemini')" style="flex: 1;">
+                                    <i class="fas fa-eye"></i> 보기/숨기기
+                                </button>
+                                <button class="btn btn-secondary" onclick="testGeminiApi()" style="flex: 1;">
+                                    <i class="fas fa-vial"></i> 연결 테스트
+                                </button>
+                            </div>
+                            <div id="geminiTestResult" style="margin-top: 10px; font-size: 12px;"></div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <div style="font-size: 12px; color: rgba(255,255,255,0.7);">
+                                <i class="fas fa-info-circle" style="color: #00d4ff;"></i> <strong>Gemini 사용량</strong><br>
+                                • 무료 크레딧 제공 (소진 시 유료 전환 필요)<br>
+                                • 분당 60회 호출 가능
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div style="display: flex; gap: 10px;">
                         <button class="btn btn-primary" onclick="saveAiSettings()" style="flex: 1;">
                             <i class="fas fa-save"></i> 저장
@@ -4824,41 +4869,104 @@
         }
 
         // =====================================================
-        // AI 분석 기능 (Google Gemini API)
+        // AI 분석 기능 (Groq API + Gemini API)
         // =====================================================
+        
+        let currentApiTab = 'groq';
+        
+        // 탭 전환
+        function switchApiTab(tab) {
+            currentApiTab = tab;
+            document.getElementById('groqSettings').style.display = tab === 'groq' ? 'block' : 'none';
+            document.getElementById('geminiSettings').style.display = tab === 'gemini' ? 'block' : 'none';
+            document.getElementById('tabGroq').className = tab === 'groq' ? 'btn' : 'btn btn-secondary';
+            document.getElementById('tabGemini').className = tab === 'gemini' ? 'btn' : 'btn btn-secondary';
+            document.getElementById('tabGroq').style.background = tab === 'groq' ? 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' : '';
+            document.getElementById('tabGemini').style.background = tab === 'gemini' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '';
+        }
         
         // AI 설정 모달 열기/닫기
         function openAiSettingsModal() {
             document.getElementById('aiSettingsModal').style.display = 'flex';
-            const savedKey = localStorage.getItem('geminiApiKey') || '';
-            document.getElementById('geminiApiKey').value = savedKey;
+            document.getElementById('groqApiKey').value = localStorage.getItem('groqApiKey') || '';
+            document.getElementById('geminiApiKey').value = localStorage.getItem('geminiApiKey') || '';
+            // Groq가 설정되어 있으면 Groq 탭, 아니면 저장된 선호 탭
+            const preferredApi = localStorage.getItem('preferredAiApi') || 'groq';
+            switchApiTab(preferredApi);
         }
         
         function closeAiSettingsModal() {
             document.getElementById('aiSettingsModal').style.display = 'none';
         }
         
-        function toggleApiKeyVisibility() {
-            const input = document.getElementById('geminiApiKey');
+        function toggleApiKeyVisibility(type) {
+            const input = document.getElementById(type + 'ApiKey');
             input.type = input.type === 'password' ? 'text' : 'password';
         }
         
         function saveAiSettings() {
-            const apiKey = document.getElementById('geminiApiKey').value.trim();
-            if (apiKey) {
-                localStorage.setItem('geminiApiKey', apiKey);
-                alert('API 키가 저장되었습니다.');
+            const groqKey = document.getElementById('groqApiKey').value.trim();
+            const geminiKey = document.getElementById('geminiApiKey').value.trim();
+            
+            if (groqKey) {
+                localStorage.setItem('groqApiKey', groqKey);
+            } else {
+                localStorage.removeItem('groqApiKey');
+            }
+            
+            if (geminiKey) {
+                localStorage.setItem('geminiApiKey', geminiKey);
             } else {
                 localStorage.removeItem('geminiApiKey');
-                alert('API 키가 삭제되었습니다.');
             }
+            
+            localStorage.setItem('preferredAiApi', currentApiTab);
+            
+            alert('AI 설정이 저장되었습니다.');
             closeAiSettingsModal();
+        }
+        
+        // Groq API 연결 테스트
+        async function testGroqApi() {
+            const apiKey = document.getElementById('groqApiKey').value.trim();
+            const resultDiv = document.getElementById('groqTestResult');
+            
+            if (!apiKey) {
+                resultDiv.innerHTML = '<span style="color: #ff6b6b;"><i class="fas fa-times-circle"></i> API 키를 입력해주세요.</span>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<span style="color: #ffa500;"><i class="fas fa-spinner fa-spin"></i> 테스트 중...</span>';
+            
+            try {
+                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'llama-3.3-70b-versatile',
+                        messages: [{ role: 'user', content: '안녕' }],
+                        max_tokens: 10
+                    })
+                });
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = '<span style="color: #00ff88;"><i class="fas fa-check-circle"></i> 연결 성공! Groq API 정상 작동합니다.</span>';
+                } else {
+                    const error = await response.json();
+                    resultDiv.innerHTML = `<span style="color: #ff6b6b;"><i class="fas fa-times-circle"></i> 오류: ${error.error?.message || '알 수 없는 오류'}</span>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<span style="color: #ff6b6b;"><i class="fas fa-times-circle"></i> 네트워크 오류: ${err.message}</span>`;
+            }
         }
         
         // Gemini API 연결 테스트
         async function testGeminiApi() {
             const apiKey = document.getElementById('geminiApiKey').value.trim();
-            const resultDiv = document.getElementById('apiTestResult');
+            const resultDiv = document.getElementById('geminiTestResult');
             
             if (!apiKey) {
                 resultDiv.innerHTML = '<span style="color: #ff6b6b;"><i class="fas fa-times-circle"></i> API 키를 입력해주세요.</span>';
@@ -4887,30 +4995,9 @@
             }
         }
         
-        // AI 분석 실행
-        async function aiAnalyzeIssues() {
-            const text = document.getElementById('parseInputText').value.trim();
-            if (!text) {
-                alert('분석할 텍스트를 입력해주세요.');
-                return;
-            }
-            
-            const apiKey = localStorage.getItem('geminiApiKey');
-            
-            // API 키가 없으면 스마트 키워드 분류 사용
-            if (!apiKey) {
-                smartKeywordAnalysis(text);
-                return;
-            }
-            
-            // AI 분석 상태 표시
-            const statusDiv = document.getElementById('aiAnalysisStatus');
-            const statusText = document.getElementById('aiStatusText');
-            statusDiv.style.display = 'block';
-            statusText.textContent = 'AI가 이슈를 분석하고 분류하는 중...';
-            
-            try {
-                const prompt = `당신은 제조업 품질 이슈 분류 전문가입니다. 아래 텍스트에서 각 이슈를 추출하고 분류해주세요.
+        // AI 분석용 프롬프트 생성
+        function getAiPrompt(text) {
+            return `당신은 제조업 품질 이슈 분류 전문가입니다. 아래 텍스트에서 각 이슈를 추출하고 분류해주세요.
 
 ## 분류 카테고리 (반드시 아래 중 하나만 선택):
 - TS: 기술지원, 기술적 문제
@@ -4946,57 +5033,135 @@ ${text}
 ]
 
 중요: JSON 배열만 응답하세요. 다른 설명은 넣지 마세요.`;
-
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: {
-                            temperature: 0.1,
-                            maxOutputTokens: 2048
-                        }
-                    })
-                });
-                
-                if (!response.ok) {
-                    throw new Error('API 호출 실패');
-                }
-                
-                const data = await response.json();
-                const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                
-                // JSON 파싱 시도
-                const jsonMatch = aiResponse.match(/\[[\s\S]*\]/);
-                if (jsonMatch) {
-                    parsedIssues = JSON.parse(jsonMatch[0]);
-                    
-                    // 유효성 검증 및 정규화
-                    const validCategories = ['TS', '저전압(이물)', '저전압', '어깨선', '표면', '탈리', '얼라인', '비전', '금형', '탭이슈', '타발유', '기타'];
-                    const validStatuses = ['waiting', 'doing', 'done', 'unresolved'];
-                    
-                    parsedIssues = parsedIssues.map(issue => ({
-                        category: validCategories.includes(issue.category) ? issue.category : '기타',
-                        status: validStatuses.includes(issue.status) ? issue.status : 'waiting',
-                        content: issue.content || '',
-                        discussion: issue.discussion || ''
-                    })).filter(issue => issue.content);
-                    
-                    statusDiv.style.display = 'none';
-                    renderParsePreview();
-                } else {
-                    throw new Error('AI 응답을 파싱할 수 없습니다');
-                }
-                
-            } catch (err) {
-                console.error('AI 분석 오류:', err);
-                statusDiv.style.display = 'none';
-                
-                // 폴백: 스마트 키워드 분류
-                if (confirm('AI 분석 중 오류가 발생했습니다.\n스마트 키워드 분류로 대체하시겠습니까?')) {
-                    smartKeywordAnalysis(text);
+        }
+        
+        // AI 분석 실행 (Groq 우선, Gemini 폴백)
+        async function aiAnalyzeIssues() {
+            const text = document.getElementById('parseInputText').value.trim();
+            if (!text) {
+                alert('분석할 텍스트를 입력해주세요.');
+                return;
+            }
+            
+            const groqKey = localStorage.getItem('groqApiKey');
+            const geminiKey = localStorage.getItem('geminiApiKey');
+            
+            // API 키가 없으면 스마트 키워드 분류 사용
+            if (!groqKey && !geminiKey) {
+                smartKeywordAnalysis(text);
+                return;
+            }
+            
+            // AI 분석 상태 표시
+            const statusDiv = document.getElementById('aiAnalysisStatus');
+            const statusText = document.getElementById('aiStatusText');
+            statusDiv.style.display = 'block';
+            
+            const prompt = getAiPrompt(text);
+            
+            // Groq API 우선 시도
+            if (groqKey) {
+                statusText.textContent = '⚡ Groq AI가 이슈를 분석하는 중...';
+                try {
+                    const result = await callGroqApi(groqKey, prompt);
+                    if (result.success) {
+                        parsedIssues = result.data;
+                        statusDiv.style.display = 'none';
+                        renderParsePreview();
+                        return;
+                    }
+                } catch (err) {
+                    console.error('Groq API 오류:', err);
                 }
             }
+            
+            // Gemini API 폴백
+            if (geminiKey) {
+                statusText.textContent = '💎 Gemini AI가 이슈를 분석하는 중...';
+                try {
+                    const result = await callGeminiApi(geminiKey, prompt);
+                    if (result.success) {
+                        parsedIssues = result.data;
+                        statusDiv.style.display = 'none';
+                        renderParsePreview();
+                        return;
+                    }
+                } catch (err) {
+                    console.error('Gemini API 오류:', err);
+                }
+            }
+            
+            // 모든 API 실패 시
+            statusDiv.style.display = 'none';
+            if (confirm('AI 분석 중 오류가 발생했습니다.\n스마트 키워드 분류로 대체하시겠습니까?')) {
+                smartKeywordAnalysis(text);
+            }
+        }
+        
+        // Groq API 호출
+        async function callGroqApi(apiKey, prompt) {
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: 'llama-3.3-70b-versatile',
+                    messages: [{ role: 'user', content: prompt }],
+                    temperature: 0.1,
+                    max_tokens: 2048
+                })
+            });
+            
+            if (!response.ok) throw new Error('Groq API 호출 실패');
+            
+            const data = await response.json();
+            const aiResponse = data.choices?.[0]?.message?.content || '';
+            
+            return parseAiResponse(aiResponse);
+        }
+        
+        // Gemini API 호출
+        async function callGeminiApi(apiKey, prompt) {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        temperature: 0.1,
+                        maxOutputTokens: 2048
+                    }
+                })
+            });
+            
+            if (!response.ok) throw new Error('Gemini API 호출 실패');
+            
+            const data = await response.json();
+            const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            
+            return parseAiResponse(aiResponse);
+        }
+        
+        // AI 응답 파싱
+        function parseAiResponse(aiResponse) {
+            const jsonMatch = aiResponse.match(/\[[\s\S]*\]/);
+            if (!jsonMatch) return { success: false };
+            
+            let issues = JSON.parse(jsonMatch[0]);
+            
+            const validCategories = ['TS', '저전압(이물)', '저전압', '어깨선', '표면', '탈리', '얼라인', '비전', '금형', '탭이슈', '타발유', '기타'];
+            const validStatuses = ['waiting', 'doing', 'done', 'unresolved'];
+            
+            issues = issues.map(issue => ({
+                category: validCategories.includes(issue.category) ? issue.category : '기타',
+                status: validStatuses.includes(issue.status) ? issue.status : 'waiting',
+                content: issue.content || '',
+                discussion: issue.discussion || ''
+            })).filter(issue => issue.content);
+            
+            return { success: true, data: issues };
         }
         
         // 스마트 키워드 기반 분류 (AI 대체/폴백)
@@ -5004,7 +5169,7 @@ ${text}
             const statusDiv = document.getElementById('aiAnalysisStatus');
             const statusText = document.getElementById('aiStatusText');
             statusDiv.style.display = 'block';
-            statusText.textContent = '스마트 키워드 분석 중...';
+            statusText.textContent = '🔍 스마트 키워드 분석 중...';
             
             // 카테고리별 키워드 사전 (확장된 버전)
             const categoryKeywords = {
