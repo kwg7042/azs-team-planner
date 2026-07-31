@@ -4884,6 +4884,10 @@
         // AI 분석 기능 (Groq API + Gemini API)
         // =====================================================
         
+        // 🔑 기본 Groq API 키 (여기에 API 키를 입력하면 모든 브라우저에서 자동 적용)
+        // Groq 무료 발급: https://console.groq.com/keys
+        const DEFAULT_GROQ_API_KEY = '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';
+        
         let currentApiTab = 'groq';
         
         // 탭 전환
@@ -5072,7 +5076,7 @@ ${text}
                 return;
             }
             
-            const groqKey = localStorage.getItem('groqApiKey');
+            const groqKey = localStorage.getItem('groqApiKey') || DEFAULT_GROQ_API_KEY;
             const geminiKey = localStorage.getItem('geminiApiKey');
             
             // API 키가 없으면 스마트 키워드 분류 사용
