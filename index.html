@@ -8417,6 +8417,16 @@ ${text}
       function dataRange(offset){ let min=null,max=null; DATA.forEach(r=>r.msgs.forEach(a=>{ const d=toGeorgia(a[0],r.convert,offset); if(!min||d<min)min=d; if(!max||d>max)max=d; })); return [min,max]; }
       function buildRooms(){ const box=$('ivRooms'); if(!box)return; box.innerHTML=''; DATA.forEach(r=>{ const lab=document.createElement('label'); lab.innerHTML=`<input type="checkbox" id="ivrm_${r.folder}" checked><span class="iv-badge" style="background:${COLORS[r.folder]||'#666'}">${r.room}</span><span style="color:#9fb3d1">${r.msgs.length.toLocaleString()}</span>`; box.appendChild(lab); }); }
       function quick(days){ const offset=parseFloat($('ivOffset').value)||0; const [min,max]=dataRange(offset); if(!max)return; const end=max; const start=days>0?new Date(end.getTime()-days*86400000):min; $('ivDFrom').value=`${start.getFullYear()}-${pad(start.getMonth()+1)}-${pad(start.getDate())}`; $('ivDTo').value=`${end.getFullYear()}-${pad(end.getMonth()+1)}-${pad(end.getDate())}`; $('ivTFrom').value='00:00'; $('ivTTo').value='23:59'; search(); }
+      function setDefaultDates(){
+        const now=new Date();
+        const to=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+        const s=new Date(now.getTime()-2*86400000);
+        const from=`${s.getFullYear()}-${pad(s.getMonth()+1)}-${pad(s.getDate())}`;
+        if(!$('ivDFrom').value) $('ivDFrom').value=from;
+        if(!$('ivDTo').value) $('ivDTo').value=to;
+        if(!$('ivTFrom').value) $('ivTFrom').value='00:00';
+        if(!$('ivTTo').value) $('ivTTo').value='23:59';
+      }
       function search(){
         const offset=parseFloat($('ivOffset').value)||0;
         const dFrom=$('ivDFrom').value, tFrom=$('ivTFrom').value||'00:00', dTo=$('ivDTo').value, tTo=$('ivTTo').value||'23:59';
@@ -8476,6 +8486,7 @@ ${text}
       let inited=false;
       function init(){
         if(inited) return; if(!$('ivRooms')) return; inited=true;
+        setDefaultDates();
         $('ivSearchBtn').addEventListener('click', search);
         document.querySelectorAll('#tab-chatissue .iv-quick button').forEach(b=> b.addEventListener('click', ()=>quick(parseInt(b.dataset.days))));
         if(DATA.length){ proceed(); return; }
