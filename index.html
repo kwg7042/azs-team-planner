@@ -3178,6 +3178,9 @@
         <button class="tab-btn" data-tab="minigame">
             <i class="fas fa-gamepad"></i> 🎮게임
         </button>
+        <button class="tab-btn" data-tab="chatissue">
+            <i class="fas fa-comments"></i> 카톡이슈
+        </button>
     </div>
 
     <div class="content-wrapper">
@@ -3907,6 +3910,68 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- ========== 카톡 이슈 조회 탭 ========== -->
+        <div class="tab-content" id="tab-chatissue">
+            <style>
+                #tab-chatissue .iv-panel{ background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:16px; margin-bottom:16px; }
+                #tab-chatissue .iv-row{ display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; }
+                #tab-chatissue .iv-field{ display:flex; flex-direction:column; gap:4px; }
+                #tab-chatissue .iv-field label{ font-size:12px; color:#9fb3d1; }
+                #tab-chatissue input, #tab-chatissue select{ font-family:inherit; font-size:14px; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,.2); background:rgba(0,0,0,.25); color:#eee; }
+                #tab-chatissue input[type=date], #tab-chatissue input[type=time]{ color-scheme:dark; }
+                #tab-chatissue .iv-btn{ cursor:pointer; background:#2563eb; border:none; font-weight:600; color:#fff; padding:9px 14px; border-radius:8px; font-size:14px; }
+                #tab-chatissue .iv-btn:hover{ background:#1d4ed8; }
+                #tab-chatissue .iv-ghost{ background:rgba(255,255,255,.1); font-size:12px; padding:6px 10px; }
+                #tab-chatissue .iv-ghost:hover{ background:rgba(255,255,255,.18); }
+                #tab-chatissue .iv-quick{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; align-items:center; }
+                #tab-chatissue .iv-quick span{ font-size:12px; color:#9fb3d1; }
+                #tab-chatissue .iv-rooms{ display:flex; gap:12px; flex-wrap:wrap; margin-top:12px; }
+                #tab-chatissue .iv-rooms label{ display:flex; align-items:center; gap:6px; font-size:13px; background:rgba(255,255,255,.06); padding:6px 10px; border-radius:20px; cursor:pointer; }
+                #tab-chatissue .iv-mentiontoggle{ display:flex; align-items:center; gap:6px; font-size:13px; margin-top:12px; }
+                #tab-chatissue .iv-note{ font-size:12px; color:#c9a227; margin-top:6px; }
+                #tab-chatissue .iv-summary{ display:flex; gap:16px; flex-wrap:wrap; font-size:13px; color:#9fb3d1; margin-bottom:12px; align-items:center; }
+                #tab-chatissue .iv-summary b{ color:#00d4ff; font-size:16px; }
+                #tab-chatissue .iv-badge{ padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600; color:#fff; }
+                #tab-chatissue .iv-msg{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); border-left:4px solid #666; border-radius:8px; padding:10px 12px; margin-bottom:8px; }
+                #tab-chatissue .iv-meta{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:12px; color:#9fb3d1; margin-bottom:4px; }
+                #tab-chatissue .iv-gt{ color:#00ff9d; font-weight:600; }
+                #tab-chatissue .iv-kt{ color:#8aa; }
+                #tab-chatissue .iv-sender{ color:#ffd479; font-weight:600; }
+                #tab-chatissue .iv-body{ font-size:14px; white-space:pre-wrap; word-break:break-word; line-height:1.5; color:#eee; }
+                #tab-chatissue .iv-tag{ font-size:10px; padding:1px 6px; border-radius:8px; background:#7c3aed; color:#fff; }
+                #tab-chatissue .iv-tag.iv-mention{ background:#0891b2; }
+                #tab-chatissue .iv-empty{ text-align:center; padding:50px; color:#788; }
+                #tab-chatissue mark{ background:#ffd479; color:#111; padding:0 2px; border-radius:2px; }
+            </style>
+            <div class="section-header">
+                <h2><i class="fas fa-comments"></i> 카톡 이슈 조회 <span style="font-size:13px;color:rgba(255,255,255,.6)">· 조지아(미국) 시간 기준</span></h2>
+            </div>
+            <div class="iv-panel">
+                <div class="iv-row">
+                    <div class="iv-field"><label>시작 날짜</label><input type="date" id="ivDFrom"></div>
+                    <div class="iv-field"><label>시작 시간</label><input type="time" id="ivTFrom" value="00:00"></div>
+                    <div class="iv-field"><label>끝 날짜</label><input type="date" id="ivDTo"></div>
+                    <div class="iv-field"><label>끝 시간</label><input type="time" id="ivTTo" value="23:59"></div>
+                    <div class="iv-field"><label>시차 (카톡+값=조지아)</label><input type="number" id="ivOffset" value="-13" step="1" style="width:90px;"></div>
+                    <div class="iv-field"><label>키워드 (선택)</label><input type="text" id="ivKw" placeholder="예: 불량, 알람, 파단"></div>
+                    <button class="iv-btn" id="ivSearchBtn">🔍 조회</button>
+                </div>
+                <div class="iv-quick">
+                    <span>빠른 선택:</span>
+                    <button class="iv-btn iv-ghost" data-days="1">최근 1일</button>
+                    <button class="iv-btn iv-ghost" data-days="3">최근 3일</button>
+                    <button class="iv-btn iv-ghost" data-days="7">최근 7일</button>
+                    <button class="iv-btn iv-ghost" data-days="0">전체 기간</button>
+                </div>
+                <div class="iv-rooms" id="ivRooms"></div>
+                <label class="iv-mentiontoggle"><input type="checkbox" id="ivMention" checked> 본문에서 그 시간대(시:분)를 <b>언급</b>한 메시지도 포함</label>
+                <div class="iv-note">※ AZS 공정기술팀은 이미 현지(조지아) 시각이라 시차 변환 없이 조회됩니다. 나머지 4개 방만 시차가 적용됩니다.</div>
+                <div class="iv-note" id="ivGenInfo">데이터 로딩 중…</div>
+            </div>
+            <div class="iv-summary" id="ivSummary"></div>
+            <div id="ivResults"><div class="iv-empty">기간을 설정하고 <b>조회</b>를 누르세요.</div></div>
         </div>
     </div>
 
@@ -8321,6 +8386,108 @@ ${text}
         // 초기화
         setTimeout(initMinigame, 1000);
         setTimeout(loadStudyData, 1500);
+    </script>
+
+    <!-- 카톡 이슈 데이터: 평문(로컬 전용·gitignore) / 암호문(배포용·AES-GCM) -->
+    <script src="_issues_data.js"></script>
+    <script src="_issues_data.enc.js"></script>
+    <!-- 카톡 이슈 조회 뷰어 로직 -->
+    <script>
+    (function(){
+      const COLORS = { "DNC_인텍":"#ef4444", "DNC_샘플대응":"#f59e0b", "AZS_팀":"#10b981", "DNC_DSK":"#3b82f6", "전극":"#a855f7" };
+      const MAX_SHOW = 1000;
+      let META = (window.ISSUE_DATA && window.ISSUE_DATA.rooms) ? window.ISSUE_DATA : null;
+      let DATA = META ? META.rooms : [];
+      const $ = id => document.getElementById(id);
+      function pad(n){ return String(n).padStart(2,'0'); }
+      function toGeorgia(iso, convert, offset){ const d=new Date(iso+":00"); return convert ? new Date(d.getTime()+offset*3600000) : d; }
+      function fmt(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+      function esc(s){ return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+      function highlight(s,kw){ if(!kw) return esc(s); const re=new RegExp('('+kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'); return esc(s).replace(re,'<mark>$1</mark>'); }
+      function mentionMinutes(text){
+        const out=[]; let m;
+        const re1=/(오전|오후)\s*(\d{1,2})\s*시(?:\s*(\d{1,2})\s*분)?(반)?/g;
+        while((m=re1.exec(text))){ let h=parseInt(m[2]); const mi=m[3]?parseInt(m[3]):(m[4]?30:0); if(m[1]==='오전')h=(h===12?0:h); else h=(h===12?12:h+12); if(h<24&&mi<60)out.push(h*60+mi); }
+        const re2=/\b([01]?\d|2[0-3]):([0-5]\d)\b/g;
+        while((m=re2.exec(text))){ out.push(parseInt(m[1])*60+parseInt(m[2])); }
+        const re3=/(?:^|[^\d:])(\d{1,2})\s*시(?:\s*(\d{1,2})\s*분)?(반)?/g;
+        while((m=re3.exec(text))){ let h=parseInt(m[1]); const mi=m[2]?parseInt(m[2]):(m[3]?30:0); if(h>=1&&h<=12&&mi<60){ out.push((h%12)*60+mi); out.push(((h%12)+12)*60+mi);} else if(h<24&&mi<60){ out.push(h*60+mi);} }
+        return out;
+      }
+      function dataRange(offset){ let min=null,max=null; DATA.forEach(r=>r.msgs.forEach(a=>{ const d=toGeorgia(a[0],r.convert,offset); if(!min||d<min)min=d; if(!max||d>max)max=d; })); return [min,max]; }
+      function buildRooms(){ const box=$('ivRooms'); if(!box)return; box.innerHTML=''; DATA.forEach(r=>{ const lab=document.createElement('label'); lab.innerHTML=`<input type="checkbox" id="ivrm_${r.folder}" checked><span class="iv-badge" style="background:${COLORS[r.folder]||'#666'}">${r.room}</span><span style="color:#9fb3d1">${r.msgs.length.toLocaleString()}</span>`; box.appendChild(lab); }); }
+      function quick(days){ const offset=parseFloat($('ivOffset').value)||0; const [min,max]=dataRange(offset); if(!max)return; const end=max; const start=days>0?new Date(end.getTime()-days*86400000):min; $('ivDFrom').value=`${start.getFullYear()}-${pad(start.getMonth()+1)}-${pad(start.getDate())}`; $('ivDTo').value=`${end.getFullYear()}-${pad(end.getMonth()+1)}-${pad(end.getDate())}`; $('ivTFrom').value='00:00'; $('ivTTo').value='23:59'; search(); }
+      function search(){
+        const offset=parseFloat($('ivOffset').value)||0;
+        const dFrom=$('ivDFrom').value, tFrom=$('ivTFrom').value||'00:00', dTo=$('ivDTo').value, tTo=$('ivTTo').value||'23:59';
+        if(!dFrom||!dTo){ alert('시작/끝 날짜를 설정하세요.'); return; }
+        const start=new Date(`${dFrom}T${tFrom}:00`), end=new Date(`${dTo}T${tTo}:59`);
+        const kw=$('ivKw').value.trim(), kwLow=kw.toLowerCase();
+        const useMention=$('ivMention').checked;
+        const minF=parseInt(tFrom.slice(0,2))*60+parseInt(tFrom.slice(3,5));
+        const minT=parseInt(tTo.slice(0,2))*60+parseInt(tTo.slice(3,5));
+        const active={}; DATA.forEach(r=>{ const el=$('ivrm_'+r.folder); active[r.folder]=el?el.checked:false; });
+        let rows=[]; const perRoom={};
+        DATA.forEach(r=>{ if(!active[r.folder])return; perRoom[r.folder]=0;
+          r.msgs.forEach(a=>{ const iso=a[0],sender=a[1],text=a[2],sys=a[3];
+            if(kw && !text.toLowerCase().includes(kwLow) && !(sender||'').toLowerCase().includes(kwLow)) return;
+            const gd=toGeorgia(iso,r.convert,offset);
+            let inRange=gd>=start&&gd<=end, mention=false;
+            if(!inRange && useMention){ if(gd>=new Date(`${dFrom}T00:00:00`)&&gd<=new Date(`${dTo}T23:59:59`)){ const mins=mentionMinutes(text); if(mins.some(x=>x>=minF&&x<=minT))mention=true; } }
+            if(inRange||mention){ rows.push({gd,iso,sender,text,sys,folder:r.folder,room:r.room,mention}); perRoom[r.folder]++; }
+          });
+        });
+        rows.sort((a,b)=>a.gd-b.gd);
+        const parts=[`<span>총 <b>${rows.length.toLocaleString()}</b>건</span>`];
+        DATA.forEach(r=>{ if(active[r.folder]&&perRoom[r.folder]) parts.push(`<span><span class="iv-badge" style="background:${COLORS[r.folder]}">${r.room}</span> ${perRoom[r.folder].toLocaleString()}</span>`); });
+        $('ivSummary').innerHTML=parts.join('');
+        const res=$('ivResults');
+        if(!rows.length){ res.innerHTML='<div class="iv-empty">해당 기간에 이슈가 없습니다.</div>'; return; }
+        const shown=rows.slice(0,MAX_SHOW);
+        let html=shown.map(x=>`<div class="iv-msg" style="border-left-color:${COLORS[x.folder]||'#666'}"><div class="iv-meta"><span class="iv-badge" style="background:${COLORS[x.folder]||'#666'}">${x.room}</span><span class="iv-gt">🕐 ${fmt(x.gd)} (조지아)</span><span class="iv-kt">카톡: ${esc(x.iso.replace('T',' '))}</span>${x.sender?`<span class="iv-sender">${esc(x.sender)}</span>`:''}${x.sys?'<span class="iv-tag">시스템</span>':''}${x.mention?'<span class="iv-tag iv-mention">🕐 본문 시간언급</span>':''}</div><div class="iv-body">${highlight(x.text,kw)}</div></div>`).join('');
+        if(rows.length>MAX_SHOW) html+=`<div class="iv-note">결과가 많아 앞 ${MAX_SHOW}건만 표시했습니다. 기간을 좁히거나 키워드로 필터하세요.</div>`;
+        res.innerHTML=html;
+      }
+      async function decryptEnc(pass, b64){
+        const raw=Uint8Array.from(atob(b64), c=>c.charCodeAt(0));
+        const salt=raw.slice(0,16), iv=raw.slice(16,28), ct=raw.slice(28);
+        const km=await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+        const key=await crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:250000, hash:'SHA-256'}, km, {name:'AES-GCM', length:256}, false, ['decrypt']);
+        const pt=await crypto.subtle.decrypt({name:'AES-GCM', iv}, key, ct);
+        return JSON.parse(new TextDecoder().decode(pt));
+      }
+      function proceed(){
+        const total=DATA.reduce((s,r)=>s+r.msgs.length,0);
+        $('ivGenInfo').textContent=`생성: ${META?META.generated:'-'} · 총 ${total.toLocaleString()}개 메시지 · 기본 시차 −13시간(변경 가능)`;
+        buildRooms();
+        quick(3);
+      }
+      function showUnlock(){
+        $('ivGenInfo').innerHTML='🔒 이 데이터는 암호화되어 있습니다. 팀 암호 입력: <input type="password" id="ivPass" style="width:170px"> <button class="iv-btn" id="ivUnlock">복호화</button> <span id="ivUnlockMsg" style="color:#ff6b6b"></span>';
+        const run=async ()=>{
+          const pass=$('ivPass').value; if(!pass){ return; }
+          $('ivUnlockMsg').style.color='#9fb3d1'; $('ivUnlockMsg').textContent=' 복호화 중…';
+          try{ const obj=await decryptEnc(pass, window.ISSUE_ENC); if(!obj||!obj.rooms) throw new Error('bad'); META=obj; DATA=obj.rooms; proceed(); }
+          catch(e){ $('ivUnlockMsg').style.color='#ff6b6b'; $('ivUnlockMsg').textContent=' 암호가 틀렸거나 데이터가 손상되었습니다.'; }
+        };
+        $('ivUnlock').addEventListener('click', run);
+        $('ivPass').addEventListener('keypress', e=>{ if(e.key==='Enter') run(); });
+      }
+      let inited=false;
+      function init(){
+        if(inited) return; if(!$('ivRooms')) return; inited=true;
+        $('ivSearchBtn').addEventListener('click', search);
+        document.querySelectorAll('#tab-chatissue .iv-quick button').forEach(b=> b.addEventListener('click', ()=>quick(parseInt(b.dataset.days))));
+        if(DATA.length){ proceed(); return; }
+        if(window.ISSUE_ENC){ showUnlock(); return; }
+        $('ivGenInfo').textContent='카톡 이슈 데이터가 없습니다. 로컬에서 260803_이슈조회_빌드_v1.0.py 실행(평문) 또는 암호화 도구로 _issues_data.enc.js 생성 후 이용하세요.';
+      }
+      // 카톡이슈 탭 최초 클릭 시 초기화(대용량 데이터 지연 로딩)
+      const btn=document.querySelector('.tab-btn[data-tab="chatissue"]');
+      if(btn) btn.addEventListener('click', init);
+      // 이미 활성 상태로 로드된 경우 대비
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', ()=>{ const t=document.getElementById('tab-chatissue'); if(t&&t.classList.contains('active')) init(); });
+    })();
     </script>
 </body>
 </html>
