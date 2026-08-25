@@ -3563,21 +3563,17 @@
                             <option value="unresolved">미해결</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>작성일</label>
+                        <input type="date" id="newIssueWrittenDate">
+                    </div>
                     <div class="form-group full-width">
                         <label>이슈 사항</label>
                         <textarea id="newIssueContent" placeholder="이슈 내용을 입력하세요"></textarea>
                     </div>
                     <div class="form-group full-width">
-                        <label>원인</label>
-                        <textarea id="newIssueCause" placeholder="원인을 입력하세요"></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>즉시 조치 사항</label>
-                        <textarea id="newIssueAction" placeholder="즉시 조치 사항을 입력하세요"></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>논의 필요 항목</label>
-                        <textarea id="newIssueDiscussion" placeholder="논의 필요 항목을 입력하세요"></textarea>
+                        <label>논의 항목</label>
+                        <textarea id="newIssueDiscussion" placeholder="논의 항목을 입력하세요"></textarea>
                     </div>
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
@@ -4515,14 +4511,26 @@
             const form = document.getElementById('issueForm');
             if (form.style.display === 'none') {
                 form.style.display = 'block';
+                if (!document.getElementById('newIssueWrittenDate').value) {
+                    document.getElementById('newIssueWrittenDate').value = getTodayDate();
+                }
             } else {
                 form.style.display = 'none';
                 // 폼 초기화
                 document.getElementById('newIssueCategory').selectedIndex = 0;
                 document.getElementById('newIssueStatus').selectedIndex = 0;
+                document.getElementById('newIssueWrittenDate').value = getTodayDate();
                 document.getElementById('newIssueContent').value = '';
                 document.getElementById('newIssueDiscussion').value = '';
             }
+        }
+
+        function getTodayDate() {
+            return new Date().toISOString().slice(0, 10);
+        }
+
+        function getIssueWrittenDate(issue) {
+            return issue.writtenDate || (issue.createdAt ? issue.createdAt.slice(0, 10) : '-');
         }
         
         function renderCategoryFilters() {
@@ -4614,24 +4622,17 @@
                     </div>
                     <div class="issue-content">
                         <div class="issue-field">
+                            <div class="issue-field-label">작성일</div>
+                            <div class="issue-field-value">${getIssueWrittenDate(issue)}</div>
+                        </div>
+                        <div class="issue-field">
                             <div class="issue-field-label">이슈 사항</div>
                             <div class="issue-field-value">${issue.content || '-'}</div>
                         </div>
                         <div class="issue-field">
-                            <div class="issue-field-label">원인</div>
-                            <div class="issue-field-value">${issue.cause || '-'}</div>
-                        </div>
-                        <div class="issue-field">
-                            <div class="issue-field-label">즉시 조치 사항</div>
-                            <div class="issue-field-value">${issue.action || '-'}</div>
-                        </div>
-                        <div class="issue-field">
-                            <div class="issue-field-label">논의 필요 항목</div>
+                            <div class="issue-field-label">논의 항목</div>
                             <div class="issue-field-value">${issue.discussion || '-'}</div>
                         </div>
-                    </div>
-                    <div class="issue-footer" style="font-size: 10px; padding-top: 8px;">
-                        <span>등록일: ${new Date(issue.createdAt).toLocaleDateString()}</span>
                     </div>
                 </div>
             `).join('');
@@ -4640,9 +4641,8 @@
         function addIssue() {
             const category = document.getElementById('newIssueCategory').value;
             const status = document.getElementById('newIssueStatus').value;
+            const writtenDate = document.getElementById('newIssueWrittenDate').value || getTodayDate();
             const content = document.getElementById('newIssueContent').value.trim();
-            const cause = document.getElementById('newIssueCause').value.trim();
-            const action = document.getElementById('newIssueAction').value.trim();
             const discussion = document.getElementById('newIssueDiscussion').value.trim();
 
             if (!content) {
@@ -4654,9 +4654,8 @@
                 id: Date.now().toString(),
                 category,
                 status,
+                writtenDate,
                 content,
-                cause,
-                action,
                 discussion,
                 createdAt: new Date().toISOString()
             };
@@ -4669,9 +4668,8 @@
             document.getElementById('issueForm').style.display = 'none';
             document.getElementById('newIssueCategory').selectedIndex = 0;
             document.getElementById('newIssueStatus').selectedIndex = 0;
+            document.getElementById('newIssueWrittenDate').value = getTodayDate();
             document.getElementById('newIssueContent').value = '';
-            document.getElementById('newIssueCause').value = '';
-            document.getElementById('newIssueAction').value = '';
             document.getElementById('newIssueDiscussion').value = '';
         }
 
@@ -4719,20 +4717,16 @@
                                 <option value="unresolved" ${issue.status === 'unresolved' ? 'selected' : ''}>미해결</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label style="font-size: 14px; margin-bottom: 8px; display: block;">작성일</label>
+                            <input type="date" id="editIssueWrittenDate" value="${getIssueWrittenDate(issue)}" style="width: 100%; padding: 12px; font-size: 14px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                        </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label style="font-size: 14px; margin-bottom: 8px; display: block;">이슈 사항</label>
                             <textarea id="editIssueContent" style="width: 100%; min-height: 100px; padding: 12px; font-size: 14px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; resize: vertical;">${issue.content || ''}</textarea>
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
-                            <label style="font-size: 14px; margin-bottom: 8px; display: block;">원인</label>
-                            <textarea id="editIssueCause" style="width: 100%; min-height: 100px; padding: 12px; font-size: 14px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; resize: vertical;">${issue.cause || ''}</textarea>
-                        </div>
-                        <div class="form-group" style="grid-column: 1 / -1;">
-                            <label style="font-size: 14px; margin-bottom: 8px; display: block;">즉시 조치 사항</label>
-                            <textarea id="editIssueAction" style="width: 100%; min-height: 100px; padding: 12px; font-size: 14px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; resize: vertical;">${issue.action || ''}</textarea>
-                        </div>
-                        <div class="form-group" style="grid-column: 1 / -1;">
-                            <label style="font-size: 14px; margin-bottom: 8px; display: block;">논의 필요 항목</label>
+                            <label style="font-size: 14px; margin-bottom: 8px; display: block;">논의 항목</label>
                             <textarea id="editIssueDiscussion" style="width: 100%; min-height: 100px; padding: 12px; font-size: 14px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; resize: vertical;">${issue.discussion || ''}</textarea>
                         </div>
                     </div>
@@ -4756,9 +4750,8 @@
             
             issue.category = document.getElementById('editIssueCategory').value;
             issue.status = document.getElementById('editIssueStatus').value;
+            issue.writtenDate = document.getElementById('editIssueWrittenDate').value || getTodayDate();
             issue.content = document.getElementById('editIssueContent').value.trim();
-            issue.cause = document.getElementById('editIssueCause').value.trim();
-            issue.action = document.getElementById('editIssueAction').value.trim();
             issue.discussion = document.getElementById('editIssueDiscussion').value.trim();
             
             saveIssues();
@@ -4812,9 +4805,28 @@
             document.getElementById('addParsedIssuesBtn').style.display = 'none';
             parsedIssues = [];
         }
+
+        function extractWrittenDate(text) {
+            const lines = text.split('\n');
+            const firstContentIndex = lines.findIndex(line => line.trim());
+            if (firstContentIndex === -1) return { writtenDate: '', text };
+
+            const firstLine = lines[firstContentIndex].trim();
+            const match = firstLine.match(/^(\d{4})\s*(?:[-./]|년\s*)(\d{1,2})\s*(?:[-./]?|월\s*)(\d{1,2})(?:일)?$/);
+            if (!match) return { writtenDate: '', text };
+
+            const writtenDate = `${match[1]}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}`;
+            lines.splice(firstContentIndex, 1);
+            return { writtenDate, text: lines.join('\n').trim() };
+        }
+
+        function applyWrittenDate(parsed, writtenDate) {
+            return parsed.map(issue => ({ ...issue, writtenDate }));
+        }
         
         function parseIssueText() {
-            const text = document.getElementById('parseInputText').value.trim();
+            const inputText = document.getElementById('parseInputText').value.trim();
+            const { writtenDate, text } = extractWrittenDate(inputText);
             if (!text) {
                 alert('텍스트를 입력해주세요.');
                 return;
@@ -4903,7 +4915,7 @@
                 discussion = discussion.trim();
                 
                 if (content) {
-                    parsedIssues.push({ category, status, content, discussion });
+                    parsedIssues.push({ category, status, content, discussion, writtenDate });
                 }
             });
             
@@ -4935,6 +4947,7 @@
                             <button onclick="removeParsedIssue(${idx})" style="background: none; border: none; color: #ff6b6b; cursor: pointer; font-size: 12px;"><i class="fas fa-times"></i></button>
                         </div>
                         <div style="font-size: 13px; color: white; margin-bottom: 4px;">${issue.content}</div>
+                        ${issue.writtenDate ? `<div style="font-size: 11px; color: rgba(255,255,255,0.5);">작성일: ${issue.writtenDate}</div>` : ''}
                         ${issue.discussion ? `<div style="font-size: 11px; color: rgba(255,255,255,0.5);">논의: ${issue.discussion}</div>` : ''}
                     </div>
                 `;
@@ -4960,6 +4973,7 @@
                     id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
                     category: issue.category,
                     status: issue.status,
+                    writtenDate: issue.writtenDate || getTodayDate(),
                     content: issue.content,
                     discussion: issue.discussion,
                     createdAt: new Date().toISOString()
@@ -5219,7 +5233,8 @@ ${text}
         
         // AI 분석 실행 (선택한 API 우선, 다른 설정 API로 폴백)
         async function aiAnalyzeIssues() {
-            const text = document.getElementById('parseInputText').value.trim();
+            const inputText = document.getElementById('parseInputText').value.trim();
+            const { writtenDate, text } = extractWrittenDate(inputText);
             if (!text) {
                 alert('분석할 텍스트를 입력해주세요.');
                 return;
@@ -5237,7 +5252,7 @@ ${text}
             
             // 어떤 AI도 사용할 수 없으면 스마트 키워드 분류 사용
             if (!groqAvailable && !exaoneAvailable && !geminiKey) {
-                smartKeywordAnalysis(text);
+                smartKeywordAnalysis(text, writtenDate);
                 return;
             }
             
@@ -5254,7 +5269,7 @@ ${text}
                 try {
                     const result = await callExaoneApi(exaoneKey, prompt);
                     if (result.success) {
-                        parsedIssues = result.data;
+                        parsedIssues = applyWrittenDate(result.data, writtenDate);
                         statusDiv.style.display = 'none';
                         renderParsePreview();
                         return;
@@ -5274,7 +5289,7 @@ ${text}
                 try {
                     const result = await callGroqApi(groqKey, prompt);
                     if (result.success) {
-                        parsedIssues = result.data;
+                        parsedIssues = applyWrittenDate(result.data, writtenDate);
                         statusDiv.style.display = 'none';
                         renderParsePreview();
                         return;
@@ -5292,7 +5307,7 @@ ${text}
                 try {
                     const result = await callGeminiApi(geminiKey, prompt);
                     if (result.success) {
-                        parsedIssues = result.data;
+                        parsedIssues = applyWrittenDate(result.data, writtenDate);
                         statusDiv.style.display = 'none';
                         renderParsePreview();
                         return;
@@ -5308,7 +5323,7 @@ ${text}
             statusDiv.style.display = 'none';
             const detail = lastErrorMsg ? `\n\n[상세 원인: ${lastErrorMsg}]` : '';
             if (confirm('AI 분석 중 오류가 발생했습니다.' + detail + '\n\n스마트 키워드 분류로 대체하시겠습니까?')) {
-                smartKeywordAnalysis(text);
+                smartKeywordAnalysis(text, writtenDate);
             }
         }
         
@@ -5504,7 +5519,7 @@ ${text}
         }
         
         // 스마트 키워드 기반 분류 (AI 대체/폴백)
-        function smartKeywordAnalysis(text) {
+        function smartKeywordAnalysis(text, writtenDate = '') {
             const statusDiv = document.getElementById('aiAnalysisStatus');
             const statusText = document.getElementById('aiStatusText');
             statusDiv.style.display = 'block';
@@ -5580,7 +5595,7 @@ ${text}
                 }
                 
                 if (content) {
-                    parsedIssues.push({ category, status, content, discussion });
+                    parsedIssues.push({ category, status, content, discussion, writtenDate });
                 }
             });
             
