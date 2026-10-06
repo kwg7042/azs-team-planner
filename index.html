@@ -575,6 +575,7 @@
             max-height: 60px;
             overflow: hidden;
             text-overflow: ellipsis;
+            white-space: pre-line;
         }
 
         .issue-footer {
@@ -1956,12 +1957,14 @@
 
         .minigame-tabs {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
             gap: 10px;
             margin-bottom: 20px;
         }
 
         .minigame-tab {
+            white-space: nowrap;
             padding: 12px 25px;
             background: rgba(255,255,255,0.1);
             border: none;
@@ -3381,7 +3384,7 @@
                         ESHG 이슈 텍스트를 붙여넣으면 자동으로 파싱하여 등록합니다.<br>
                         각 이슈는 빈 줄로 구분하거나, 번호(1., 2.)로 시작하면 됩니다.
                     </p>
-                    <textarea id="parseInputText" placeholder="여기에 텍스트를 붙여넣으세요...\n\n예시:\n금형 마모로 인한 저전압 불량 증가 추세\n탭 용접부 스크래치 발생 - 비전검사 통과\n어깨선 얼라인 틀어짐 조치중" style="width: 100%; height: 150px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; font-size: 13px; resize: vertical;"></textarea>
+                    <textarea id="parseInputText" placeholder="여기에 텍스트를 붙여넣으세요...&#10;&#10;예시:&#10;금형 마모로 인한 저전압 불량 증가 추세&#10;탭 용접부 스크래치 발생 - 비전검사 통과&#10;어깨선 얼라인 틀어짐 조치중" style="width: 100%; height: 150px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; padding: 12px; font-size: 13px; resize: vertical;"></textarea>
                     <div style="display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; align-items: center;">
                         <button class="btn btn-primary" onclick="parseIssueText()">
                             <i class="fas fa-search"></i> 키워드 파싱
@@ -3466,7 +3469,7 @@
                             <input type="text" id="groqProxyUrl" placeholder="https://your-proxy.workers.dev" 
                                    style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 14px;">
                             <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 8px;">
-                                � 프록시를 사용하면 <strong>API 키를 입력하지 않아도</strong> 됩니다. 키는 프록시 서버에 안전하게 보관됩니다.<br>
+                                🔐 프록시를 사용하면 <strong>API 키를 입력하지 않아도</strong> 됩니다. 키는 프록시 서버에 안전하게 보관됩니다.<br>
                                 💡 회사 네트워크 CORS 차단 회피에도 사용됩니다. (Cloudflare Workers)
                             </p>
                         </div>
@@ -4184,9 +4187,9 @@
                     task.day !== -1 && 
                     task.day < todayIndex) {
                     
+                    if (task.originalDay === undefined) task.originalDay = task.day; // 원래 요일 저장
                     task.day = todayIndex;
                     task.autoMoved = true; // 자동 이동 표시
-                    task.originalDay = task.originalDay || task.day; // 원래 요일 저장
                     hasUpdates = true;
                 }
             });
@@ -4361,8 +4364,8 @@
                      style="opacity: 0.85; font-size: 12px;"
                      id="task-${task.id}"
                      ondblclick="editTask('${task.id}')">
-                    <div class="task-assignee" style="font-size: 10px;">${task.assignee}</div>
-                    <div class="task-title" style="text-decoration: line-through; font-size: 11px;">${task.title}</div>
+                    <div class="task-assignee" style="font-size: 10px;">${escapeHtml(task.assignee)}</div>
+                    <div class="task-title" style="text-decoration: line-through; font-size: 11px;">${escapeHtml(task.title)}</div>
                     <div class="task-meta">
                         <div class="task-checkbox checked" 
                              onclick="toggleTask('${task.id}')" title="진행중으로 되돌리기">
@@ -4384,8 +4387,8 @@
                      ondragstart="drag(event, '${task.id}')"
                      ondblclick="editTask('${task.id}')"
                      id="task-${task.id}">
-                    <div class="task-assignee">${task.assignee} ${autoMovedBadge}</div>
-                    <div class="task-title">${task.title}</div>
+                    <div class="task-assignee">${escapeHtml(task.assignee)} ${autoMovedBadge}</div>
+                    <div class="task-title">${escapeHtml(task.title)}</div>
                     <div class="task-meta">
                         <div class="task-checkbox ${task.completed ? 'checked' : ''}" 
                              onclick="toggleTask('${task.id}')" title="완료로 이동">
@@ -4452,9 +4455,13 @@
             const task = tasks.find(t => t.id === id);
             if (task) {
                 task.completed = !task.completed;
+                // 업무 완료 시 코인 지급 (같은 업무로 중복 지급 방지)
+                const earnsCoin = task.completed && !task.coinAwarded;
+                if (earnsCoin) task.coinAwarded = true;
                 saveTasks();
                 renderWeeklyGrid();
                 renderCalendar();
+                if (earnsCoin) earnCoin(1, '업무 완료');
             }
         }
 
@@ -4527,7 +4534,7 @@
         }
 
         function getTodayDate() {
-            return new Date().toISOString().slice(0, 10);
+            return formatDateKey(new Date()); // 로컬 날짜 기준 (toISOString은 UTC라 하루 밀릴 수 있음)
         }
 
         function getIssueWrittenDate(issue) {
@@ -4605,7 +4612,7 @@
                 <div class="issue-card status-${issue.status}" ondblclick="editIssueCard('${issue.id}')" title="더블클릭으로 수정">
                     <div class="issue-header">
                         <div class="issue-category">
-                            <span class="issue-badge" style="font-size: 11px; padding: 3px 8px;">${issue.category}</span>
+                            <span class="issue-badge" style="font-size: 11px; padding: 3px 8px;">${escapeHtml(issue.category)}</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px;">
                             <select class="issue-status status-${issue.status}" 
@@ -4628,11 +4635,11 @@
                         </div>
                         <div class="issue-field">
                             <div class="issue-field-label">이슈 사항</div>
-                            <div class="issue-field-value">${issue.content || '-'}</div>
+                            <div class="issue-field-value">${escapeHtml(issue.content || '-')}</div>
                         </div>
                         <div class="issue-field">
                             <div class="issue-field-label">논의 항목</div>
-                            <div class="issue-field-value">${issue.discussion || '-'}</div>
+                            <div class="issue-field-value">${escapeHtml(issue.discussion || '-')}</div>
                         </div>
                     </div>
                 </div>
@@ -4724,11 +4731,11 @@
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label style="font-size: 14px; margin-bottom: 8px; display: block;">이슈 사항</label>
-                            <textarea id="editIssueContent" style="width: 100%; min-height: 100px; padding: 12px; font-size: 14px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; resize: vertical;">${issue.content || ''}</textarea>
+                            <textarea id="editIssueContent" style="width: 100%; min-height: 100px; padding: 12px; font-size: 14px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; resize: vertical;">${escapeHtml(issue.content || '')}</textarea>
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label style="font-size: 14px; margin-bottom: 8px; display: block;">논의 항목</label>
-                            <textarea id="editIssueDiscussion" style="width: 100%; min-height: 100px; padding: 12px; font-size: 14px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; resize: vertical;">${issue.discussion || ''}</textarea>
+                            <textarea id="editIssueDiscussion" style="width: 100%; min-height: 100px; padding: 12px; font-size: 14px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; resize: vertical;">${escapeHtml(issue.discussion || '')}</textarea>
                         </div>
                     </div>
                     <div style="display: flex; gap: 15px; margin-top: 20px; justify-content: center;">
@@ -4867,11 +4874,12 @@
                 
                 // 카테고리 추출 [TS], (표면), TS:, 표면- 등
                 for (const cat of categories) {
+                    const c = cat.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // '저전압(이물)'의 괄호 이스케이프
                     const patterns = [
-                        new RegExp(`\\[${cat}\\]`, 'i'),
-                        new RegExp(`\\(${cat}\\)`, 'i'),
-                        new RegExp(`^${cat}[:\\-\\s]`, 'i'),
-                        new RegExp(`${cat}`, 'i')
+                        new RegExp(`\\[${c}\\]`, 'i'),
+                        new RegExp(`\\(${c}\\)`, 'i'),
+                        new RegExp(`^${c}[:\\-\\s]`, 'i'),
+                        new RegExp(`${c}`, 'i')
                     ];
                     for (const pattern of patterns) {
                         if (pattern.test(firstLine)) {
@@ -4950,9 +4958,9 @@
                             <span style="color: ${statusColors[issue.status]}; font-size: 11px;">${statusLabels[issue.status]}</span>
                             <button onclick="removeParsedIssue(${idx})" style="background: none; border: none; color: #ff6b6b; cursor: pointer; font-size: 12px;"><i class="fas fa-times"></i></button>
                         </div>
-                        <div style="font-size: 13px; color: white; margin-bottom: 4px;">${issue.content}</div>
-                        ${issue.writtenDate ? `<div style="font-size: 11px; color: rgba(255,255,255,0.5);">작성일: ${issue.writtenDate}</div>` : ''}
-                        ${issue.discussion ? `<div style="font-size: 11px; color: rgba(255,255,255,0.5);">논의: ${issue.discussion}</div>` : ''}
+                        <div style="font-size: 13px; color: white; margin-bottom: 4px;">${escapeHtml(issue.content)}</div>
+                        ${issue.writtenDate ? `<div style="font-size: 11px; color: rgba(255,255,255,0.5);">작성일: ${escapeHtml(issue.writtenDate)}</div>` : ''}
+                        ${issue.discussion ? `<div style="font-size: 11px; color: rgba(255,255,255,0.5);">논의: ${escapeHtml(issue.discussion)}</div>` : ''}
                     </div>
                 `;
             });
@@ -4995,7 +5003,7 @@
         // AI 분석 기능 (Groq API + Gemini API)
         // =====================================================
         
-        // � Groq 키는 더 이상 여기에 두지 않습니다. Cloudflare Worker(프록시)의
+        // 🔐 Groq 키는 더 이상 여기에 두지 않습니다. Cloudflare Worker(프록시)의
         //    Secret(GROQ_API_KEY)으로만 관리되어 브라우저에 노출되지 않습니다.
         //
         // ▼▼ 배포한 Cloudflare Worker 주소를 여기에 넣으면 모든 사용자가 자동으로 프록시를 사용합니다.
@@ -5012,7 +5020,7 @@
             return (localStorage.getItem('exaoneProxyUrl') || DEFAULT_EXAONE_PROXY_URL || '').trim();
         }
 
-        let currentApiTab = 'groq';
+        let currentApiTab = localStorage.getItem('preferredAiApi') || 'groq';
         
         // 탭 전환
         function switchApiTab(tab) {
@@ -5252,7 +5260,8 @@ ${text}
             
             // Groq는 프록시 URL이 있으면(키 불필요) 또는 개인 키가 있으면 사용 가능
             const groqAvailable = !!(proxyUrl || groqKey);
-            const exaoneAvailable = !!(exaoneProxyUrl || exaoneKey);
+            // EXAONE은 기본 프록시(localhost)가 항상 채워져 있으므로, 설정에서 EXAONE을 선택한 경우에만 사용
+            const exaoneAvailable = currentApiTab === 'exaone' && !!(exaoneProxyUrl || exaoneKey);
             
             // 어떤 AI도 사용할 수 없으면 스마트 키워드 분류 사용
             if (!groqAvailable && !exaoneAvailable && !geminiKey) {
@@ -5791,6 +5800,7 @@ ${text}
 
         function renderHistory() {
             const container = document.getElementById('historyContainer');
+            if (!container) return; // 과거이력 화면이 제거됨
             
             if (historyData.length === 0) {
                 container.innerHTML = `
@@ -5830,7 +5840,7 @@ ${text}
                                             <div class="history-day-title">${day}요일</div>
                                             ${dayTasks.length > 0 ? dayTasks.map(t => `
                                                 <div class="history-task ${t.completed ? 'done' : 'incomplete'}">
-                                                    ${t.assignee}: ${t.title} ${t.completed ? '✓' : '✗'}
+                                                    ${escapeHtml(t.assignee)}: ${escapeHtml(t.title)} ${t.completed ? '✓' : '✗'}
                                                 </div>
                                             `).join('') : '<div style="color: rgba(255,255,255,0.3); font-size: 12px;">없음</div>'}
                                         </div>
@@ -6003,6 +6013,8 @@ ${text}
             
             // 6주 (42일) 렌더링
             for (let i = 0; i < 42; i++) {
+                // 이번 달이 끝난 뒤 새 주가 시작되면 중단 (빈 주 한 칸만 그려지는 문제 방지)
+                if (i > 0 && i % 7 === 0 && cellDate > lastDay) break;
                 const isCurrentMonth = cellDate.getMonth() === month;
                 const isToday = cellDate.toDateString() === today.toDateString();
                 const isWeekend = cellDate.getDay() === 0 || cellDate.getDay() === 6;
@@ -6039,8 +6051,8 @@ ${text}
                         <div class="attendance-entries">
                             ${entries.map(e => `
                                 <div class="attendance-entry">
-                                    <span class="entry-name">${e.member}</span>
-                                    <span class="entry-type" style="background: ${e.typeInfo.color}30; color: ${e.typeInfo.color};">${e.typeInfo.label}${e.note ? ' (' + e.note + ')' : ''}</span>
+                                    <span class="entry-name">${escapeHtml(e.member)}</span>
+                                    <span class="entry-type" style="background: ${e.typeInfo.color}30; color: ${e.typeInfo.color};">${e.typeInfo.label}${e.note ? ' (' + escapeHtml(e.note) + ')' : ''}</span>
                                 </div>
                             `).join('')}
                         </div>
@@ -6048,9 +6060,6 @@ ${text}
                 `;
                 
                 cellDate.setDate(cellDate.getDate() + 1);
-                
-                // 6주 이후 현재 월이 아니면 중단
-                if (i >= 35 && cellDate.getMonth() !== month) break;
             }
             
             grid.innerHTML = html;
@@ -6098,8 +6107,8 @@ ${text}
             
             selectedAttendanceCell = { member: myName, dateKey };
             
-            const date = new Date(dateKey);
-            const dateStr = `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+            const [y, m, d] = dateKey.split('-').map(Number); // new Date('YYYY-MM-DD')는 UTC로 해석되어 미국 시간대에서 하루 전으로 표시됨
+            const dateStr = `${y}년 ${m}월 ${d}일`;
             
             document.getElementById('modalDateTitle').textContent = dateStr;
             document.getElementById('modalMemberName').textContent = myName;
@@ -6193,8 +6202,11 @@ ${text}
             }
             csv += '출근,재택,휴가,반차,출장,교육,공가\n';
             
-            TEAM_MEMBERS.forEach(member => {
-                csv += `${member},`;
+            const csvCell = v => /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+            // 팀원 목록에 없는 닉네임으로 입력된 근태도 누락되지 않게 포함
+            const members = [...TEAM_MEMBERS, ...Object.keys(attendanceData).filter(m => !TEAM_MEMBERS.includes(m))];
+            members.forEach(member => {
+                csv += `${csvCell(member)},`;
                 let counts = { work: 0, remote: 0, vacation: 0, half: 0, business: 0, training: 0, official: 0 };
                 
                 for (let d = 1; d <= lastDay; d++) {
@@ -6203,7 +6215,7 @@ ${text}
                     const type = data ? data.type : null;
                     const note = data ? data.note : '';
                     const typeInfo = type ? ATTENDANCE_TYPES[type] : null;
-                    csv += `${typeInfo ? typeInfo.label + (note ? '(' + note + ')' : '') : ''},`;
+                    csv += `${typeInfo ? csvCell(typeInfo.label + (note ? '(' + note + ')' : '')) : ''},`;
                     
                     if (type === 'work') counts.work++;
                     else if (type === 'remote') counts.remote++;
@@ -6459,7 +6471,7 @@ ${text}
                 
                 if (listEl) {
                     listEl.innerHTML = onlineUsers.length > 0 
-                        ? onlineUsers.map(name => `<div style="padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-user" style="margin-right: 6px; color: #00ff88;"></i>${name}</div>`).join('')
+                        ? onlineUsers.map(name => `<div style="padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-user" style="margin-right: 6px; color: #00ff88;"></i>${escapeHtml(name)}</div>`).join('')
                         : '<div style="color: rgba(255,255,255,0.5);">접속자 없음</div>';
                 }
             });
@@ -6791,10 +6803,15 @@ ${text}
         const originalSetupDataListeners = setupDataListeners;
         setupDataListeners = function() {
             originalSetupDataListeners();
-            setupOmokListener();
+            // 게임 탭은 omok_game 경로만 사용 (구버전 'omok' 경로 리스너는 상태를 덮어써서 제외)
+            setupOmokIntegratedListener();
             setupChessListener();
+            setupChessIntegratedListener();
             setupChatListener();
             setupYieldListener();
+            // 고정 지연(setTimeout) 대신 Firebase 연결 직후 로드 → SDK 로딩이 늦어도 누락되지 않음
+            initMinigame();
+            loadStudyData();
         };
 
         // =====================================================
@@ -6946,8 +6963,8 @@ ${text}
             if (isChessCheckmate(chessCurrentPlayer)) {
                 chessGameOver = true;
                 const winner = chessCurrentPlayer === 'white' ? '흑' : '백';
-                document.getElementById('chessWinnerBanner').innerHTML = 
-                    `<div class="winner-banner">🎉 체크메이트! ${winner} 승리! 🎉</div>`;
+                const banner = document.getElementById('chessWinnerBannerMini');
+                if (banner) banner.innerHTML = `<div class="winner-banner">🎉 체크메이트! ${winner} 승리! 🎉</div>`;
                 addChessLog(`🏆 체크메이트! ${winner} 승리!`);
             }
             
@@ -7138,13 +7155,13 @@ ${text}
                 turnEl.textContent = `${chessCurrentPlayer === 'white' ? '백' : '흑'} 차례 (${chessCurrentPlayer === 'white' ? 'White' : 'Black'})`;
             }
             
-            const checkEl = document.getElementById('chessCheckWarning');
+            const checkEl = document.getElementById('chessCheckWarningMini');
             if (checkEl) {
                 checkEl.innerHTML = (chessIsInCheck && !chessGameOver) ? '<div class="check-warning">⚠️ 체크!</div>' : '';
             }
             
-            const capturedWhiteEl = document.getElementById('capturedWhite');
-            const capturedBlackEl = document.getElementById('capturedBlack');
+            const capturedWhiteEl = document.getElementById('capturedWhiteMini');
+            const capturedBlackEl = document.getElementById('capturedBlackMini');
             const whiteCaptures = chessCapturedPieces && Array.isArray(chessCapturedPieces.white) ? chessCapturedPieces.white : [];
             const blackCaptures = chessCapturedPieces && Array.isArray(chessCapturedPieces.black) ? chessCapturedPieces.black : [];
             if (capturedWhiteEl) capturedWhiteEl.textContent = whiteCaptures.map(p => CHESS_PIECES.white[p.type]).join('');
@@ -7152,7 +7169,7 @@ ${text}
         }
 
         function addChessLog(text) {
-            const logEl = document.getElementById('chessGameLog');
+            const logEl = document.getElementById('chessGameLogMini');
             if (!logEl) return;
             const entry = document.createElement('div');
             entry.className = 'log-entry';
@@ -7173,8 +7190,8 @@ ${text}
         }
 
         function resetChessGame() {
-            const banner = document.getElementById('chessWinnerBanner');
-            const log = document.getElementById('chessGameLog');
+            const banner = document.getElementById('chessWinnerBannerMini');
+            const log = document.getElementById('chessGameLogMini');
             if (banner) banner.innerHTML = '';
             if (log) log.innerHTML = '<div class="log-entry">새 게임 시작!</div>';
             initChessBoard();
@@ -7207,6 +7224,12 @@ ${text}
                     chessIsInCheck = data.isInCheck || false;
                     renderChessBoard();
                     updateChessDisplay();
+                    // 상대가 둔 수가 게임 탭(미니 보드)에 바로 보이도록 갱신
+                    const banner = document.getElementById('chessWinnerBannerMini');
+                    if (banner) banner.innerHTML = chessGameOver
+                        ? `<div class="winner-banner">🎉 체크메이트! ${chessCurrentPlayer === 'white' ? '흑' : '백'} 승리! 🎉</div>`
+                        : '';
+                    renderChessBoardMini();
                 }
             });
         }
@@ -7345,7 +7368,7 @@ ${text}
                 const isMine = msg.sender === myNickname;
                 return `
                     <div class="chat-message ${isMine ? 'mine' : ''}">
-                        <div class="sender">${msg.sender}</div>
+                        <div class="sender">${escapeHtml(msg.sender)}</div>
                         <div class="text">${escapeHtml(msg.text)}</div>
                         <div class="time">${msg.time}</div>
                     </div>
@@ -7358,9 +7381,7 @@ ${text}
         
         // HTML 이스케이프
         function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+            return String(text ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         }
         
         // ========== 공장 수율 데이터 함수 ==========
@@ -7411,7 +7432,7 @@ ${text}
             
             for (const key of sortedFactories) {
                 const factory = data[key];
-                const yieldRate = factory.yield_rate || 0;
+                const yieldRate = Number(factory.yield_rate) || 0;
                 const defects = factory.top_defects || [];
                 const updatedAt = factory.updated_at || '-';
                 
@@ -7422,7 +7443,7 @@ ${text}
                 
                 // 불량 원인 배지
                 let defectBadges = defects.slice(0, 3).map((d, i) => {
-                    return `<span class="defect-badge defect-badge-${i+1}">${i+1}. ${d}</span>`;
+                    return `<span class="defect-badge defect-badge-${i+1}">${i+1}. ${escapeHtml(d)}</span>`;
                 }).join('');
                 
                 if (!defectBadges) defectBadges = '<span style="color: rgba(255,255,255,0.4);">-</span>';
@@ -7431,7 +7452,7 @@ ${text}
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
                         <td style="padding: 15px; font-weight: 600;">
                             <i class="fas fa-cog" style="margin-right: 8px; color: #667eea;"></i>
-                            ${factory.equipment || factory.factory || key}
+                            ${escapeHtml(factory.equipment || factory.factory || key)}
                         </td>
                         <td style="padding: 15px; text-align: center;">
                             <span class="yield-rate" style="color: ${yieldColor};">
@@ -7442,7 +7463,7 @@ ${text}
                             ${defectBadges}
                         </td>
                         <td style="padding: 15px; text-align: center; font-size: 11px; color: rgba(255,255,255,0.5);">
-                            ${updatedAt}
+                            ${escapeHtml(updatedAt)}
                         </td>
                     </tr>
                 `;
@@ -7590,7 +7611,7 @@ ${text}
         }
 
         function doGacha() {
-            if (gameData.coins < 1) {
+            if ((gameData.coins || 0) < 1) {
                 alert('코인이 부족합니다! 업무를 완료하면 코인을 얻을 수 있어요.');
                 return;
             }
@@ -7664,7 +7685,7 @@ ${text}
         }
 
         function doEnhance() {
-            if (gameData.coins < 3) {
+            if ((gameData.coins || 0) < 3) {
                 alert('코인이 부족합니다! (3코인 필요)');
                 return;
             }
@@ -7732,7 +7753,7 @@ ${text}
                 container.innerHTML = leaderboard.map((item, i) => `
                     <div class="leaderboard-item">
                         <span class="leaderboard-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`}</span>
-                        <span class="leaderboard-name">${item.name}</span>
+                        <span class="leaderboard-name">${escapeHtml(item.name)}</span>
                         <span class="leaderboard-level">+${item.level}</span>
                     </div>
                 `).join('');
@@ -7783,13 +7804,6 @@ ${text}
                 document.head.appendChild(style);
             }
         }
-
-        // 기존 업무 완료 함수에 코인 추가 연동
-        const originalMoveToCompleted = window.moveToCompleted;
-        window.moveToCompleted = function(taskId) {
-            if (originalMoveToCompleted) originalMoveToCompleted(taskId);
-            earnCoin(2, '업무 완료');
-        };
 
         // =====================================================
         // 학습 탭
@@ -8052,17 +8066,17 @@ ${text}
                 const date = new Date(m.createdAt).toLocaleDateString('ko-KR');
                 const isDefault = m.isDefault ? '<span style="font-size: 10px; background: #667eea; padding: 2px 6px; border-radius: 4px; margin-left: 5px;">기본</span>' : '';
                 const deleteBtn = m.isDefault ? '' : `
-                        <div class="study-material-delete" onclick="event.stopPropagation(); deleteStudyMaterial('${m.id}')">
+                        <div class="study-material-delete" onclick="event.stopPropagation(); deleteStudyMaterial('${escapeHtml(m.id)}')">
                             <i class="fas fa-trash"></i>
                         </div>
                 `;
                 
                 return `
-                    <div class="study-material-item ${m.type} ${isYoutube ? 'youtube' : ''}" onclick="openStudyMaterial('${m.url}')">
+                    <div class="study-material-item ${m.type} ${isYoutube ? 'youtube' : ''}" onclick="openStudyMaterialById('${escapeHtml(m.id)}')">
                         <i class="${iconBrand} ${icon}" style="${iconColor}"></i>
                         <div class="study-material-info">
-                            <div class="study-material-title">${m.title}${isDefault}</div>
-                            <div class="study-material-meta">${m.createdBy} · ${date}</div>
+                            <div class="study-material-title">${escapeHtml(m.title)}${isDefault}</div>
+                            <div class="study-material-meta">${escapeHtml(m.createdBy)} · ${date}</div>
                         </div>
                         ${deleteBtn}
                     </div>
@@ -8071,7 +8085,14 @@ ${text}
         }
         
         // 학습 자료 열기
+        function openStudyMaterialById(id) {
+            const material = studyMaterials.find(m => String(m.id) === String(id));
+            if (material) openStudyMaterial(material.url);
+        }
+
         function openStudyMaterial(url) {
+            url = String(url || '').trim();
+            if (!/^(https?:|data:)/i.test(url)) url = 'https://' + url.replace(/^[a-z][a-z0-9+.-]*:\/*/i, '');
             if (url.startsWith('data:')) {
                 // Base64 파일인 경우 새 창에서 열기
                 const newWindow = window.open();
@@ -8155,7 +8176,7 @@ ${text}
                     <div class="study-checkbox">
                         <i class="fas fa-check"></i>
                     </div>
-                    <span class="checklist-text" style="flex: 1;">${item.text}</span>
+                    <span class="checklist-text" style="flex: 1;">${escapeHtml(item.text)}</span>
                     <div class="study-material-delete" onclick="event.stopPropagation(); deleteChecklistItem('${item.id}')">
                         <i class="fas fa-times"></i>
                     </div>
@@ -8343,14 +8364,16 @@ ${text}
                 alert('관람 모드에서는 돌을 놓을 수 없습니다.');
                 return;
             }
+            if (!omokBoard[y]) omokBoard[y] = Array(BOARD_SIZE).fill(null);
             if (omokBoard[y][x]) return;
             
             omokBoard[y][x] = currentPlayer;
             
-            // 승리 체크
-            if (checkWin(x, y)) {
+            // 승리 체크 (돌 색을 넘겨야 연속 5개를 셀 수 있음)
+            if (checkWin(x, y, currentPlayer)) {
                 gameOver = true;
                 const winner = currentPlayer;
+                showOmokWinner(winner);
                 if (db) {
                     db.ref('omok_game').set({
                         board: omokBoard,
@@ -8360,6 +8383,7 @@ ${text}
                         players: omokPlayers
                     });
                 }
+                renderOmokBoardMini();
                 return;
             }
             
@@ -8547,27 +8571,33 @@ ${text}
             if (!db) return;
             
             db.ref('omok_game').on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    if (data.board) omokBoard = data.board;
-                    if (data.currentPlayer) currentPlayer = data.currentPlayer;
-                    if (data.gameOver !== undefined) gameOver = data.gameOver;
-                    if (data.players) {
-                        omokPlayers = data.players;
-                        updateOmokPlayersDisplay();
-                        updateOmokModeNotice();
-                    }
-                    
-                    renderOmokBoardMini();
-                    
-                    if (data.winner) {
-                        const banner = document.getElementById('omokWinnerBannerMini');
-                        if (banner) {
-                            banner.innerHTML = `<div style="background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; padding: 15px; border-radius: 10px; text-align: center; font-size: 18px; font-weight: bold;">🎉 ${data.winner === 'black' ? '흑돌' : '백돌'} 승리!</div>`;
-                        }
-                    }
+                // Firebase는 null 값을 저장하지 않아 빈 줄/빈 판/빈 플레이어가 통째로 빠져서 옴 → 항상 15x15로 복원
+                const data = snapshot.val() || {};
+                omokBoard = restoreBoard(data.board);
+                currentPlayer = data.currentPlayer || 'black';
+                gameOver = !!data.gameOver;
+                omokPlayers = {
+                    black: (data.players && data.players.black) || null,
+                    white: (data.players && data.players.white) || null
+                };
+                // 다른 사람이 새 게임을 시작해 내 자리가 풀린 경우 내 선택도 해제
+                if (myStone && omokPlayers[myStone] !== myPlayerId) {
+                    myStone = null;
+                    document.getElementById('btnBlackMini')?.classList.remove('selected');
+                    document.getElementById('btnWhiteMini')?.classList.remove('selected');
                 }
+                
+                renderOmokBoardMini();
+                showOmokWinner(data.winner || null);
             });
+        }
+
+        function showOmokWinner(winner) {
+            const banner = document.getElementById('omokWinnerBannerMini');
+            if (!banner) return;
+            banner.innerHTML = winner
+                ? `<div style="background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; padding: 15px; border-radius: 10px; text-align: center; font-size: 18px; font-weight: bold;">🎉 ${winner === 'black' ? '흑돌' : '백돌'} 승리!</div>`
+                : '';
         }
 
         // 체스 Firebase 리스너 확장
@@ -8575,27 +8605,32 @@ ${text}
             if (!db) return;
             
             db.ref('chess_game').on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    if (data.board) chessBoard = data.board;
-                    if (data.currentPlayer) chessCurrentPlayer = data.currentPlayer;
-                    if (data.gameOver !== undefined) chessGameOver = data.gameOver;
-                    if (data.players) {
-                        chessPlayers = data.players;
-                        updateChessPlayersDisplay();
-                        updateChessModeNotice();
-                    }
-                    
-                    renderChessBoardMini();
+                // 새 게임으로 플레이어가 비워지면 Firebase에서 경로가 통째로 사라지므로 null도 처리
+                const data = snapshot.val() || {};
+                if (data.board) chessBoard = data.board;
+                if (data.currentPlayer) chessCurrentPlayer = data.currentPlayer;
+                if (data.gameOver !== undefined) chessGameOver = data.gameOver;
+                chessPlayers = {
+                    white: (data.players && data.players.white) || null,
+                    black: (data.players && data.players.black) || null
+                };
+                if (myChessSide && chessPlayers[myChessSide] !== myPlayerId) {
+                    myChessSide = null;
+                    document.getElementById('chessBtnWhiteMini')?.classList.remove('selected');
+                    document.getElementById('chessBtnBlackMini')?.classList.remove('selected');
                 }
+                
+                renderChessBoardMini();
             });
         }
 
         // 오목 게임 리셋 확장
-        const originalResetOmokGame = window.resetOmokGame;
         window.resetOmokGame = function() {
+            // 확인을 먼저 받고 나서 초기화 (기존엔 판을 지운 뒤에 확인창이 떠서 취소해도 판이 사라졌음)
+            if (!confirm('새 게임을 시작하시겠습니까?')) return;
             omokPlayers = { black: null, white: null };
             myStone = null;
+            initOmokBoard();
             
             if (db) {
                 db.ref('omok_game').set({
@@ -8609,15 +8644,14 @@ ${text}
             
             document.getElementById('btnBlackMini')?.classList.remove('selected');
             document.getElementById('btnWhiteMini')?.classList.remove('selected');
-            document.getElementById('omokWinnerBannerMini').innerHTML = '';
-            
-            if (originalResetOmokGame) originalResetOmokGame();
+            showOmokWinner(null);
             renderOmokBoardMini();
         };
 
         // 체스 게임 리셋 확장
         const originalResetChessGame = window.resetChessGame;
         window.resetChessGame = function() {
+            if (!confirm('새 게임을 시작하시겠습니까?')) return;
             chessPlayers = { white: null, black: null };
             myChessSide = null;
             
@@ -8633,15 +8667,8 @@ ${text}
             renderChessBoardMini();
         };
 
-        // 통합 리스너 초기화
-        setTimeout(() => {
-            setupOmokIntegratedListener();
-            setupChessIntegratedListener();
-        }, 2000);
-
-        // 초기화
-        setTimeout(initMinigame, 1000);
-        setTimeout(loadStudyData, 1500);
+        // Firebase 없이 열린 경우에도 기본 학습 자료는 표시
+        setTimeout(() => { if (!db) loadStudyData(); }, 1500);
     </script>
 
     <!-- 카톡 이슈 데이터: 평문(로컬 전용·gitignore) / 암호문(배포용·AES-GCM) -->
