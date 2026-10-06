@@ -1,0 +1,63 @@
+name: 카톡이슈 데이터 갱신
+
+# 매일 한국시간 09:00 (UTC 00:00). GitHub 예약 실행은 몇 분~수십 분 늦게 시작될 수 있음.
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      days:
+        description: '최근 며칠 메일을 볼지 (처음 한 번은 30 권장)'
+        required: false
+        default: '3'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kakao-issue-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TZ: Asia/Seoul
+    steps:
+      - name: 스크립트 가져오기 (main)
+        uses: actions/checkout@v4
+        with:
+          path: src
+
+      - name: 사이트 가져오기 (gh-pages)
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: site
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 라이브러리 설치
+        run: pip install --quiet google-api-python-client google-auth cryptography
+
+      - name: Gmail 수집 → 병합 → 암호화
+        id: sync
+        env:
+          GMAIL_TOKEN_JSON: ${{ secrets.GMAIL_TOKEN_JSON }}
+          ISSUE_PASSWORD: ${{ secrets.ISSUE_PASSWORD }}
+          KAKAO_ROOM_RULES: ${{ secrets.KAKAO_ROOM_RULES }}
+          DAYS: ${{ github.event.inputs.days || '3' }}
+        run: python src/tools/kakao_issue_sync.py --enc site/_issues_data.enc.js --days "$DAYS"
+
+      - name: gh-pages에 반영
+        if: steps.sync.outputs.changed == 'true'
+        working-directory: site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add _issues_data.enc.js
+          git commit -m "auto: 카톡이슈 데이터 갱신 ($(date '+%Y-%m-%d %H:%M'))"
+          git push origin HEAD:gh-pages
