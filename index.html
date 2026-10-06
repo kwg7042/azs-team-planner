@@ -3982,7 +3982,7 @@
                     <div class="iv-field"><label>시작 시간</label><input type="time" id="ivTFrom" value="00:00"></div>
                     <div class="iv-field"><label>끝 날짜</label><input type="date" id="ivDTo"></div>
                     <div class="iv-field"><label>끝 시간</label><input type="time" id="ivTTo" value="23:59"></div>
-                    <div class="iv-field"><label>시차 (카톡+값=조지아)</label><input type="number" id="ivOffset" value="-13" step="1" style="width:90px;"></div>
+                    <div class="iv-field"><label>시차 (카톡→조지아)</label><select id="ivOffset"><option value="auto" selected>자동 (서머타임 반영)</option><option value="-13">−13시간 고정 (서머타임)</option><option value="-14">−14시간 고정 (표준시)</option></select></div>
                     <div class="iv-field"><label>키워드 (선택)</label><input type="text" id="ivKw" placeholder="예: 불량, 알람, 파단"></div>
                     <button class="iv-btn" id="ivSearchBtn">🔍 조회</button>
                 </div>
@@ -4178,7 +4178,7 @@
             // 오늘이 이번 주가 아니면 자동 이동 안함
             if (todayIndex === -1) return false;
             
-            let hasUpdates = false;
+            const movedTasks = [];
             
             // 완료되지 않은 업무 중 day가 오늘보다 작은 것들을 오늘로 이동
             tasks.forEach(task => {
@@ -4190,16 +4190,14 @@
                     if (task.originalDay === undefined) task.originalDay = task.day; // 원래 요일 저장
                     task.day = todayIndex;
                     task.autoMoved = true; // 자동 이동 표시
-                    hasUpdates = true;
+                    movedTasks.push(task);
                 }
             });
             
-            // 변경사항이 있으면 저장
-            if (hasUpdates && db) {
-                db.ref('tasks').set(tasks);
-            }
+            // 변경사항이 있으면 바뀐 업무만 저장
+            if (movedTasks.length) saveTasks(movedTasks);
             
-            return hasUpdates;
+            return movedTasks.length > 0;
         }
         
         function renderWeeklyGrid() {
@@ -4410,7 +4408,7 @@
             const newTitle = prompt('업무 내용 수정:', task.title);
             if (newTitle !== null && newTitle.trim() !== '') {
                 task.title = newTitle.trim();
-                saveTasks();
+                saveTasks([task]);
                 renderWeeklyGrid();
             }
         }
@@ -4444,7 +4442,7 @@
             };
 
             tasks.push(task);
-            saveTasks();
+            saveTasks([task]);
             renderWeeklyGrid();
             renderCalendar();
             
@@ -4458,7 +4456,7 @@
                 // 업무 완료 시 코인 지급 (같은 업무로 중복 지급 방지)
                 const earnsCoin = task.completed && !task.coinAwarded;
                 if (earnsCoin) task.coinAwarded = true;
-                saveTasks();
+                saveTasks([task]);
                 renderWeeklyGrid();
                 renderCalendar();
                 if (earnsCoin) earnCoin(1, '업무 완료');
@@ -4468,7 +4466,7 @@
         function deleteTask(id) {
             if (confirm('이 업무를 삭제하시겠습니까?')) {
                 tasks = tasks.filter(t => t.id !== id);
-                saveTasks();
+                saveTasks([], [id]);
                 renderWeeklyGrid();
                 renderCalendar();
             }
@@ -4505,7 +4503,7 @@
             const task = tasks.find(t => t.id === taskId);
             if (task) {
                 task.day = day;
-                saveTasks();
+                saveTasks([task]);
                 renderWeeklyGrid();
             }
         }
@@ -4669,7 +4667,7 @@
             };
 
             issues.push(issue);
-            saveIssues();
+            saveIssues([issue]);
             renderIssues();
             
             // 폼 숨기고 초기화
@@ -4762,7 +4760,7 @@
             issue.content = document.getElementById('editIssueContent').value.trim();
             issue.discussion = document.getElementById('editIssueDiscussion').value.trim();
             
-            saveIssues();
+            saveIssues([issue]);
             renderIssues();
             closeIssueEditModal();
         }
@@ -4777,7 +4775,7 @@
             const issue = issues.find(i => i.id === id);
             if (issue) {
                 issue.status = status;
-                saveIssues();
+                saveIssues([issue]);
                 renderIssues();
             }
         }
@@ -4785,7 +4783,7 @@
         function deleteIssue(id) {
             if (confirm('이 이슈를 삭제하시겠습니까?')) {
                 issues = issues.filter(i => i.id !== id);
-                saveIssues();
+                saveIssues([], [id]);
                 renderIssues();
             }
         }
@@ -4980,8 +4978,9 @@
                 return;
             }
             
+            const added = [];
             parsedIssues.forEach(issue => {
-                issues.push({
+                added.push({
                     id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
                     category: issue.category,
                     status: issue.status,
@@ -4991,8 +4990,9 @@
                     createdAt: new Date().toISOString()
                 });
             });
+            issues.push(...added);
             
-            saveIssues();
+            saveIssues(added);
             renderIssues();
             closeTextParseModal();
             alert(`${parsedIssues.length}건의 이슈가 등록되었습니다.`);
@@ -5780,17 +5780,18 @@ ${text}
                 return;
             }
 
-            historyData.push({
+            const historyEntry = {
                 weekKey,
                 weekDisplay: document.getElementById('weekDisplay').textContent,
                 tasks: [...weekTasks],
                 archivedAt: new Date().toISOString()
-            });
+            };
+            historyData.push(historyEntry);
 
             tasks = tasks.filter(t => t.weekKey !== weekKey);
             
-            saveHistory();
-            saveTasks();
+            saveHistory(historyEntry);
+            saveTasks([], weekTasks.map(t => t.id));
             renderWeeklyGrid();
             renderHistory();
             renderCalendar();
@@ -5860,20 +5861,38 @@ ${text}
         // =====================================================
         // 데이터 저장/로드
         // =====================================================
-        function saveTasks() {
+        // 항목 단위 저장: 바뀐 항목(id 키)만 기록해서, 여러 명이 동시에 수정해도 서로의 변경을 덮어쓰지 않음
+        function saveItems(path, list, localKey, changed = [], removedIds = []) {
             if (isConnected && db) {
-                db.ref('tasks').set(tasks);
+                const updates = {};
+                changed.forEach(item => { updates[item.id] = item; });
+                removedIds.forEach(id => { updates[id] = null; });
+                if (Object.keys(updates).length) db.ref(path).update(updates);
             } else {
-                localStorage.setItem('planner_tasks', JSON.stringify(tasks));
+                localStorage.setItem(localKey, JSON.stringify(list));
             }
         }
 
-        function saveIssues() {
-            if (isConnected && db) {
-                db.ref('issues').set(issues);
-            } else {
-                localStorage.setItem('planner_issues', JSON.stringify(issues));
-            }
+        function saveTasks(changed, removedIds) {
+            saveItems('tasks', tasks, 'planner_tasks', changed, removedIds);
+        }
+
+        function saveIssues(changed, removedIds) {
+            saveItems('issues', issues, 'planner_issues', changed, removedIds);
+        }
+
+        // 기존 배열 형식(0,1,2… 인덱스 키) 데이터를 id 키 형식으로 한 번 변환. 변환이 필요 없으면 false
+        function migrateToKeyed(path, data) {
+            const needs = Array.isArray(data) || Object.keys(data).some(k => !data[k] || String(data[k].id) !== k);
+            if (!needs || !db) return false;
+            const keyed = {};
+            (Array.isArray(data) ? data : Object.values(data)).filter(Boolean).forEach(item => {
+                let id = String(item.id || (Date.now().toString() + Math.random().toString(36).substr(2, 5)));
+                while (keyed[id]) id += '_' + Math.random().toString(36).substr(2, 3); // 중복 id도 잃지 않게
+                keyed[id] = { ...item, id };
+            });
+            db.ref(path).set(keyed);
+            return true;
         }
 
         function saveKpiData() {
@@ -5884,9 +5903,9 @@ ${text}
             }
         }
 
-        function saveHistory() {
+        function saveHistory(entry) {
             if (isConnected && db) {
-                db.ref('history').set(historyData);
+                db.ref('history').push(entry);
             } else {
                 localStorage.setItem('planner_history', JSON.stringify(historyData));
             }
@@ -6093,7 +6112,7 @@ ${text}
             } else {
                 delete attendanceData[member][dateKey];
             }
-            saveAttendanceData();
+            saveAttendanceData(member, dateKey);
         }
 
         function openAttendanceModal(dateKey) {
@@ -6183,9 +6202,10 @@ ${text}
             renderAttendance();
         }
 
-        function saveAttendanceData() {
+        function saveAttendanceData(member, dateKey) {
             if (isConnected && db) {
-                db.ref('attendance').set(attendanceData);
+                // 해당 팀원·날짜 한 칸만 저장 (다른 사람 근태를 덮어쓰지 않음)
+                db.ref(`attendance/${member}/${dateKey}`).set(attendanceData[member]?.[dateKey] || null);
             } else {
                 localStorage.setItem('planner_attendance', JSON.stringify(attendanceData));
             }
@@ -6381,8 +6401,9 @@ ${text}
             
             db.ref('tasks').on('value', (snapshot) => {
                 const data = snapshot.val();
+                if (data && migrateToKeyed('tasks', data)) return; // 변환 저장 후 다시 호출됨
                 if (data) {
-                    tasks = Array.isArray(data) ? data : Object.values(data);
+                    tasks = Object.values(data).filter(Boolean);
                 } else {
                     tasks = [];
                 }
@@ -6393,8 +6414,9 @@ ${text}
 
             db.ref('issues').on('value', (snapshot) => {
                 const data = snapshot.val();
+                if (data && migrateToKeyed('issues', data)) return; // 변환 저장 후 다시 호출됨
                 if (data) {
-                    issues = Array.isArray(data) ? data : Object.values(data);
+                    issues = Object.values(data).filter(Boolean);
                 } else {
                     issues = [];
                 }
@@ -6416,7 +6438,7 @@ ${text}
             db.ref('history').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    historyData = Array.isArray(data) ? data : Object.values(data);
+                    historyData = Object.values(data).filter(Boolean);
                 } else {
                     historyData = [];
                 }
@@ -8683,7 +8705,21 @@ ${text}
       let DATA = META ? META.rooms : [];
       const $ = id => document.getElementById(id);
       function pad(n){ return String(n).padStart(2,'0'); }
-      function toGeorgia(iso, convert, offset){ const d=new Date(iso+":00"); return convert ? new Date(d.getTime()+offset*3600000) : d; }
+      // 미국 동부 서머타임: 3월 둘째 일요일 02:00 ~ 11월 첫째 일요일 02:00 (현지) → 한국(UTC+9)과 −13시간, 그 외 −14시간
+      const DST_CACHE={};
+      function dstRangeUTC(y){ if(DST_CACHE[y]) return DST_CACHE[y];
+        const mar1=new Date(Date.UTC(y,2,1)).getUTCDay(), nov1=new Date(Date.UTC(y,10,1)).getUTCDay();
+        const start=Date.UTC(y,2,1+((7-mar1)%7)+7,7);  // 02:00 EST = 07:00 UTC
+        const end=Date.UTC(y,10,1+((7-nov1)%7),6);     // 02:00 EDT = 06:00 UTC
+        return DST_CACHE[y]=[start,end]; }
+      function autoOffset(kstWallUTC){ const utc=kstWallUTC-9*3600000; const [s,e]=dstRangeUTC(new Date(utc).getUTCFullYear()); return (utc>=s&&utc<e)?-13:-14; }
+      function readOffset(){ const v=$('ivOffset').value; return v==='auto'?'auto':(parseFloat(v)||0); }
+      function toGeorgia(iso, convert, offset){
+        const m=/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/.exec(iso); if(!m) return new Date(iso);
+        let t=Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5]);
+        if(convert) t+=(offset==='auto'?autoOffset(t):offset)*3600000;
+        const u=new Date(t); return new Date(u.getUTCFullYear(),u.getUTCMonth(),u.getUTCDate(),u.getUTCHours(),u.getUTCMinutes());
+      }
       function fmt(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
       function esc(s){ return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
       function highlight(s,kw){ if(!kw) return esc(s); const re=new RegExp('('+kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'); return esc(s).replace(re,'<mark>$1</mark>'); }
@@ -8699,7 +8735,7 @@ ${text}
       }
       function dataRange(offset){ let min=null,max=null; DATA.forEach(r=>r.msgs.forEach(a=>{ const d=toGeorgia(a[0],r.convert,offset); if(!min||d<min)min=d; if(!max||d>max)max=d; })); return [min,max]; }
       function buildRooms(){ const box=$('ivRooms'); if(!box)return; box.innerHTML=''; DATA.forEach(r=>{ const lab=document.createElement('label'); lab.innerHTML=`<input type="checkbox" id="ivrm_${r.folder}" checked><span class="iv-badge" style="background:${COLORS[r.folder]||'#666'}">${r.room}</span><span style="color:#9fb3d1">${r.msgs.length.toLocaleString()}</span>`; box.appendChild(lab); }); }
-      function quick(days){ const offset=parseFloat($('ivOffset').value)||0; const [min,max]=dataRange(offset); if(!max)return; const end=max; const start=days>0?new Date(end.getTime()-days*86400000):min; $('ivDFrom').value=`${start.getFullYear()}-${pad(start.getMonth()+1)}-${pad(start.getDate())}`; $('ivDTo').value=`${end.getFullYear()}-${pad(end.getMonth()+1)}-${pad(end.getDate())}`; $('ivTFrom').value='00:00'; $('ivTTo').value='23:59'; search(); }
+      function quick(days){ const offset=readOffset(); const [min,max]=dataRange(offset); if(!max)return; const end=max; const start=days>0?new Date(end.getTime()-days*86400000):min; $('ivDFrom').value=`${start.getFullYear()}-${pad(start.getMonth()+1)}-${pad(start.getDate())}`; $('ivDTo').value=`${end.getFullYear()}-${pad(end.getMonth()+1)}-${pad(end.getDate())}`; $('ivTFrom').value='00:00'; $('ivTTo').value='23:59'; search(); }
       function setDefaultDates(){
         const now=new Date();
         const to=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
@@ -8711,7 +8747,7 @@ ${text}
         if(!$('ivTTo').value) $('ivTTo').value='23:59';
       }
       function search(){
-        const offset=parseFloat($('ivOffset').value)||0;
+        const offset=readOffset();
         const dFrom=$('ivDFrom').value, tFrom=$('ivTFrom').value||'00:00', dTo=$('ivDTo').value, tTo=$('ivTTo').value||'23:59';
         if(!dFrom||!dTo){ alert('시작/끝 날짜를 설정하세요.'); return; }
         const start=new Date(`${dFrom}T${tFrom}:00`), end=new Date(`${dTo}T${tTo}:59`);
@@ -8751,7 +8787,7 @@ ${text}
       }
       function proceed(){
         const total=DATA.reduce((s,r)=>s+r.msgs.length,0);
-        $('ivGenInfo').textContent=`생성: ${META?META.generated:'-'} · 총 ${total.toLocaleString()}개 메시지 · 기본 시차 −13시간(변경 가능)`;
+        $('ivGenInfo').textContent=`생성: ${META?META.generated:'-'} · 총 ${total.toLocaleString()}개 메시지 · 시차는 미국 서머타임에 맞춰 자동 적용(3월 둘째 일요일~11월 첫째 일요일 −13시간, 그 외 −14시간)`;
         buildRooms();
         quick(3);
       }
