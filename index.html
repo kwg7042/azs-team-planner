@@ -1714,7 +1714,7 @@
         /* ===== 학습 탭 ===== */
         .study-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
             gap: 20px;
         }
         
@@ -3102,6 +3102,134 @@
         .login-input-group button:hover {
             transform: scale(1.05);
         }
+
+        /* ===== 왼쪽 사이드 탭 (PC) ===== */
+        .app-body {
+            display: flex;
+            align-items: flex-start;
+        }
+        .app-body > .tab-nav {
+            flex: 0 0 190px;
+            width: 190px;
+            flex-direction: column;
+            gap: 4px;
+            padding: 16px 10px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            border-bottom: none;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+        .app-body > .tab-nav .tab-btn {
+            width: 100%;
+            padding: 12px 14px;
+            border-bottom: none;
+            border-left: 3px solid transparent;
+            border-radius: 8px;
+            text-align: left;
+            white-space: nowrap;
+        }
+        .app-body > .tab-nav .tab-btn i {
+            width: 20px;
+            text-align: center;
+        }
+        .app-body > .tab-nav .tab-btn.active {
+            border-left-color: #00d4ff;
+            background: rgba(0,212,255,0.1);
+        }
+        .app-body > .content-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+        /* 좁은 화면(태블릿·모바일): 공간이 좁으니 기존처럼 위쪽 가로 탭 */
+        @media screen and (max-width: 900px) {
+            .app-body { display: block; }
+            .app-body > .tab-nav {
+                width: auto;
+                height: auto;
+                position: static;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 8px 10px;
+                gap: 6px;
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+            }
+            .app-body > .tab-nav .tab-btn {
+                width: auto;
+                padding: 8px 10px;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+            }
+            .app-body > .tab-nav .tab-btn.active {
+                border-left-color: transparent;
+                border-bottom-color: #00d4ff;
+            }
+            .app-body > .tab-nav .tab-btn i { width: auto; }
+        }
+        @media screen and (max-width: 480px) {
+            .app-body > .tab-nav { padding: 6px 8px; gap: 4px; }
+            .app-body > .tab-nav .tab-btn { padding: 6px 8px; }
+        }
+
+        /* ===== 신기술 검토 탭 ===== */
+        .tr-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+        .tr-toolbar input, .tr-toolbar select {
+            padding: 9px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+            background: rgba(255,255,255,0.08); color: #fff; font-size: 13px;
+        }
+        .tr-toolbar input { flex: 1 1 220px; min-width: 0; }
+        .tr-toolbar select option, .tr-form select option { background: #1a1a2e; color: #fff; }
+        .tr-stats { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; font-size: 12px; }
+        .tr-stat { background: rgba(255,255,255,0.06); padding: 6px 12px; border-radius: 20px; cursor: pointer; border: 1px solid transparent; }
+        .tr-stat.active { border-color: #00d4ff; }
+        .tr-stat b { margin-left: 4px; }
+        .tr-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
+        .tr-card {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px;
+            border-top: 3px solid var(--tr-color, #667eea);
+        }
+        .tr-card-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+        .tr-card-title { font-size: 15px; font-weight: 600; line-height: 1.4; word-break: break-word; }
+        .tr-card-actions { display: flex; gap: 4px; flex-shrink: 0; }
+        .tr-card-actions button {
+            background: rgba(255,255,255,0.08); border: none; color: rgba(255,255,255,0.7);
+            width: 28px; height: 28px; border-radius: 6px; cursor: pointer;
+        }
+        .tr-card-actions button:hover { color: #fff; background: rgba(255,255,255,0.18); }
+        .tr-badges { display: flex; flex-wrap: wrap; gap: 6px; font-size: 11px; }
+        .tr-badge { padding: 3px 9px; border-radius: 10px; background: rgba(255,255,255,0.1); }
+        .tr-status { color: #1a1a2e; font-weight: 600; background: var(--tr-color, #667eea); }
+        .tr-meta { font-size: 12px; color: rgba(255,255,255,0.55); display: flex; flex-wrap: wrap; gap: 12px; }
+        .tr-field-label { font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 3px; }
+        .tr-field-value { font-size: 13px; line-height: 1.55; white-space: pre-line; word-break: break-word; color: rgba(255,255,255,0.9); }
+        .tr-links a { color: #00d4ff; font-size: 12px; word-break: break-all; display: block; }
+        .tr-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none;
+            align-items: center; justify-content: center; z-index: 2000; padding: 16px;
+        }
+        .tr-modal.open { display: flex; }
+        .tr-modal-box {
+            background: #23233d; border-radius: 14px; padding: 22px; width: 100%; max-width: 640px;
+            max-height: 90vh; overflow-y: auto;
+        }
+        .tr-modal-box h3 { margin-bottom: 16px; }
+        .tr-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .tr-form .full { grid-column: 1 / -1; }
+        .tr-form label { display: block; font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 5px; }
+        .tr-form input, .tr-form select, .tr-form textarea {
+            width: 100%; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+            background: rgba(255,255,255,0.08); color: #fff; font-size: 14px; font-family: inherit;
+        }
+        .tr-form textarea { min-height: 90px; resize: vertical; }
+        .tr-modal-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+        @media screen and (max-width: 768px) {
+            .tr-list { grid-template-columns: 1fr; }
+            .tr-form { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -3157,7 +3285,8 @@
         </div>
     </div>
 
-    <!-- 탭 네비게이션 -->
+    <div class="app-body">
+    <!-- 탭 네비게이션 (PC: 왼쪽 세로 / 모바일: 위쪽 가로) -->
     <div class="tab-nav">
         <button class="tab-btn active" data-tab="tasks">
             <i class="fas fa-tasks"></i> 업무관리
@@ -3178,6 +3307,9 @@
 
         <button class="tab-btn" data-tab="study">
             <i class="fas fa-graduation-cap"></i> 학습
+        </button>
+        <button class="tab-btn" data-tab="techreview">
+            <i class="fas fa-lightbulb"></i> 신기술 검토
         </button>
         <button class="tab-btn" data-tab="minigame">
             <i class="fas fa-gamepad"></i> 🎮게임
@@ -3714,6 +3846,49 @@
             </div>
         </div>
 
+        <!-- ========== 신기술 검토 탭 ========== -->
+        <div class="tab-content" id="tab-techreview">
+            <div class="section-header">
+                <h2><i class="fas fa-lightbulb"></i> 신기술 검토</h2>
+                <button class="btn btn-primary" onclick="openTechReviewModal()">
+                    <i class="fas fa-plus"></i> 새 검토 추가
+                </button>
+            </div>
+            <div class="tr-toolbar">
+                <input type="text" id="trSearch" placeholder="제목·내용·담당자 검색" oninput="renderTechReviews()">
+                <select id="trCategoryFilter" onchange="renderTechReviews()"></select>
+                <select id="trSort" onchange="renderTechReviews()">
+                    <option value="date">검토일 최신순</option>
+                    <option value="updated">최근 수정순</option>
+                    <option value="title">제목순</option>
+                </select>
+            </div>
+            <div class="tr-stats" id="trStats"></div>
+            <div class="tr-list" id="trList"></div>
+        </div>
+
+        <div class="tr-modal" id="trModal" onclick="if(event.target===this) closeTechReviewModal()">
+            <div class="tr-modal-box">
+                <h3 id="trModalTitle"><i class="fas fa-lightbulb"></i> 새 검토 추가</h3>
+                <div class="tr-form">
+                    <div class="full"><label>기술명 / 제목 *</label><input type="text" id="trTitle" maxlength="120" placeholder="예: AI 비전 외관검사"></div>
+                    <div><label>분야</label><input type="text" id="trCategory" list="trCategoryList" maxlength="30" placeholder="예: 검사"></div>
+                    <div><label>상태</label><select id="trStatus"></select></div>
+                    <div><label>담당자</label><input type="text" id="trOwner" list="trOwnerList" maxlength="30"></div>
+                    <div><label>검토일</label><input type="date" id="trDate"></div>
+                    <div class="full"><label>개요 / 검토 내용</label><textarea id="trSummary" placeholder="어떤 기술인지, 무엇을 검토했는지"></textarea></div>
+                    <div class="full"><label>결과 / 기대효과 / 다음 단계</label><textarea id="trResult" placeholder="테스트 결과, 적용 여부, 비용·효과, 후속 조치"></textarea></div>
+                    <div class="full"><label>관련 링크 (한 줄에 하나)</label><textarea id="trLinks" style="min-height:60px" placeholder="https://..."></textarea></div>
+                </div>
+                <datalist id="trCategoryList"></datalist>
+                <datalist id="trOwnerList"></datalist>
+                <div class="tr-modal-foot">
+                    <button class="btn btn-secondary" onclick="closeTechReviewModal()">취소</button>
+                    <button class="btn btn-primary" onclick="saveTechReviewFromModal()"><i class="fas fa-save"></i> 저장</button>
+                </div>
+            </div>
+        </div>
+
         <!-- ========== 🎮 미니게임 탭 ========== -->
         <div class="tab-content" id="tab-minigame">
             <div class="minigame-container">
@@ -4002,6 +4177,7 @@
             <div id="ivResults"><div class="iv-empty">기간을 설정하고 <b>조회</b>를 누르세요.</div></div>
         </div>
     </div>
+    </div><!-- /.app-body -->
 
     <script>
         // =====================================================
@@ -6821,6 +6997,198 @@ ${text}
             initOmokBoard();
         };
 
+
+        // =====================================================
+        // 신기술 검토
+        // =====================================================
+        const TR_STATUSES = [
+            { key: 'idea', label: '검토 예정', color: '#94a3b8' },
+            { key: 'reviewing', label: '검토중', color: '#00d4ff' },
+            { key: 'testing', label: '테스트중', color: '#f59e0b' },
+            { key: 'applied', label: '적용 완료', color: '#00ff88' },
+            { key: 'hold', label: '보류', color: '#a78bfa' },
+            { key: 'dropped', label: '중단', color: '#ff6b6b' },
+        ];
+        const TR_DEFAULT_CATEGORIES = ['공정', '설비', '검사', '소재', '자동화', 'AI/데이터', '기타'];
+        let techReviews = [];
+        let trEditingId = null;
+        let trStatusFilter = 'all';
+
+        function trStatusInfo(key) {
+            return TR_STATUSES.find(s => s.key === key) || TR_STATUSES[1];
+        }
+
+        function trSafeUrl(u) {
+            const t = String(u || '').trim();
+            return /^https?:\/\//i.test(t) ? t : '';
+        }
+
+        function setupTechReviewListener() {
+            if (!db) return;
+            db.ref('techReviews').off();
+            db.ref('techReviews').on('value', snap => {
+                const data = snap.val();
+                techReviews = data ? Object.values(data).filter(r => r && r.id) : [];
+                renderTechReviews();
+            });
+        }
+
+        function loadTechReviewsLocal() {
+            try { techReviews = JSON.parse(localStorage.getItem('planner_techReviews') || '[]'); }
+            catch (e) { techReviews = []; }
+            renderTechReviews();
+        }
+
+        function saveTechReview(item, removedId) {
+            if (removedId) techReviews = techReviews.filter(r => r.id !== removedId);
+            if (item) {
+                const i = techReviews.findIndex(r => r.id === item.id);
+                if (i >= 0) techReviews[i] = item; else techReviews.push(item);
+            }
+            saveItems('techReviews', techReviews, 'planner_techReviews', item ? [item] : [], removedId ? [removedId] : []);
+            renderTechReviews();
+        }
+
+        function fillTechReviewSelects() {
+            const cats = [...new Set([...TR_DEFAULT_CATEGORIES, ...techReviews.map(r => r.category).filter(Boolean)])];
+            const sel = document.getElementById('trCategoryFilter');
+            if (sel) {
+                const cur = sel.value || 'all';
+                sel.innerHTML = '<option value="all">전체 분야</option>' + cats.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+                sel.value = cats.includes(cur) ? cur : 'all';
+            }
+            const dl = document.getElementById('trCategoryList');
+            if (dl) dl.innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">`).join('');
+            const ol = document.getElementById('trOwnerList');
+            if (ol) ol.innerHTML = TEAM_MEMBERS.map(m => `<option value="${escapeHtml(m)}">`).join('');
+            const st = document.getElementById('trStatus');
+            if (st && !st.options.length) st.innerHTML = TR_STATUSES.map(s => `<option value="${s.key}">${s.label}</option>`).join('');
+        }
+
+        function renderTechReviews() {
+            const list = document.getElementById('trList');
+            if (!list) return;
+            fillTechReviewSelects();
+            const q = (document.getElementById('trSearch').value || '').trim().toLowerCase();
+            const cat = document.getElementById('trCategoryFilter').value || 'all';
+            const sort = document.getElementById('trSort').value || 'date';
+
+            const base = techReviews.filter(r => {
+                if (cat !== 'all' && r.category !== cat) return false;
+                if (!q) return true;
+                return [r.title, r.summary, r.result, r.owner, r.category, r.createdBy]
+                    .some(v => String(v || '').toLowerCase().includes(q));
+            });
+
+            const counts = {};
+            base.forEach(r => { counts[r.status] = (counts[r.status] || 0) + 1; });
+            document.getElementById('trStats').innerHTML =
+                `<span class="tr-stat ${trStatusFilter === 'all' ? 'active' : ''}" data-status="all">전체<b>${base.length}</b></span>` +
+                TR_STATUSES.map(s => `<span class="tr-stat ${trStatusFilter === s.key ? 'active' : ''}" data-status="${s.key}" style="color:${s.color}">${s.label}<b>${counts[s.key] || 0}</b></span>`).join('');
+
+            const rows = base.filter(r => trStatusFilter === 'all' || r.status === trStatusFilter);
+            rows.sort((a, b) => {
+                if (sort === 'title') return String(a.title || '').localeCompare(String(b.title || ''), 'ko');
+                if (sort === 'updated') return (b.updatedAt || 0) - (a.updatedAt || 0);
+                return String(b.date || '').localeCompare(String(a.date || '')) || (b.updatedAt || 0) - (a.updatedAt || 0);
+            });
+
+            if (!rows.length) {
+                list.innerHTML = `<div class="empty-state" style="grid-column:1/-1">${techReviews.length ? '조건에 맞는 검토가 없습니다.' : '아직 등록된 신기술 검토가 없습니다.<br><br>위의 <b>새 검토 추가</b>로 그동안 검토한 기술을 등록해 주세요.'}</div>`;
+                return;
+            }
+            list.innerHTML = rows.map(r => {
+                const st = trStatusInfo(r.status);
+                const links = String(r.links || '').split('\n').map(trSafeUrl).filter(Boolean);
+                return `<div class="tr-card" style="--tr-color:${st.color}">
+                    <div class="tr-card-head">
+                        <div class="tr-card-title">${escapeHtml(r.title)}</div>
+                        <div class="tr-card-actions">
+                            <button title="수정" data-tr-edit="${escapeHtml(r.id)}"><i class="fas fa-pen"></i></button>
+                            <button title="삭제" data-tr-del="${escapeHtml(r.id)}"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="tr-badges">
+                        <span class="tr-badge tr-status">${st.label}</span>
+                        ${r.category ? `<span class="tr-badge">${escapeHtml(r.category)}</span>` : ''}
+                    </div>
+                    <div class="tr-meta">
+                        ${r.owner ? `<span><i class="fas fa-user"></i> ${escapeHtml(r.owner)}</span>` : ''}
+                        ${r.date ? `<span><i class="fas fa-calendar"></i> ${escapeHtml(r.date)}</span>` : ''}
+                    </div>
+                    ${r.summary ? `<div><div class="tr-field-label">개요 / 검토 내용</div><div class="tr-field-value">${escapeHtml(r.summary)}</div></div>` : ''}
+                    ${r.result ? `<div><div class="tr-field-label">결과 / 기대효과</div><div class="tr-field-value">${escapeHtml(r.result)}</div></div>` : ''}
+                    ${links.length ? `<div class="tr-links"><div class="tr-field-label">관련 링크</div>${links.map(u => `<a href="${escapeHtml(u)}" target="_blank" rel="noopener noreferrer">${escapeHtml(u)}</a>`).join('')}</div>` : ''}
+                    <div class="tr-meta" style="font-size:11px">작성: ${escapeHtml(r.createdBy || '-')}${r.updatedBy && r.updatedBy !== r.createdBy ? ` · 수정: ${escapeHtml(r.updatedBy)}` : ''}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function openTechReviewModal(id) {
+            fillTechReviewSelects();
+            const r = id ? techReviews.find(x => x.id === id) : null;
+            trEditingId = r ? r.id : null;
+            document.getElementById('trModalTitle').innerHTML = `<i class="fas fa-lightbulb"></i> ${r ? '검토 수정' : '새 검토 추가'}`;
+            document.getElementById('trTitle').value = r ? r.title || '' : '';
+            document.getElementById('trCategory').value = r ? r.category || '' : '';
+            document.getElementById('trStatus').value = r ? trStatusInfo(r.status).key : 'reviewing';
+            document.getElementById('trOwner').value = r ? r.owner || '' : (localStorage.getItem('chat_nickname') || '');
+            document.getElementById('trDate').value = r ? r.date || '' : formatDateKey(new Date());
+            document.getElementById('trSummary').value = r ? r.summary || '' : '';
+            document.getElementById('trResult').value = r ? r.result || '' : '';
+            document.getElementById('trLinks').value = r ? r.links || '' : '';
+            document.getElementById('trModal').classList.add('open');
+            document.getElementById('trTitle').focus();
+        }
+
+        function closeTechReviewModal() {
+            document.getElementById('trModal').classList.remove('open');
+            trEditingId = null;
+        }
+
+        function saveTechReviewFromModal() {
+            const title = document.getElementById('trTitle').value.trim();
+            if (!title) { alert('기술명/제목을 입력해 주세요.'); return; }
+            const me = localStorage.getItem('chat_nickname') || '익명';
+            const prev = trEditingId ? techReviews.find(x => x.id === trEditingId) : null;
+            const item = {
+                id: prev ? prev.id : 'tr_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+                title,
+                category: document.getElementById('trCategory').value.trim(),
+                status: document.getElementById('trStatus').value,
+                owner: document.getElementById('trOwner').value.trim(),
+                date: document.getElementById('trDate').value,
+                summary: document.getElementById('trSummary').value.trim(),
+                result: document.getElementById('trResult').value.trim(),
+                links: document.getElementById('trLinks').value.split('\n').map(x => x.trim()).filter(Boolean).join('\n'),
+                createdBy: prev ? prev.createdBy || me : me,
+                createdAt: prev ? prev.createdAt || Date.now() : Date.now(),
+                updatedBy: me,
+                updatedAt: Date.now(),
+            };
+            saveTechReview(item);
+            closeTechReviewModal();
+        }
+
+        function deleteTechReview(id) {
+            const r = techReviews.find(x => x.id === id);
+            if (!r) return;
+            if (!confirm(`'${r.title}' 검토를 삭제할까요?`)) return;
+            saveTechReview(null, id);
+        }
+
+        document.addEventListener('click', e => {
+            const stat = e.target.closest('.tr-stat');
+            if (stat) { trStatusFilter = stat.dataset.status; renderTechReviews(); return; }
+            const ed = e.target.closest('[data-tr-edit]');
+            if (ed) { openTechReviewModal(ed.dataset.trEdit); return; }
+            const del = e.target.closest('[data-tr-del]');
+            if (del) deleteTechReview(del.dataset.trDel);
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && document.getElementById('trModal')?.classList.contains('open')) closeTechReviewModal();
+        });
+
         // Firebase 연결 후 오목/체스 리스너 설정
         const originalSetupDataListeners = setupDataListeners;
         setupDataListeners = function() {
@@ -6834,6 +7202,7 @@ ${text}
             // 고정 지연(setTimeout) 대신 Firebase 연결 직후 로드 → SDK 로딩이 늦어도 누락되지 않음
             initMinigame();
             loadStudyData();
+            setupTechReviewListener();
         };
 
         // =====================================================
@@ -8690,7 +9059,7 @@ ${text}
         };
 
         // Firebase 없이 열린 경우에도 기본 학습 자료는 표시
-        setTimeout(() => { if (!db) loadStudyData(); }, 1500);
+        setTimeout(() => { if (!db) { loadStudyData(); loadTechReviewsLocal(); } }, 1500);
     </script>
 
     <!-- 카톡 이슈 데이터: 평문(로컬 전용·gitignore) / 암호문(배포용·AES-GCM) -->
