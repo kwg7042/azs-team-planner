@@ -925,7 +925,8 @@
     const headers = { 'Content-Type': 'application/json' };
     if (!proxy && key) headers.Authorization = `Bearer ${key}`;
     const ctrl = new AbortController();
-    const tm = setTimeout(() => ctrl.abort(), (opt && opt.timeoutMs) || 180000);
+    // 로컬 프록시(180초)보다 조금 길게 기다려 프록시의 시간 초과 메시지를 받도록 함
+    const tm = setTimeout(() => ctrl.abort(), (opt && opt.timeoutMs) || 200000);
     try {
       const res = await fetch(url, {
         method: 'POST', headers, signal: ctrl.signal,
@@ -938,7 +939,7 @@
       if (!res.ok) {
         const t = await res.text().catch(() => '');
         const slow = /timed?\s*out|timeout/i.test(t) || res.status === 504;
-        throw new Error(`EXAONE 오류 ${res.status}${t ? ': ' + t.slice(0, 240) : ''}${slow ? '\n→ 프록시가 응답을 기다리다 끊었습니다. 도면 수를 줄이거나 \'깊게 생각하기\'를 끄고 다시 시도하세요. 로컬 프록시는 기본 60초 제한입니다.' : ''}`);
+        throw new Error(`EXAONE 오류 ${res.status}${t ? ': ' + t.slice(0, 240) : ''}${slow ? '\n→ 프록시가 응답을 기다리다 끊었습니다. 도면 수를 줄이거나 \'깊게 생각하기\'를 끄고 다시 시도하세요. 로컬 프록시는 180초 제한입니다.' : ''}`);
       }
       const data = await res.json();
       const msg = data && data.choices && data.choices[0] && data.choices[0].message;
