@@ -3314,6 +3314,9 @@
         <button class="tab-btn" data-tab="techreview">
             <i class="fas fa-lightbulb"></i> 신기술 검토
         </button>
+        <button class="tab-btn" data-tab="patentmotion">
+            <i class="fas fa-film"></i> 특허 모션
+        </button>
         <button class="tab-btn" data-tab="minigame">
             <i class="fas fa-gamepad"></i> 🎮게임
         </button>
@@ -4124,6 +4127,9 @@
                 </table>
             </div>
         </div>
+
+        <!-- ========== 특허 모션 탭 (내용은 patent_motion.js가 탭을 처음 열 때 채움) ========== -->
+        <div class="tab-content" id="tab-patentmotion"></div>
 
         <!-- ========== 카톡 이슈 조회 탭 ========== -->
         <div class="tab-content" id="tab-chatissue">
@@ -9268,5 +9274,7 @@ ${text}
       if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', ()=>{ const t=document.getElementById('tab-chatissue'); if(t&&t.classList.contains('active')) init(); });
     })();
     </script>
+    <!-- 특허 모션 탭: PDF → EXAONE 해석 → 동작 애니메이션 -->
+    <script src="patent_motion.js"></script>
 </body>
 </html>
