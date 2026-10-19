@@ -4155,7 +4155,7 @@
                             </div>
                         </div>
                         <button class="enhance-btn" onclick="doEnhance()">
-                            <span>⚔️ 강화하기 (1🪙)</span>
+                            <span id="enhanceBtnLabel">⚔️ 강화하기 (1🪙)</span>
                         </button>
                         <div class="enhance-history" id="enhanceHistory"></div>
                     </div>
@@ -8278,6 +8278,12 @@ ${text}
                 glow.style.background = 'radial-gradient(circle, rgba(0,212,255,0.3), transparent)';
             }
 
+            // 강화 버튼: 진행 중이면 무료, 새 도전이면 1코인
+            const enhanceLabel = document.getElementById('enhanceBtnLabel');
+            if (enhanceLabel) {
+                enhanceLabel.textContent = gameData.enhancePaid ? '⚔️ 강화하기 (무료)' : '⚔️ 강화하기 (1🪙)';
+            }
+
             // 경고 메시지
             const warning = document.getElementById('enhanceWarning');
             if (level >= 7) {
@@ -8389,15 +8395,18 @@ ${text}
         }
 
         function doEnhance() {
-            if ((gameData.coins || 0) < 1) {
-                alert('코인이 부족합니다! (1코인 필요)');
-                return;
+            // 도전 시작할 때만 1코인, 성공하는 동안은 무료로 계속 강화
+            if (!gameData.enhancePaid) {
+                if ((gameData.coins || 0) < 1) {
+                    alert('코인이 부족합니다! (1코인 필요)');
+                    return;
+                }
+                gameData.coins -= 1;
+                gameData.enhancePaid = true;
             }
 
             const level = gameData.weaponLevel || 0;
             const rate = ENHANCE_RATES[Math.min(level, 11)];
-
-            gameData.coins -= 1;
 
             const success = Math.random() * 100 < rate;
             const historyDiv = document.getElementById('enhanceHistory');
@@ -8415,6 +8424,7 @@ ${text}
 
             } else {
                 gameData.weaponLevel = 0;
+                gameData.enhancePaid = false; // 파괴되면 다음 도전은 다시 1코인
                 historyDiv.innerHTML = `<div class="enhance-fail">💥 +${level} 강화 실패... 파괴됨!</div>` + historyDiv.innerHTML;
 
                 // 파괴 효과
