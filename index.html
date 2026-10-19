@@ -3395,6 +3395,37 @@
         @media (hover: none) and (pointer: coarse) {
             .pika-touch { display: flex; }
         }
+
+        /* ===== 검 외형 애니메이션 ===== */
+        .sword-svg { display: block; margin: 0 auto; overflow: visible; }
+        .sword-svg.tier-2, .sword-svg.tier-3, .sword-svg.tier-4, .sword-svg.tier-5 { animation: swordFloat 3s ease-in-out infinite; }
+        .sword-svg .sw-aura { animation: swordAura 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+        .sword-svg .sw-rays { animation: swordRays 14s linear infinite; transform-box: fill-box; transform-origin: center; }
+        .sword-svg .sw-flame { animation: swordFlame 0.6s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: bottom center; }
+        .sword-svg .sw-star { animation: swordTwinkle 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+        .sword-svg .sw-gem { animation: swordGem 1.8s ease-in-out infinite; }
+        .sword-svg .sw-wings { animation: swordWings 2.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center bottom; }
+        @keyframes swordFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        @keyframes swordAura { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
+        @keyframes swordRays { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes swordFlame { from { transform: scaleY(0.94) scaleX(1); opacity: 0.75; } to { transform: scaleY(1.05) scaleX(1.06); opacity: 0.95; } }
+        @keyframes swordTwinkle { 0%, 100% { opacity: 0; transform: scale(0.4); } 50% { opacity: 1; transform: scale(1); } }
+        @keyframes swordGem { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
+        @keyframes swordWings { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.06); } }
+        @keyframes swordLevelUp { 0% { transform: scale(1); } 40% { transform: scale(1.18); filter: brightness(1.8); } 100% { transform: scale(1); } }
+        .weapon-big.level-up { animation: swordLevelUp 0.6s ease; }
+        .weapon-big { text-shadow: none; transition: transform 0.4s ease; }
+
+        /* ===== 히든 캐릭터 ===== */
+        .collection-item.hidden-locked { filter: none; color: rgba(255,255,255,0.55); font-weight: bold; background: rgba(255,79,216,0.08); border: 2px dashed rgba(255,79,216,0.35); }
+        .collection-item.hidden-owned { animation: hiddenGlow 2.5s linear infinite; }
+        @keyframes hiddenGlow {
+            0% { box-shadow: 0 0 14px #ff4fd8; } 33% { box-shadow: 0 0 14px #4fd8ff; }
+            66% { box-shadow: 0 0 14px #ffe14f; } 100% { box-shadow: 0 0 14px #ff4fd8; }
+        }
+        .collection-summary { text-align: center; font-size: 13px; color: rgba(255,255,255,0.75); margin-bottom: 10px; }
+        .collection-summary b { color: #ffd700; }
+        .collection-summary .hidden-count { color: #ff4fd8; }
     </style>
 </head>
 <body>
@@ -4164,6 +4195,7 @@
                 <!-- 컬렉션 -->
                 <div class="minigame-panel" id="panel-collection">
                     <div class="collection-hint">💡 모은 인형을 누르면 내 이름 옆에 아이콘으로 표시돼요. 한 번 더 누르면 해제돼요.</div>
+                    <div class="collection-summary" id="collectionSummary"></div>
                     <div class="collection-grid" id="collectionGrid">
                         <!-- 컬렉션 아이템들 -->
                     </div>
@@ -6282,7 +6314,7 @@ ${text}
                                             <div class="history-day-title">${day}요일</div>
                                             ${dayTasks.length > 0 ? dayTasks.map(t => `
                                                 <div class="history-task ${t.completed ? 'done' : 'incomplete'}">
-                                                    ${escapeHtml(t.assignee)}: ${escapeHtml(t.title)} ${t.completed ? '✓' : '✗'}
+                                                    ${nameWithIcon(t.assignee)}: ${escapeHtml(t.title)} ${t.completed ? '✓' : '✗'}
                                                 </div>
                                             `).join('') : '<div style="color: rgba(255,255,255,0.3); font-size: 12px;">없음</div>'}
                                         </div>
@@ -6511,7 +6543,7 @@ ${text}
                         <div class="attendance-entries">
                             ${entries.map(e => `
                                 <div class="attendance-entry">
-                                    <span class="entry-name">${escapeHtml(e.member)}</span>
+                                    <span class="entry-name">${nameWithIcon(e.member)}</span>
                                     <span class="entry-type" style="background: ${e.typeInfo.color}30; color: ${e.typeInfo.color};">${e.typeInfo.label}${e.note ? ' (' + escapeHtml(e.note) + ')' : ''}</span>
                                 </div>
                             `).join('')}
@@ -7381,13 +7413,13 @@ ${text}
                         ${r.category ? `<span class="tr-badge">${escapeHtml(r.category)}</span>` : ''}
                     </div>
                     <div class="tr-meta">
-                        ${r.owner ? `<span><i class="fas fa-user"></i> ${escapeHtml(r.owner)}</span>` : ''}
+                        ${r.owner ? `<span>${iconOf(r.owner) ? '' : '<i class="fas fa-user"></i> '}${nameWithIcon(r.owner)}</span>` : ''}
                         ${r.date ? `<span><i class="fas fa-calendar"></i> ${escapeHtml(r.date)}</span>` : ''}
                     </div>
                     ${r.summary ? `<div><div class="tr-field-label">개요 / 검토 내용</div><div class="tr-field-value">${escapeHtml(r.summary)}</div></div>` : ''}
                     ${r.result ? `<div><div class="tr-field-label">결과 / 기대효과</div><div class="tr-field-value">${escapeHtml(r.result)}</div></div>` : ''}
                     ${links.length ? `<div class="tr-links"><div class="tr-field-label">관련 링크</div>${links.map(u => `<a href="${escapeHtml(u)}" target="_blank" rel="noopener noreferrer">${escapeHtml(u)}</a>`).join('')}</div>` : ''}
-                    <div class="tr-meta" style="font-size:11px">작성: ${escapeHtml(r.createdBy || '-')}${r.updatedBy && r.updatedBy !== r.createdBy ? ` · 수정: ${escapeHtml(r.updatedBy)}` : ''}</div>
+                    <div class="tr-meta" style="font-size:11px">작성: ${r.createdBy ? nameWithIcon(r.createdBy) : '-'}${r.updatedBy && r.updatedBy !== r.createdBy ? ` · 수정: ${nameWithIcon(r.updatedBy)}` : ''}</div>
                 </div>`;
             }).join('');
         }
@@ -7458,6 +7490,140 @@ ${text}
         });
 
 
+
+        // ===== 검 외형 (강화 단계별로 점점 웅장해짐) =====
+        const SWORD_TIERS = [
+            // 0~2: 낡은 철검
+            { from: 0,  blade: ['#c9cdd1', '#7d8288'], guard: '#7a5a32', grip: '#5a3a1a', pommel: '#7a5a32', gem: null,      glow: null,      nameColor: '#cfcfcf' },
+            // 3~4: 강철검
+            { from: 3,  blade: ['#ffffff', '#9aa7b2'], guard: '#d7dde3', grip: '#2f2a3a', pommel: '#d7dde3', gem: null,      glow: '#9fd3ff', nameColor: '#e6f3ff' },
+            // 5~6: 서리검
+            { from: 5,  blade: ['#e6f7ff', '#2a8cff'], guard: '#cfe8ff', grip: '#1c2e4a', pommel: '#cfe8ff', gem: '#4fc3ff', glow: '#3aa0ff', nameColor: '#6cc8ff' },
+            // 7~8: 마검
+            { from: 7,  blade: ['#f6dcff', '#8a2be2'], guard: '#d9a6ff', grip: '#2a1240', pommel: '#d9a6ff', gem: '#c77dff', glow: '#a855f7', nameColor: '#c98bff' },
+            // 9~10: 성검 (날개)
+            { from: 9,  blade: ['#fffbe0', '#ffb300'], guard: '#ffd54f', grip: '#5a1a1a', pommel: '#ffd54f', gem: '#ff3b5c', glow: '#ffd700', nameColor: '#ffd700' },
+            // 11+: 신검 (불꽃 + 큰 날개 + 왕관)
+            { from: 11, blade: ['#ffffff', '#ff5e3a'], guard: '#fff0a8', grip: '#3a0a0a', pommel: '#fff0a8', gem: '#ffffff', glow: '#ff7a1a', nameColor: '#ff9a3c' }
+        ];
+
+        function getSwordTier(level) {
+            let t = 0;
+            SWORD_TIERS.forEach((tier, i) => { if (level >= tier.from) t = i; });
+            return t;
+        }
+
+        function swordSVG(level) {
+            const L = Math.min(level, 15);
+            const t = getSwordTier(L);
+            const T = SWORD_TIERS[t];
+            const cx = 100, guardY = 228;
+            const bladeLen = Math.min(205, 110 + L * 7);
+            const w = 14 + t * 2.4;
+            const tipY = guardY - bladeLen;
+            const tipBase = tipY + w * 1.3;
+            const parts = [];
+            const uid = `sw${L}`; // 그라디언트 id 충돌 방지
+
+            parts.push(`<defs>
+                <linearGradient id="${uid}Blade" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="${T.blade[1]}"/><stop offset="0.45" stop-color="${T.blade[0]}"/>
+                    <stop offset="0.55" stop-color="${T.blade[0]}"/><stop offset="1" stop-color="${T.blade[1]}"/>
+                </linearGradient>
+                <radialGradient id="${uid}Aura"><stop offset="0" stop-color="${T.glow || '#000'}" stop-opacity="0.55"/><stop offset="1" stop-color="${T.glow || '#000'}" stop-opacity="0"/></radialGradient>
+                <linearGradient id="${uid}Flame" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffde59"/><stop offset="0.5" stop-color="#ff7a1a"/><stop offset="1" stop-color="#ff2d55" stop-opacity="0"/></linearGradient>
+            </defs>`);
+
+            // 오라 / 후광
+            if (T.glow) parts.push(`<ellipse cx="${cx}" cy="${(tipY + guardY) / 2}" rx="${55 + t * 10}" ry="${bladeLen * 0.65}" fill="url(#${uid}Aura)" class="sw-aura"/>`);
+            if (t >= 4) {
+                const rays = [];
+                const n = t >= 5 ? 16 : 12;
+                for (let i = 0; i < n; i++) {
+                    rays.push(`<polygon points="${cx - 3},${guardY - 70} ${cx + 3},${guardY - 70} ${cx},${guardY - 70 - (t >= 5 ? 125 : 100)}" transform="rotate(${i * 360 / n} ${cx} ${guardY - 70})" fill="${T.glow}" opacity="0.35"/>`);
+                }
+                parts.push(`<g class="sw-rays">${rays.join('')}</g>`);
+            }
+
+            // 날개 (성검 이상)
+            if (t >= 4) {
+                const span = t >= 5 ? 92 : 70;
+                const wing = (s) => {
+                    const feathers = [];
+                    for (let i = 0; i < 4; i++) {
+                        const fx = cx + s * (22 + i * span / 4.4);
+                        const fy = guardY - 8 - i * 9;
+                        feathers.push(`<path d="M ${cx + s * 12} ${guardY - 4} Q ${fx} ${fy - 26} ${fx + s * 16} ${fy - 4} Q ${fx} ${fy + 6} ${cx + s * 12} ${guardY + 4} Z" fill="${i % 2 ? '#ffffff' : T.guard}" opacity="${0.95 - i * 0.12}"/>`);
+                    }
+                    return feathers.join('');
+                };
+                parts.push(`<g class="sw-wings">${wing(-1)}${wing(1)}</g>`);
+            }
+
+            // 불꽃 (신검)
+            if (t >= 5) {
+                parts.push(`<g class="sw-flame">
+                    <path d="M ${cx - w / 2 - 4} ${guardY - 6} Q ${cx - w - 14} ${(tipY + guardY) / 2} ${cx} ${tipY - 26} Q ${cx + w + 14} ${(tipY + guardY) / 2} ${cx + w / 2 + 4} ${guardY - 6} Z" fill="url(#${uid}Flame)" opacity="0.85"/>
+                </g>`);
+            }
+
+            // 칼날
+            parts.push(`<polygon points="${cx - w / 2},${guardY} ${cx - w / 2},${tipBase} ${cx},${tipY} ${cx + w / 2},${tipBase} ${cx + w / 2},${guardY}" fill="url(#${uid}Blade)" stroke="${T.blade[1]}" stroke-width="1"/>`);
+            parts.push(`<line x1="${cx}" y1="${guardY - 6}" x2="${cx}" y2="${tipBase + 4}" stroke="rgba(0,0,0,0.25)" stroke-width="${Math.max(1.5, w / 6)}"/>`);
+
+            // 룬 문양 (마검 이상)
+            if (t >= 3) {
+                const runes = [];
+                const count = 3 + (t - 3) * 2;
+                for (let i = 0; i < count; i++) {
+                    const ry = guardY - 22 - i * ((bladeLen - 50) / count);
+                    runes.push(`<path d="M ${cx - 3} ${ry} l 3 -6 l 3 6 M ${cx - 2} ${ry - 3} h 4" stroke="${T.glow}" stroke-width="1.3" fill="none"/>`);
+                }
+                parts.push(`<g class="sw-runes">${runes.join('')}</g>`);
+            }
+
+            // 가드 (코등이)
+            if (t === 0) {
+                parts.push(`<rect x="${cx - 30}" y="${guardY - 3}" width="60" height="9" rx="3" fill="${T.guard}"/>`);
+            } else {
+                const gw = 34 + t * 8;
+                parts.push(`<path d="M ${cx - gw} ${guardY - 2 - t * 2} Q ${cx - gw / 2} ${guardY + 10} ${cx} ${guardY + 4} Q ${cx + gw / 2} ${guardY + 10} ${cx + gw} ${guardY - 2 - t * 2} Q ${cx + gw / 2} ${guardY - 2} ${cx} ${guardY - 6} Q ${cx - gw / 2} ${guardY - 2} ${cx - gw} ${guardY - 2 - t * 2} Z" fill="${T.guard}" stroke="rgba(0,0,0,0.3)" stroke-width="1"/>`);
+                if (t >= 3) {
+                    parts.push(`<circle cx="${cx - gw}" cy="${guardY - 3 - t * 2}" r="4" fill="${T.gem || T.guard}"/><circle cx="${cx + gw}" cy="${guardY - 3 - t * 2}" r="4" fill="${T.gem || T.guard}"/>`);
+                }
+            }
+            if (T.gem) parts.push(`<circle cx="${cx}" cy="${guardY + 1}" r="${5 + t}" fill="${T.gem}" stroke="#fff" stroke-width="1.5" class="sw-gem"/>`);
+
+            // 손잡이 + 폼멜
+            parts.push(`<rect x="${cx - 6}" y="${guardY + 7}" width="12" height="40" rx="3" fill="${T.grip}"/>`);
+            for (let i = 0; i < 5; i++) {
+                parts.push(`<line x1="${cx - 6}" y1="${guardY + 12 + i * 8}" x2="${cx + 6}" y2="${guardY + 16 + i * 8}" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>`);
+            }
+            if (t >= 5) {
+                // 왕관 폼멜
+                const py = guardY + 52;
+                parts.push(`<path d="M ${cx - 12} ${py + 8} L ${cx - 12} ${py - 4} L ${cx - 6} ${py + 2} L ${cx} ${py - 8} L ${cx + 6} ${py + 2} L ${cx + 12} ${py - 4} L ${cx + 12} ${py + 8} Z" fill="${T.pommel}" stroke="#c98a00" stroke-width="1"/>`);
+            } else {
+                parts.push(`<circle cx="${cx}" cy="${guardY + 53}" r="${7 + t}" fill="${T.pommel}" stroke="rgba(0,0,0,0.3)" stroke-width="1"/>`);
+            }
+
+            // 반짝임 (서리검 이상)
+            if (t >= 2) {
+                const stars = [];
+                const count = 2 + t;
+                for (let i = 0; i < count; i++) {
+                    const sx = cx + (i % 2 ? 1 : -1) * (18 + (i * 13) % 40);
+                    const sy = tipY + 20 + (i * 47) % Math.max(60, bladeLen - 30);
+                    const r = 3 + (i % 3);
+                    stars.push(`<path d="M ${sx} ${sy - r * 2} L ${sx + r * 0.5} ${sy - r * 0.5} L ${sx + r * 2} ${sy} L ${sx + r * 0.5} ${sy + r * 0.5} L ${sx} ${sy + r * 2} L ${sx - r * 0.5} ${sy + r * 0.5} L ${sx - r * 2} ${sy} L ${sx - r * 0.5} ${sy - r * 0.5} Z" fill="#fff" class="sw-star" style="animation-delay:${(i * 0.37).toFixed(2)}s"/>`);
+                }
+                parts.push(stars.join(''));
+            }
+
+            return `<svg class="sword-svg tier-${t}" viewBox="0 0 200 300" width="150" height="225" aria-label="강화 검 +${level}"
+                style="filter: drop-shadow(0 0 ${T.glow ? 6 + t * 3 : 2}px ${T.glow || 'rgba(0,0,0,0.5)'})">${parts.join('')}</svg>`;
+        }
+
         // ===== 컬렉션 아이콘 (이름 옆 표시) =====
         function iconOf(name) {
             const e = name ? userIcons[name] : '';
@@ -7475,6 +7641,13 @@ ${text}
             if (typeof renderChatMessages === 'function') renderChatMessages();
             if (typeof renderCollection === 'function' && document.getElementById('collectionGrid')) renderCollection();
             if (document.getElementById('weeklyGrid')) renderWeeklyGrid();
+            // 근태·신기술 검토·학습·강화 랭킹·출첵 목록도 아이콘 갱신
+            const safe = (fn) => { try { fn(); } catch (e) { console.warn('아이콘 갱신 실패', e); } };
+            if (typeof renderAttendance === 'function') safe(renderAttendance);
+            if (typeof renderTechReviews === 'function' && document.getElementById('trSearch')) safe(renderTechReviews);
+            if (typeof renderStudyMaterials === 'function') safe(renderStudyMaterials);
+            if (typeof loadLeaderboard === 'function') safe(loadLeaderboard);
+            if (typeof renderCheckinToday === 'function') safe(renderCheckinToday);
         }
         function setupUserIconListener() {
             if (!db) return;
@@ -8213,14 +8386,19 @@ ${text}
             // 전설 (3%)
             { emoji: '🌟', name: '황금별', rarity: 'legendary', rate: 1.5 },
             { emoji: '👑', name: '왕관', rarity: 'legendary', rate: 1 },
-            { emoji: '💎', name: '다이아몬드', rarity: 'legendary', rate: 0.5 }
+            { emoji: '💎', name: '다이아몬드', rarity: 'legendary', rate: 0.5 },
+            // 히든 (각 0.1%) — 뽑기 전까지 컬렉션에 ❓로 표시
+            { emoji: '🦖', name: '티라노', rarity: 'hidden', rate: 0.1 },
+            { emoji: '👽', name: '외계인', rarity: 'hidden', rate: 0.1 },
+            { emoji: '🧞', name: '지니', rarity: 'hidden', rate: 0.1 }
         ];
 
         const RARITY_COLORS = {
             normal: '#aaa',
             rare: '#00d4ff',
             epic: '#a855f7',
-            legendary: '#ffd700'
+            legendary: '#ffd700',
+            hidden: '#ff4fd8'
         };
 
         const ENHANCE_RATES = [90, 90, 90, 70, 70, 70, 50, 50, 50, 30, 15, 5];
@@ -8264,19 +8442,22 @@ ${text}
 
             // 강화 UI 업데이트
             const level = gameData.weaponLevel || 0;
-            document.getElementById('weaponBig').textContent = level >= 10 ? '⚔️' : '🗡️';
-            document.getElementById('weaponName').textContent = `${WEAPON_NAMES[Math.min(level, 12)]} +${level}`;
+            const weaponBigEl = document.getElementById('weaponBig');
+            if (weaponBigEl.dataset.level !== String(level)) {
+                weaponBigEl.innerHTML = swordSVG(level);
+                weaponBigEl.dataset.level = String(level);
+            }
+            const weaponNameEl = document.getElementById('weaponName');
+            weaponNameEl.textContent = `${WEAPON_NAMES[Math.min(level, 12)]} +${level}`;
+            weaponNameEl.style.color = SWORD_TIERS[getSwordTier(level)].nameColor;
             document.getElementById('enhanceRate').textContent = `${ENHANCE_RATES[Math.min(level, 11)]}%`;
 
-            // 글로우 색상 변경
+            // 글로우 색상 변경 (검 단계 색과 맞춤)
             const glow = document.getElementById('weaponGlow');
-            if (level >= 10) {
-                glow.style.background = 'radial-gradient(circle, rgba(255,215,0,0.5), transparent)';
-            } else if (level >= 7) {
-                glow.style.background = 'radial-gradient(circle, rgba(168,85,247,0.4), transparent)';
-            } else if (level >= 4) {
-                glow.style.background = 'radial-gradient(circle, rgba(0,212,255,0.3), transparent)';
-            }
+            const glowColor = SWORD_TIERS[getSwordTier(level)].glow;
+            glow.style.background = glowColor
+                ? `radial-gradient(circle, ${glowColor}66, transparent)`
+                : 'radial-gradient(circle, rgba(255,107,107,0.3), transparent)';
 
             // 강화 버튼: 진행 중이면 무료, 새 도전이면 1코인
             const enhanceLabel = document.getElementById('enhanceBtnLabel');
@@ -8328,8 +8509,9 @@ ${text}
 
             gameData.coins -= 1;
 
-            // 확률 기반 뽑기
-            const rand = Math.random() * 100;
+            // 확률 기반 뽑기 (확률 합계 기준이라 히든을 더해도 비율 유지)
+            const totalRate = GACHA_ITEMS.reduce((sum, it) => sum + it.rate, 0);
+            const rand = Math.random() * totalRate;
             let cumulative = 0;
             let result = GACHA_ITEMS[0];
 
@@ -8370,6 +8552,15 @@ ${text}
                     <br><small>${result.rarity.toUpperCase()}</small>
                 </div>
             `;
+
+            // 히든 등급이면 무지개 효과 + 알림
+            if (result.rarity === 'hidden') {
+                display.innerHTML += `<div style="margin-top: 6px; font-weight: bold; color: #ff4fd8;">🎉 히든 캐릭터 발견!</div>`;
+                display.style.boxShadow = '0 0 60px #ff4fd8';
+                setTimeout(() => {
+                    display.style.boxShadow = '0 0 30px rgba(255,215,0,0.2)';
+                }, 3000);
+            }
 
             // 전설 등급이면 특별 효과
             if (result.rarity === 'legendary') {
@@ -8417,10 +8608,8 @@ ${text}
 
                 // 강화 성공 효과
                 const weaponBig = document.getElementById('weaponBig');
-                weaponBig.style.animation = 'none';
-                setTimeout(() => {
-                    weaponBig.style.animation = 'weaponPulse 0.5s ease 3';
-                }, 10);
+                weaponBig.classList.remove('level-up');
+                setTimeout(() => weaponBig.classList.add('level-up'), 10);
 
             } else {
                 gameData.weaponLevel = 0;
@@ -8445,14 +8634,30 @@ ${text}
             const owned = gameData.collection || [];
 
             const selected = iconOf(localStorage.getItem('chat_nickname') || '');
-            grid.innerHTML = GACHA_ITEMS.map(item => `
-                <div class="collection-item ${owned.includes(item.emoji) ? 'owned' : 'locked'} ${selected === item.emoji ? 'selected' : ''}" 
-                     style="border-color: ${owned.includes(item.emoji) ? RARITY_COLORS[item.rarity] : 'transparent'}"
-                     ${owned.includes(item.emoji) ? `onclick="selectMyIcon('${item.emoji}')"` : ''}
-                     title="${item.name} (${item.rarity})${owned.includes(item.emoji) ? ' - 눌러서 내 아이콘으로' : ''}">
+            grid.innerHTML = GACHA_ITEMS.map(item => {
+                const has = owned.includes(item.emoji);
+                const hidden = item.rarity === 'hidden';
+                if (hidden && !has) {
+                    // 히든은 뽑기 전까지 정체를 숨김
+                    return `<div class="collection-item hidden-locked" title="??? (히든)">❓</div>`;
+                }
+                return `
+                <div class="collection-item ${has ? 'owned' : 'locked'} ${hidden && has ? 'hidden-owned' : ''} ${selected === item.emoji ? 'selected' : ''}" 
+                     style="border-color: ${has ? RARITY_COLORS[item.rarity] : 'transparent'}"
+                     ${has ? `onclick="selectMyIcon('${item.emoji}')"` : ''}
+                     title="${item.name} (${item.rarity})${has ? ' - 눌러서 내 아이콘으로' : ''}">
                     ${item.emoji}
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
+
+            const summary = document.getElementById('collectionSummary');
+            if (summary) {
+                const normalItems = GACHA_ITEMS.filter(it => it.rarity !== 'hidden');
+                const hiddenItems = GACHA_ITEMS.filter(it => it.rarity === 'hidden');
+                const ownNormal = normalItems.filter(it => owned.includes(it.emoji)).length;
+                const ownHidden = hiddenItems.filter(it => owned.includes(it.emoji)).length;
+                summary.innerHTML = `수집 <b>${ownNormal}/${normalItems.length}</b> · <span class="hidden-count">히든 ${ownHidden}/${hiddenItems.length}</span>`;
+            }
         }
 
         function loadLeaderboard() {
@@ -8469,7 +8674,7 @@ ${text}
                 container.innerHTML = leaderboard.map((item, i) => `
                     <div class="leaderboard-item">
                         <span class="leaderboard-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`}</span>
-                        <span class="leaderboard-name">${escapeHtml(item.name)}</span>
+                        <span class="leaderboard-name">${nameWithIcon(item.name)}</span>
                         <span class="leaderboard-level">+${item.level}</span>
                     </div>
                 `).join('');
@@ -8525,6 +8730,7 @@ ${text}
         // 출석체크 (하루 1회, +1코인)
         // =====================================================
         let checkinTodayRef = null;
+        let checkinTodayData = {};
 
         function getLocalDateKey(date = new Date()) {
             const y = date.getFullYear();
@@ -8539,18 +8745,24 @@ ${text}
             if (checkinTodayRef) checkinTodayRef.off();
             checkinTodayRef = db.ref(`checkin/${today}`);
             checkinTodayRef.on('value', (snapshot) => {
-                const data = snapshot.val() || {};
-                const names = Object.entries(data)
-                    .sort((a, b) => a[1] - b[1])
-                    .map(([name, time]) => {
-                        const t = new Date(time);
-                        return `${name} <small style="color:rgba(255,255,255,0.5)">${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}</small>`;
-                    });
-                document.getElementById('checkinTodayCount').textContent = names.length;
-                document.getElementById('checkinTodayList').innerHTML = names.length
-                    ? names.map(n => `<span>${n}</span>`).join('')
-                    : '<span style="background:none;color:rgba(255,255,255,0.5)">아직 아무도 출석하지 않았어요</span>';
+                checkinTodayData = snapshot.val() || {};
+                renderCheckinToday();
             });
+        }
+
+        function renderCheckinToday() {
+            const listEl = document.getElementById('checkinTodayList');
+            if (!listEl) return;
+            const names = Object.entries(checkinTodayData)
+                .sort((a, b) => a[1] - b[1])
+                .map(([name, time]) => {
+                    const t = new Date(time);
+                    return `${nameWithIcon(name)} <small style="color:rgba(255,255,255,0.5)">${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}</small>`;
+                });
+            document.getElementById('checkinTodayCount').textContent = names.length;
+            listEl.innerHTML = names.length
+                ? names.map(n => `<span>${n}</span>`).join('')
+                : '<span style="background:none;color:rgba(255,255,255,0.5)">아직 아무도 출석하지 않았어요</span>';
         }
 
         function doCheckIn() {
@@ -9548,7 +9760,7 @@ ${text}
                         <i class="${iconBrand} ${icon}" style="${iconColor}"></i>
                         <div class="study-material-info">
                             <div class="study-material-title">${escapeHtml(m.title)}${isDefault}</div>
-                            <div class="study-material-meta">${escapeHtml(m.createdBy)} · ${date}</div>
+                            <div class="study-material-meta">${nameWithIcon(m.createdBy)} · ${date}</div>
                         </div>
                         ${deleteBtn}
                     </div>
