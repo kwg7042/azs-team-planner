@@ -3426,6 +3426,26 @@
         .collection-summary { text-align: center; font-size: 13px; color: rgba(255,255,255,0.75); margin-bottom: 10px; }
         .collection-summary b { color: #ffd700; }
         .collection-summary .hidden-count { color: #ff4fd8; }
+
+        /* ===== 코인 아이콘 (동전 이모지가 구버전 Windows에서 네모로 깨져 CSS로 그림) ===== */
+        .coin-ico {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            border-radius: 50%;
+            vertical-align: -0.15em;
+            background: radial-gradient(circle at 35% 30%, #fff7c2 0%, #ffd700 40%, #e0a800 75%, #b07d00 100%);
+            box-shadow: inset 0 0 0 0.08em #c99200, 0 0 0.15em rgba(255, 200, 0, 0.5);
+            position: relative;
+        }
+        .coin-ico::after {
+            content: '';
+            position: absolute;
+            inset: 0.22em;
+            border-radius: 50%;
+            border: 0.07em solid rgba(150, 100, 0, 0.55);
+        }
+        .coin-icon .coin-ico { width: 28px; height: 28px; vertical-align: middle; }
     </style>
 </head>
 <body>
@@ -4099,11 +4119,11 @@
                     <h2>✅ 오늘의 출석체크</h2>
                     <p>하루에 한 번 출석체크하면 <strong style="color:#ffd700">1코인</strong>을 받아요! (자정 기준 초기화)</p>
                     <div class="checkin-stats">
-                        <div class="checkin-stat">🪙 보유 코인<strong id="checkinCoinCount">0</strong></div>
+                        <div class="checkin-stat"><span class="coin-ico"></span> 보유 코인<strong id="checkinCoinCount">0</strong></div>
                         <div class="checkin-stat">🔥 연속 출석<strong id="checkinStreak">0</strong>일</div>
                         <div class="checkin-stat">📅 누적 출석<strong id="checkinTotal">0</strong>일</div>
                     </div>
-                    <button class="checkin-btn" id="checkinBtn" onclick="doCheckIn()">출석체크 하기 (+1🪙)</button>
+                    <button class="checkin-btn" id="checkinBtn" onclick="doCheckIn()">출석체크 하기 (+1<span class="coin-ico"></span>)</button>
                     <div id="checkinMessage" style="margin-top: 12px; font-size: 13px; color: rgba(255,255,255,0.7);"></div>
                 </div>
                 <div class="checkin-grid">
@@ -4125,7 +4145,7 @@
                 <!-- 내 정보 -->
                 <div class="minigame-header">
                     <div class="coin-display">
-                        <span class="coin-icon">🪙</span>
+                        <span class="coin-icon"><span class="coin-ico"></span></span>
                         <span class="coin-count" id="myCoinCount">0</span>
                         <span class="coin-label">코인</span>
                     </div>
@@ -4160,7 +4180,7 @@
                         </div>
                         <button class="gacha-btn" onclick="doGacha()">
                             <span class="gacha-btn-icon">🎰</span>
-                            <span>뽑기! (1🪙)</span>
+                            <span>뽑기! (1<span class="coin-ico"></span>)</span>
                         </button>
                     </div>
                     <div class="gacha-history">
@@ -4186,7 +4206,7 @@
                             </div>
                         </div>
                         <button class="enhance-btn" onclick="doEnhance()">
-                            <span id="enhanceBtnLabel">⚔️ 강화하기 (1🪙)</span>
+                            <span id="enhanceBtnLabel">⚔️ 강화하기 (1<span class="coin-ico"></span>)</span>
                         </button>
                         <div class="enhance-history" id="enhanceHistory"></div>
                     </div>
@@ -4275,6 +4295,7 @@
                             <button data-key="left">◀</button>
                             <button data-key="right">▶</button>
                             <button data-key="jump">⬆</button>
+                            <button data-key="down">⬇</button>
                             <button data-key="spike">💥</button>
                         </div>
                         <div class="pika-help" id="pikaHelp"></div>
@@ -8462,7 +8483,7 @@ ${text}
             // 강화 버튼: 진행 중이면 무료, 새 도전이면 1코인
             const enhanceLabel = document.getElementById('enhanceBtnLabel');
             if (enhanceLabel) {
-                enhanceLabel.textContent = gameData.enhancePaid ? '⚔️ 강화하기 (무료)' : '⚔️ 강화하기 (1🪙)';
+                enhanceLabel.innerHTML = gameData.enhancePaid ? '⚔️ 강화하기 (무료)' : '⚔️ 강화하기 (1<span class="coin-ico"></span>)';
             }
 
             // 경고 메시지
@@ -8709,7 +8730,7 @@ ${text}
                 z-index: 10000;
                 animation: slideIn 0.5s ease, slideOut 0.5s ease 2s forwards;
             `;
-            notification.innerHTML = `🪙 +${amount} 코인 획득! (${reason})`;
+            notification.innerHTML = `<span class="coin-ico"></span> +${amount} 코인 획득! (${reason})`;
             document.body.appendChild(notification);
 
             setTimeout(() => notification.remove(), 2500);
@@ -8828,7 +8849,7 @@ ${text}
             document.getElementById('checkinTotal').textContent = gameData.checkInTotal || 0;
 
             btn.disabled = checkedToday;
-            btn.textContent = checkedToday ? '✅ 오늘 출석 완료' : '출석체크 하기 (+1🪙)';
+            btn.innerHTML = checkedToday ? '✅ 오늘 출석 완료' : '출석체크 하기 (+1<span class="coin-ico"></span>)';
             document.getElementById('checkinMessage').textContent = checkedToday
                 ? '내일 또 출석하고 코인 받아가세요!'
                 : '';
@@ -8880,7 +8901,7 @@ ${text}
 
         let pika = null;
         const pikaKeys = {};
-        const pikaTouchKeys = { left: false, right: false, jump: false, spike: false };
+        const pikaTouchKeys = { left: false, right: false, jump: false, down: false, spike: false };
         let pikaRaf = null;
         let pikaLastTs = 0;
         let pikaAcc = 0;
@@ -8955,8 +8976,8 @@ ${text}
             const mode = document.getElementById('pikaMode').value;
             document.getElementById('pikaLevel').style.display = mode === 'cpu' ? '' : 'none';
             document.getElementById('pikaHelp').innerHTML = mode === 'cpu'
-                ? `🎮 <b>나(왼쪽)</b>: ← → 이동 · ↑ 점프 · <b>Space</b> 스파이크(점프 중) / 슬라이딩(땅에서 ← 또는 →와 함께)<br>${PIKA.WIN_SCORE}점 먼저 내면 승리`
-                : `🎮 <b>1P(왼쪽)</b>: A D 이동 · W 점프 · F 스파이크/슬라이딩 &nbsp;|&nbsp; <b>2P(오른쪽)</b>: ← → 이동 · ↑ 점프 · Enter 스파이크/슬라이딩<br>슬라이딩 = 땅에서 방향키 + 스파이크 키 · ${PIKA.WIN_SCORE}점 먼저 내면 승리`;
+                ? `🎮 <b>나(왼쪽)</b>: ← → 이동 · ↑ 점프 · <b>Space</b> 스파이크(점프 중) / 슬라이딩(땅에서 ← 또는 →와 함께)<br>💥 스파이크 방향: Space와 함께 → 강하게 · ← 짧게 · ↑ 높이 · ↓ 내리꽂기 · ${PIKA.WIN_SCORE}점 먼저 내면 승리`
+                : `🎮 <b>1P(왼쪽)</b>: A D 이동 · W 점프 · S 아래 · F 스파이크/슬라이딩 &nbsp;|&nbsp; <b>2P(오른쪽)</b>: ← → 이동 · ↑ 점프 · ↓ 아래 · Enter 스파이크/슬라이딩<br>슬라이딩 = 땅에서 방향키 + 스파이크 키 · 스파이크 방향 = 스파이크 키와 함께 앞(강하게)/뒤(짧게)/위(높이)/아래(내리꽂기) · ${PIKA.WIN_SCORE}점 먼저 내면 승리`;
         }
 
         function getPikaInput(player) {
@@ -8968,13 +8989,14 @@ ${text}
                         left: k.ArrowLeft || k.KeyA || t.left,
                         right: k.ArrowRight || k.KeyD || t.right,
                         jump: k.ArrowUp || k.KeyW || t.jump,
+                        down: k.ArrowDown || k.KeyS || t.down,
                         spike: k.Space || k.KeyF || k.Enter || t.spike
                     };
                 }
-                return { left: k.KeyA || t.left, right: k.KeyD || t.right, jump: k.KeyW || t.jump, spike: k.KeyF || t.spike };
+                return { left: k.KeyA || t.left, right: k.KeyD || t.right, jump: k.KeyW || t.jump, down: k.KeyS || t.down, spike: k.KeyF || t.spike };
             }
             if (pika.mode === 'cpu') return getPikaAiInput(player);
-            return { left: k.ArrowLeft, right: k.ArrowRight, jump: k.ArrowUp, spike: k.Enter || k.NumpadEnter };
+            return { left: k.ArrowLeft, right: k.ArrowRight, jump: k.ArrowUp, down: k.ArrowDown, spike: k.Enter || k.NumpadEnter };
         }
 
         // 공이 머리 높이까지 떨어지는 지점 예측
@@ -9031,12 +9053,17 @@ ${text}
                     p.ai.jumpNow = Math.random() < lv.jumpProb;
                     // 네트에서 멀면 스파이크가 네트에 걸리므로 가까울 때만
                     p.ai.willSpike = p.x - PIKA.NET_X < 150 && Math.random() < lv.spikeProb;
+                    // 스파이크 방향도 랜덤 (위: 로브 / 아래: 내리꽂기 / 기본)
+                    const r = Math.random();
+                    p.ai.spikeAim = r < 0.15 ? 'up' : r < 0.55 ? 'down' : 'none';
                 }
                 if (p.ai.jumpNow) input.jump = true;
             }
             if (!onGround && p.ai.willSpike &&
                 Math.hypot(ball.x - p.x, ball.y - (p.y - PIKA.PR)) < 75) {
                 input.spike = true;
+                input.jump = p.ai.spikeAim === 'up';
+                input.down = p.ai.spikeAim === 'down';
             }
 
             // 걸어서는 못 닿지만 슬라이딩으로는 닿는 공이면 슬라이딩
@@ -9062,6 +9089,7 @@ ${text}
 
         function updatePikaPlayer(p) {
             const input = getPikaInput(p);
+            p.lastInput = input; // 스파이크 방향 판정용
             const speed = (p.side === 'right' && pika.mode === 'cpu') ? (p.ai.speed || PIKA.MOVE) : PIKA.MOVE;
             const onGround = p.y >= PIKA.GROUND;
 
@@ -9130,11 +9158,25 @@ ${text}
                 ball.vx = dir * 2 + nx * 3;
                 ball.vy = -10;
             } else if (p.spikeTimer > 0 && airborne) {
-                // 스파이크: 네트는 넘기되 최대한 날카롭게 내리꽂기
-                ball.vx = dir * 16;
-                const t = Math.max(1, Math.abs(PIKA.NET_X - ball.x) / 16);
+                // 스파이크 방향 조절 (오리지널처럼 방향키를 누른 채로 때리기)
+                //  앞(상대 쪽) = 빠르고 길게, 뒤 = 느리고 짧게(페인트), 없음 = 기본
+                //  ↑ = 높이 띄우는 로브, ↓ = 네트를 넘기는 한도에서 가장 날카롭게
+                const inp = p.lastInput || {};
+                const fwd = dir > 0 ? inp.right : inp.left;
+                const back = dir > 0 ? inp.left : inp.right;
+                const speedX = fwd ? 18 : back ? 10 : 16;
+                ball.vx = dir * speedX;
+                const t = Math.max(1, Math.abs(PIKA.NET_X - ball.x) / speedX);
                 const vyMax = (PIKA.NET_TOP - PIKA.BR - 8 - ball.y - 0.5 * PIKA.B_GRAV * t * t) / t;
-                ball.vy = Math.min(5 + Math.random() * 4, vyMax);
+                if (inp.jump) {
+                    // 로브: 높이 띄워 상대 코트 깊숙이 떨어뜨림
+                    ball.vx = dir * (fwd ? 7 : back ? 4.5 : 6);
+                    ball.vy = -7;
+                } else if (inp.down) {
+                    ball.vy = Math.min(13, vyMax);
+                } else {
+                    ball.vy = Math.min(4 + Math.random() * 2, vyMax);
+                }
                 p.spikeTimer = 0;
             } else {
                 const speed = 10;
@@ -9212,7 +9254,7 @@ ${text}
 
             // 속도 제한
             const sp = Math.hypot(ball.vx, ball.vy);
-            if (sp > 18) { ball.vx *= 18 / sp; ball.vy *= 18 / sp; }
+            if (sp > 22) { ball.vx *= 22 / sp; ball.vy *= 22 / sp; }
 
             // 바닥 → 득점
             if (ball.y + BR >= PIKA.GROUND) {
@@ -9451,7 +9493,7 @@ ${text}
         function initPikaVolley() {
             if (pikaInited || !document.getElementById('pikaCanvas')) return;
             pikaInited = true;
-            const GAME_KEYS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space', 'Enter', 'NumpadEnter', 'KeyA', 'KeyD', 'KeyW', 'KeyF'];
+            const GAME_KEYS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space', 'Enter', 'NumpadEnter', 'KeyA', 'KeyD', 'KeyW', 'KeyS', 'KeyF'];
             const isTyping = (e) => {
                 const t = e.target;
                 return t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
