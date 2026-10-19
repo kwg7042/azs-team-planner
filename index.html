@@ -3453,6 +3453,9 @@
     <div class="app-body">
     <!-- 탭 네비게이션 (PC: 왼쪽 세로 / 모바일: 위쪽 가로) -->
     <div class="tab-nav">
+        <button class="tab-btn" data-tab="checkin">
+            <i class="fas fa-calendar-check"></i> 출첵
+        </button>
         <button class="tab-btn active" data-tab="tasks">
             <i class="fas fa-tasks"></i> 업무관리
         </button>
@@ -3472,9 +3475,6 @@
         </button>
         <button class="tab-btn" data-tab="patentmotion">
             <i class="fas fa-film"></i> 특허 모션
-        </button>
-        <button class="tab-btn" data-tab="checkin">
-            <i class="fas fa-calendar-check"></i> 출첵
         </button>
         <button class="tab-btn" data-tab="minigame">
             <i class="fas fa-gamepad"></i> 🎮게임
@@ -8642,15 +8642,18 @@ ${text}
             PR: 30,          // 피카츄 충돌 반지름
             BR: 18,          // 공 반지름
             MOVE: 4.2,
+            DIVE_VX: 8,      // 슬라이딩 속도
+            DIVE_VY: -4,     // 슬라이딩 시 살짝 뜨는 높이
+            DIVE_RECOVER: 18, // 슬라이딩 후 일어나는 시간(프레임)
             JUMP: -13,
             P_GRAV: 0.7,
             B_GRAV: 0.36,
             WIN_SCORE: 15
         };
         const PIKA_LEVELS = {
-            easy:   { speed: 3.0, jumpProb: 0.3, spikeProb: 0.2, error: 40 },
-            normal: { speed: 3.8, jumpProb: 0.6, spikeProb: 0.5, error: 22 },
-            hard:   { speed: 4.3, jumpProb: 0.9, spikeProb: 0.85, error: 8 }
+            easy:   { speed: 3.0, jumpProb: 0.3, spikeProb: 0.2, diveProb: 0.2, error: 40 },
+            normal: { speed: 3.8, jumpProb: 0.6, spikeProb: 0.5, diveProb: 0.5, error: 22 },
+            hard:   { speed: 4.3, jumpProb: 0.9, spikeProb: 0.85, diveProb: 0.8, error: 8 }
         };
 
         let pika = null;
@@ -8668,13 +8671,19 @@ ${text}
                 vx: 0, vy: 0,
                 spikeTimer: 0,
                 hitCooldown: 0,
+                dive: 0,          // 1이면 슬라이딩 중
+                diveDir: 0,
+                recover: 0,       // 슬라이딩 후 엎드려 있는 시간
                 ai: { targetX: null, willSpike: false }
             };
         }
 
         function resetPikaRound(server) {
-            pika.p1.x = 100; pika.p1.y = PIKA.GROUND; pika.p1.vx = 0; pika.p1.vy = 0; pika.p1.spikeTimer = 0;
-            pika.p2.x = PIKA.W - 100; pika.p2.y = PIKA.GROUND; pika.p2.vx = 0; pika.p2.vy = 0; pika.p2.spikeTimer = 0;
+            [pika.p1, pika.p2].forEach(p => {
+                p.x = p.side === 'left' ? 100 : PIKA.W - 100;
+                p.y = PIKA.GROUND; p.vx = 0; p.vy = 0;
+                p.spikeTimer = 0; p.dive = 0; p.recover = 0;
+            });
             pika.ball = {
                 x: server === 'left' ? 100 : PIKA.W - 100,
                 y: 90, vx: 0, vy: 0, angle: 0
@@ -8724,8 +8733,8 @@ ${text}
             const mode = document.getElementById('pikaMode').value;
             document.getElementById('pikaLevel').style.display = mode === 'cpu' ? '' : 'none';
             document.getElementById('pikaHelp').innerHTML = mode === 'cpu'
-                ? `🎮 <b>나(왼쪽)</b>: ← → 이동 · ↑ 점프 · <b>Space</b> 스파이크 (점프 중에 누르면 강스매시!)<br>${PIKA.WIN_SCORE}점 먼저 내면 승리`
-                : `🎮 <b>1P(왼쪽)</b>: A D 이동 · W 점프 · F 스파이크 &nbsp;|&nbsp; <b>2P(오른쪽)</b>: ← → 이동 · ↑ 점프 · Enter 스파이크<br>${PIKA.WIN_SCORE}점 먼저 내면 승리`;
+                ? `🎮 <b>나(왼쪽)</b>: ← → 이동 · ↑ 점프 · <b>Space</b> 스파이크(점프 중) / 슬라이딩(땅에서 ← 또는 →와 함께)<br>${PIKA.WIN_SCORE}점 먼저 내면 승리`
+                : `🎮 <b>1P(왼쪽)</b>: A D 이동 · W 점프 · F 스파이크/슬라이딩 &nbsp;|&nbsp; <b>2P(오른쪽)</b>: ← → 이동 · ↑ 점프 · Enter 스파이크/슬라이딩<br>슬라이딩 = 땅에서 방향키 + 스파이크 키 · ${PIKA.WIN_SCORE}점 먼저 내면 승리`;
         }
 
         function getPikaInput(player) {
@@ -8776,6 +8785,7 @@ ${text}
                 // 항상 공보다 뒤(오른쪽)에 서야 상대 코트로 넘어감 → 오차는 뒤쪽으로만
                 p.ai.offset = Math.random() * lv.error;
                 p.ai.decided = false;
+                p.ai.diveDecided = false;
             }
             p.ai.wasMySide = onMySide;
 
@@ -8806,24 +8816,68 @@ ${text}
                 Math.hypot(ball.x - p.x, ball.y - (p.y - PIKA.PR)) < 75) {
                 input.spike = true;
             }
+
+            // 걸어서는 못 닿지만 슬라이딩으로는 닿는 공이면 슬라이딩
+            if (onGround && onMySide && !p.ai.diveDecided && ball.vy > 0) {
+                const remain = (PIKA.GROUND - 30) - ball.y;
+                if (remain > 0) {
+                    const t = (-ball.vy + Math.sqrt(ball.vy * ball.vy + 2 * PIKA.B_GRAV * remain)) / PIKA.B_GRAV;
+                    const bx = ball.x + ball.vx * t;
+                    const need = Math.abs(bx - p.x) - (PIKA.PR + PIKA.BR) * 0.6;
+                    if (t < 25 && bx > PIKA.NET_X && need > lv.speed * t && need < PIKA.DIVE_VX * t) {
+                        p.ai.diveDecided = true;
+                        if (Math.random() < lv.diveProb) {
+                            input.left = bx < p.x;
+                            input.right = bx > p.x;
+                            input.jump = false;
+                            input.spike = true;
+                        }
+                    }
+                }
+            }
             return input;
         }
 
         function updatePikaPlayer(p) {
             const input = getPikaInput(p);
             const speed = (p.side === 'right' && pika.mode === 'cpu') ? (p.ai.speed || PIKA.MOVE) : PIKA.MOVE;
-            p.vx = 0;
-            if (input.left) p.vx -= speed;
-            if (input.right) p.vx += speed;
-
             const onGround = p.y >= PIKA.GROUND;
-            if (input.jump && onGround) p.vy = PIKA.JUMP;
-            if (input.spike && !onGround && p.spikeTimer === 0) p.spikeTimer = 12;
+
+            if (p.dive) {
+                // 슬라이딩 중에는 조작 불가
+            } else if (p.recover > 0) {
+                // 착지 후 잠깐 엎드려 있음
+                p.recover--;
+                p.vx = 0;
+            } else {
+                p.vx = 0;
+                if (input.left) p.vx -= speed;
+                if (input.right) p.vx += speed;
+
+                if (input.spike && onGround && (input.left || input.right) && !input.jump) {
+                    // 슬라이딩 (오리지널: 땅에서 방향키 + 스파이크 키)
+                    p.dive = 1;
+                    p.diveDir = input.left ? -1 : 1;
+                    p.vx = p.diveDir * PIKA.DIVE_VX;
+                    p.vy = PIKA.DIVE_VY;
+                } else {
+                    if (input.jump && onGround) p.vy = PIKA.JUMP;
+                    if (input.spike && !onGround && p.spikeTimer === 0) p.spikeTimer = 12;
+                }
+            }
 
             p.x += p.vx;
             p.vy += PIKA.P_GRAV;
             p.y += p.vy;
-            if (p.y >= PIKA.GROUND) { p.y = PIKA.GROUND; p.vy = 0; }
+            if (p.y >= PIKA.GROUND) {
+                p.y = PIKA.GROUND;
+                p.vy = 0;
+                if (p.dive) {
+                    p.dive = 0;
+                    p.vx = 0;
+                    p.recover = PIKA.DIVE_RECOVER;
+                }
+            }
 
             const half = PIKA.NET_W / 2;
             if (p.side === 'left') {
@@ -8837,7 +8891,8 @@ ${text}
 
         function collidePikaBall(p) {
             const ball = pika.ball;
-            const cx = p.x, cy = p.y - PIKA.PR;
+            const lying = p.dive || p.recover > 0;
+            const cx = p.x, cy = p.y - (lying ? 16 : PIKA.PR);
             const dx = ball.x - cx, dy = ball.y - cy;
             const dist = Math.hypot(dx, dy);
             const R = PIKA.PR + PIKA.BR;
@@ -8848,7 +8903,11 @@ ${text}
             const dir = p.side === 'left' ? 1 : -1;
             const airborne = p.y < PIKA.GROUND;
 
-            if (p.spikeTimer > 0 && airborne) {
+            if (lying) {
+                // 슬라이딩 리시브: 공을 높이 띄워 살려냄
+                ball.vx = dir * 2 + nx * 3;
+                ball.vy = -10;
+            } else if (p.spikeTimer > 0 && airborne) {
                 // 스파이크: 네트는 넘기되 최대한 날카롭게 내리꽂기
                 ball.vx = dir * 16;
                 const t = Math.max(1, Math.abs(PIKA.NET_X - ball.x) / 16);
@@ -8969,10 +9028,16 @@ ${text}
             if (pika.state !== 'over') pikaRaf = requestAnimationFrame(pikaLoop);
         }
 
-        function drawPikachu(ctx, x, y, facing, spiking) {
+        function drawPikachu(ctx, x, y, facing, spiking, lean = 0) {
             ctx.save();
             ctx.translate(x, y);
             ctx.scale(facing, 1);
+            if (lean) {
+                // 슬라이딩: 몸을 앞(또는 뒤)으로 눕힘
+                ctx.translate(0, -20);
+                ctx.rotate(lean * Math.PI * 0.42);
+                ctx.translate(0, 8);
+            }
 
             // 꼬리
             ctx.fillStyle = '#c98a00';
@@ -9126,8 +9191,9 @@ ${text}
                 ctx.fill();
             });
 
-            drawPikachu(ctx, pika.p1.x, pika.p1.y, 1, pika.p1.spikeTimer > 0);
-            drawPikachu(ctx, pika.p2.x, pika.p2.y, -1, pika.p2.spikeTimer > 0);
+            const leanOf = (p, facing) => (p.dive || p.recover > 0) ? (p.diveDir * facing > 0 ? 1 : -1) : 0;
+            drawPikachu(ctx, pika.p1.x, pika.p1.y, 1, pika.p1.spikeTimer > 0, leanOf(pika.p1, 1));
+            drawPikachu(ctx, pika.p2.x, pika.p2.y, -1, pika.p2.spikeTimer > 0, leanOf(pika.p2, -1));
             drawPokeball(ctx, pika.ball);
 
             // 점수
