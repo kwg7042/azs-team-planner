@@ -915,6 +915,18 @@
     return { proxy: (proxy || '').trim(), key };
   }
 
+  const EXAONE_TIMEOUT_MS = 15 * 60 * 1000;
+
+  // 오래 걸리는 요청 동안 경과 시간을 로그에 표시
+  function startTicker(id, msg) {
+    const t0 = Date.now();
+    let base = msg;
+    const draw = () => setLog(id, `${base} (경과 ${Math.round((Date.now() - t0) / 1000)}초)`);
+    draw();
+    const iv = setInterval(draw, 1000);
+    return { set(m) { base = m; draw(); }, stop() { clearInterval(iv); } };
+  }
+
   async function exaoneChat(messages, opt) {
     const { proxy, key } = exaoneTarget();
     if (!proxy && !key) {
@@ -925,8 +937,8 @@
     const headers = { 'Content-Type': 'application/json' };
     if (!proxy && key) headers.Authorization = `Bearer ${key}`;
     const ctrl = new AbortController();
-    // 로컬 프록시(180초)보다 조금 길게 기다려 프록시의 시간 초과 메시지를 받도록 함
-    const tm = setTimeout(() => ctrl.abort(), (opt && opt.timeoutMs) || 200000);
+    // 도면이 많거나 '깊게 생각하기'면 수 분 걸리므로 최대 15분까지 기다림 (로컬 프록시도 15분)
+    const tm = setTimeout(() => ctrl.abort(), (opt && opt.timeoutMs) || EXAONE_TIMEOUT_MS);
     try {
       const res = await fetch(url, {
         method: 'POST', headers, signal: ctrl.signal,
@@ -939,13 +951,13 @@
       if (!res.ok) {
         const t = await res.text().catch(() => '');
         const slow = /timed?\s*out|timeout/i.test(t) || res.status === 504;
-        throw new Error(`EXAONE 오류 ${res.status}${t ? ': ' + t.slice(0, 240) : ''}${slow ? '\n→ 프록시가 응답을 기다리다 끊었습니다. 도면 수를 줄이거나 \'깊게 생각하기\'를 끄고 다시 시도하세요. 로컬 프록시는 180초 제한입니다.' : ''}`);
+        throw new Error(`EXAONE 오류 ${res.status}${t ? ': ' + t.slice(0, 240) : ''}${slow ? '\n→ 프록시가 응답을 기다리다 끊었습니다. 로컬 프록시를 최신 버전(대기 15분)으로 다시 실행했는지 확인하고, 그래도 끊기면 도면 수를 줄이거나 \'깊게 생각하기\'를 끄고 다시 시도하세요.' : ''}`);
       }
       const data = await res.json();
       const msg = data && data.choices && data.choices[0] && data.choices[0].message;
       return String((msg && msg.content) || '');
     } catch (e) {
-      if (e.name === 'AbortError') throw new Error('EXAONE 응답 시간 초과 (도면 수를 줄이거나 다시 시도하세요)');
+      if (e.name === 'AbortError') throw new Error(`EXAONE 응답 시간 초과 (${Math.round(((opt && opt.timeoutMs) || EXAONE_TIMEOUT_MS) / 60000)}분). 도면 수를 줄이거나 다시 시도하세요.`);
       if (e instanceof TypeError) throw new Error(`EXAONE에 연결하지 못했습니다 (${proxy ? '프록시 ' + proxy : '직접 호출'}). 프록시가 켜져 있는지, 주소가 맞는지 확인하세요.`);
       throw e;
     } finally { clearTimeout(tm); }
@@ -1263,9 +1275,12 @@
         content.push({ type: 'image_url', image_url: { url: await pageImage(state.pdf.doc, p.no) } });
       }
       content.push({ type: 'text', text: '위 자료를 바탕으로 동작 사양 JSON 하나만 출력하라.' });
-      setLog('pmLog', 'EXAONE이 도면과 본문을 해석하는 중… (최대 몇 분 걸릴 수 있습니다)');
       const t0 = Date.now();
-      const raw = await chatJson([{ role: 'system', content: SYSTEM_PROMPT }, { role: 'user', content }], { thinking: $('pmThink').checked, maxTokens: $('pmThink').checked ? 8000 : 4000 }, (m) => setLog('pmLog', m));
+      const ticker = startTicker('pmLog', 'EXAONE이 도면과 본문을 해석하는 중… (최대 15분까지 기다립니다)');
+      let raw;
+      try {
+        raw = await chatJson([{ role: 'system', content: SYSTEM_PROMPT }, { role: 'user', content }], { thinking: $('pmThink').checked, maxTokens: $('pmThink').checked ? 8000 : 4000 }, (m) => ticker.set(m));
+      } finally { ticker.stop(); }
       applySpec(raw);
       setLog('pmLog', `해석 완료 (${Math.round((Date.now() - t0) / 1000)}초). 아래 동작과 '근거/추정'을 확인하고, 다르면 4번에서 수정 요청하세요.`);
     } catch (e) {
@@ -1283,17 +1298,19 @@
     if (!state.spec) { setLog('pmFixLog', '먼저 PDF를 분석하거나 샘플을 불러오세요.', true); return; }
     if (state.busy) return;
     state.busy = true; $('pmFixBtn').disabled = true;
-    setLog('pmFixLog', 'EXAONE이 사양을 수정하는 중…');
+    const ticker = startTicker('pmFixLog', 'EXAONE이 사양을 수정하는 중…');
     try {
       const raw = await chatJson([
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: `[현재 사양]\n${JSON.stringify(state.spec)}\n\n[수정 요청]\n${req}\n\n요청을 반영한 전체 사양 JSON 하나만 출력하라. 요청과 관계없는 부분은 그대로 둔다. 바뀐 내용은 assumptions 맨 앞에 "사용자 요청: ..." 형태로 남긴다.` },
-      ], { thinking: false, maxTokens: 4000 }, (m) => setLog('pmFixLog', m));
+      ], { thinking: false, maxTokens: 4000 }, (m) => ticker.set(m));
+      ticker.stop();
       applySpec(raw, { keepTime: true });
       setLog('pmFixLog', '수정을 반영했습니다.');
     } catch (e) {
+      ticker.stop();
       setLog('pmFixLog', e.message, true);
-    } finally { state.busy = false; $('pmFixBtn').disabled = false; }
+    } finally { ticker.stop(); state.busy = false; $('pmFixBtn').disabled = false; }
   }
 
   function bind() {
