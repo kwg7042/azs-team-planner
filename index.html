@@ -3693,6 +3693,15 @@
         .cell .forbid-mark { position: relative; z-index: 2; color: #e53935; font-size: 15px; font-weight: 900; pointer-events: none; text-shadow: 0 0 2px #fff; }
         .cell.forbidden { cursor: not-allowed; }
         .omok-rule-hint { margin-left: 10px; font-size: 12px; color: rgba(255,255,255,0.6); }
+
+        /* 체스 승격 선택 창 */
+        .chess-promo-overlay { position: fixed; inset: 0; z-index: 20000; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; }
+        .chess-promo-box { background: #23233a; border: 2px solid #667eea; border-radius: 14px; padding: 18px 20px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .chess-promo-title { font-weight: bold; margin-bottom: 12px; }
+        .chess-promo-btns { display: flex; gap: 10px; justify-content: center; }
+        .chess-promo-btns button { width: 70px; height: 80px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); background: #f0d9b5; font-size: 38px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .chess-promo-btns button small { font-size: 11px; color: #333; text-shadow: none; }
+        .chess-promo-btns button:hover { border-color: #667eea; transform: scale(1.06); }
     </style>
 </head>
 <body>
@@ -4635,7 +4644,7 @@
                         </select>
                         <button class="btn btn-primary" onclick="startChessAi()"><i class="fas fa-redo"></i> 새 게임</button>
                     </div>
-                    <div class="omokai-info" id="chessAiInfo">AI와 1:1 체스 · 2인 체스와 같은 규칙(캐슬링·앙파상 없음, 폰은 퀸 승격) · 진행 중 새 게임은 1패</div>
+                    <div class="omokai-info" id="chessAiInfo">AI와 1:1 체스 · 정식 규칙(캐슬링·앙파상·승격 선택·3회 반복·50수 무승부) · 진행 중 새 게임은 1패</div>
                     <div class="game-container-mini">
                         <div class="game-board-wrapper-mini">
                             <div id="chessAiBoard"></div>
@@ -8181,6 +8190,351 @@ ${text}
             black: { king: '♚\uFE0E', queen: '♛\uFE0E', rook: '♜\uFE0E', bishop: '♝\uFE0E', knight: '♞\uFE0E', pawn: '♟\uFE0E' }
         };
 
+        // =====================================================
+        // ♟️ 체스 규칙 엔진 (2인 체스 · AI 체스 공용, 국제 체스 정식 규칙)
+        //  - 캐슬링(킹·룩 미이동, 사이 빈칸, 체크 중/지나는 칸/도착 칸 공격받으면 불가)
+        //  - 앙파상(상대 폰이 2칸 전진한 바로 다음 수에만), 승격(퀸·룩·비숍·나이트 선택)
+        //  - 무승부: 스테일메이트, 기물 부족, 같은 국면 3회 반복, 50수 규칙
+        //  white = 🔴 빨강(먼저 둠, 아래쪽 7행에서 출발), black = 🔵 파랑
+        // =====================================================
+        const CHESS_AI_LEVELS = {
+            easy:   { label: '🐣 쉬움', depth: 1, noise: 80, timeMs: 300, blunder: 0.25 }, // 25%는 아무 수나 (초보용)
+            normal: { label: '🙂 보통', depth: 2, noise: 15, timeMs: 800 },
+            hard:   { label: '🧠 알파고급', depth: 4, noise: 0, timeMs: 1800 }
+        };
+        const CAI_VAL = { pawn: 100, knight: 320, bishop: 330, rook: 500, queen: 900, king: 0 };
+        const CAI_MATE = 1000000;
+        // 위치 점수 (빨강 기준, 0행 = 상대 진영 끝줄)
+        const CAI_PST = {
+            pawn: [[0,0,0,0,0,0,0,0],[50,50,50,50,50,50,50,50],[10,10,20,30,30,20,10,10],[5,5,10,25,25,10,5,5],[0,0,0,20,20,0,0,0],[5,-5,-10,0,0,-10,-5,5],[5,10,10,-20,-20,10,10,5],[0,0,0,0,0,0,0,0]],
+            knight: [[-50,-40,-30,-30,-30,-30,-40,-50],[-40,-20,0,0,0,0,-20,-40],[-30,0,10,15,15,10,0,-30],[-30,5,15,20,20,15,5,-30],[-30,0,15,20,20,15,0,-30],[-30,5,10,15,15,10,5,-30],[-40,-20,0,5,5,0,-20,-40],[-50,-40,-30,-30,-30,-30,-40,-50]],
+            bishop: [[-20,-10,-10,-10,-10,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,10,10,5,0,-10],[-10,5,5,10,10,5,5,-10],[-10,0,10,10,10,10,0,-10],[-10,10,10,10,10,10,10,-10],[-10,5,0,0,0,0,5,-10],[-20,-10,-10,-10,-10,-10,-10,-20]],
+            rook: [[0,0,0,0,0,0,0,0],[5,10,10,10,10,10,10,5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[0,0,0,5,5,0,0,0]],
+            queen: [[-20,-10,-10,-5,-5,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,5,5,5,0,-10],[-5,0,5,5,5,5,0,-5],[0,0,5,5,5,5,0,-5],[-10,5,5,5,5,5,0,-10],[-10,0,5,0,0,0,0,-10],[-20,-10,-10,-5,-5,-10,-10,-20]],
+            king: [[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-20,-30,-30,-40,-40,-30,-30,-20],[-10,-20,-20,-20,-20,-20,-20,-10],[20,20,0,0,0,0,20,20],[20,30,10,0,0,10,30,20]]
+        };
+        const CAI_KNIGHT = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+        const CAI_KING = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+        const CAI_ROOK_D = [[0,1],[0,-1],[1,0],[-1,0]];
+        const CAI_BISHOP_D = [[1,1],[1,-1],[-1,1],[-1,-1]];
+        const CAI_PROMOS = ['queen', 'knight', 'rook', 'bishop'];
+        const caiOpp = (c) => c === 'white' ? 'black' : 'white';
+        const caiIn = (r, c) => r >= 0 && r < 8 && c >= 0 && c < 8;
+
+        function caiInitialBoard() {
+            const back = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook'];
+            const b = Array(8).fill(null).map(() => Array(8).fill(null));
+            for (let c = 0; c < 8; c++) {
+                b[0][c] = { type: back[c], color: 'black' }; b[1][c] = { type: 'pawn', color: 'black' };
+                b[6][c] = { type: 'pawn', color: 'white' }; b[7][c] = { type: back[c], color: 'white' };
+            }
+            return b;
+        }
+
+        // 게임 상태: 캐슬링 권리, 앙파상 칸, 50수 규칙용 카운터(반수)
+        function caiNewState() {
+            return { castle: { wK: true, wQ: true, bK: true, bQ: true }, ep: null, half: 0 };
+        }
+        function caiCopyState(st) {
+            return { castle: Object.assign({}, st.castle), ep: st.ep ? st.ep.slice() : null, half: st.half || 0 };
+        }
+
+        // (r, c) 칸이 byColor에게 공격받는지
+        function caiAttacked(b, r, c, byColor) {
+            const pr = byColor === 'white' ? r + 1 : r - 1; // 공격하는 폰이 있는 행
+            for (const dc of [-1, 1]) {
+                if (caiIn(pr, c + dc)) { const p = b[pr][c + dc]; if (p && p.color === byColor && p.type === 'pawn') return true; }
+            }
+            for (const [dr, dc] of CAI_KNIGHT) {
+                const nr = r + dr, nc = c + dc;
+                if (caiIn(nr, nc)) { const p = b[nr][nc]; if (p && p.color === byColor && p.type === 'knight') return true; }
+            }
+            for (const [dr, dc] of CAI_KING) {
+                const nr = r + dr, nc = c + dc;
+                if (caiIn(nr, nc)) { const p = b[nr][nc]; if (p && p.color === byColor && p.type === 'king') return true; }
+            }
+            for (const [dirs, types] of [[CAI_ROOK_D, ['rook', 'queen']], [CAI_BISHOP_D, ['bishop', 'queen']]]) {
+                for (const [dr, dc] of dirs) {
+                    let nr = r + dr, nc = c + dc;
+                    while (caiIn(nr, nc)) {
+                        const p = b[nr][nc];
+                        if (p) { if (p.color === byColor && types.includes(p.type)) return true; break; }
+                        nr += dr; nc += dc;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function caiFindKing(b, color) {
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) { const p = b[r][c]; if (p && p.type === 'king' && p.color === color) return [r, c]; }
+            return null;
+        }
+        function caiInCheck(b, color) {
+            const k = caiFindKing(b, color);
+            return k ? caiAttacked(b, k[0], k[1], caiOpp(color)) : false;
+        }
+
+        // 의사 합법수 (자기 킹이 체크되는지는 caiLegalMoves에서 거름)
+        function caiPseudoMoves(b, color, st, capturesOnly) {
+            st = st || caiNewState();
+            const moves = [];
+            const enemy = caiOpp(color);
+            const push = (fr, fc, tr, tc, extra) => {
+                const p = b[fr][fc];
+                const cap = extra && extra.ep ? b[fr][tc] : b[tr][tc];
+                if (cap && cap.color === color) return;
+                if (capturesOnly && !cap && !(extra && extra.promo)) return;
+                const base = (cap ? 10 * CAI_VAL[cap.type] - CAI_VAL[p.type] + 10000 : 0);
+                if (p.type === 'pawn' && (tr === 0 || tr === 7)) {
+                    // 승격: 네 가지 모두 가능 (퀸을 먼저 탐색)
+                    CAI_PROMOS.forEach((t, i) => moves.push({ fr, fc, tr, tc, cap: cap || null, promo: t, ep: false, castle: null, score: base + 8000 - i * 1000 }));
+                    return;
+                }
+                moves.push(Object.assign({ fr, fc, tr, tc, cap: cap || null, promo: null, ep: false, castle: null, score: base }, extra || {}));
+            };
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+                const p = b[r][c];
+                if (!p || p.color !== color) continue;
+                if (p.type === 'pawn') {
+                    const dir = color === 'white' ? -1 : 1, start = color === 'white' ? 6 : 1;
+                    if (caiIn(r + dir, c) && !b[r + dir][c]) {
+                        push(r, c, r + dir, c, (r + dir === 0 || r + dir === 7) ? { promo: true } : null);
+                        if (!capturesOnly && r === start && !b[r + 2 * dir][c]) push(r, c, r + 2 * dir, c);
+                    }
+                    for (const dc of [-1, 1]) {
+                        const tr = r + dir, tc = c + dc;
+                        if (!caiIn(tr, tc)) continue;
+                        if (b[tr][tc] && b[tr][tc].color === enemy) push(r, c, tr, tc);
+                        // 앙파상: 직전에 상대 폰이 2칸 전진해 지나간 칸으로 대각선 이동
+                        else if (st.ep && st.ep[0] === tr && st.ep[1] === tc && b[r][tc] && b[r][tc].type === 'pawn' && b[r][tc].color === enemy) {
+                            push(r, c, tr, tc, { ep: true, score: 10 * CAI_VAL.pawn - CAI_VAL.pawn + 10000 });
+                        }
+                    }
+                } else if (p.type === 'knight') {
+                    for (const [dr, dc] of CAI_KNIGHT) if (caiIn(r + dr, c + dc)) push(r, c, r + dr, c + dc);
+                } else if (p.type === 'king') {
+                    for (const [dr, dc] of CAI_KING) if (caiIn(r + dr, c + dc)) push(r, c, r + dr, c + dc);
+                    // 캐슬링
+                    const home = color === 'white' ? 7 : 0;
+                    if (!capturesOnly && r === home && c === 4 && !caiAttacked(b, home, 4, enemy)) {
+                        const rookAt = (cc) => { const q = b[home][cc]; return q && q.type === 'rook' && q.color === color; };
+                        const kRight = color === 'white' ? st.castle.wK : st.castle.bK;
+                        const qRight = color === 'white' ? st.castle.wQ : st.castle.bQ;
+                        if (kRight && rookAt(7) && !b[home][5] && !b[home][6] &&
+                            !caiAttacked(b, home, 5, enemy) && !caiAttacked(b, home, 6, enemy)) {
+                            moves.push({ fr: r, fc: 4, tr: home, tc: 6, cap: null, promo: null, ep: false, castle: 'K', score: 500 });
+                        }
+                        if (qRight && rookAt(0) && !b[home][1] && !b[home][2] && !b[home][3] &&
+                            !caiAttacked(b, home, 3, enemy) && !caiAttacked(b, home, 2, enemy)) {
+                            moves.push({ fr: r, fc: 4, tr: home, tc: 2, cap: null, promo: null, ep: false, castle: 'Q', score: 400 });
+                        }
+                    }
+                } else {
+                    const dirs = p.type === 'rook' ? CAI_ROOK_D : p.type === 'bishop' ? CAI_BISHOP_D : CAI_ROOK_D.concat(CAI_BISHOP_D);
+                    for (const [dr, dc] of dirs) {
+                        let nr = r + dr, nc = c + dc;
+                        while (caiIn(nr, nc)) {
+                            if (b[nr][nc]) { if (b[nr][nc].color !== color) push(r, c, nr, nc); break; }
+                            push(r, c, nr, nc);
+                            nr += dr; nc += dc;
+                        }
+                    }
+                }
+            }
+            return moves;
+        }
+
+        // 수 두기 (되돌리기 정보 반환)
+        function caiMake(b, m, st) {
+            st = st || caiNewState();
+            const undo = { castle: Object.assign({}, st.castle), ep: st.ep, half: st.half };
+            const p = b[m.fr][m.fc];
+            m.piece = p;
+            b[m.tr][m.tc] = m.promo ? { type: m.promo, color: p.color } : p;
+            b[m.fr][m.fc] = null;
+            if (m.ep) b[m.fr][m.tc] = null;                      // 앙파상으로 잡힌 폰 제거
+            if (m.castle === 'K') { b[m.fr][5] = b[m.fr][7]; b[m.fr][7] = null; }
+            if (m.castle === 'Q') { b[m.fr][3] = b[m.fr][0]; b[m.fr][0] = null; }
+            // 캐슬링 권리: 킹이 움직이거나, 룩이 처음 자리에서 움직이거나 잡히면 사라짐
+            if (p.type === 'king') { if (p.color === 'white') st.castle.wK = st.castle.wQ = false; else st.castle.bK = st.castle.bQ = false; }
+            const corner = (r, c) => {
+                if (r === 7 && c === 7) st.castle.wK = false;
+                if (r === 7 && c === 0) st.castle.wQ = false;
+                if (r === 0 && c === 7) st.castle.bK = false;
+                if (r === 0 && c === 0) st.castle.bQ = false;
+            };
+            corner(m.fr, m.fc); corner(m.tr, m.tc);
+            st.ep = (p.type === 'pawn' && Math.abs(m.tr - m.fr) === 2) ? [(m.fr + m.tr) / 2, m.fc] : null;
+            st.half = (p.type === 'pawn' || m.cap) ? 0 : st.half + 1;
+            return undo;
+        }
+        function caiUnmake(b, m, st, undo) {
+            b[m.fr][m.fc] = m.piece;
+            if (m.ep) { b[m.tr][m.tc] = null; b[m.fr][m.tc] = m.cap; }
+            else b[m.tr][m.tc] = m.cap || null;
+            if (m.castle === 'K') { b[m.fr][7] = b[m.fr][5]; b[m.fr][5] = null; }
+            if (m.castle === 'Q') { b[m.fr][0] = b[m.fr][3]; b[m.fr][3] = null; }
+            if (st && undo) { st.castle = undo.castle; st.ep = undo.ep; st.half = undo.half; }
+        }
+
+        function caiLegalMoves(b, color, st, capturesOnly) {
+            st = st || caiNewState();
+            return caiPseudoMoves(b, color, st, capturesOnly).filter(m => {
+                const u = caiMake(b, m, st);
+                const ok = !caiInCheck(b, color);
+                caiUnmake(b, m, st, u);
+                return ok;
+            });
+        }
+
+        // 기물 부족 무승부: 킹만 / 킹+비숍 / 킹+나이트 / 비숍들이 모두 같은 색 칸
+        function caiInsufficient(b) {
+            const others = [];
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) { const p = b[r][c]; if (p && p.type !== 'king') others.push({ p, sq: (r + c) % 2 }); }
+            if (!others.length) return true;
+            if (others.length === 1 && (others[0].p.type === 'bishop' || others[0].p.type === 'knight')) return true;
+            if (others.every(o => o.p.type === 'bishop')) return others.every(o => o.sq === others[0].sq);
+            return false;
+        }
+
+        // 3회 반복 판정용 국면 키 (말 배치 + 둘 차례 + 캐슬링 권리 + 실제로 가능한 앙파상)
+        function caiPositionKey(b, toMove, st) {
+            let s = '';
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) { const p = b[r][c]; s += p ? (p.color === 'white' ? p.type[0].toUpperCase() : p.type[0]) + (p.type === 'knight' ? 'n' : '') : '.'; }
+            const cr = (st.castle.wK ? 'K' : '') + (st.castle.wQ ? 'Q' : '') + (st.castle.bK ? 'k' : '') + (st.castle.bQ ? 'q' : '');
+            const ep = st.ep && caiLegalMoves(b, toMove, st, true).some(m => m.ep) ? st.ep.join('') : '-';
+            return `${s} ${toMove} ${cr || '-'} ${ep}`;
+        }
+
+        // 수를 둔 뒤 다음 차례 기준으로 게임이 끝났는지
+        //  → { over, result: 'white'|'black'|'draw'|null, reason }
+        function caiGameStatus(b, toMove, st, posCounts) {
+            const moves = caiLegalMoves(b, toMove, st, false);
+            if (!moves.length) {
+                return caiInCheck(b, toMove)
+                    ? { over: true, result: caiOpp(toMove), reason: '체크메이트' }
+                    : { over: true, result: 'draw', reason: '스테일메이트' };
+            }
+            if (caiInsufficient(b)) return { over: true, result: 'draw', reason: '기물 부족' };
+            if (st.half >= 100) return { over: true, result: 'draw', reason: '50수 규칙 (50수 동안 폰 이동·잡기 없음)' };
+            if (posCounts && Object.values(posCounts).some(n => n >= 3)) return { over: true, result: 'draw', reason: '같은 국면 3회 반복' };
+            return { over: false, result: null, reason: '' };
+        }
+
+        // 기보 표기용
+        function caiMoveText(m) {
+            const sq = (r, c) => 'abcdefgh'[c] + (8 - r);
+            const side = m.piece.color === 'white' ? '빨강' : '파랑';
+            if (m.castle) return `${side}: 캐슬링 (${m.castle === 'K' ? '킹 쪽 O-O' : '퀸 쪽 O-O-O'})`;
+            return `${side}: ${getChessPieceName(m.piece.type)} ${sq(m.fr, m.fc)} → ${sq(m.tr, m.tc)}`
+                + (m.cap ? ` ×${getChessPieceName(m.cap.type)}` : '')
+                + (m.ep ? ' (앙파상)' : '')
+                + (m.promo ? ` (${getChessPieceName(m.promo)} 승격)` : '');
+        }
+
+        // 빨강(white) 기준 점수 → 둘 차례 기준으로 뒤집어 반환
+        function caiEval(b, toMove) {
+            let s = 0;
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+                const p = b[r][c];
+                if (!p) continue;
+                const v = CAI_VAL[p.type] + CAI_PST[p.type][p.color === 'white' ? r : 7 - r][c];
+                s += p.color === 'white' ? v : -v;
+            }
+            return toMove === 'white' ? s : -s;
+        }
+
+        function caiQuiesce(b, color, st, alpha, beta, depth, ctx) {
+            ctx.nodes++;
+            const stand = caiEval(b, color);
+            if (stand >= beta) return beta;
+            if (stand > alpha) alpha = stand;
+            if (depth <= 0) return alpha;
+            const moves = caiLegalMoves(b, color, st, true).sort((x, y) => y.score - x.score);
+            for (const m of moves) {
+                if (m.promo && m.promo !== 'queen') continue; // 교환 탐색에서는 퀸 승격만
+                const u = caiMake(b, m, st);
+                const v = -caiQuiesce(b, caiOpp(color), st, -beta, -alpha, depth - 1, ctx);
+                caiUnmake(b, m, st, u);
+                if (v >= beta) return beta;
+                if (v > alpha) alpha = v;
+            }
+            return alpha;
+        }
+
+        function caiSearch(b, color, st, depth, alpha, beta, ply, ctx) {
+            if (ctx.timeUp || performance.now() > ctx.deadline) { ctx.timeUp = true; return 0; }
+            ctx.nodes++;
+            const moves = caiLegalMoves(b, color, st, false);
+            if (!moves.length) return caiInCheck(b, color) ? -CAI_MATE + ply : 0; // 체크메이트 / 스테일메이트
+            if (st.half >= 100) return 0;
+            if (depth <= 0) return caiQuiesce(b, color, st, alpha, beta, 4, ctx);
+            moves.sort((x, y) => y.score - x.score);
+            for (const m of moves) {
+                if (m.promo === 'rook' || m.promo === 'bishop') continue; // 룩·비숍 승격은 퀸보다 나을 일이 거의 없어 생략
+                const u = caiMake(b, m, st);
+                const v = -caiSearch(b, caiOpp(color), st, depth - 1, -beta, -alpha, ply + 1, ctx);
+                caiUnmake(b, m, st, u);
+                if (ctx.timeUp) return 0;
+                if (v >= beta) return beta;
+                if (v > alpha) alpha = v;
+            }
+            return alpha;
+        }
+
+        // 반복 심화 + 시간 제한으로 최선의 수 고르기
+        function caiChooseMove(board, color, levelKey, state) {
+            const lv = CHESS_AI_LEVELS[levelKey] || CHESS_AI_LEVELS.normal;
+            const b = board.map(row => row.slice());
+            const st = caiCopyState(state || caiNewState());
+            const root = caiLegalMoves(b, color, st, false).filter(m => !m.promo || m.promo === 'queen' || m.promo === 'knight');
+            if (!root.length) return null;
+            const ctx = { nodes: 0, timeUp: false, deadline: performance.now() + lv.timeMs };
+            let best = root[0], order = root.slice().sort((x, y) => y.score - x.score);
+            for (let d = 1; d <= lv.depth; d++) {
+                let alpha = -Infinity, iterBest = null;
+                const scored = [];
+                for (const m of order) {
+                    const u = caiMake(b, m, st);
+                    // 흔들림(noise)을 줄 때는 모든 수를 정확한 점수로 계산해야 함 (가지치기 경계값에 noise가 붙으면 메이트를 놓침)
+                    const window = lv.noise ? -Infinity : alpha;
+                    let v = -caiSearch(b, caiOpp(color), st, d - 1, -Infinity, -window, 1, ctx);
+                    caiUnmake(b, m, st, u);
+                    if (ctx.timeUp) break;
+                    // 쉬움/보통은 일부러 흔들림, 단 메이트 점수는 그대로
+                    if (lv.noise && Math.abs(v) < CAI_MATE - 1000) v += (Math.random() - 0.5) * 2 * lv.noise;
+                    scored.push([m, v]);
+                    if (v > alpha) { alpha = v; iterBest = m; }
+                }
+                if (ctx.timeUp && !iterBest) break;
+                if (iterBest) best = iterBest;
+                // 다음 깊이에서는 좋은 수부터 탐색
+                order = scored.sort((x, y) => y[1] - x[1]).map(x => x[0]).concat(order.filter(m => !scored.some(s => s[0] === m)));
+                if (ctx.timeUp) break;
+            }
+            // 쉬움: 메이트 기회가 아니면 가끔 아무 수나 둠
+            if (lv.blunder && Math.random() < lv.blunder) {
+                const u = caiMake(b, best, st);
+                const mates = !caiLegalMoves(b, caiOpp(color), st, false).length && caiInCheck(b, caiOpp(color));
+                caiUnmake(b, best, st, u);
+                if (!mates) return root[Math.floor(Math.random() * root.length)];
+            }
+            return best;
+        }
+
+        // 승격 기물 고르기 창 (사람이 둘 때)
+        function chessPickPromotion(color) {
+            return new Promise(resolve => {
+                const ov = document.createElement('div');
+                ov.className = 'chess-promo-overlay';
+                ov.innerHTML = `<div class="chess-promo-box"><div class="chess-promo-title">폰 승격: 바꿀 기물을 고르세요</div>
+                    <div class="chess-promo-btns">${CAI_PROMOS.map(t => `<button data-t="${t}" class="${color === 'white' ? 'chess-piece-red' : 'chess-piece-blue'}">${CHESS_PIECES[color][t]}<small>${getChessPieceName(t)}</small></button>`).join('')}</div></div>`;
+                ov.querySelectorAll('button').forEach(btn => btn.onclick = () => { ov.remove(); resolve(btn.dataset.t); });
+                document.body.appendChild(ov);
+            });
+        }
+
         let chessBoard = [];
         let chessCurrentPlayer = 'white';
         let chessSelectedCell = null;
@@ -8190,6 +8544,9 @@ ${text}
         let chessCapturedPieces = { white: [], black: [] };
         let chessMoveHistory = [];
         let chessIsInCheck = false;
+        let chessState = caiNewState();   // 캐슬링 권리 · 앙파상 칸 · 50수 카운터
+        let chessPositions = {};          // 3회 반복 판정용 국면 횟수
+        let chessResultInfo = null;       // { result: 'white'|'black'|'draw', reason }
 
         function initChessBoard() {
             chessBoard = [
@@ -8220,9 +8577,21 @@ ${text}
             chessCapturedPieces = { white: [], black: [] };
             chessMoveHistory = [];
             chessIsInCheck = false;
+            chessState = caiNewState();
+            chessPositions = { [caiPositionKey(chessBoard, 'white', chessState)]: 1 };
+            chessResultInfo = null;
             
             renderChessBoard();
             updateChessDisplay();
+        }
+
+        // 승부/무승부 배너
+        function chessResultBannerHtml() {
+            if (!chessGameOver) return '';
+            const info = chessResultInfo;
+            if (info && info.result === 'draw') return `<div class="winner-banner">🤝 무승부 — ${escapeHtml(info.reason)}</div>`;
+            const winner = info && info.result ? info.result : caiOpp(chessCurrentPlayer);
+            return `<div class="winner-banner">🎉 체크메이트! ${winner === 'white' ? '🔴 빨강' : '🔵 파랑'} 승리! 🎉</div>`;
         }
 
         function renderChessBoard() {
@@ -8274,9 +8643,20 @@ ${text}
             const piece = chessBoard[row] && chessBoard[row][col];
             
             if (chessSelectedCell && chessValidMoves.some(m => m.row === row && m.col === col)) {
-                moveChessPiece(chessSelectedCell.row, chessSelectedCell.col, row, col);
+                const from = chessSelectedCell;
+                const opt = chessValidMoves.find(m => m.row === row && m.col === col);
                 chessSelectedCell = null;
                 chessValidMoves = [];
+                if (opt.move && opt.move.promo) {
+                    // 승격: 퀸·룩·비숍·나이트 중 선택
+                    chessPickPromotion(chessCurrentPlayer).then(t => {
+                        moveChessPiece(from.row, from.col, row, col, t);
+                        renderChessBoard();
+                        if (typeof renderChessBoardMini === 'function') renderChessBoardMini();
+                    });
+                } else {
+                    moveChessPiece(from.row, from.col, row, col);
+                }
                 renderChessBoard();
                 return;
             }
@@ -8293,53 +8673,51 @@ ${text}
             renderChessBoard();
         }
 
-        function moveChessPiece(fromRow, fromCol, toRow, toCol) {
-            const piece = chessBoard[fromRow][fromCol];
-            const targetPiece = chessBoard[toRow][toCol];
+        // 정식 규칙 엔진(cai*)으로 수를 두고 승부·무승부 판정 후 동기화
+        function moveChessPiece(fromRow, fromCol, toRow, toCol, promoType) {
+            const piece = chessBoard[fromRow] && chessBoard[fromRow][fromCol];
+            if (!piece) return;
+            const legal = caiLegalMoves(chessBoard, piece.color, chessState, false)
+                .filter(m => m.fr === fromRow && m.fc === fromCol && m.tr === toRow && m.tc === toCol);
+            if (!legal.length) return; // 규칙상 둘 수 없는 수
+            const m = legal.find(x => !x.promo || x.promo === (promoType || 'queen')) || legal[0];
+            if (m.cap) chessCapturedPieces[m.cap.color].push(m.cap);
+            caiMake(chessBoard, m, chessState);
+            addChessLog(caiMoveText(m));
             
-            if (targetPiece) {
-                chessCapturedPieces[targetPiece.color].push(targetPiece);
-            }
+            chessCurrentPlayer = caiOpp(piece.color);
+            chessIsInCheck = caiInCheck(chessBoard, chessCurrentPlayer);
+            const key = caiPositionKey(chessBoard, chessCurrentPlayer, chessState);
+            chessPositions[key] = (chessPositions[key] || 0) + 1;
             
-            chessBoard[toRow][toCol] = piece;
-            chessBoard[fromRow][fromCol] = null;
-            
-            // 폰 프로모션
-            if (piece.type === 'pawn') {
-                if ((piece.color === 'white' && toRow === 0) || (piece.color === 'black' && toRow === 7)) {
-                    chessBoard[toRow][toCol] = { type: 'queen', color: piece.color };
-                    addChessLog(`${piece.color === 'white' ? '빨강' : '파랑'} 폰 → 퀸 승격!`);
-                }
-            }
-            
-            const colNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-            const pieceName = getChessPieceName(piece.type);
-            addChessLog(`${piece.color === 'white' ? '빨강' : '파랑'}: ${pieceName} ${colNames[fromCol]}${8-fromRow} → ${colNames[toCol]}${8-toRow}`);
-            
-            chessCurrentPlayer = chessCurrentPlayer === 'white' ? 'black' : 'white';
-            chessIsInCheck = isChessKingInCheck(chessCurrentPlayer);
-            
-            if (isChessCheckmate(chessCurrentPlayer)) {
+            // 체크메이트 / 스테일메이트 / 기물 부족 / 50수 / 3회 반복
+            const status = caiGameStatus(chessBoard, chessCurrentPlayer, chessState, chessPositions);
+            chessResultInfo = status.over ? { result: status.result, reason: status.reason } : null;
+            if (status.over) {
                 chessGameOver = true;
-                const winner = chessCurrentPlayer === 'white' ? '파랑' : '빨강';
                 const banner = document.getElementById('chessWinnerBannerMini');
-                if (banner) banner.innerHTML = `<div class="winner-banner">🎉 체크메이트! ${winner} 승리! 🎉</div>`;
-                addChessLog(`🏆 체크메이트! ${winner} 승리!`);
+                if (banner) banner.innerHTML = chessResultBannerHtml();
+                addChessLog(status.result === 'draw'
+                    ? `🤝 무승부 — ${status.reason}`
+                    : `🏆 체크메이트! ${status.result === 'white' ? '빨강' : '파랑'} 승리!`);
             }
             // 게임 탭(2인 모드)에서 내가 둔 수로 체크메이트면 전적 기록 (방금 둔 쪽이 승자)
             let chessResult = null;
-            if (chessGameOver && piece.color !== chessCurrentPlayer && chessPlayers[piece.color] === myPlayerId) {
+            if (status.over && status.result === piece.color && chessPlayers[piece.color] === myPlayerId) {
                 chessResult = [seatName(chessPlayers[piece.color], chessPlayerNames), seatName(chessPlayers[chessCurrentPlayer], chessPlayerNames)];
             }
             
-            // Firebase 동기화
+            // Firebase 동기화 (캐슬링 권리·앙파상·반복 횟수도 함께)
             if (db) {
                 db.ref('chess').set({
                     boardJson: JSON.stringify(chessBoard),
                     currentPlayer: chessCurrentPlayer,
                     gameOver: chessGameOver,
                     capturedPieces: chessCapturedPieces,
-                    isInCheck: chessIsInCheck
+                    isInCheck: chessIsInCheck,
+                    stateJson: JSON.stringify(chessState),
+                    positionsJson: JSON.stringify(chessPositions),
+                    result: chessResultInfo
                 });
             }
             if (chessResult) recordGameResult('chess', chessResult[0], chessResult[1]);
@@ -8350,168 +8728,13 @@ ${text}
         function getChessValidMoves(row, col) {
             const piece = chessBoard[row] && chessBoard[row][col];
             if (!piece) return [];
-            
-            let moves = [];
-            switch (piece.type) {
-                case 'pawn': moves = getChessPawnMoves(row, col, piece.color); break;
-                case 'rook': moves = getChessRookMoves(row, col, piece.color); break;
-                case 'knight': moves = getChessKnightMoves(row, col, piece.color); break;
-                case 'bishop': moves = getChessBishopMoves(row, col, piece.color); break;
-                case 'queen': moves = [...getChessRookMoves(row, col, piece.color), ...getChessBishopMoves(row, col, piece.color)]; break;
-                case 'king': moves = getChessKingMoves(row, col, piece.color); break;
-            }
-            
-            return moves.filter(move => !wouldChessBeInCheck(row, col, move.row, move.col, piece.color));
+            // 캐슬링·앙파상·승격까지 포함한 합법수 (승격은 같은 칸으로 4가지가 나옴)
+            return caiLegalMoves(chessBoard, piece.color, chessState, false)
+                .filter(m => m.fr === row && m.fc === col)
+                .map(m => ({ row: m.tr, col: m.tc, move: m }));
         }
 
-        function getChessPawnMoves(row, col, color) {
-            const moves = [];
-            const dir = color === 'white' ? -1 : 1;
-            const startRow = color === 'white' ? 6 : 1;
-            
-            // 전진
-            if (isChessInBounds(row + dir, col) && chessBoard[row + dir] && !chessBoard[row + dir][col]) {
-                moves.push({ row: row + dir, col });
-                // 처음 2칸 이동
-                if (row === startRow && chessBoard[row + 2 * dir] && !chessBoard[row + 2 * dir][col]) {
-                    moves.push({ row: row + 2 * dir, col });
-                }
-            }
-            
-            // 대각선 공격
-            [-1, 1].forEach(dc => {
-                const newRow = row + dir, newCol = col + dc;
-                if (isChessInBounds(newRow, newCol) && chessBoard[newRow]) {
-                    const target = chessBoard[newRow][newCol];
-                    if (target && target.color !== color) {
-                        moves.push({ row: newRow, col: newCol });
-                    }
-                }
-            });
-            return moves;
-        }
-
-        function getChessRookMoves(row, col, color) {
-            const moves = [];
-            [[0, 1], [0, -1], [1, 0], [-1, 0]].forEach(([dr, dc]) => {
-                for (let i = 1; i < 8; i++) {
-                    const newRow = row + dr * i, newCol = col + dc * i;
-                    if (!isChessInBounds(newRow, newCol) || !chessBoard[newRow]) break;
-                    const target = chessBoard[newRow][newCol];
-                    if (!target) { moves.push({ row: newRow, col: newCol }); }
-                    else { if (target.color !== color) moves.push({ row: newRow, col: newCol }); break; }
-                }
-            });
-            return moves;
-        }
-
-        function getChessKnightMoves(row, col, color) {
-            const moves = [];
-            [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]].forEach(([dr, dc]) => {
-                const newRow = row + dr, newCol = col + dc;
-                if (isChessInBounds(newRow, newCol) && chessBoard[newRow]) {
-                    const target = chessBoard[newRow][newCol];
-                    if (!target || target.color !== color) moves.push({ row: newRow, col: newCol });
-                }
-            });
-            return moves;
-        }
-
-        function getChessBishopMoves(row, col, color) {
-            const moves = [];
-            [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(([dr, dc]) => {
-                for (let i = 1; i < 8; i++) {
-                    const newRow = row + dr * i, newCol = col + dc * i;
-                    if (!isChessInBounds(newRow, newCol) || !chessBoard[newRow]) break;
-                    const target = chessBoard[newRow][newCol];
-                    if (!target) { moves.push({ row: newRow, col: newCol }); }
-                    else { if (target.color !== color) moves.push({ row: newRow, col: newCol }); break; }
-                }
-            });
-            return moves;
-        }
-
-        function getChessKingMoves(row, col, color) {
-            const moves = [];
-            [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]].forEach(([dr, dc]) => {
-                const newRow = row + dr, newCol = col + dc;
-                if (isChessInBounds(newRow, newCol) && chessBoard[newRow]) {
-                    const target = chessBoard[newRow][newCol];
-                    if (!target || target.color !== color) moves.push({ row: newRow, col: newCol });
-                }
-            });
-            return moves;
-        }
-
-        function isChessInBounds(row, col) { return row >= 0 && row < 8 && col >= 0 && col < 8; }
-
-        function findChessKing(color) {
-            for (let row = 0; row < 8; row++) {
-                for (let col = 0; col < 8; col++) {
-                    const piece = chessBoard[row] && chessBoard[row][col];
-                    if (piece && piece.type === 'king' && piece.color === color) return { row, col };
-                }
-            }
-            return null;
-        }
-
-        function isChessKingInCheck(color) {
-            const kingPos = findChessKing(color);
-            if (!kingPos) return false;
-            const enemyColor = color === 'white' ? 'black' : 'white';
-            
-            for (let row = 0; row < 8; row++) {
-                for (let col = 0; col < 8; col++) {
-                    const piece = chessBoard[row] && chessBoard[row][col];
-                    if (piece && piece.color === enemyColor) {
-                        const attacks = getChessAttackMoves(row, col, piece);
-                        if (attacks.some(m => m.row === kingPos.row && m.col === kingPos.col)) return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        function getChessAttackMoves(row, col, piece) {
-            switch (piece.type) {
-                case 'pawn':
-                    const dir = piece.color === 'white' ? -1 : 1;
-                    const attacks = [];
-                    if (isChessInBounds(row + dir, col - 1)) attacks.push({ row: row + dir, col: col - 1 });
-                    if (isChessInBounds(row + dir, col + 1)) attacks.push({ row: row + dir, col: col + 1 });
-                    return attacks;
-                case 'rook': return getChessRookMoves(row, col, piece.color);
-                case 'knight': return getChessKnightMoves(row, col, piece.color);
-                case 'bishop': return getChessBishopMoves(row, col, piece.color);
-                case 'queen': return [...getChessRookMoves(row, col, piece.color), ...getChessBishopMoves(row, col, piece.color)];
-                case 'king': return getChessKingMoves(row, col, piece.color);
-                default: return [];
-            }
-        }
-
-        function wouldChessBeInCheck(fromRow, fromCol, toRow, toCol, color) {
-            const originalPiece = chessBoard[toRow][toCol];
-            const movingPiece = chessBoard[fromRow][fromCol];
-            chessBoard[toRow][toCol] = movingPiece;
-            chessBoard[fromRow][fromCol] = null;
-            const inCheck = isChessKingInCheck(color);
-            chessBoard[fromRow][fromCol] = movingPiece;
-            chessBoard[toRow][toCol] = originalPiece;
-            return inCheck;
-        }
-
-        function isChessCheckmate(color) {
-            if (!isChessKingInCheck(color)) return false;
-            for (let row = 0; row < 8; row++) {
-                for (let col = 0; col < 8; col++) {
-                    const piece = chessBoard[row] && chessBoard[row][col];
-                    if (piece && piece.color === color) {
-                        if (getChessValidMoves(row, col).length > 0) return false;
-                    }
-                }
-            }
-            return true;
-        }
+        // (예전 체스 이동 규칙 함수들은 정식 규칙 엔진 cai*로 대체됨)
 
         function updateChessDisplay() {
             const turnEl = document.getElementById('chessCurrentTurn');
@@ -8567,7 +8790,10 @@ ${text}
                     currentPlayer: 'white',
                     gameOver: false,
                     capturedPieces: { white: [], black: [] },
-                    isInCheck: false
+                    isInCheck: false,
+                    stateJson: JSON.stringify(chessState),
+                    positionsJson: JSON.stringify(chessPositions),
+                    result: null
                 });
             }
         }
@@ -8587,13 +8813,16 @@ ${text}
                         black: Array.isArray(cap.black) ? cap.black : []
                     };
                     chessIsInCheck = data.isInCheck || false;
+                    try { chessState = data.stateJson ? JSON.parse(data.stateJson) : caiNewState(); } catch (e) { chessState = caiNewState(); }
+                    try { chessPositions = data.positionsJson ? JSON.parse(data.positionsJson) : {}; } catch (e) { chessPositions = {}; }
+                    chessResultInfo = data.result || null;
+                    // 상대가 둔 수를 보는 중이면 선택 해제 (선택한 말의 이동 칸이 바뀌었을 수 있음)
+                    chessSelectedCell = null; chessValidMoves = [];
                     renderChessBoard();
                     updateChessDisplay();
                     // 상대가 둔 수가 게임 탭(미니 보드)에 바로 보이도록 갱신
                     const banner = document.getElementById('chessWinnerBannerMini');
-                    if (banner) banner.innerHTML = chessGameOver
-                        ? `<div class="winner-banner">🎉 체크메이트! ${chessCurrentPlayer === 'white' ? '🔵 파랑' : '🔴 빨강'} 승리! 🎉</div>`
-                        : '';
+                    if (banner) banner.innerHTML = chessResultBannerHtml();
                     renderChessBoardMini();
                 }
             });
@@ -11582,224 +11811,8 @@ ${text}
 
 
         // =====================================================
-        // 🤖 AI 체스 (혼자 AI와 대결, 2인 체스와 같은 규칙: 캐슬링·앙파상 없음, 폰은 퀸 승격)
-        //  white = 🔴 빨강(먼저 둠, 아래쪽에서 출발), black = 🔵 파랑
+        // 🤖 AI 체스 (혼자 AI와 대결) — 규칙 엔진(cai*)은 2인 체스 코드 위쪽에 있음
         // =====================================================
-        const CHESS_AI_LEVELS = {
-            easy:   { label: '🐣 쉬움', depth: 1, noise: 80, timeMs: 300, blunder: 0.25 }, // 25%는 아무 수나 (초보용)
-            normal: { label: '🙂 보통', depth: 2, noise: 15, timeMs: 800 },
-            hard:   { label: '🧠 알파고급', depth: 4, noise: 0, timeMs: 1800 }
-        };
-        const CAI_VAL = { pawn: 100, knight: 320, bishop: 330, rook: 500, queen: 900, king: 0 };
-        const CAI_MATE = 1000000;
-        // 위치 점수 (빨강 기준, 0행 = 상대 진영 끝줄)
-        const CAI_PST = {
-            pawn: [[0,0,0,0,0,0,0,0],[50,50,50,50,50,50,50,50],[10,10,20,30,30,20,10,10],[5,5,10,25,25,10,5,5],[0,0,0,20,20,0,0,0],[5,-5,-10,0,0,-10,-5,5],[5,10,10,-20,-20,10,10,5],[0,0,0,0,0,0,0,0]],
-            knight: [[-50,-40,-30,-30,-30,-30,-40,-50],[-40,-20,0,0,0,0,-20,-40],[-30,0,10,15,15,10,0,-30],[-30,5,15,20,20,15,5,-30],[-30,0,15,20,20,15,0,-30],[-30,5,10,15,15,10,5,-30],[-40,-20,0,5,5,0,-20,-40],[-50,-40,-30,-30,-30,-30,-40,-50]],
-            bishop: [[-20,-10,-10,-10,-10,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,10,10,5,0,-10],[-10,5,5,10,10,5,5,-10],[-10,0,10,10,10,10,0,-10],[-10,10,10,10,10,10,10,-10],[-10,5,0,0,0,0,5,-10],[-20,-10,-10,-10,-10,-10,-10,-20]],
-            rook: [[0,0,0,0,0,0,0,0],[5,10,10,10,10,10,10,5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[0,0,0,5,5,0,0,0]],
-            queen: [[-20,-10,-10,-5,-5,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,5,5,5,0,-10],[-5,0,5,5,5,5,0,-5],[0,0,5,5,5,5,0,-5],[-10,5,5,5,5,5,0,-10],[-10,0,5,0,0,0,0,-10],[-20,-10,-10,-5,-5,-10,-10,-20]],
-            king: [[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-20,-30,-30,-40,-40,-30,-30,-20],[-10,-20,-20,-20,-20,-20,-20,-10],[20,20,0,0,0,0,20,20],[20,30,10,0,0,10,30,20]]
-        };
-        const CAI_KNIGHT = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
-        const CAI_KING = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
-        const CAI_ROOK_D = [[0,1],[0,-1],[1,0],[-1,0]];
-        const CAI_BISHOP_D = [[1,1],[1,-1],[-1,1],[-1,-1]];
-        const caiOpp = (c) => c === 'white' ? 'black' : 'white';
-        const caiIn = (r, c) => r >= 0 && r < 8 && c >= 0 && c < 8;
-
-        function caiInitialBoard() {
-            const back = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook'];
-            const b = Array(8).fill(null).map(() => Array(8).fill(null));
-            for (let c = 0; c < 8; c++) {
-                b[0][c] = { type: back[c], color: 'black' }; b[1][c] = { type: 'pawn', color: 'black' };
-                b[6][c] = { type: 'pawn', color: 'white' }; b[7][c] = { type: back[c], color: 'white' };
-            }
-            return b;
-        }
-
-        // (r, c) 칸이 byColor에게 공격받는지
-        function caiAttacked(b, r, c, byColor) {
-            const pr = byColor === 'white' ? r + 1 : r - 1; // 공격하는 폰이 있는 행
-            for (const dc of [-1, 1]) {
-                if (caiIn(pr, c + dc)) { const p = b[pr][c + dc]; if (p && p.color === byColor && p.type === 'pawn') return true; }
-            }
-            for (const [dr, dc] of CAI_KNIGHT) {
-                const nr = r + dr, nc = c + dc;
-                if (caiIn(nr, nc)) { const p = b[nr][nc]; if (p && p.color === byColor && p.type === 'knight') return true; }
-            }
-            for (const [dr, dc] of CAI_KING) {
-                const nr = r + dr, nc = c + dc;
-                if (caiIn(nr, nc)) { const p = b[nr][nc]; if (p && p.color === byColor && p.type === 'king') return true; }
-            }
-            for (const [dirs, types] of [[CAI_ROOK_D, ['rook', 'queen']], [CAI_BISHOP_D, ['bishop', 'queen']]]) {
-                for (const [dr, dc] of dirs) {
-                    let nr = r + dr, nc = c + dc;
-                    while (caiIn(nr, nc)) {
-                        const p = b[nr][nc];
-                        if (p) { if (p.color === byColor && types.includes(p.type)) return true; break; }
-                        nr += dr; nc += dc;
-                    }
-                }
-            }
-            return false;
-        }
-
-        function caiFindKing(b, color) {
-            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) { const p = b[r][c]; if (p && p.type === 'king' && p.color === color) return [r, c]; }
-            return null;
-        }
-        function caiInCheck(b, color) {
-            const k = caiFindKing(b, color);
-            return k ? caiAttacked(b, k[0], k[1], caiOpp(color)) : false;
-        }
-
-        // 의사 합법수 (자기 킹이 체크되는지는 아직 안 봄)
-        function caiPseudoMoves(b, color, capturesOnly) {
-            const moves = [];
-            const add = (fr, fc, tr, tc) => {
-                const cap = b[tr][tc];
-                if (cap && cap.color === color) return;
-                if (capturesOnly && !cap) return;
-                const p = b[fr][fc];
-                const promo = p.type === 'pawn' && (tr === 0 || tr === 7);
-                moves.push({ fr, fc, tr, tc, cap, promo, score: (cap ? 10 * CAI_VAL[cap.type] - CAI_VAL[p.type] + 10000 : 0) + (promo ? 8000 : 0) });
-            };
-            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
-                const p = b[r][c];
-                if (!p || p.color !== color) continue;
-                if (p.type === 'pawn') {
-                    const dir = color === 'white' ? -1 : 1, start = color === 'white' ? 6 : 1;
-                    if (caiIn(r + dir, c) && !b[r + dir][c]) {
-                        if (!capturesOnly || r + dir === 0 || r + dir === 7) add(r, c, r + dir, c);
-                        if (!capturesOnly && r === start && !b[r + 2 * dir][c]) add(r, c, r + 2 * dir, c);
-                    }
-                    for (const dc of [-1, 1]) {
-                        if (caiIn(r + dir, c + dc) && b[r + dir][c + dc] && b[r + dir][c + dc].color !== color) add(r, c, r + dir, c + dc);
-                    }
-                } else if (p.type === 'knight' || p.type === 'king') {
-                    for (const [dr, dc] of (p.type === 'knight' ? CAI_KNIGHT : CAI_KING)) if (caiIn(r + dr, c + dc)) add(r, c, r + dr, c + dc);
-                } else {
-                    const dirs = p.type === 'rook' ? CAI_ROOK_D : p.type === 'bishop' ? CAI_BISHOP_D : CAI_ROOK_D.concat(CAI_BISHOP_D);
-                    for (const [dr, dc] of dirs) {
-                        let nr = r + dr, nc = c + dc;
-                        while (caiIn(nr, nc)) {
-                            if (b[nr][nc]) { if (b[nr][nc].color !== color) add(r, c, nr, nc); break; }
-                            add(r, c, nr, nc);
-                            nr += dr; nc += dc;
-                        }
-                    }
-                }
-            }
-            return moves;
-        }
-
-        function caiMake(b, m) {
-            const p = b[m.fr][m.fc];
-            m.piece = p;
-            b[m.tr][m.tc] = m.promo ? { type: 'queen', color: p.color } : p;
-            b[m.fr][m.fc] = null;
-        }
-        function caiUnmake(b, m) {
-            b[m.fr][m.fc] = m.piece;
-            b[m.tr][m.tc] = m.cap || null;
-        }
-
-        function caiLegalMoves(b, color, capturesOnly) {
-            return caiPseudoMoves(b, color, capturesOnly).filter(m => {
-                caiMake(b, m);
-                const ok = !caiInCheck(b, color);
-                caiUnmake(b, m);
-                return ok;
-            });
-        }
-
-        // 빨강(white) 기준 점수 → 둘 차례 기준으로 뒤집어 반환
-        function caiEval(b, toMove) {
-            let s = 0;
-            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
-                const p = b[r][c];
-                if (!p) continue;
-                const v = CAI_VAL[p.type] + CAI_PST[p.type][p.color === 'white' ? r : 7 - r][c];
-                s += p.color === 'white' ? v : -v;
-            }
-            return toMove === 'white' ? s : -s;
-        }
-
-        function caiQuiesce(b, color, alpha, beta, depth, ctx) {
-            ctx.nodes++;
-            const stand = caiEval(b, color);
-            if (stand >= beta) return beta;
-            if (stand > alpha) alpha = stand;
-            if (depth <= 0) return alpha;
-            const moves = caiLegalMoves(b, color, true).sort((x, y) => y.score - x.score);
-            for (const m of moves) {
-                caiMake(b, m);
-                const v = -caiQuiesce(b, caiOpp(color), -beta, -alpha, depth - 1, ctx);
-                caiUnmake(b, m);
-                if (v >= beta) return beta;
-                if (v > alpha) alpha = v;
-            }
-            return alpha;
-        }
-
-        function caiSearch(b, color, depth, alpha, beta, ply, ctx) {
-            if (ctx.timeUp || performance.now() > ctx.deadline) { ctx.timeUp = true; return 0; }
-            ctx.nodes++;
-            const moves = caiLegalMoves(b, color, false);
-            if (!moves.length) return caiInCheck(b, color) ? -CAI_MATE + ply : 0; // 체크메이트 / 스테일메이트
-            if (depth <= 0) return caiQuiesce(b, color, alpha, beta, 4, ctx);
-            moves.sort((x, y) => y.score - x.score);
-            for (const m of moves) {
-                caiMake(b, m);
-                const v = -caiSearch(b, caiOpp(color), depth - 1, -beta, -alpha, ply + 1, ctx);
-                caiUnmake(b, m);
-                if (ctx.timeUp) return 0;
-                if (v >= beta) return beta;
-                if (v > alpha) alpha = v;
-            }
-            return alpha;
-        }
-
-        // 반복 심화 + 시간 제한으로 최선의 수 고르기
-        function caiChooseMove(board, color, levelKey) {
-            const lv = CHESS_AI_LEVELS[levelKey] || CHESS_AI_LEVELS.normal;
-            const b = board.map(row => row.slice());
-            const root = caiLegalMoves(b, color, false);
-            if (!root.length) return null;
-            const ctx = { nodes: 0, timeUp: false, deadline: performance.now() + lv.timeMs };
-            let best = root[0], order = root.slice().sort((x, y) => y.score - x.score);
-            for (let d = 1; d <= lv.depth; d++) {
-                let alpha = -Infinity, iterBest = null;
-                const scored = [];
-                for (const m of order) {
-                    caiMake(b, m);
-                    // 흔들림(noise)을 줄 때는 모든 수를 정확한 점수로 계산해야 함 (가지치기 경계값에 noise가 붙으면 메이트를 놓침)
-                    const window = lv.noise ? -Infinity : alpha;
-                    let v = -caiSearch(b, caiOpp(color), d - 1, -Infinity, -window, 1, ctx);
-                    caiUnmake(b, m);
-                    if (ctx.timeUp) break;
-                    // 쉬움/보통은 일부러 흔들림, 단 메이트 점수는 그대로
-                    if (lv.noise && Math.abs(v) < CAI_MATE - 1000) v += (Math.random() - 0.5) * 2 * lv.noise;
-                    scored.push([m, v]);
-                    if (v > alpha) { alpha = v; iterBest = m; }
-                }
-                if (ctx.timeUp && !iterBest) break;
-                if (iterBest) best = iterBest;
-                // 다음 깊이에서는 좋은 수부터 탐색
-                order = scored.sort((x, y) => y[1] - x[1]).map(x => x[0]).concat(order.filter(m => !scored.some(s => s[0] === m)));
-                if (ctx.timeUp) break;
-            }
-            // 쉬움: 메이트 기회가 아니면 가끔 아무 수나 둠
-            if (lv.blunder && Math.random() < lv.blunder) {
-                caiMake(b, best);
-                const mates = !caiLegalMoves(b, caiOpp(color), false).length && caiInCheck(b, caiOpp(color));
-                caiUnmake(b, best);
-                if (!mates) return root[Math.floor(Math.random() * root.length)];
-            }
-            return best;
-        }
-
         // ---------- 게임 진행 / 화면 ----------
         let chessAi = null; // { board, me, ai, turn, level, over, result, sel, moves, last, plies, log, thinking, captured }
 
@@ -11811,11 +11824,13 @@ ${text}
                 recordGameResult(`chess_ai_${chessAi.level}`, null, myGameName());
             }
             const me = document.getElementById('chessAiColor').value;
+            const board = caiInitialBoard(), st = caiNewState();
             chessAi = {
-                board: caiInitialBoard(), me, ai: caiOpp(me), turn: 'white',
+                board, st, me, ai: caiOpp(me), turn: 'white',
                 level: document.getElementById('chessAiLevel').value,
-                over: false, result: null, sel: null, moves: [], last: null, plies: 0, log: [], thinking: false,
-                captured: { white: [], black: [] }
+                over: false, result: null, reason: '', sel: null, moves: [], last: null, plies: 0, log: [], thinking: false,
+                captured: { white: [], black: [] },
+                positions: { [caiPositionKey(board, 'white', st)]: 1 } // 3회 반복 판정용
             };
             renderChessAiStats();
             renderChessAi();
@@ -11827,31 +11842,27 @@ ${text}
 
         function chessAiApply(m) {
             const g = chessAi;
-            const p = g.board[m.fr][m.fc];
+            const color = g.board[m.fr][m.fc].color;
             if (m.cap) g.captured[m.cap.color].push(m.cap.type);
-            caiMake(g.board, m);
+            caiMake(g.board, m, g.st);
             g.last = { fr: m.fr, fc: m.fc, tr: m.tr, tc: m.tc };
             g.plies++;
-            g.log.unshift(`${caiSideName(p.color).slice(-2)}: ${getChessPieceName(p.type)} ${caiSq(m.fr, m.fc)} → ${caiSq(m.tr, m.tc)}${m.cap ? ' ×' + getChessPieceName(m.cap.type) : ''}${m.promo ? ' (퀸 승격)' : ''}`);
-            g.turn = caiOpp(p.color);
+            g.log.unshift(caiMoveText(m));
+            g.turn = caiOpp(color);
             g.sel = null; g.moves = [];
-            // 종료 판정
-            const next = caiLegalMoves(g.board, g.turn, false);
-            const pieces = g.board.flat().filter(Boolean);
-            if (!next.length) {
-                g.over = true;
-                if (caiInCheck(g.board, g.turn)) {
-                    g.result = p.color; // 방금 둔 쪽 승리
-                    g.log.unshift(`🏆 체크메이트! ${caiSideName(p.color)} 승리`);
-                    if (p.color === g.me) recordGameResult(`chess_ai_${g.level}`, myGameName(), null);
-                    else recordGameResult(`chess_ai_${g.level}`, null, myGameName());
+            const key = caiPositionKey(g.board, g.turn, g.st);
+            g.positions[key] = (g.positions[key] || 0) + 1;
+            // 종료 판정 (체크메이트 / 스테일메이트 / 기물 부족 / 50수 / 3회 반복)
+            const status = caiGameStatus(g.board, g.turn, g.st, g.positions);
+            if (status.over) {
+                g.over = true; g.result = status.result; g.reason = status.reason;
+                if (status.result === 'draw') {
+                    g.log.unshift(`🤝 무승부 — ${status.reason}`);
                 } else {
-                    g.result = 'draw';
-                    g.log.unshift('🤝 스테일메이트 (무승부)');
+                    g.log.unshift(`🏆 체크메이트! ${caiSideName(status.result)} 승리`);
+                    if (status.result === g.me) recordGameResult(`chess_ai_${g.level}`, myGameName(), null);
+                    else recordGameResult(`chess_ai_${g.level}`, null, myGameName());
                 }
-            } else if (pieces.length === 2 || g.plies >= 300) {
-                g.over = true; g.result = 'draw';
-                g.log.unshift(pieces.length === 2 ? '🤝 킹만 남아 무승부' : '🤝 300수가 넘어 무승부');
             }
             renderChessAi();
         }
@@ -11861,15 +11872,21 @@ ${text}
             if (!g) { alert('먼저 "새 게임"을 눌러 주세요.'); return; }
             if (g.over || g.thinking || g.turn !== g.me) return;
             const p = g.board[r][c];
-            const target = g.moves.find(m => m.tr === r && m.tc === c);
-            if (g.sel && target) {
-                chessAiApply(target);
-                if (!g.over) chessAiThink();
+            const targets = g.moves.filter(m => m.tr === r && m.tc === c);
+            if (g.sel && targets.length) {
+                const go = (m) => { chessAiApply(m); if (!g.over) chessAiThink(); };
+                if (targets[0].promo) {
+                    // 승격: 퀸·룩·비숍·나이트 중 선택
+                    g.thinking = true;
+                    chessPickPromotion(g.me).then(t => { g.thinking = false; go(targets.find(m => m.promo === t)); });
+                } else {
+                    go(targets[0]);
+                }
                 return;
             }
             if (p && p.color === g.me) {
                 g.sel = { r, c };
-                g.moves = caiLegalMoves(g.board, g.me, false).filter(m => m.fr === r && m.fc === c);
+                g.moves = caiLegalMoves(g.board, g.me, g.st, false).filter(m => m.fr === r && m.fc === c);
             } else {
                 g.sel = null; g.moves = [];
             }
@@ -11883,7 +11900,7 @@ ${text}
             // 화면에 "생각 중"을 먼저 그린 뒤 계산
             setTimeout(() => {
                 if (chessAi !== g || g.over) return;
-                const m = caiChooseMove(g.board, g.ai, g.level);
+                const m = caiChooseMove(g.board, g.ai, g.level, g.st);
                 g.thinking = false;
                 if (m) chessAiApply(m);
             }, 60);
@@ -11925,7 +11942,7 @@ ${text}
             const lvLabel = CHESS_AI_LEVELS[g.level].label;
             if (g.over) {
                 turnEl.textContent = '게임 종료!';
-                const text = g.result === 'draw' ? '🤝 무승부' : g.result === g.me ? `🎉 체크메이트! ${lvLabel} AI를 이겼어요!` : '🤖 AI 승리… 다시 도전!';
+                const text = g.result === 'draw' ? `🤝 무승부 (${g.reason})` : g.result === g.me ? `🎉 체크메이트! ${lvLabel} AI를 이겼어요!` : '🤖 AI 승리… 다시 도전!';
                 banner.innerHTML = `<div class="omokai-banner ${g.result === g.me ? 'win' : 'lose'}">${text}</div>`;
             } else {
                 banner.innerHTML = '';
