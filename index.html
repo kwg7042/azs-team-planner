@@ -2280,6 +2280,41 @@
             border-radius: 50%;
         }
 
+        /* AI 체스 보드 */
+        #chessAiBoard {
+            display: grid;
+            grid-template-columns: repeat(8, 45px);
+            grid-template-rows: repeat(8, 45px);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        #chessAiBoard .chess-cell {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        #chessAiBoard .chess-cell.light { background: #f0d9b5; }
+        #chessAiBoard .chess-cell.dark { background: #b58863; }
+        #chessAiBoard .chess-cell.selected { box-shadow: inset 0 0 0 3px #667eea; }
+        #chessAiBoard .chess-cell.valid-move::after {
+            content: '';
+            width: 14px;
+            height: 14px;
+            background: rgba(102,126,234,0.5);
+            border-radius: 50%;
+        }
+
+        #chessAiBoard .chess-cell.last-move { box-shadow: inset 0 0 0 100px rgba(255, 214, 0, 0.35); }
+        #chessAiBoard .chess-cell.selected { box-shadow: inset 0 0 0 3px #667eea, inset 0 0 0 100px rgba(102,126,234,0.25); }
+        #chessAiBoard .chess-cell.capture-move { box-shadow: inset 0 0 0 4px rgba(255, 60, 60, 0.85); }
+        #chessAiBoard .chess-cell.in-check { background: radial-gradient(circle, #ff4d4d 0%, #c62828 60%, transparent 100%) !important; }
+
         /* 인형뽑기 */
         .gacha-machine {
             text-align: center;
@@ -3653,6 +3688,11 @@
         .dodge-ranking td.dodge-best { color: #ffd400; font-weight: bold; }
         .dodge-ranking tr.dodge-me td { background: rgba(79,163,255,0.15); }
         .dodge-ranking th:nth-child(2), .dodge-ranking td:nth-child(2) { text-align: left; }
+
+        /* 흑 금수 자리 표시 */
+        .cell .forbid-mark { position: relative; z-index: 2; color: #e53935; font-size: 15px; font-weight: 900; pointer-events: none; text-shadow: 0 0 2px #fff; }
+        .cell.forbidden { cursor: not-allowed; }
+        .omok-rule-hint { margin-left: 10px; font-size: 12px; color: rgba(255,255,255,0.6); }
     </style>
 </head>
 <body>
@@ -4376,6 +4416,7 @@
                     <button class="minigame-tab" onclick="switchMinigame('omok')">⚫ 오목</button>
                     <button class="minigame-tab" onclick="switchMinigame('chess')">♟️ 체스</button>
                     <button class="minigame-tab" onclick="switchMinigame('omokai')">🤖 AI 오목</button>
+                    <button class="minigame-tab" onclick="switchMinigame('chessai')">🤖 AI 체스</button>
                     <button class="minigame-tab" onclick="switchMinigame('pikachu')">⚡ 피카츄배구</button>
                     <button class="minigame-tab" onclick="switchMinigame('dodge')">✈️ 닷지</button>
                 </div>
@@ -4464,6 +4505,7 @@
                         <button class="btn btn-primary" onclick="resetOmokGame()">
                             <i class="fas fa-redo"></i> 새 게임
                         </button>
+                        <span class="omok-rule-hint">규칙: 정확히 5목이면 승리(6목 이상 무효) · 흑은 3-3·6목 금지(✕ 표시)</span>
                     </div>
                     <div class="game-container-mini">
                         <div class="game-board-wrapper-mini">
@@ -4544,7 +4586,7 @@
                         </select>
                         <button class="btn btn-primary" onclick="startOmokAi()"><i class="fas fa-redo"></i> 새 게임</button>
                     </div>
-                    <div class="omokai-info" id="omokAiInfo">AI와 1:1 오목 · 5목을 먼저 만들면 승리 · 진행 중에 새 게임을 누르면 1패</div>
+                    <div class="omokai-info" id="omokAiInfo">AI와 1:1 오목 · 정확히 5목이면 승리(6목 이상 무효) · 흑은 3-3·6목 금지(✕ 표시) · 진행 중 새 게임은 1패</div>
                     <div class="game-container-mini">
                         <div class="game-board-wrapper-mini">
                             <div id="omokAiBoard"></div>
@@ -4576,6 +4618,47 @@
                     <div class="leaderboard dodge-ranking">
                         <h4>🏆 닷지 랭킹 (오래 버틴 시간)</h4>
                         <div id="dodgeRanking" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                    </div>
+                </div>
+
+                <!-- AI 체스 패널 -->
+                <div class="minigame-panel" id="panel-chessai">
+                    <div class="omokai-controls">
+                        <select id="chessAiLevel" onchange="renderChessAiStats()">
+                            <option value="easy">🐣 쉬움</option>
+                            <option value="normal" selected>🙂 보통</option>
+                            <option value="hard">🧠 알파고급 (어려움)</option>
+                        </select>
+                        <select id="chessAiColor">
+                            <option value="white">🔴 내가 빨강 (먼저 둠)</option>
+                            <option value="black">🔵 내가 파랑 (AI가 먼저)</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="startChessAi()"><i class="fas fa-redo"></i> 새 게임</button>
+                    </div>
+                    <div class="omokai-info" id="chessAiInfo">AI와 1:1 체스 · 2인 체스와 같은 규칙(캐슬링·앙파상 없음, 폰은 퀸 승격) · 진행 중 새 게임은 1패</div>
+                    <div class="game-container-mini">
+                        <div class="game-board-wrapper-mini">
+                            <div id="chessAiBoard"></div>
+                        </div>
+                        <div class="game-info-mini">
+                            <div class="game-status">
+                                <h4><i class="fas fa-robot"></i> AI 대전</h4>
+                                <div id="chessAiBanner"></div>
+                                <div class="current-turn-mini" id="chessAiTurn">난이도와 진영을 고르고 "새 게임"을 누르세요</div>
+                            </div>
+                            <div class="captured-pieces-mini">
+                                <span>잡힌 말:</span>
+                                <div id="chessAiCaptured"></div>
+                            </div>
+                            <div class="game-log-mini">
+                                <h4><i class="fas fa-list"></i> 기보</h4>
+                                <div id="chessAiLog"></div>
+                            </div>
+                            <div class="game-stats-mini">
+                                <h4><i class="fas fa-trophy"></i> AI 상대 전적 · <span id="chessAiStatsLevel">🙂 보통</span></h4>
+                                <div id="chessAiStatsMini" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -7401,6 +7484,8 @@ ${text}
             if (!omokBoard[y] || omokBoard[y][x]) {
                 return; // 이미 돌이 있음
             }
+            const forbidden = omokForbiddenReason(omokBoard, x, y, currentPlayer);
+            if (forbidden) { alert(`흑 금수: ${forbidden} 자리에는 둘 수 없습니다.`); return; }
 
             // 돌 놓기
             omokBoard[y][x] = currentPlayer;
@@ -7441,6 +7526,91 @@ ${text}
         }
 
         // 승리 체크
+        // =====================================================
+        // 오목 규칙: 흑 3-3 금지, 6목 이상(장목)은 승리 아님
+        //  - 정확히 5목이면 3-3이 함께 생겨도 승리 (렌주와 동일)
+        //  - 흑은 장목이 되는 자리에 둘 수 없음, 백은 둘 수 있지만 승리 아님
+        // =====================================================
+        const OMOK_DIRS = [[1, 0], [0, 1], [1, 1], [1, -1]];
+
+        function omokAt(board, x, y) {
+            if (x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE) return 'out';
+            return (board[y] && board[y][x]) || null;
+        }
+
+        // (x, y)를 지나는 한 방향의 연속 돌 개수 ((x, y)는 color라고 가정)
+        function omokRun(board, x, y, dx, dy, color) {
+            let n = 1;
+            for (let i = 1; omokAt(board, x + dx * i, y + dy * i) === color; i++) n++;
+            for (let i = 1; omokAt(board, x - dx * i, y - dy * i) === color; i++) n++;
+            return n;
+        }
+
+        // board에 이미 (x, y)가 놓였다고 보고 판정
+        function omokExactFive(board, x, y, color) {
+            return OMOK_DIRS.some(([dx, dy]) => omokRun(board, x, y, dx, dy, color) === 5);
+        }
+        function omokOverline(board, x, y, color) {
+            return OMOK_DIRS.some(([dx, dy]) => omokRun(board, x, y, dx, dy, color) >= 6);
+        }
+
+        // 한 방향에 (x, y)를 포함하는 '열린 3'이 있는지:
+        // 그 줄의 빈칸 하나에 흑을 더 두면 (x, y)를 포함한 열린 4(양끝 모두 정확히 5목이 되는 4)가 되는가
+        function omokHasOpenThree(board, x, y, dx, dy) {
+            // 이미 '4'(한 수 더 두면 5목)인 줄은 3이 아님
+            for (let k = -4; k <= 4; k++) {
+                if (k === 0) continue;
+                const ex = x + dx * k, ey = y + dy * k;
+                if (omokAt(board, ex, ey) !== null) continue;
+                board[ey][ex] = 'black';
+                const five = omokRun(board, x, y, dx, dy, 'black') === 5;
+                board[ey][ex] = null;
+                if (five) return false;
+            }
+            for (let k = -4; k <= 4; k++) {
+                if (k === 0) continue;
+                const ex = x + dx * k, ey = y + dy * k;
+                if (omokAt(board, ex, ey) !== null) continue;
+                board[ey][ex] = 'black';
+                let open = false;
+                if (omokRun(board, x, y, dx, dy, 'black') === 4) {
+                    // 4의 양 끝 칸 찾기
+                    let a = 1; while (omokAt(board, x + dx * a, y + dy * a) === 'black') a++;
+                    let b = 1; while (omokAt(board, x - dx * b, y - dy * b) === 'black') b++;
+                    const ends = [[x + dx * a, y + dy * a, dx, dy], [x - dx * b, y - dy * b, -dx, -dy]];
+                    // 양 끝이 비어 있고, 거기 두면 6목이 아닌 정확히 5목이 되어야 열린 4
+                    open = ends.every(([cx, cy, sx, sy]) => omokAt(board, cx, cy) === null && omokAt(board, cx + sx, cy + sy) !== 'black');
+                }
+                board[ey][ex] = null;
+                if (open) return true;
+            }
+            return false;
+        }
+
+        // 흑이 (x, y)에 두면 금수인지 → 사유 문자열 / 아니면 null
+        function omokForbiddenReason(board, x, y, color) {
+            if (color !== 'black' || omokAt(board, x, y) !== null) return null;
+            board[y][x] = 'black';
+            let reason = null;
+            if (omokExactFive(board, x, y, 'black')) reason = null;              // 5목 완성은 항상 허용
+            else if (omokOverline(board, x, y, 'black')) reason = '장목(6목 이상)';
+            else if (OMOK_DIRS.filter(([dx, dy]) => omokHasOpenThree(board, x, y, dx, dy)).length >= 2) reason = '삼삼(3-3)';
+            board[y][x] = null;
+            return reason;
+        }
+
+        // 화면에 표시할 흑 금수 자리 목록 (돌 주변만 검사)
+        function omokForbiddenCells(board) {
+            const out = [];
+            for (let y = 0; y < BOARD_SIZE; y++) for (let x = 0; x < BOARD_SIZE; x++) {
+                if (omokAt(board, x, y) !== null) continue;
+                let near = 0;
+                for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) if (omokAt(board, x + dx, y + dy) === 'black') near++;
+                if (near >= 2 && omokForbiddenReason(board, x, y, 'black')) out.push(`${x},${y}`);
+            }
+            return new Set(out);
+        }
+
         function checkWin(x, y, player) {
             const directions = [
                 [1, 0],  // 가로
@@ -7470,7 +7640,7 @@ ${text}
                     count++;
                 }
 
-                if (count >= 5) return true;
+                if (count === 5) return true; // 6목 이상(장목)은 승리 아님
             }
             
             return false;
@@ -7962,6 +8132,7 @@ ${text}
             if (typeof renderGameStats === 'function') ['omok', 'chess'].forEach(g => { safe(() => renderGameStats(g)); safe(() => renderGameChat(g)); });
             if (typeof renderOmokAiStats === 'function') safe(renderOmokAiStats);
             if (typeof renderDodgeRanking === 'function') safe(renderDodgeRanking);
+            if (typeof renderChessAiStats === 'function') safe(renderChessAiStats);
         }
         function setupUserIconListener() {
             if (!db) return;
@@ -7990,6 +8161,7 @@ ${text}
             setupGameStatsAndChat();
             setupOmokAiStats();
             setupDodgeRanking();
+            setupChessAiStats();
             setupChatListener();
             setupYieldListener();
             // 고정 지연(setTimeout) 대신 Firebase 연결 직후 로드 → SDK 로딩이 늦어도 누락되지 않음
@@ -8860,6 +9032,9 @@ ${text}
             } else if (panel === 'omokai') {
                 renderOmokAi();
                 renderOmokAiStats();
+            } else if (panel === 'chessai') {
+                renderChessAi();
+                renderChessAiStats();
             } else if (panel === 'dodge') {
                 drawDodge();
                 renderDodgeRanking();
@@ -10674,6 +10849,9 @@ ${text}
             }
             
             boardEl.innerHTML = '';
+            // 내가 흑이고 내 차례면 금수 자리에 ✕ 표시
+            const showForbidden = !gameOver && myStone === 'black' && currentPlayer === 'black' && omokPlayers.black === myPlayerId;
+            const forbiddenSet = showForbidden ? omokForbiddenCells(omokBoard) : new Set();
             
             for (let y = 0; y < BOARD_SIZE; y++) {
                 for (let x = 0; x < BOARD_SIZE; x++) {
@@ -10681,6 +10859,10 @@ ${text}
                     cell.className = 'cell';
                     cell.dataset.x = x;
                     cell.dataset.y = y;
+                    if (forbiddenSet.has(`${x},${y}`)) {
+                        cell.classList.add('forbidden');
+                        cell.innerHTML = '<span class="forbid-mark" title="흑 금수(3-3 또는 6목)">✕</span>';
+                    }
                     
                     if (omokBoard[y] && omokBoard[y][x]) {
                         const stone = document.createElement('div');
@@ -10795,6 +10977,8 @@ ${text}
             }
             if (!omokBoard[y]) omokBoard[y] = Array(BOARD_SIZE).fill(null);
             if (omokBoard[y][x]) return;
+            const forbidden = omokForbiddenReason(omokBoard, x, y, currentPlayer);
+            if (forbidden) { alert(`흑 금수: ${forbidden} 자리에는 둘 수 없습니다.`); return; }
             
             omokBoard[y][x] = currentPlayer;
             omokLastMove = { x, y };
@@ -11114,18 +11298,25 @@ ${text}
         }
 
         function omokAiCheckWin(board, x, y, color) {
-            for (const [dx, dy] of [[1, 0], [0, 1], [1, 1], [1, -1]]) {
-                let count = 1;
-                for (const s of [1, -1]) {
-                    for (let i = 1; i < 5; i++) {
-                        const nx = x + dx * i * s, ny = y + dy * i * s;
-                        if (nx < 0 || nx >= BOARD_SIZE || ny < 0 || ny >= BOARD_SIZE || board[ny][nx] !== color) break;
-                        count++;
-                    }
-                }
-                if (count >= 5) return true;
+            return omokExactFive(board, x, y, color); // 정확히 5목만 승리
+        }
+
+        // 흑이면 금수(3-3, 장목)를 뺀 상위 k개 후보
+        function omokAiTop(board, color, opp, defense, k) {
+            const out = [];
+            for (const c of omokAiRank(board, color, opp, defense)) {
+                if (color === 'black' && omokForbiddenReason(board, c.x, c.y, 'black')) continue;
+                out.push(c);
+                if (out.length >= k) break;
             }
-            return false;
+            return out;
+        }
+
+        function omokAiWouldWin(board, c, color) {
+            board[c.y][c.x] = color;
+            const w = omokExactFive(board, c.x, c.y, color);
+            board[c.y][c.x] = null;
+            return w;
         }
 
         // (x, y)에 color 돌을 둔다고 가정했을 때의 점수
@@ -11175,12 +11366,14 @@ ${text}
         function omokAiChooseMove(board, aiColor, levelKey) {
             const lv = OMOK_AI_LEVELS[levelKey] || OMOK_AI_LEVELS.normal;
             const opp = aiColor === 'black' ? 'white' : 'black';
-            const ranked = omokAiRank(board, aiColor, opp, lv.defense);
+            const all = omokAiRank(board, aiColor, opp, lv.defense);
+            // 흑이면 금수 자리는 후보에서 제외
+            const ranked = aiColor === 'black' ? all.filter(c => !omokForbiddenReason(board, c.x, c.y, 'black')) : all;
             if (!ranked.length) return null;
-            // 이길 수 있으면 무조건 승리, 상대가 다음에 이기는 자리는 무조건 막기
-            const win = ranked.find(c => c.attack >= OMOK_WINDOW_SCORE[5]);
+            // 이길 수 있으면 무조건 승리(정확히 5목), 상대가 다음에 5목을 만드는 자리는 무조건 막기
+            const win = ranked.find(c => omokAiWouldWin(board, c, aiColor));
             if (win) return win;
-            const mustBlock = ranked.filter(c => c.block >= OMOK_WINDOW_SCORE[5]).sort((a, b) => b.attack - a.attack)[0];
+            const mustBlock = ranked.filter(c => omokAiWouldWin(board, c, opp)).sort((a, b) => b.attack - a.attack)[0];
             if (mustBlock && levelKey !== 'easy') return mustBlock;
             if (mustBlock && Math.random() < 0.85) return mustBlock; // 쉬움은 가끔 놓침
 
@@ -11231,7 +11424,7 @@ ${text}
         function omokAiSearch(board, toMove, depth, alpha, beta) {
             if (depth === 0) return omokAiEvalBoard(board, toMove);
             const opp = toMove === 'black' ? 'white' : 'black';
-            const cands = omokAiRank(board, toMove, opp, 1.0).slice(0, OMOK_AI_SEARCH.width);
+            const cands = omokAiTop(board, toMove, opp, 1.0, OMOK_AI_SEARCH.width);
             if (!cands.length) return 0;
             let best = -Infinity;
             for (const c of cands) {
@@ -11289,6 +11482,8 @@ ${text}
             const g = omokAi;
             if (!g) { alert('먼저 "새 게임"을 눌러 주세요.'); return; }
             if (g.over || g.thinking || g.turn !== g.me || g.board[y][x]) return;
+            const forbidden = omokForbiddenReason(g.board, x, y, g.me);
+            if (forbidden) { alert(`흑 금수: ${forbidden} 자리에는 둘 수 없습니다.`); return; }
             omokAiPlace(x, y, g.me);
             if (!g.over) omokAiThink();
         }
@@ -11312,11 +11507,17 @@ ${text}
             const g = omokAi;
             const board = g ? g.board : omokAiEmptyBoard();
             boardEl.innerHTML = '';
+            const showForbidden = g && !g.over && !g.thinking && g.me === 'black' && g.turn === 'black';
+            const forbiddenSet = showForbidden ? omokForbiddenCells(board) : new Set();
             for (let y = 0; y < BOARD_SIZE; y++) {
                 for (let x = 0; x < BOARD_SIZE; x++) {
                     const cell = document.createElement('div');
                     cell.className = 'cell';
                     cell.dataset.x = x; cell.dataset.y = y;
+                    if (forbiddenSet.has(`${x},${y}`)) {
+                        cell.classList.add('forbidden');
+                        cell.innerHTML = '<span class="forbid-mark" title="흑 금수(3-3 또는 6목)">✕</span>';
+                    }
                     if (board[y][x]) {
                         const stone = document.createElement('div');
                         stone.className = `stone ${board[y][x]}`;
@@ -11376,6 +11577,392 @@ ${text}
                 const key = `omok_ai_${level}`;
                 db.ref(`game_stats/${key}`).off();
                 db.ref(`game_stats/${key}`).on('value', snap => { gameStats[key] = snap.val() || {}; renderOmokAiStats(); });
+            });
+        }
+
+
+        // =====================================================
+        // 🤖 AI 체스 (혼자 AI와 대결, 2인 체스와 같은 규칙: 캐슬링·앙파상 없음, 폰은 퀸 승격)
+        //  white = 🔴 빨강(먼저 둠, 아래쪽에서 출발), black = 🔵 파랑
+        // =====================================================
+        const CHESS_AI_LEVELS = {
+            easy:   { label: '🐣 쉬움', depth: 1, noise: 80, timeMs: 300, blunder: 0.25 }, // 25%는 아무 수나 (초보용)
+            normal: { label: '🙂 보통', depth: 2, noise: 15, timeMs: 800 },
+            hard:   { label: '🧠 알파고급', depth: 4, noise: 0, timeMs: 1800 }
+        };
+        const CAI_VAL = { pawn: 100, knight: 320, bishop: 330, rook: 500, queen: 900, king: 0 };
+        const CAI_MATE = 1000000;
+        // 위치 점수 (빨강 기준, 0행 = 상대 진영 끝줄)
+        const CAI_PST = {
+            pawn: [[0,0,0,0,0,0,0,0],[50,50,50,50,50,50,50,50],[10,10,20,30,30,20,10,10],[5,5,10,25,25,10,5,5],[0,0,0,20,20,0,0,0],[5,-5,-10,0,0,-10,-5,5],[5,10,10,-20,-20,10,10,5],[0,0,0,0,0,0,0,0]],
+            knight: [[-50,-40,-30,-30,-30,-30,-40,-50],[-40,-20,0,0,0,0,-20,-40],[-30,0,10,15,15,10,0,-30],[-30,5,15,20,20,15,5,-30],[-30,0,15,20,20,15,0,-30],[-30,5,10,15,15,10,5,-30],[-40,-20,0,5,5,0,-20,-40],[-50,-40,-30,-30,-30,-30,-40,-50]],
+            bishop: [[-20,-10,-10,-10,-10,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,10,10,5,0,-10],[-10,5,5,10,10,5,5,-10],[-10,0,10,10,10,10,0,-10],[-10,10,10,10,10,10,10,-10],[-10,5,0,0,0,0,5,-10],[-20,-10,-10,-10,-10,-10,-10,-20]],
+            rook: [[0,0,0,0,0,0,0,0],[5,10,10,10,10,10,10,5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[0,0,0,5,5,0,0,0]],
+            queen: [[-20,-10,-10,-5,-5,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,5,5,5,0,-10],[-5,0,5,5,5,5,0,-5],[0,0,5,5,5,5,0,-5],[-10,5,5,5,5,5,0,-10],[-10,0,5,0,0,0,0,-10],[-20,-10,-10,-5,-5,-10,-10,-20]],
+            king: [[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-20,-30,-30,-40,-40,-30,-30,-20],[-10,-20,-20,-20,-20,-20,-20,-10],[20,20,0,0,0,0,20,20],[20,30,10,0,0,10,30,20]]
+        };
+        const CAI_KNIGHT = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+        const CAI_KING = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+        const CAI_ROOK_D = [[0,1],[0,-1],[1,0],[-1,0]];
+        const CAI_BISHOP_D = [[1,1],[1,-1],[-1,1],[-1,-1]];
+        const caiOpp = (c) => c === 'white' ? 'black' : 'white';
+        const caiIn = (r, c) => r >= 0 && r < 8 && c >= 0 && c < 8;
+
+        function caiInitialBoard() {
+            const back = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook'];
+            const b = Array(8).fill(null).map(() => Array(8).fill(null));
+            for (let c = 0; c < 8; c++) {
+                b[0][c] = { type: back[c], color: 'black' }; b[1][c] = { type: 'pawn', color: 'black' };
+                b[6][c] = { type: 'pawn', color: 'white' }; b[7][c] = { type: back[c], color: 'white' };
+            }
+            return b;
+        }
+
+        // (r, c) 칸이 byColor에게 공격받는지
+        function caiAttacked(b, r, c, byColor) {
+            const pr = byColor === 'white' ? r + 1 : r - 1; // 공격하는 폰이 있는 행
+            for (const dc of [-1, 1]) {
+                if (caiIn(pr, c + dc)) { const p = b[pr][c + dc]; if (p && p.color === byColor && p.type === 'pawn') return true; }
+            }
+            for (const [dr, dc] of CAI_KNIGHT) {
+                const nr = r + dr, nc = c + dc;
+                if (caiIn(nr, nc)) { const p = b[nr][nc]; if (p && p.color === byColor && p.type === 'knight') return true; }
+            }
+            for (const [dr, dc] of CAI_KING) {
+                const nr = r + dr, nc = c + dc;
+                if (caiIn(nr, nc)) { const p = b[nr][nc]; if (p && p.color === byColor && p.type === 'king') return true; }
+            }
+            for (const [dirs, types] of [[CAI_ROOK_D, ['rook', 'queen']], [CAI_BISHOP_D, ['bishop', 'queen']]]) {
+                for (const [dr, dc] of dirs) {
+                    let nr = r + dr, nc = c + dc;
+                    while (caiIn(nr, nc)) {
+                        const p = b[nr][nc];
+                        if (p) { if (p.color === byColor && types.includes(p.type)) return true; break; }
+                        nr += dr; nc += dc;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function caiFindKing(b, color) {
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) { const p = b[r][c]; if (p && p.type === 'king' && p.color === color) return [r, c]; }
+            return null;
+        }
+        function caiInCheck(b, color) {
+            const k = caiFindKing(b, color);
+            return k ? caiAttacked(b, k[0], k[1], caiOpp(color)) : false;
+        }
+
+        // 의사 합법수 (자기 킹이 체크되는지는 아직 안 봄)
+        function caiPseudoMoves(b, color, capturesOnly) {
+            const moves = [];
+            const add = (fr, fc, tr, tc) => {
+                const cap = b[tr][tc];
+                if (cap && cap.color === color) return;
+                if (capturesOnly && !cap) return;
+                const p = b[fr][fc];
+                const promo = p.type === 'pawn' && (tr === 0 || tr === 7);
+                moves.push({ fr, fc, tr, tc, cap, promo, score: (cap ? 10 * CAI_VAL[cap.type] - CAI_VAL[p.type] + 10000 : 0) + (promo ? 8000 : 0) });
+            };
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+                const p = b[r][c];
+                if (!p || p.color !== color) continue;
+                if (p.type === 'pawn') {
+                    const dir = color === 'white' ? -1 : 1, start = color === 'white' ? 6 : 1;
+                    if (caiIn(r + dir, c) && !b[r + dir][c]) {
+                        if (!capturesOnly || r + dir === 0 || r + dir === 7) add(r, c, r + dir, c);
+                        if (!capturesOnly && r === start && !b[r + 2 * dir][c]) add(r, c, r + 2 * dir, c);
+                    }
+                    for (const dc of [-1, 1]) {
+                        if (caiIn(r + dir, c + dc) && b[r + dir][c + dc] && b[r + dir][c + dc].color !== color) add(r, c, r + dir, c + dc);
+                    }
+                } else if (p.type === 'knight' || p.type === 'king') {
+                    for (const [dr, dc] of (p.type === 'knight' ? CAI_KNIGHT : CAI_KING)) if (caiIn(r + dr, c + dc)) add(r, c, r + dr, c + dc);
+                } else {
+                    const dirs = p.type === 'rook' ? CAI_ROOK_D : p.type === 'bishop' ? CAI_BISHOP_D : CAI_ROOK_D.concat(CAI_BISHOP_D);
+                    for (const [dr, dc] of dirs) {
+                        let nr = r + dr, nc = c + dc;
+                        while (caiIn(nr, nc)) {
+                            if (b[nr][nc]) { if (b[nr][nc].color !== color) add(r, c, nr, nc); break; }
+                            add(r, c, nr, nc);
+                            nr += dr; nc += dc;
+                        }
+                    }
+                }
+            }
+            return moves;
+        }
+
+        function caiMake(b, m) {
+            const p = b[m.fr][m.fc];
+            m.piece = p;
+            b[m.tr][m.tc] = m.promo ? { type: 'queen', color: p.color } : p;
+            b[m.fr][m.fc] = null;
+        }
+        function caiUnmake(b, m) {
+            b[m.fr][m.fc] = m.piece;
+            b[m.tr][m.tc] = m.cap || null;
+        }
+
+        function caiLegalMoves(b, color, capturesOnly) {
+            return caiPseudoMoves(b, color, capturesOnly).filter(m => {
+                caiMake(b, m);
+                const ok = !caiInCheck(b, color);
+                caiUnmake(b, m);
+                return ok;
+            });
+        }
+
+        // 빨강(white) 기준 점수 → 둘 차례 기준으로 뒤집어 반환
+        function caiEval(b, toMove) {
+            let s = 0;
+            for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+                const p = b[r][c];
+                if (!p) continue;
+                const v = CAI_VAL[p.type] + CAI_PST[p.type][p.color === 'white' ? r : 7 - r][c];
+                s += p.color === 'white' ? v : -v;
+            }
+            return toMove === 'white' ? s : -s;
+        }
+
+        function caiQuiesce(b, color, alpha, beta, depth, ctx) {
+            ctx.nodes++;
+            const stand = caiEval(b, color);
+            if (stand >= beta) return beta;
+            if (stand > alpha) alpha = stand;
+            if (depth <= 0) return alpha;
+            const moves = caiLegalMoves(b, color, true).sort((x, y) => y.score - x.score);
+            for (const m of moves) {
+                caiMake(b, m);
+                const v = -caiQuiesce(b, caiOpp(color), -beta, -alpha, depth - 1, ctx);
+                caiUnmake(b, m);
+                if (v >= beta) return beta;
+                if (v > alpha) alpha = v;
+            }
+            return alpha;
+        }
+
+        function caiSearch(b, color, depth, alpha, beta, ply, ctx) {
+            if (ctx.timeUp || performance.now() > ctx.deadline) { ctx.timeUp = true; return 0; }
+            ctx.nodes++;
+            const moves = caiLegalMoves(b, color, false);
+            if (!moves.length) return caiInCheck(b, color) ? -CAI_MATE + ply : 0; // 체크메이트 / 스테일메이트
+            if (depth <= 0) return caiQuiesce(b, color, alpha, beta, 4, ctx);
+            moves.sort((x, y) => y.score - x.score);
+            for (const m of moves) {
+                caiMake(b, m);
+                const v = -caiSearch(b, caiOpp(color), depth - 1, -beta, -alpha, ply + 1, ctx);
+                caiUnmake(b, m);
+                if (ctx.timeUp) return 0;
+                if (v >= beta) return beta;
+                if (v > alpha) alpha = v;
+            }
+            return alpha;
+        }
+
+        // 반복 심화 + 시간 제한으로 최선의 수 고르기
+        function caiChooseMove(board, color, levelKey) {
+            const lv = CHESS_AI_LEVELS[levelKey] || CHESS_AI_LEVELS.normal;
+            const b = board.map(row => row.slice());
+            const root = caiLegalMoves(b, color, false);
+            if (!root.length) return null;
+            const ctx = { nodes: 0, timeUp: false, deadline: performance.now() + lv.timeMs };
+            let best = root[0], order = root.slice().sort((x, y) => y.score - x.score);
+            for (let d = 1; d <= lv.depth; d++) {
+                let alpha = -Infinity, iterBest = null;
+                const scored = [];
+                for (const m of order) {
+                    caiMake(b, m);
+                    // 흔들림(noise)을 줄 때는 모든 수를 정확한 점수로 계산해야 함 (가지치기 경계값에 noise가 붙으면 메이트를 놓침)
+                    const window = lv.noise ? -Infinity : alpha;
+                    let v = -caiSearch(b, caiOpp(color), d - 1, -Infinity, -window, 1, ctx);
+                    caiUnmake(b, m);
+                    if (ctx.timeUp) break;
+                    // 쉬움/보통은 일부러 흔들림, 단 메이트 점수는 그대로
+                    if (lv.noise && Math.abs(v) < CAI_MATE - 1000) v += (Math.random() - 0.5) * 2 * lv.noise;
+                    scored.push([m, v]);
+                    if (v > alpha) { alpha = v; iterBest = m; }
+                }
+                if (ctx.timeUp && !iterBest) break;
+                if (iterBest) best = iterBest;
+                // 다음 깊이에서는 좋은 수부터 탐색
+                order = scored.sort((x, y) => y[1] - x[1]).map(x => x[0]).concat(order.filter(m => !scored.some(s => s[0] === m)));
+                if (ctx.timeUp) break;
+            }
+            // 쉬움: 메이트 기회가 아니면 가끔 아무 수나 둠
+            if (lv.blunder && Math.random() < lv.blunder) {
+                caiMake(b, best);
+                const mates = !caiLegalMoves(b, caiOpp(color), false).length && caiInCheck(b, caiOpp(color));
+                caiUnmake(b, best);
+                if (!mates) return root[Math.floor(Math.random() * root.length)];
+            }
+            return best;
+        }
+
+        // ---------- 게임 진행 / 화면 ----------
+        let chessAi = null; // { board, me, ai, turn, level, over, result, sel, moves, last, plies, log, thinking, captured }
+
+        function chessAiInProgress() { return chessAi && !chessAi.over && chessAi.plies > 0; }
+
+        function startChessAi() {
+            if (chessAiInProgress()) {
+                if (!confirm(`진행 중인 AI 체스가 있습니다.\n지금 새 게임을 시작하면 [${myGameName()}] 님에게 1패가 기록됩니다.\n그래도 새 게임을 시작하시겠습니까?`)) return;
+                recordGameResult(`chess_ai_${chessAi.level}`, null, myGameName());
+            }
+            const me = document.getElementById('chessAiColor').value;
+            chessAi = {
+                board: caiInitialBoard(), me, ai: caiOpp(me), turn: 'white',
+                level: document.getElementById('chessAiLevel').value,
+                over: false, result: null, sel: null, moves: [], last: null, plies: 0, log: [], thinking: false,
+                captured: { white: [], black: [] }
+            };
+            renderChessAiStats();
+            renderChessAi();
+            if (chessAi.ai === 'white') chessAiThink();
+        }
+
+        const caiSideName = (c) => c === 'white' ? '🔴 빨강' : '🔵 파랑';
+        const caiSq = (r, c) => 'abcdefgh'[c] + (8 - r);
+
+        function chessAiApply(m) {
+            const g = chessAi;
+            const p = g.board[m.fr][m.fc];
+            if (m.cap) g.captured[m.cap.color].push(m.cap.type);
+            caiMake(g.board, m);
+            g.last = { fr: m.fr, fc: m.fc, tr: m.tr, tc: m.tc };
+            g.plies++;
+            g.log.unshift(`${caiSideName(p.color).slice(-2)}: ${getChessPieceName(p.type)} ${caiSq(m.fr, m.fc)} → ${caiSq(m.tr, m.tc)}${m.cap ? ' ×' + getChessPieceName(m.cap.type) : ''}${m.promo ? ' (퀸 승격)' : ''}`);
+            g.turn = caiOpp(p.color);
+            g.sel = null; g.moves = [];
+            // 종료 판정
+            const next = caiLegalMoves(g.board, g.turn, false);
+            const pieces = g.board.flat().filter(Boolean);
+            if (!next.length) {
+                g.over = true;
+                if (caiInCheck(g.board, g.turn)) {
+                    g.result = p.color; // 방금 둔 쪽 승리
+                    g.log.unshift(`🏆 체크메이트! ${caiSideName(p.color)} 승리`);
+                    if (p.color === g.me) recordGameResult(`chess_ai_${g.level}`, myGameName(), null);
+                    else recordGameResult(`chess_ai_${g.level}`, null, myGameName());
+                } else {
+                    g.result = 'draw';
+                    g.log.unshift('🤝 스테일메이트 (무승부)');
+                }
+            } else if (pieces.length === 2 || g.plies >= 300) {
+                g.over = true; g.result = 'draw';
+                g.log.unshift(pieces.length === 2 ? '🤝 킹만 남아 무승부' : '🤝 300수가 넘어 무승부');
+            }
+            renderChessAi();
+        }
+
+        function chessAiClick(r, c) {
+            const g = chessAi;
+            if (!g) { alert('먼저 "새 게임"을 눌러 주세요.'); return; }
+            if (g.over || g.thinking || g.turn !== g.me) return;
+            const p = g.board[r][c];
+            const target = g.moves.find(m => m.tr === r && m.tc === c);
+            if (g.sel && target) {
+                chessAiApply(target);
+                if (!g.over) chessAiThink();
+                return;
+            }
+            if (p && p.color === g.me) {
+                g.sel = { r, c };
+                g.moves = caiLegalMoves(g.board, g.me, false).filter(m => m.fr === r && m.fc === c);
+            } else {
+                g.sel = null; g.moves = [];
+            }
+            renderChessAi();
+        }
+
+        function chessAiThink() {
+            const g = chessAi;
+            g.thinking = true;
+            renderChessAi();
+            // 화면에 "생각 중"을 먼저 그린 뒤 계산
+            setTimeout(() => {
+                if (chessAi !== g || g.over) return;
+                const m = caiChooseMove(g.board, g.ai, g.level);
+                g.thinking = false;
+                if (m) chessAiApply(m);
+            }, 60);
+        }
+
+        function renderChessAi() {
+            const boardEl = document.getElementById('chessAiBoard');
+            if (!boardEl) return;
+            const g = chessAi;
+            const board = g ? g.board : caiInitialBoard();
+            const flip = g && g.me === 'black'; // 파랑이면 내 말이 아래로 오게 뒤집기
+            const checkKing = g && !g.over && caiInCheck(board, g.turn) ? caiFindKing(board, g.turn) : null;
+            boardEl.innerHTML = '';
+            for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) {
+                const r = flip ? 7 - i : i, c = flip ? 7 - j : j;
+                const cell = document.createElement('div');
+                cell.className = `chess-cell ${(r + c) % 2 === 0 ? 'light' : 'dark'}`;
+                const p = board[r][c];
+                if (p) {
+                    cell.textContent = CHESS_PIECES[p.color][p.type];
+                    cell.classList.add(p.color === 'black' ? 'chess-piece-blue' : 'chess-piece-red');
+                }
+                if (g && g.last && ((g.last.fr === r && g.last.fc === c) || (g.last.tr === r && g.last.tc === c))) cell.classList.add('last-move');
+                if (g && g.sel && g.sel.r === r && g.sel.c === c) cell.classList.add('selected');
+                const mv = g && g.moves.find(m => m.tr === r && m.tc === c);
+                if (mv) cell.classList.add(mv.cap ? 'capture-move' : 'valid-move');
+                if (checkKing && checkKing[0] === r && checkKing[1] === c) cell.classList.add('in-check');
+                cell.onclick = () => chessAiClick(r, c);
+                boardEl.appendChild(cell);
+            }
+            const turnEl = document.getElementById('chessAiTurn');
+            const banner = document.getElementById('chessAiBanner');
+            if (!g) {
+                turnEl.textContent = '난이도와 진영을 고르고 "새 게임"을 누르세요';
+                banner.innerHTML = '';
+                document.getElementById('chessAiLog').innerHTML = '';
+                return;
+            }
+            const lvLabel = CHESS_AI_LEVELS[g.level].label;
+            if (g.over) {
+                turnEl.textContent = '게임 종료!';
+                const text = g.result === 'draw' ? '🤝 무승부' : g.result === g.me ? `🎉 체크메이트! ${lvLabel} AI를 이겼어요!` : '🤖 AI 승리… 다시 도전!';
+                banner.innerHTML = `<div class="omokai-banner ${g.result === g.me ? 'win' : 'lose'}">${text}</div>`;
+            } else {
+                banner.innerHTML = '';
+                const check = caiInCheck(g.board, g.turn) ? ' <span style="color:#ff6b6b">체크!</span>' : '';
+                turnEl.innerHTML = g.thinking
+                    ? `🤖 AI(${caiSideName(g.ai)}) 생각 중<span class="omokai-dots"></span>`
+                    : `${caiSideName(g.turn)} 차례${g.turn === g.me ? ' <span style="color:#4cd137">(내 차례)</span>' : ''}${check}`;
+            }
+            document.getElementById('chessAiInfo').textContent = `${lvLabel} · 나: ${caiSideName(g.me)} / AI: ${caiSideName(g.ai)} · ${g.plies}수`;
+            const capEl = document.getElementById('chessAiCaptured');
+            capEl.innerHTML = ['white', 'black'].map(col => `<div class="captured-row"><span>${col === 'white' ? '🔴' : '🔵'}</span><span class="${col === 'white' ? 'chess-piece-red' : 'chess-piece-blue'}">${g.captured[col].map(t => CHESS_PIECES[col][t]).join('')}</span></div>`).join('');
+            document.getElementById('chessAiLog').innerHTML = g.log.slice(0, 40).map(l => `<div class="log-entry">${escapeHtml(l)}</div>`).join('');
+        }
+
+        function renderChessAiStats() {
+            const el = document.getElementById('chessAiStatsMini');
+            if (!el) return;
+            const level = (chessAi && chessAi.level) || document.getElementById('chessAiLevel').value;
+            document.getElementById('chessAiStatsLevel').textContent = CHESS_AI_LEVELS[level].label;
+            const rows = Object.entries(gameStats[`chess_ai_${level}`] || {})
+                .map(([name, d]) => { const win = d.win || 0, loss = d.loss || 0, total = win + loss; return { name, win, loss, total, rate: total ? win / total : 0 }; })
+                .filter(r => r.total > 0)
+                .sort((a, b) => b.win - a.win || b.rate - a.rate)
+                .slice(0, 10);
+            el.innerHTML = rows.length
+                ? `<table><tr><th>이름</th><th>승</th><th>패</th><th>승률</th></tr>${rows.map(r => `
+                    <tr><td>${nameWithIcon(r.name)}</td><td class="gs-win">${r.win}</td><td class="gs-loss">${r.loss}</td>
+                    <td class="gs-rate">${Math.round(r.rate * 100)}%</td></tr>`).join('')}</table>`
+                : '<div class="gs-empty">아직 기록이 없어요</div>';
+        }
+
+        function setupChessAiStats() {
+            if (!db) return;
+            Object.keys(CHESS_AI_LEVELS).forEach(level => {
+                const key = `chess_ai_${level}`;
+                db.ref(`game_stats/${key}`).off();
+                db.ref(`game_stats/${key}`).on('value', snap => { gameStats[key] = snap.val() || {}; renderChessAiStats(); });
             });
         }
 
