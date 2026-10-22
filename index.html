@@ -2182,6 +2182,74 @@
             50% { box-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 0 5px rgba(255,59,59,0.25); }
         }
 
+        /* AI 오목 보드 (미니 보드와 같은 모양) */
+        #omokAiBoard {
+            display: grid;
+            grid-template-columns: repeat(15, 28px);
+            grid-template-rows: repeat(15, 28px);
+            background: linear-gradient(135deg, #deb887, #d2b48c);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        #omokAiBoard .cell {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+        }
+        #omokAiBoard .cell::before,
+        #omokAiBoard .cell::after {
+            content: '';
+            position: absolute;
+            background: #8b7355;
+        }
+        #omokAiBoard .cell::before {
+            width: 100%;
+            height: 1px;
+            top: 50%;
+        }
+        #omokAiBoard .cell::after {
+            width: 1px;
+            height: 100%;
+            left: 50%;
+        }
+        #omokAiBoard .stone {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            position: relative;
+            z-index: 1;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        #omokAiBoard .stone.black {
+            background: radial-gradient(circle at 30% 30%, #555, #000);
+        }
+        #omokAiBoard .stone.white {
+            background: radial-gradient(circle at 30% 30%, #fff, #ddd);
+        }
+        /* 마지막에 둔 돌: 가운데 빨간 점 + 깜빡이는 테두리 */
+        #omokAiBoard .stone.last-move::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 8px; height: 8px;
+            margin: -4px 0 0 -4px;
+            border-radius: 50%;
+            background: #ff3b3b;
+            box-shadow: 0 0 4px #ff3b3b;
+        }
+        #omokAiBoard .stone.last-move {
+            animation: omokLastPulseAi 1.4s ease-in-out infinite;
+        }
+        @keyframes omokLastPulseAi {
+            0%, 100% { box-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 0 2px rgba(255,59,59,0.9); }
+            50% { box-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 0 5px rgba(255,59,59,0.25); }
+        }
+
         /* 체스 보드 미니 */
         #chessBoardMini {
             display: grid;
@@ -3563,6 +3631,17 @@
             .game-container-mini { grid-template-columns: minmax(0, 1fr); }
             .game-board-wrapper-mini { overflow-x: auto; justify-content: flex-start; max-width: 100%; }
         }
+
+        /* ===== AI 오목 ===== */
+        .omokai-controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 15px; }
+        .omokai-controls select { padding: 8px 12px; border-radius: 20px; border: none; background: rgba(255,255,255,0.12); color: #fff; font-size: 13px; }
+        .omokai-controls select option { color: #000; }
+        .omokai-info { text-align: center; font-size: 12px; color: rgba(255,255,255,0.65); margin-bottom: 10px; }
+        .omokai-banner { padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; font-size: 15px; margin-bottom: 8px; }
+        .omokai-banner.win { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #1a1a2e; }
+        .omokai-banner.lose { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+        .omokai-dots::after { content: ''; animation: omokaiDots 1.2s steps(4) infinite; }
+        @keyframes omokaiDots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
     </style>
 </head>
 <body>
@@ -4285,6 +4364,7 @@
                     <button class="minigame-tab" onclick="switchMinigame('collection')">🏆 컬렉션</button>
                     <button class="minigame-tab" onclick="switchMinigame('omok')">⚫ 오목</button>
                     <button class="minigame-tab" onclick="switchMinigame('chess')">♟️ 체스</button>
+                    <button class="minigame-tab" onclick="switchMinigame('omokai')">🤖 AI 오목</button>
                     <button class="minigame-tab" onclick="switchMinigame('pikachu')">⚡ 피카츄배구</button>
                 </div>
 
@@ -4435,6 +4515,39 @@
                             <button data-key="spike">💥</button>
                         </div>
                         <div class="pika-help" id="pikaHelp"></div>
+                    </div>
+                </div>
+
+                <!-- AI 오목 패널 -->
+                <div class="minigame-panel" id="panel-omokai">
+                    <div class="omokai-controls">
+                        <select id="omokAiLevel" onchange="renderOmokAiStats()">
+                            <option value="easy">🐣 쉬움</option>
+                            <option value="normal" selected>🙂 보통</option>
+                            <option value="hard">🧠 알파고급 (어려움)</option>
+                        </select>
+                        <select id="omokAiColor">
+                            <option value="black">⚫ 내가 흑 (먼저 둠)</option>
+                            <option value="white">⚪ 내가 백 (AI가 먼저)</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="startOmokAi()"><i class="fas fa-redo"></i> 새 게임</button>
+                    </div>
+                    <div class="omokai-info" id="omokAiInfo">AI와 1:1 오목 · 5목을 먼저 만들면 승리 · 진행 중에 새 게임을 누르면 1패</div>
+                    <div class="game-container-mini">
+                        <div class="game-board-wrapper-mini">
+                            <div id="omokAiBoard"></div>
+                        </div>
+                        <div class="game-info-mini">
+                            <div class="game-status">
+                                <h4><i class="fas fa-robot"></i> AI 대전</h4>
+                                <div id="omokAiBanner"></div>
+                                <div class="current-turn-mini" id="omokAiTurn">난이도와 돌을 고르고 "새 게임"을 누르세요</div>
+                            </div>
+                            <div class="game-stats-mini">
+                                <h4><i class="fas fa-trophy"></i> AI 상대 전적 · <span id="omokAiStatsLevel">🙂 보통</span></h4>
+                                <div id="omokAiStatsMini" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -7819,6 +7932,7 @@ ${text}
             if (typeof loadLeaderboard === 'function') safe(loadLeaderboard);
             if (typeof renderCheckinToday === 'function') safe(renderCheckinToday);
             if (typeof renderGameStats === 'function') ['omok', 'chess'].forEach(g => { safe(() => renderGameStats(g)); safe(() => renderGameChat(g)); });
+            if (typeof renderOmokAiStats === 'function') safe(renderOmokAiStats);
         }
         function setupUserIconListener() {
             if (!db) return;
@@ -7845,6 +7959,7 @@ ${text}
             setupChessListener();
             setupChessIntegratedListener();
             setupGameStatsAndChat();
+            setupOmokAiStats();
             setupChatListener();
             setupYieldListener();
             // 고정 지연(setTimeout) 대신 Firebase 연결 직후 로드 → SDK 로딩이 늦어도 누락되지 않음
@@ -8712,6 +8827,9 @@ ${text}
                 renderChessBoardMini();
             } else if (panel === 'pikachu') {
                 drawPika();
+            } else if (panel === 'omokai') {
+                renderOmokAi();
+                renderOmokAiStats();
             }
         }
 
@@ -10632,6 +10750,290 @@ ${text}
                     gameChats[game] = Object.values(data).sort((a, b) => (a.time || 0) - (b.time || 0));
                     renderGameChat(game);
                 });
+            });
+        }
+
+
+        // =====================================================
+        // 🤖 AI 오목 (혼자 AI와 대결, 공유 판과 별개)
+        // =====================================================
+        const OMOK_AI_LEVELS = {
+            easy:   { label: '🐣 쉬움', defense: 0.7, pick: 4, lookahead: false },
+            normal: { label: '🙂 보통', defense: 1.0, pick: 1, lookahead: false },
+            hard:   { label: '🧠 알파고급', defense: 1.05, pick: 1, lookahead: true }
+        };
+        // 5칸 창 안의 내 돌 개수별 점수 (상대 돌이 섞인 창은 무효)
+        const OMOK_WINDOW_SCORE = [0, 1, 15, 200, 4000, 1000000];
+
+        let omokAi = null; // { board, me, ai, level, turn, over, winner, last, moves, thinking }
+
+        function omokAiEmptyBoard() {
+            return Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
+        }
+
+        function omokAiCheckWin(board, x, y, color) {
+            for (const [dx, dy] of [[1, 0], [0, 1], [1, 1], [1, -1]]) {
+                let count = 1;
+                for (const s of [1, -1]) {
+                    for (let i = 1; i < 5; i++) {
+                        const nx = x + dx * i * s, ny = y + dy * i * s;
+                        if (nx < 0 || nx >= BOARD_SIZE || ny < 0 || ny >= BOARD_SIZE || board[ny][nx] !== color) break;
+                        count++;
+                    }
+                }
+                if (count >= 5) return true;
+            }
+            return false;
+        }
+
+        // (x, y)에 color 돌을 둔다고 가정했을 때의 점수
+        function omokAiPointScore(board, x, y, color) {
+            let total = 0;
+            for (const [dx, dy] of [[1, 0], [0, 1], [1, 1], [1, -1]]) {
+                for (let k = -4; k <= 0; k++) {
+                    let own = 0, blocked = false;
+                    for (let i = 0; i < 5; i++) {
+                        const nx = x + dx * (k + i), ny = y + dy * (k + i);
+                        if (nx < 0 || nx >= BOARD_SIZE || ny < 0 || ny >= BOARD_SIZE) { blocked = true; break; }
+                        const c = (nx === x && ny === y) ? color : board[ny][nx];
+                        if (c === color) own++;
+                        else if (c) { blocked = true; break; }
+                    }
+                    if (!blocked) total += OMOK_WINDOW_SCORE[own];
+                }
+            }
+            return total;
+        }
+
+        // 이미 둔 돌 주변 2칸 이내의 빈 칸만 후보로
+        function omokAiCandidates(board) {
+            const out = [];
+            let any = false;
+            for (let y = 0; y < BOARD_SIZE; y++) for (let x = 0; x < BOARD_SIZE; x++) {
+                if (board[y][x]) { any = true; continue; }
+                let near = false;
+                for (let dy = -2; dy <= 2 && !near; dy++) for (let dx = -2; dx <= 2; dx++) {
+                    const nx = x + dx, ny = y + dy;
+                    if (nx >= 0 && nx < BOARD_SIZE && ny >= 0 && ny < BOARD_SIZE && board[ny][nx]) { near = true; break; }
+                }
+                if (near) out.push({ x, y });
+            }
+            if (!any) out.push({ x: 7, y: 7 });
+            return out;
+        }
+
+        function omokAiRank(board, me, opp, defense) {
+            return omokAiCandidates(board).map(c => {
+                const attack = omokAiPointScore(board, c.x, c.y, me);
+                const block = omokAiPointScore(board, c.x, c.y, opp);
+                return Object.assign(c, { attack, block, score: attack * 1.1 + block * defense });
+            }).sort((a, b) => b.score - a.score);
+        }
+
+        function omokAiChooseMove(board, aiColor, levelKey) {
+            const lv = OMOK_AI_LEVELS[levelKey] || OMOK_AI_LEVELS.normal;
+            const opp = aiColor === 'black' ? 'white' : 'black';
+            const ranked = omokAiRank(board, aiColor, opp, lv.defense);
+            if (!ranked.length) return null;
+            // 이길 수 있으면 무조건 승리, 상대가 다음에 이기는 자리는 무조건 막기
+            const win = ranked.find(c => c.attack >= OMOK_WINDOW_SCORE[5]);
+            if (win) return win;
+            const mustBlock = ranked.filter(c => c.block >= OMOK_WINDOW_SCORE[5]).sort((a, b) => b.attack - a.attack)[0];
+            if (mustBlock && levelKey !== 'easy') return mustBlock;
+            if (mustBlock && Math.random() < 0.85) return mustBlock; // 쉬움은 가끔 놓침
+
+            if (lv.lookahead) {
+                // 알파고급: 6수 앞까지 읽는 알파-베타 탐색 (각 단계 상위 후보만)
+                const top = ranked.slice(0, OMOK_AI_SEARCH.width);
+                let best = top[0], bestVal = -Infinity, alpha = -Infinity;
+                for (const c of top) {
+                    board[c.y][c.x] = aiColor;
+                    const val = omokAiCheckWin(board, c.x, c.y, aiColor)
+                        ? OMOK_AI_WIN
+                        : -omokAiSearch(board, opp, OMOK_AI_SEARCH.depth - 1, -Infinity, -alpha);
+                    board[c.y][c.x] = null;
+                    if (val > bestVal) { bestVal = val; best = c; }
+                    if (val > alpha) alpha = val;
+                }
+                return best;
+            }
+            // 보통: 최선 / 쉬움: 상위 몇 개 중 랜덤
+            const n = Math.min(lv.pick, ranked.length);
+            return ranked[Math.floor(Math.random() * n)];
+        }
+
+        const OMOK_AI_WIN = 1e9;
+        const OMOK_AI_SEARCH = { depth: 6, width: 7 }; // 보통 상대 10전 10승, 한 수 0.5초 내외
+
+        // 판 전체 평가: 5칸 창마다 한 색만 있으면 그 색 점수. 둘 차례인 쪽의 위협은 더 크게 봄
+        function omokAiEvalBoard(board, toMove) {
+            let mine = 0, theirs = 0;
+            const dirs = [[1, 0], [0, 1], [1, 1], [1, -1]];
+            for (let y = 0; y < BOARD_SIZE; y++) for (let x = 0; x < BOARD_SIZE; x++) {
+                for (const [dx, dy] of dirs) {
+                    const ex = x + dx * 4, ey = y + dy * 4;
+                    if (ex < 0 || ex >= BOARD_SIZE || ey < 0 || ey >= BOARD_SIZE) continue;
+                    let a = 0, b = 0;
+                    for (let i = 0; i < 5; i++) {
+                        const c = board[y + dy * i][x + dx * i];
+                        if (c === toMove) a++; else if (c) b++;
+                    }
+                    if (a && !b) mine += OMOK_WINDOW_SCORE[a] * (a === 4 ? 3 : 1); // 내 차례에 4는 곧 승리
+                    else if (b && !a) theirs += OMOK_WINDOW_SCORE[b];
+                }
+            }
+            return mine - theirs * 1.2;
+        }
+
+        // 네가맥스 알파-베타: toMove 입장의 점수를 돌려줌
+        function omokAiSearch(board, toMove, depth, alpha, beta) {
+            if (depth === 0) return omokAiEvalBoard(board, toMove);
+            const opp = toMove === 'black' ? 'white' : 'black';
+            const cands = omokAiRank(board, toMove, opp, 1.0).slice(0, OMOK_AI_SEARCH.width);
+            if (!cands.length) return 0;
+            let best = -Infinity;
+            for (const c of cands) {
+                board[c.y][c.x] = toMove;
+                const val = omokAiCheckWin(board, c.x, c.y, toMove)
+                    ? OMOK_AI_WIN - (OMOK_AI_SEARCH.depth - depth) // 빨리 이길수록 좋게
+                    : -omokAiSearch(board, opp, depth - 1, -beta, -alpha);
+                board[c.y][c.x] = null;
+                if (val > best) best = val;
+                if (best > alpha) alpha = best;
+                if (alpha >= beta) break;
+            }
+            return best;
+        }
+
+        function omokAiInProgress() {
+            return omokAi && !omokAi.over && omokAi.moves > 0;
+        }
+
+        function startOmokAi() {
+            if (omokAiInProgress()) {
+                if (!confirm(`진행 중인 AI 대전이 있습니다.\n지금 새 게임을 시작하면 [${myGameName()}] 님에게 1패가 기록됩니다.\n그래도 새 게임을 시작하시겠습니까?`)) return;
+                recordGameResult(`omok_ai_${omokAi.level}`, null, myGameName());
+            }
+            const me = document.getElementById('omokAiColor').value;
+            const level = document.getElementById('omokAiLevel').value;
+            omokAi = {
+                board: omokAiEmptyBoard(), me, ai: me === 'black' ? 'white' : 'black',
+                level, turn: 'black', over: false, winner: null, last: null, moves: 0, thinking: false
+            };
+            renderOmokAiStats();
+            renderOmokAi();
+            if (omokAi.ai === 'black') omokAiThink();
+        }
+
+        function omokAiPlace(x, y, color) {
+            const g = omokAi;
+            g.board[y][x] = color;
+            g.last = { x, y };
+            g.moves++;
+            if (omokAiCheckWin(g.board, x, y, color)) {
+                g.over = true; g.winner = color;
+                // 내가 이기면 1승, AI가 이기면 1패 (난이도별 기록)
+                if (color === g.me) recordGameResult(`omok_ai_${g.level}`, myGameName(), null);
+                else recordGameResult(`omok_ai_${g.level}`, null, myGameName());
+            } else if (g.moves >= BOARD_SIZE * BOARD_SIZE) {
+                g.over = true; g.winner = 'draw';
+            } else {
+                g.turn = color === 'black' ? 'white' : 'black';
+            }
+            renderOmokAi();
+        }
+
+        function omokAiClick(x, y) {
+            const g = omokAi;
+            if (!g) { alert('먼저 "새 게임"을 눌러 주세요.'); return; }
+            if (g.over || g.thinking || g.turn !== g.me || g.board[y][x]) return;
+            omokAiPlace(x, y, g.me);
+            if (!g.over) omokAiThink();
+        }
+
+        function omokAiThink() {
+            const g = omokAi;
+            g.thinking = true;
+            renderOmokAi();
+            // 생각하는 척 잠깐 쉬고 둠
+            setTimeout(() => {
+                if (omokAi !== g || g.over) return;
+                const mv = omokAiChooseMove(g.board, g.ai, g.level);
+                g.thinking = false;
+                if (mv) omokAiPlace(mv.x, mv.y, g.ai);
+            }, g.level === 'hard' ? 250 : 400); // 알파고급은 계산 자체에 시간이 걸려 대기는 짧게
+        }
+
+        function renderOmokAi() {
+            const boardEl = document.getElementById('omokAiBoard');
+            if (!boardEl) return;
+            const g = omokAi;
+            const board = g ? g.board : omokAiEmptyBoard();
+            boardEl.innerHTML = '';
+            for (let y = 0; y < BOARD_SIZE; y++) {
+                for (let x = 0; x < BOARD_SIZE; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.x = x; cell.dataset.y = y;
+                    if (board[y][x]) {
+                        const stone = document.createElement('div');
+                        stone.className = `stone ${board[y][x]}`;
+                        if (g && g.last && g.last.x === x && g.last.y === y) stone.classList.add('last-move');
+                        cell.appendChild(stone);
+                    }
+                    cell.onclick = () => omokAiClick(x, y);
+                    boardEl.appendChild(cell);
+                }
+            }
+            const turnEl = document.getElementById('omokAiTurn');
+            const banner = document.getElementById('omokAiBanner');
+            const stoneName = (c) => c === 'black' ? '⚫ 흑' : '⚪ 백';
+            if (!g) {
+                turnEl.textContent = '난이도와 돌을 고르고 "새 게임"을 누르세요';
+                banner.innerHTML = '';
+                return;
+            }
+            const lvLabel = OMOK_AI_LEVELS[g.level].label;
+            if (g.over) {
+                turnEl.textContent = '게임 종료!';
+                const text = g.winner === 'draw' ? '무승부!' : g.winner === g.me ? `🎉 승리! ${lvLabel} AI를 이겼어요!` : `🤖 AI 승리… 다시 도전!`;
+                banner.innerHTML = `<div class="omokai-banner ${g.winner === g.me ? 'win' : 'lose'}">${text}</div>`;
+            } else {
+                banner.innerHTML = '';
+                turnEl.innerHTML = g.thinking
+                    ? `🤖 AI(${stoneName(g.ai)}) 생각 중<span class="omokai-dots"></span>`
+                    : `${stoneName(g.turn)} 차례 ${g.turn === g.me ? '<span style="color:#4cd137">(내 차례)</span>' : ''}`;
+            }
+            document.getElementById('omokAiInfo').textContent = `${lvLabel} · 나: ${stoneName(g.me)} / AI: ${stoneName(g.ai)} · ${g.moves}수`;
+        }
+
+        function renderOmokAiStats() {
+            const el = document.getElementById('omokAiStatsMini');
+            if (!el) return;
+            const level = (omokAi && omokAi.level) || document.getElementById('omokAiLevel').value;
+            document.getElementById('omokAiStatsLevel').textContent = OMOK_AI_LEVELS[level].label;
+            const key = `omok_ai_${level}`;
+            const rows = Object.entries(gameStats[key] || {})
+                .map(([name, d]) => {
+                    const win = d.win || 0, loss = d.loss || 0, total = win + loss;
+                    return { name, win, loss, total, rate: total ? win / total : 0 };
+                })
+                .filter(r => r.total > 0)
+                .sort((a, b) => b.win - a.win || b.rate - a.rate)
+                .slice(0, 10);
+            el.innerHTML = rows.length
+                ? `<table><tr><th>이름</th><th>승</th><th>패</th><th>승률</th></tr>${rows.map(r => `
+                    <tr><td>${nameWithIcon(r.name)}</td><td class="gs-win">${r.win}</td><td class="gs-loss">${r.loss}</td>
+                    <td class="gs-rate">${Math.round(r.rate * 100)}%</td></tr>`).join('')}</table>`
+                : '<div class="gs-empty">아직 기록이 없어요</div>';
+        }
+
+        function setupOmokAiStats() {
+            if (!db) return;
+            Object.keys(OMOK_AI_LEVELS).forEach(level => {
+                const key = `omok_ai_${level}`;
+                db.ref(`game_stats/${key}`).off();
+                db.ref(`game_stats/${key}`).on('value', snap => { gameStats[key] = snap.val() || {}; renderOmokAiStats(); });
             });
         }
 
