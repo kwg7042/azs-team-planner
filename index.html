@@ -3702,6 +3702,10 @@
         .chess-promo-btns button { width: 70px; height: 80px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); background: #f0d9b5; font-size: 38px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .chess-promo-btns button small { font-size: 11px; color: #333; text-shadow: none; }
         .chess-promo-btns button:hover { border-color: #667eea; transform: scale(1.06); }
+
+        /* 캐슬링 표시 */
+        #chessBoardMini .chess-cell.castle-move, #chessAiBoard .chess-cell.castle-move { box-shadow: inset 0 0 0 4px #ffc107 !important; }
+        .castle-hint { margin-top: 8px; padding: 8px 10px; border-radius: 8px; background: rgba(255,193,7,0.12); border: 1px solid rgba(255,193,7,0.4); font-size: 12px; line-height: 1.6; }
     </style>
 </head>
 <body>
@@ -4654,6 +4658,7 @@
                                 <h4><i class="fas fa-robot"></i> AI 대전</h4>
                                 <div id="chessAiBanner"></div>
                                 <div class="current-turn-mini" id="chessAiTurn">난이도와 진영을 고르고 "새 게임"을 누르세요</div>
+                                <div class="castle-hint" id="chessAiCastleHint" style="display:none"></div>
                             </div>
                             <div class="captured-pieces-mini">
                                 <span>잡힌 말:</span>
@@ -4712,6 +4717,7 @@
                                 <div class="current-turn-mini" id="chessCurrentTurnMini">
                                     🔴 빨강 차례
                                 </div>
+                                <div class="castle-hint" id="chessCastleHintMini" style="display:none"></div>
                             </div>
                             <div class="captured-pieces-mini">
                                 <span>잡힌 말:</span>
@@ -8422,6 +8428,34 @@ ${text}
             return { over: false, result: null, reason: '' };
         }
 
+        // 캐슬링 가능 여부와 안 되는 이유 (킹을 선택했을 때 안내용)
+        function caiCastleInfo(b, color, st) {
+            const home = color === 'white' ? 7 : 0, enemy = caiOpp(color);
+            const sq = (c) => 'abcdefgh'[c] + (8 - home);
+            const king = b[home][4];
+            return [['K', 7, [5, 6], [5, 6]], ['Q', 0, [1, 2, 3], [3, 2]]].map(([side, rc, between, path]) => {
+                const info = { side, ok: false, reason: '', kingTo: [home, side === 'K' ? 6 : 2], rookAt: [home, rc],
+                    how: `${sq(side === 'K' ? 6 : 2)} 칸 또는 ${sq(rc)} 룩 클릭` };
+                const right = st.castle[(color === 'white' ? 'w' : 'b') + side];
+                const rook = b[home][rc];
+                const blocked = between.filter(c => b[home][c]).map(sq);
+                const attacked = path.filter(c => caiAttacked(b, home, c, enemy)).map(sq);
+                if (!king || king.type !== 'king' || king.color !== color) info.reason = '킹이 처음 자리(e열)에 없음';
+                else if (!right) info.reason = '킹 또는 이쪽 룩이 이미 움직였음';
+                else if (!rook || rook.type !== 'rook' || rook.color !== color) info.reason = '룩이 처음 자리에 없음';
+                else if (blocked.length) info.reason = `사이에 말이 있음 (${blocked.join(', ')})`;
+                else if (caiAttacked(b, home, 4, enemy)) info.reason = '체크 상태에서는 불가';
+                else if (attacked.length) info.reason = `${attacked.join(', ')} 칸이 공격받고 있음`;
+                else info.ok = true;
+                return info;
+            });
+        }
+        function caiCastleHintHtml(b, color, st) {
+            return '🏰 캐슬링 — ' + caiCastleInfo(b, color, st).map(i =>
+                `${i.side === 'K' ? '킹 쪽(O-O)' : '퀸 쪽(O-O-O)'} ${i.ok ? `<b style="color:#4cd137">가능</b> · ${i.how}` : `<span style="color:#ff8a8a">불가</span> · ${i.reason}`}`
+            ).join('<br>');
+        }
+
         // 기보 표기용
         function caiMoveText(m) {
             const sq = (r, c) => 'abcdefgh'[c] + (8 - r);
@@ -8547,6 +8581,7 @@ ${text}
         let chessState = caiNewState();   // 캐슬링 권리 · 앙파상 칸 · 50수 카운터
         let chessPositions = {};          // 3회 반복 판정용 국면 횟수
         let chessResultInfo = null;       // { result: 'white'|'black'|'draw', reason }
+        let chessCastleHint = '';         // 킹을 골랐을 때 캐슬링 안내
 
         function initChessBoard() {
             chessBoard = [
@@ -8647,6 +8682,7 @@ ${text}
                 const opt = chessValidMoves.find(m => m.row === row && m.col === col);
                 chessSelectedCell = null;
                 chessValidMoves = [];
+                chessCastleHint = '';
                 if (opt.move && opt.move.promo) {
                     // 승격: 퀸·룩·비숍·나이트 중 선택
                     chessPickPromotion(chessCurrentPlayer).then(t => {
@@ -8661,15 +8697,29 @@ ${text}
                 return;
             }
             
+            // 킹을 고른 뒤 같은 편 룩을 누르면 그쪽으로 캐슬링 (체스닷컴과 같은 방식)
+            if (chessSelectedCell && piece && piece.type === 'rook' && piece.color === chessCurrentPlayer) {
+                const castle = chessValidMoves.find(m => m.move && m.move.castle && (m.move.castle === 'K' ? 7 : 0) === col && m.row === row);
+                if (castle) {
+                    const from = chessSelectedCell;
+                    chessSelectedCell = null; chessValidMoves = []; chessCastleHint = '';
+                    moveChessPiece(from.row, from.col, castle.row, castle.col);
+                    renderChessBoard();
+                    return;
+                }
+            }
+            
             if (piece && piece.color === chessCurrentPlayer) {
                 chessSelectedCell = { row, col };
                 chessValidMoves = getChessValidMoves(row, col);
+                chessCastleHint = piece.type === 'king' ? caiCastleHintHtml(chessBoard, piece.color, chessState) : '';
                 renderChessBoard();
                 return;
             }
             
             chessSelectedCell = null;
             chessValidMoves = [];
+            chessCastleHint = '';
             renderChessBoard();
         }
 
@@ -8817,7 +8867,7 @@ ${text}
                     try { chessPositions = data.positionsJson ? JSON.parse(data.positionsJson) : {}; } catch (e) { chessPositions = {}; }
                     chessResultInfo = data.result || null;
                     // 상대가 둔 수를 보는 중이면 선택 해제 (선택한 말의 이동 칸이 바뀌었을 수 있음)
-                    chessSelectedCell = null; chessValidMoves = [];
+                    chessSelectedCell = null; chessValidMoves = []; chessCastleHint = '';
                     renderChessBoard();
                     updateChessDisplay();
                     // 상대가 둔 수가 게임 탭(미니 보드)에 바로 보이도록 갱신
@@ -11294,6 +11344,10 @@ ${text}
                     if (chessValidMoves.some(m => m.row === row && m.col === col)) {
                         cell.classList.add('valid-move');
                     }
+                    // 캐슬링 칸(킹 도착 칸)과 그쪽 룩을 금색으로 표시
+                    if (chessValidMoves.some(m => m.move && m.move.castle && ((m.row === row && m.col === col) || (m.row === row && (m.move.castle === 'K' ? 7 : 0) === col)))) {
+                        cell.classList.add('castle-move');
+                    }
                     
                     const piece = chessBoard[row][col];
                     if (piece) {
@@ -11309,6 +11363,8 @@ ${text}
             updateChessPlayersDisplay();
             updateChessModeNotice();
             updateChessTurnDisplayMini();
+            const hintEl = document.getElementById('chessCastleHintMini');
+            if (hintEl) { hintEl.innerHTML = chessSelectedCell ? chessCastleHint : ''; hintEl.style.display = hintEl.innerHTML ? '' : 'none'; }
         }
 
         // 체스 진영 선택 (통합)
@@ -11884,9 +11940,15 @@ ${text}
                 }
                 return;
             }
+            // 킹을 고른 뒤 같은 편 룩을 누르면 캐슬링
+            if (g.sel && p && p.type === 'rook' && p.color === g.me) {
+                const castle = g.moves.find(m => m.castle && m.tr === r && (m.castle === 'K' ? 7 : 0) === c);
+                if (castle) { chessAiApply(castle); if (!g.over) chessAiThink(); return; }
+            }
             if (p && p.color === g.me) {
                 g.sel = { r, c };
                 g.moves = caiLegalMoves(g.board, g.me, g.st, false).filter(m => m.fr === r && m.fc === c);
+                g.castleHint = p.type === 'king' ? caiCastleHintHtml(g.board, g.me, g.st) : '';
             } else {
                 g.sel = null; g.moves = [];
             }
@@ -11927,6 +11989,7 @@ ${text}
                 if (g && g.sel && g.sel.r === r && g.sel.c === c) cell.classList.add('selected');
                 const mv = g && g.moves.find(m => m.tr === r && m.tc === c);
                 if (mv) cell.classList.add(mv.cap ? 'capture-move' : 'valid-move');
+                if (g && g.moves.some(m => m.castle && m.tr === r && (m.tc === c || (m.castle === 'K' ? 7 : 0) === c))) cell.classList.add('castle-move');
                 if (checkKing && checkKing[0] === r && checkKing[1] === c) cell.classList.add('in-check');
                 cell.onclick = () => chessAiClick(r, c);
                 boardEl.appendChild(cell);
@@ -11952,6 +12015,8 @@ ${text}
                     : `${caiSideName(g.turn)} 차례${g.turn === g.me ? ' <span style="color:#4cd137">(내 차례)</span>' : ''}${check}`;
             }
             document.getElementById('chessAiInfo').textContent = `${lvLabel} · 나: ${caiSideName(g.me)} / AI: ${caiSideName(g.ai)} · ${g.plies}수`;
+            const hintEl = document.getElementById('chessAiCastleHint');
+            if (hintEl) { hintEl.innerHTML = g.sel && g.castleHint ? g.castleHint : ''; hintEl.style.display = hintEl.innerHTML ? '' : 'none'; }
             const capEl = document.getElementById('chessAiCaptured');
             capEl.innerHTML = ['white', 'black'].map(col => `<div class="captured-row"><span>${col === 'white' ? '🔴' : '🔵'}</span><span class="${col === 'white' ? 'chess-piece-red' : 'chess-piece-blue'}">${g.captured[col].map(t => CHESS_PIECES[col][t]).join('')}</span></div>`).join('');
             document.getElementById('chessAiLog').innerHTML = g.log.slice(0, 40).map(l => `<div class="log-entry">${escapeHtml(l)}</div>`).join('');
