@@ -2163,6 +2163,24 @@
         #omokBoardMini .stone.white {
             background: radial-gradient(circle at 30% 30%, #fff, #ddd);
         }
+        /* 마지막에 둔 돌: 가운데 빨간 점 + 깜빡이는 테두리 */
+        #omokBoardMini .stone.last-move::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 8px; height: 8px;
+            margin: -4px 0 0 -4px;
+            border-radius: 50%;
+            background: #ff3b3b;
+            box-shadow: 0 0 4px #ff3b3b;
+        }
+        #omokBoardMini .stone.last-move {
+            animation: omokLastPulse 1.4s ease-in-out infinite;
+        }
+        @keyframes omokLastPulse {
+            0%, 100% { box-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 0 2px rgba(255,59,59,0.9); }
+            50% { box-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 0 5px rgba(255,59,59,0.25); }
+        }
 
         /* 체스 보드 미니 */
         #chessBoardMini {
@@ -10170,6 +10188,7 @@ ${text}
         const myPlayerId = 'player_' + Math.random().toString(36).substr(2, 9);
         // 플레이어 ID → 이름 (오목/체스에서 누가 두는지 표시)
         let omokPlayerNames = {};
+        let omokLastMove = null; // 마지막에 둔 자리 {x, y}
         let chessPlayerNames = {};
 
         function myGameName() {
@@ -10206,6 +10225,7 @@ ${text}
                     if (omokBoard[y] && omokBoard[y][x]) {
                         const stone = document.createElement('div');
                         stone.className = `stone ${omokBoard[y][x]}`;
+                        if (omokLastMove && omokLastMove.x === x && omokLastMove.y === y) stone.classList.add('last-move');
                         cell.appendChild(stone);
                     }
                     
@@ -10317,6 +10337,7 @@ ${text}
             if (omokBoard[y][x]) return;
             
             omokBoard[y][x] = currentPlayer;
+            omokLastMove = { x, y };
             
             // 승리 체크 (돌 색을 넘겨야 연속 5개를 셀 수 있음)
             if (checkWin(x, y, currentPlayer)) {
@@ -10333,7 +10354,8 @@ ${text}
                         gameOver: true,
                         winner: winner,
                         players: omokPlayers,
-                        playerNames: omokPlayerNames
+                        playerNames: omokPlayerNames,
+                        lastMove: omokLastMove
                     });
                 }
                 // 판 저장 후 전적 기록
@@ -10352,7 +10374,8 @@ ${text}
                     gameOver: false,
                     winner: null,
                     players: omokPlayers,
-                    playerNames: omokPlayerNames
+                    playerNames: omokPlayerNames,
+                    lastMove: omokLastMove
                 });
             }
             
@@ -10627,6 +10650,7 @@ ${text}
                     white: (data.players && data.players.white) || null
                 };
                 omokPlayerNames = data.playerNames || {};
+                omokLastMove = data.lastMove || null;
                 // 다른 사람이 새 게임을 시작해 내 자리가 풀린 경우 내 선택도 해제
                 if (myStone && omokPlayers[myStone] !== myPlayerId) {
                     myStone = null;
@@ -10674,10 +10698,16 @@ ${text}
 
         // 오목 게임 리셋 확장
         window.resetOmokGame = function() {
+            // 진행 중(돌이 놓였고 아직 승부가 안 남)에 새 게임을 누르면 누른 사람이 1패
+            const inProgress = !gameOver && omokBoard.some(row => row && row.some(Boolean));
+            const msg = inProgress
+                ? '진행 중인 게임이 있습니다.\n지금 새 게임을 시작하면 [' + myGameName() + '] 님에게 1패가 기록됩니다.\n그래도 새 게임을 시작하시겠습니까?'
+                : '새 게임을 시작하시겠습니까?';
             // 확인을 먼저 받고 나서 초기화 (기존엔 판을 지운 뒤에 확인창이 떠서 취소해도 판이 사라졌음)
-            if (!confirm('새 게임을 시작하시겠습니까?')) return;
+            if (!confirm(msg)) return;
             omokPlayers = { black: null, white: null };
             myStone = null;
+            omokLastMove = null;
             initOmokBoard();
             
             if (db) {
@@ -10689,6 +10719,8 @@ ${text}
                     players: omokPlayers
                 });
             }
+            // 판을 비운 뒤 기권패 기록 (승리는 주지 않음)
+            if (inProgress) recordGameResult('omok', null, myGameName());
             
             document.getElementById('btnBlackMini')?.classList.remove('selected');
             document.getElementById('btnWhiteMini')?.classList.remove('selected');
