@@ -3642,6 +3642,17 @@
         .omokai-banner.lose { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
         .omokai-dots::after { content: ''; animation: omokaiDots 1.2s steps(4) infinite; }
         @keyframes omokaiDots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
+
+        /* ===== 닷지 ===== */
+        .dodge-area { text-align: center; padding: 15px; background: linear-gradient(180deg, #0b1020, #05060f); border-radius: 20px; border: 3px solid rgba(79,163,255,0.35); margin-bottom: 20px; }
+        .dodge-top { display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+        .dodge-top .pika-start { padding: 8px 20px; border-radius: 20px; border: none; background: linear-gradient(135deg, #ffd400, #ff8c00); color: #1a1a2e; font-weight: bold; font-size: 14px; cursor: pointer; }
+        .dodge-mybest { font-size: 13px; color: rgba(255,255,255,0.8); }
+        .dodge-mybest b { color: #ffd400; }
+        #dodgeCanvas { width: 100%; max-width: 640px; height: auto; display: block; margin: 0 auto; border-radius: 12px; touch-action: none; cursor: crosshair; }
+        .dodge-ranking td.dodge-best { color: #ffd400; font-weight: bold; }
+        .dodge-ranking tr.dodge-me td { background: rgba(79,163,255,0.15); }
+        .dodge-ranking th:nth-child(2), .dodge-ranking td:nth-child(2) { text-align: left; }
     </style>
 </head>
 <body>
@@ -4366,6 +4377,7 @@
                     <button class="minigame-tab" onclick="switchMinigame('chess')">♟️ 체스</button>
                     <button class="minigame-tab" onclick="switchMinigame('omokai')">🤖 AI 오목</button>
                     <button class="minigame-tab" onclick="switchMinigame('pikachu')">⚡ 피카츄배구</button>
+                    <button class="minigame-tab" onclick="switchMinigame('dodge')">✈️ 닷지</button>
                 </div>
 
                 <!-- 인형뽑기 -->
@@ -4548,6 +4560,22 @@
                                 <div id="omokAiStatsMini" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- 닷지 패널 -->
+                <div class="minigame-panel" id="panel-dodge">
+                    <div class="dodge-area">
+                        <div class="dodge-top">
+                            <button class="pika-start" id="dodgeStartBtn" onclick="startDodge()">▶ 시작</button>
+                            <span class="dodge-mybest" id="dodgeMyBest">아직 내 기록이 없어요</span>
+                        </div>
+                        <canvas id="dodgeCanvas" width="640" height="480"></canvas>
+                        <div class="pika-help">🎮 방향키(또는 WASD)로 이동 · Space 시작/일시정지 · 📱 화면을 손가락으로 끌어서 이동<br>사방에서 날아오는 총알을 피해 최대한 오래 버티세요. 시간이 갈수록 총알이 많아지고 빨라집니다.</div>
+                    </div>
+                    <div class="leaderboard dodge-ranking">
+                        <h4>🏆 닷지 랭킹 (오래 버틴 시간)</h4>
+                        <div id="dodgeRanking" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
                     </div>
                 </div>
 
@@ -7933,6 +7961,7 @@ ${text}
             if (typeof renderCheckinToday === 'function') safe(renderCheckinToday);
             if (typeof renderGameStats === 'function') ['omok', 'chess'].forEach(g => { safe(() => renderGameStats(g)); safe(() => renderGameChat(g)); });
             if (typeof renderOmokAiStats === 'function') safe(renderOmokAiStats);
+            if (typeof renderDodgeRanking === 'function') safe(renderDodgeRanking);
         }
         function setupUserIconListener() {
             if (!db) return;
@@ -7960,6 +7989,7 @@ ${text}
             setupChessIntegratedListener();
             setupGameStatsAndChat();
             setupOmokAiStats();
+            setupDodgeRanking();
             setupChatListener();
             setupYieldListener();
             // 고정 지연(setTimeout) 대신 Firebase 연결 직후 로드 → SDK 로딩이 늦어도 누락되지 않음
@@ -8830,6 +8860,9 @@ ${text}
             } else if (panel === 'omokai') {
                 renderOmokAi();
                 renderOmokAiStats();
+            } else if (panel === 'dodge') {
+                drawDodge();
+                renderDodgeRanking();
             }
         }
 
@@ -9872,6 +9905,315 @@ ${text}
             document.addEventListener('DOMContentLoaded', initPikaVolley);
         } else {
             initPikaVolley();
+        }
+
+        // =====================================================
+        // ✈️ 닷지 (곰플레이어 닷지 재현): 사방에서 날아오는 총알 피하기
+        // =====================================================
+        const DODGE = {
+            W: 640, H: 480,
+            SPEED: 3.2,          // 비행기 이동 속도(px/프레임)
+            HIT_R: 4,            // 비행기 판정 반지름 (그림보다 작게 → 원작처럼 아슬아슬하게 피할 수 있음)
+            BULLET_R: 3,
+            START_COUNT: 18,     // 시작 총알 수
+            GROW_PER_SEC: 2.2,   // 초당 늘어나는 총알 수
+            MAX_COUNT: 320
+        };
+        let dodge = null;            // { state: 'ready'|'playing'|'dead', t, x, y, bullets, sparks, paused }
+        const dodgeKeys = {};
+        let dodgeRaf = null, dodgeLastTs = 0, dodgeAcc = 0;
+        let dodgeScores = {};
+        let dodgeTouch = null;       // 터치 드래그 시작점
+
+        function isDodgeVisible() {
+            const panel = document.getElementById('panel-dodge');
+            const tab = document.getElementById('tab-minigame');
+            return panel && tab && panel.classList.contains('active') && tab.classList.contains('active');
+        }
+
+        function dodgeSpawnBullet(g) {
+            // 화면 가장자리 랜덤 위치에서 비행기 쪽(약간 빗나가게)으로 발사
+            const W = DODGE.W, H = DODGE.H, m = 6;
+            let x, y;
+            const side = Math.floor(Math.random() * 4);
+            if (side === 0) { x = Math.random() * W; y = -m; }
+            else if (side === 1) { x = W + m; y = Math.random() * H; }
+            else if (side === 2) { x = Math.random() * W; y = H + m; }
+            else { x = -m; y = Math.random() * H; }
+            const tx = g.x + (Math.random() - 0.5) * 90, ty = g.y + (Math.random() - 0.5) * 90;
+            const d = Math.hypot(tx - x, ty - y) || 1;
+            const sp = (1.6 + Math.random() * 1.6) * (1 + Math.min(g.t, 90) / 75); // 시간이 갈수록 빨라짐
+            const hue = [0, 20, 40, 50, 330][Math.floor(Math.random() * 5)];
+            g.bullets.push({ x, y, vx: (tx - x) / d * sp, vy: (ty - y) / d * sp, hue });
+        }
+
+        function startDodge() {
+            const g = { state: 'ready', t: 0, readyT: 60, x: DODGE.W / 2, y: DODGE.H / 2, bullets: [], sparks: [], paused: false };
+            for (let i = 0; i < DODGE.START_COUNT; i++) dodgeSpawnBullet(g);
+            // 처음 총알은 화면 밖 멀리서 출발시켜 시작하자마자 맞지 않게
+            g.bullets.forEach(b => { b.x -= b.vx * 30; b.y -= b.vy * 30; });
+            dodge = g;
+            document.getElementById('dodgeStartBtn').textContent = '↻ 다시 시작';
+            dodgeLastTs = 0; dodgeAcc = 0;
+            if (!dodgeRaf) dodgeRaf = requestAnimationFrame(dodgeLoop);
+        }
+
+        function dodgeStep() {
+            const g = dodge;
+            if (g.state === 'dead') {
+                g.sparks.forEach(s => { s.x += s.vx; s.y += s.vy; s.vx *= 0.96; s.vy *= 0.96; s.life--; });
+                g.sparks = g.sparks.filter(s => s.life > 0);
+                g.bullets.forEach(b => { b.x += b.vx; b.y += b.vy; });
+                return;
+            }
+            // 이동 (대각선은 같은 속도로)
+            let mx = 0, my = 0;
+            const k = dodgeKeys;
+            if (k.ArrowLeft || k.KeyA) mx -= 1;
+            if (k.ArrowRight || k.KeyD) mx += 1;
+            if (k.ArrowUp || k.KeyW) my -= 1;
+            if (k.ArrowDown || k.KeyS) my += 1;
+            if (mx || my) {
+                const n = Math.hypot(mx, my);
+                g.x += mx / n * DODGE.SPEED; g.y += my / n * DODGE.SPEED;
+            }
+            g.x = Math.max(8, Math.min(DODGE.W - 8, g.x));
+            g.y = Math.max(8, Math.min(DODGE.H - 8, g.y));
+
+            if (g.state === 'ready') { if (--g.readyT <= 0) g.state = 'playing'; return; }
+
+            g.t += 1 / 60;
+            const target = Math.min(DODGE.MAX_COUNT, Math.floor(DODGE.START_COUNT + g.t * DODGE.GROW_PER_SEC));
+            const W = DODGE.W, H = DODGE.H, m = 20;
+            for (const b of g.bullets) { b.x += b.vx; b.y += b.vy; }
+            // 화면 밖으로 나간 총알은 새로 발사
+            const alive = g.bullets.filter(b => b.x > -m && b.x < W + m && b.y > -m && b.y < H + m);
+            const lost = g.bullets.length - alive.length;
+            g.bullets = alive;
+            for (let i = 0; i < lost && g.bullets.length < target; i++) dodgeSpawnBullet(g);
+            while (g.bullets.length < target) dodgeSpawnBullet(g);
+
+            const R = DODGE.HIT_R + DODGE.BULLET_R;
+            if (g.bullets.some(b => (b.x - g.x) ** 2 + (b.y - g.y) ** 2 < R * R)) dodgeDie();
+        }
+
+        function dodgeDie() {
+            const g = dodge;
+            g.state = 'dead';
+            for (let i = 0; i < 40; i++) {
+                const a = Math.random() * Math.PI * 2, sp = 1 + Math.random() * 4;
+                g.sparks.push({ x: g.x, y: g.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 40 + Math.random() * 30, hue: 20 + Math.random() * 40 });
+            }
+            const sec = Math.floor(g.t * 100) / 100;
+            g.final = sec;
+            saveDodgeScore(sec);
+        }
+
+        function saveDodgeScore(sec) {
+            const name = myGameName();
+            const key = statKey(name);
+            const prevBest = (dodgeScores[key] && dodgeScores[key].best) || 0;
+            dodge.newBest = sec > prevBest;
+            if (!db) return;
+            db.ref(`dodge_scores/${key}`).transaction(cur => {
+                cur = cur || { best: 0, plays: 0 };
+                cur.plays = (cur.plays || 0) + 1;
+                if (sec > (cur.best || 0)) { cur.best = sec; cur.bestAt = Date.now(); }
+                cur.updatedAt = Date.now();
+                return cur;
+            });
+        }
+
+        function renderDodgeRanking() {
+            const el = document.getElementById('dodgeRanking');
+            if (!el) return;
+            const me = statKey(myGameName());
+            const rows = Object.entries(dodgeScores)
+                .map(([name, d]) => ({ name, best: d.best || 0, plays: d.plays || 0 }))
+                .filter(r => r.best > 0)
+                .sort((a, b) => b.best - a.best);
+            const medal = (i) => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+            el.innerHTML = rows.length
+                ? `<table><tr><th>순위</th><th>이름</th><th>최고 기록</th><th>판수</th></tr>${rows.slice(0, 10).map((r, i) => `
+                    <tr class="${r.name === me ? 'dodge-me' : ''}"><td>${medal(i)}</td><td>${nameWithIcon(r.name)}</td>
+                    <td class="dodge-best">${r.best.toFixed(2)}초</td><td>${r.plays}</td></tr>`).join('')}</table>`
+                : '<div class="gs-empty">아직 기록이 없어요. 첫 기록의 주인공이 되어 보세요!</div>';
+            const mine = dodgeScores[me];
+            const myRank = rows.findIndex(r => r.name === me);
+            document.getElementById('dodgeMyBest').innerHTML = mine && mine.best
+                ? `내 최고 <b>${mine.best.toFixed(2)}초</b>${myRank >= 0 ? ` · ${myRank + 1}위` : ''} · ${mine.plays || 0}판`
+                : '아직 내 기록이 없어요';
+        }
+
+        function setupDodgeRanking() {
+            if (!db) return;
+            db.ref('dodge_scores').off();
+            db.ref('dodge_scores').on('value', snap => { dodgeScores = snap.val() || {}; renderDodgeRanking(); });
+        }
+
+        function drawDodgePlane(ctx, x, y, t) {
+            ctx.save();
+            ctx.translate(x, y);
+            // 엔진 불꽃
+            const f = 4 + Math.sin(t * 40) * 2;
+            ctx.fillStyle = '#ff9a1a';
+            ctx.beginPath(); ctx.moveTo(-3, 7); ctx.lineTo(0, 7 + f + 3); ctx.lineTo(3, 7); ctx.closePath(); ctx.fill();
+            // 동체 + 날개
+            ctx.fillStyle = '#e8f4ff';
+            ctx.strokeStyle = '#4fa3ff';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, -10);
+            ctx.lineTo(3, -2); ctx.lineTo(10, 4); ctx.lineTo(10, 6); ctx.lineTo(3, 4);
+            ctx.lineTo(3, 7); ctx.lineTo(5, 9); ctx.lineTo(-5, 9); ctx.lineTo(-3, 7);
+            ctx.lineTo(-3, 4); ctx.lineTo(-10, 6); ctx.lineTo(-10, 4); ctx.lineTo(-3, -2);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#4fa3ff';
+            ctx.beginPath(); ctx.ellipse(0, -3, 1.6, 3, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+        }
+
+        function drawDodge() {
+            const canvas = document.getElementById('dodgeCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const { W, H } = DODGE;
+            ctx.fillStyle = '#05060f';
+            ctx.fillRect(0, 0, W, H);
+            // 배경 별
+            ctx.fillStyle = 'rgba(255,255,255,0.35)';
+            for (let i = 0; i < 60; i++) ctx.fillRect((i * 97) % W, (i * 57 + i * i) % H, 1, 1);
+
+            const g = dodge;
+            ctx.textAlign = 'center';
+            if (!g) {
+                drawDodgePlane(ctx, W / 2, H / 2, 0);
+                ctx.fillStyle = '#ffd400';
+                ctx.font = 'bold 34px "Segoe UI", sans-serif';
+                ctx.fillText('✈️ DODGE', W / 2, H / 2 - 50);
+                ctx.fillStyle = '#fff';
+                ctx.font = '15px "Segoe UI", sans-serif';
+                ctx.fillText('사방에서 날아오는 총알을 피해 오래 버티세요', W / 2, H / 2 + 45);
+                ctx.fillText('Space 또는 ▶ 시작', W / 2, H / 2 + 70);
+                return;
+            }
+            // 총알
+            for (const b of g.bullets) {
+                ctx.fillStyle = `hsl(${b.hue}, 100%, 60%)`;
+                ctx.beginPath(); ctx.arc(b.x, b.y, DODGE.BULLET_R, 0, Math.PI * 2); ctx.fill();
+            }
+            // 비행기 / 폭발
+            if (g.state !== 'dead') drawDodgePlane(ctx, g.x, g.y, g.t + (g.readyT || 0) / 60);
+            for (const s of g.sparks) {
+                ctx.fillStyle = `hsla(${s.hue}, 100%, 60%, ${Math.min(1, s.life / 30)})`;
+                ctx.fillRect(s.x - 1.5, s.y - 1.5, 3, 3);
+            }
+            // 시간
+            ctx.textAlign = 'left';
+            ctx.font = 'bold 22px "Segoe UI", monospace';
+            ctx.fillStyle = '#fff';
+            ctx.fillText(`${g.t.toFixed(2)}초`, 14, 32);
+            ctx.font = '12px "Segoe UI", sans-serif';
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.fillText(`총알 ${g.bullets.length}개`, 14, 52);
+            ctx.textAlign = 'center';
+            if (g.state === 'ready') {
+                ctx.fillStyle = '#ffd400';
+                ctx.font = 'bold 36px "Segoe UI", sans-serif';
+                ctx.fillText(g.readyT > 30 ? 'READY' : 'GO!', W / 2, H / 2 - 40);
+            }
+            if (g.state === 'dead' && g.sparks.length < 25) {
+                ctx.fillStyle = 'rgba(0,0,0,0.55)';
+                ctx.fillRect(0, H / 2 - 70, W, 140);
+                ctx.fillStyle = '#ff5e5e';
+                ctx.font = 'bold 30px "Segoe UI", sans-serif';
+                ctx.fillText('GAME OVER', W / 2, H / 2 - 25);
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 26px "Segoe UI", sans-serif';
+                ctx.fillText(`${g.final.toFixed(2)}초 버팀${g.newBest ? '  🎉 최고 기록!' : ''}`, W / 2, H / 2 + 12);
+                ctx.font = '14px "Segoe UI", sans-serif';
+                ctx.fillStyle = 'rgba(255,255,255,0.75)';
+                ctx.fillText('Space 또는 ↻ 다시 시작', W / 2, H / 2 + 45);
+            }
+            if (g.paused) {
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.fillRect(0, 0, W, H);
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 28px "Segoe UI", sans-serif';
+                ctx.fillText('⏸ 일시정지 · Space로 계속', W / 2, H / 2);
+            }
+        }
+
+        function dodgeLoop(ts) {
+            dodgeRaf = null;
+            if (!dodge) return;
+            if (!isDodgeVisible()) {
+                // 다른 탭으로 가면 자동 일시정지
+                if (dodge.state !== 'dead') dodge.paused = true;
+                return;
+            }
+            if (dodge.paused) { drawDodge(); return; }
+            if (!dodgeLastTs) dodgeLastTs = ts;
+            dodgeAcc += Math.min(100, ts - dodgeLastTs);
+            dodgeLastTs = ts;
+            const STEP = 1000 / 60;
+            while (dodgeAcc >= STEP) { dodgeStep(); dodgeAcc -= STEP; }
+            drawDodge();
+            const animating = dodge.state !== 'dead' || dodge.sparks.length > 0;
+            if (animating) dodgeRaf = requestAnimationFrame(dodgeLoop);
+            else drawDodge();
+        }
+
+        function dodgeSpaceAction() {
+            if (!dodge || dodge.state === 'dead') { startDodge(); return; }
+            dodge.paused = !dodge.paused;
+            if (!dodge.paused) { dodgeLastTs = 0; if (!dodgeRaf) dodgeRaf = requestAnimationFrame(dodgeLoop); }
+            drawDodge();
+        }
+
+        let dodgeInited = false;
+        function initDodge() {
+            if (dodgeInited || !document.getElementById('dodgeCanvas')) return;
+            dodgeInited = true;
+            const KEYS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'KeyA', 'KeyD', 'KeyW', 'KeyS', 'Space'];
+            const isTyping = (e) => {
+                const t = e.target;
+                return t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
+            };
+            document.addEventListener('keydown', (e) => {
+                if (!isDodgeVisible() || isTyping(e) || !KEYS.includes(e.code)) return;
+                e.preventDefault();
+                if (e.code === 'Space') { if (!e.repeat) dodgeSpaceAction(); return; }
+                dodgeKeys[e.code] = true;
+            });
+            document.addEventListener('keyup', (e) => { if (KEYS.includes(e.code)) dodgeKeys[e.code] = false; });
+            window.addEventListener('blur', () => Object.keys(dodgeKeys).forEach(k => dodgeKeys[k] = false));
+
+            // 모바일: 화면을 손가락으로 끌면 끈 만큼 비행기가 움직임
+            const canvas = document.getElementById('dodgeCanvas');
+            const scale = () => DODGE.W / canvas.getBoundingClientRect().width;
+            canvas.addEventListener('pointerdown', (e) => {
+                if (e.pointerType === 'mouse') return;
+                e.preventDefault();
+                if (!dodge || dodge.state === 'dead') startDodge();
+                dodgeTouch = { x: e.clientX, y: e.clientY };
+            });
+            canvas.addEventListener('pointermove', (e) => {
+                if (!dodgeTouch || !dodge || dodge.state === 'dead' || dodge.paused) return;
+                e.preventDefault();
+                const s = scale();
+                dodge.x = Math.max(8, Math.min(DODGE.W - 8, dodge.x + (e.clientX - dodgeTouch.x) * s * 1.2));
+                dodge.y = Math.max(8, Math.min(DODGE.H - 8, dodge.y + (e.clientY - dodgeTouch.y) * s * 1.2));
+                dodgeTouch = { x: e.clientX, y: e.clientY };
+            });
+            ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => canvas.addEventListener(ev, () => { dodgeTouch = null; }));
+            drawDodge();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initDodge);
+        } else {
+            initDodge();
         }
 
         // =====================================================
