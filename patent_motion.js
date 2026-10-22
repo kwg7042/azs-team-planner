@@ -893,8 +893,8 @@
     '',
     '[출력 형식]',
     '{"title":"","source":"특허/논문 번호","summary":"장치가 무엇을 어떻게 하는지 2~3문장",',
-    ' "web":{"width_mm":0,"pitch_mm":0,"bands":[{"name":"","width_mm":0,"material":"coated"}],"preformed_tabs":null},',
-    ' "stations":[{"id":"s1","type":"rotary_notch","label":"도면 부호를 포함한 이름","edges":{"top":{"cut":"tabs","tab_width_mm":0},"bottom":{"cut":"none"}},"segments_per_rev":4}],',
+    ' "web":{"width_mm":0,"pitch_mm":0,"bands":[{"name":"","width_mm":0,"material":"coated|foil|other"}],"preformed_tabs":null},',
+    ' "stations":[{"id":"s1","type":"4가지 유형 중 문서에 맞는 것","label":"도면 부호를 포함한 이름", ...유형별 필드}],',
     ' "parts":[{"no":"부호","name":"부품명","role":"역할"}],',
     ' "evidence":[{"text":"사양에 반영한 사실","source":"근거 위치(도 3, 청구항 4 등)"}],',
     ' "assumptions":["특허에 없어 추정한 내용"],',
@@ -905,6 +905,8 @@
     '- 특허에 근거가 있는 것만 evidence에, 추정은 assumptions에 넣는다. 근거 없이 단정하지 않는다.',
     '- 4가지 유형에 맞지 않는 기구는 가장 가까운 유형으로 근사하고, 차이를 unsupported에 적는다.',
     '- 모든 문장은 한국어로 쓴다.',
+    '- 매번 백지상태에서 시작한다. 위 출력 형식은 구조 안내일 뿐이며 그 값이나 이전 결과·샘플을 재사용하지 않는다. 이번에 받은 문서에 나온 장치만 사양으로 만든다.',
+    '- 문서에 4가지 유형에 해당하는 공정이 없으면 stations를 빈 배열로 두고, 문서의 실제 동작을 unsupported에 설명한다.',
   ].join('\n');
 
   function exaoneTarget() {
@@ -1186,6 +1188,23 @@
     });
   }
 
+  // 새 PDF를 분석할 때 이전 모션·결과를 모두 지워 백지상태로 시작
+  function clearMotion(msg) {
+    state.spec = null; state.layout = null; state.warnings = []; state.t = 0;
+    if (state.scene) {
+      state.scene.disposeRoot();
+      state.scene.rd.render(state.scene.sc, state.scene.cam); // 빈 장면으로 다시 그림
+    }
+    $('pmTitle').textContent = '';
+    $('pmTop').innerHTML = ''; $('pmSide').innerHTML = '';
+    $('pmStatus').textContent = '-'; $('pmStatusSub').textContent = msg || '';
+    $('pmJson').value = ''; $('pmFix').value = '';
+    setLog('pmFixLog', ''); setLog('pmJsonLog', '');
+    try { localStorage.removeItem('pm_last_spec'); } catch (e) { /* noop */ }
+    renderResult();
+    renderColors();
+  }
+
   function applySpec(raw, opt) {
     const { spec, warnings } = normalizeSpec(raw);
     state.spec = spec; state.warnings = warnings;
@@ -1257,6 +1276,7 @@
       $('pmPdfInfo').textContent = `${file.name} · ${pdf.total}쪽${pdf.total > 40 ? ' (앞 40쪽만 사용)' : ''} · 도면으로 보이는 페이지 ${sel}장 자동 선택`;
       $('pmAnalyzeRow').style.display = '';
       renderThumbs();
+      clearMotion('새 PDF를 불러왔습니다. 도면 페이지를 확인하고 분석을 누르세요.');
       setLog('pmLog', sel ? '' : '도면 페이지를 자동으로 찾지 못했습니다. 미리보기에서 도면 페이지를 직접 골라 주세요.');
     } catch (e) {
       setLog('pmLog', 'PDF를 읽지 못했습니다: ' + e.message, true);
@@ -1267,6 +1287,7 @@
     if (state.busy || !state.pdf) return;
     const sel = state.pdf.pages.filter((p) => p.sel);
     state.busy = true; $('pmAnalyze').disabled = true;
+    clearMotion('분석 중… 이전 모션은 지우고 이 문서만으로 새로 만듭니다.');
     try {
       setLog('pmLog', `도면 ${sel.length}장을 이미지로 변환하는 중…`);
       const content = [{ type: 'text', text: '[특허 본문 발췌]\n' + pickText(state.pdf.pages, 14000) }];
@@ -1274,7 +1295,7 @@
         content.push({ type: 'text', text: `[도면 이미지: PDF ${p.no}쪽]` });
         content.push({ type: 'image_url', image_url: { url: await pageImage(state.pdf.doc, p.no) } });
       }
-      content.push({ type: 'text', text: '위 자료를 바탕으로 동작 사양 JSON 하나만 출력하라.' });
+      content.push({ type: 'text', text: '위 자료만 근거로, 이전 결과나 예시와 무관하게 처음부터 동작 사양 JSON 하나만 출력하라.' });
       const t0 = Date.now();
       const ticker = startTicker('pmLog', 'EXAONE이 도면과 본문을 해석하는 중… (최대 15분까지 기다립니다)');
       let raw;
