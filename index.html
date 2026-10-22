@@ -1485,14 +1485,16 @@
         .chess-cell.light { background: #f0d9b5; }
         .chess-cell.dark { background: #b58863; }
 
-        .chess-cell.black-piece {
-            color: #000;
-            text-shadow: 0 0 2px #333;
+        .chess-cell.black-piece,
+        .chess-piece-blue {
+            color: #1e5bff;
+            text-shadow: 0 0 2px #fff, 0 0 3px #fff;
         }
 
-        .chess-cell.white-piece {
-            color: #fff;
-            text-shadow: 0 0 3px #000, 0 0 3px #000;
+        .chess-cell.white-piece,
+        .chess-piece-red {
+            color: #e5212d;
+            text-shadow: 0 0 2px #fff, 0 0 3px #fff;
         }
 
         .chess-cell.selected {
@@ -3446,6 +3448,103 @@
             border: 0.07em solid rgba(150, 100, 0, 0.55);
         }
         .coin-icon .coin-ico { width: 28px; height: 28px; vertical-align: middle; }
+
+        /* ===== 인형뽑기 등급 테두리 ===== */
+        .collection-grid .ci-section { grid-column: 1 / -1; font-weight: bold; font-size: 14px; margin-top: 6px; }
+        .collection-grid .ci-section small { font-weight: normal; opacity: 0.75; margin-left: 4px; }
+        .grade-text-bronze { color: #e0a060; } .grade-text-silver { color: #dfe6ee; } .grade-text-gold { color: #ffd700; }
+        .grade-text-emerald { color: #2ee59d; } .grade-text-hidden { color: #ff4fd8; }
+        .collection-item { position: relative; border-width: 3px; border-style: solid; }
+        .collection-item.locked { filter: none; opacity: 0.7; }
+        .collection-item.locked .ci-emoji { filter: grayscale(100%) brightness(0.35); }
+        .collection-item.grade-bronze { border-color: #cd7f32; }
+        .collection-item.grade-silver { border-color: #c9d1d9; }
+        .collection-item.grade-gold { border-color: #ffd700; }
+        .collection-item.grade-emerald { border-color: #2ee59d; }
+        .collection-item.owned.grade-bronze { box-shadow: 0 0 8px rgba(205,127,50,0.5); background: linear-gradient(145deg, rgba(205,127,50,0.25), rgba(255,255,255,0.06)); }
+        .collection-item.owned.grade-silver { box-shadow: 0 0 10px rgba(201,209,217,0.6); background: linear-gradient(145deg, rgba(220,230,240,0.28), rgba(255,255,255,0.06)); }
+        .collection-item.owned.grade-gold { box-shadow: 0 0 14px rgba(255,215,0,0.7); background: linear-gradient(145deg, rgba(255,215,0,0.3), rgba(255,255,255,0.06)); }
+        .collection-item.owned.grade-emerald { box-shadow: 0 0 18px rgba(46,229,157,0.8); background: linear-gradient(145deg, rgba(46,229,157,0.3), rgba(0,80,60,0.3)); animation: emeraldPulse 2s ease-in-out infinite; }
+        @keyframes emeraldPulse { 0%, 100% { box-shadow: 0 0 12px rgba(46,229,157,0.6); } 50% { box-shadow: 0 0 24px rgba(46,229,157,1); } }
+
+        /* 히든: 무지개 회전 테두리 + 우주 배경 + 반짝임 */
+        .collection-item.grade-hidden { border-color: transparent; overflow: hidden; z-index: 0; }
+        .collection-item.hidden-owned { background: radial-gradient(circle at 50% 40%, #3a1060, #0b0420 70%); box-shadow: 0 0 22px rgba(255,79,216,0.8), 0 0 40px rgba(79,216,255,0.4); animation: none; }
+        .collection-item.hidden-owned::before {
+            content: ''; position: absolute; inset: -60%; z-index: -2;
+            background: conic-gradient(#ff4fd8, #4fd8ff, #ffe14f, #4fff9b, #ff4fd8);
+            animation: hiddenSpin 2.5s linear infinite;
+        }
+        .collection-item.hidden-owned::after {
+            content: ''; position: absolute; inset: 3px; z-index: -1; border-radius: 11px;
+            background: radial-gradient(circle at 50% 35%, #4a1a7a, #0b0420 75%);
+        }
+        .collection-item.hidden-owned .ci-emoji { animation: hiddenFloat 2s ease-in-out infinite; filter: drop-shadow(0 0 8px #ff4fd8); }
+        .collection-item .ci-spark { position: absolute; color: #fff; font-size: 11px; animation: hiddenTwinkle 1.6s ease-in-out infinite; pointer-events: none; }
+        .collection-item .ci-spark.s1 { top: 6px; left: 8px; } .collection-item .ci-spark.s2 { top: 12px; right: 8px; animation-delay: 0.5s; }
+        .collection-item .ci-spark.s3 { bottom: 8px; left: 14px; animation-delay: 1s; }
+        .collection-item.hidden-locked { border: 3px dashed rgba(255,79,216,0.55); background: rgba(255,79,216,0.08); opacity: 1; animation: hiddenLockPulse 2.4s ease-in-out infinite; }
+        .collection-item.hidden-locked .ci-emoji { filter: none; }
+        @keyframes hiddenSpin { to { transform: rotate(360deg); } }
+        @keyframes hiddenFloat { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-4px) scale(1.08); } }
+        @keyframes hiddenTwinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1.2); } }
+        @keyframes hiddenLockPulse { 0%, 100% { box-shadow: 0 0 0 rgba(255,79,216,0); } 50% { box-shadow: 0 0 14px rgba(255,79,216,0.5); } }
+
+        /* 뽑기 결과 원판 테두리 */
+        .gacha-display.grade-bronze { border-color: #cd7f32; box-shadow: 0 0 25px rgba(205,127,50,0.5); }
+        .gacha-display.grade-silver { border-color: #c9d1d9; box-shadow: 0 0 30px rgba(201,209,217,0.6); }
+        .gacha-display.grade-gold { border-color: #ffd700; box-shadow: 0 0 40px rgba(255,215,0,0.8); }
+        .gacha-display.grade-emerald { border-color: #2ee59d; box-shadow: 0 0 50px rgba(46,229,157,0.9); }
+        .gacha-display.grade-hidden { border-color: #ff4fd8; box-shadow: 0 0 60px #ff4fd8, 0 0 90px #4fd8ff; animation: hiddenGlowRing 1.2s linear infinite; }
+        @keyframes hiddenGlowRing { 0% { border-color: #ff4fd8; } 33% { border-color: #4fd8ff; } 66% { border-color: #ffe14f; } 100% { border-color: #ff4fd8; } }
+        .gacha-chip { margin-right: 5px; padding: 3px 8px; background: rgba(255,255,255,0.08); border-radius: 15px; display: inline-block; margin-bottom: 5px; border: 2px solid rgba(255,255,255,0.2); }
+        .gacha-chip.grade-bronze { border-color: #cd7f32; } .gacha-chip.grade-silver { border-color: #c9d1d9; }
+        .gacha-chip.grade-gold { border-color: #ffd700; } .gacha-chip.grade-emerald { border-color: #2ee59d; }
+        .gacha-chip.grade-hidden { border-color: #ff4fd8; box-shadow: 0 0 8px #ff4fd8; }
+
+        /* 히든 아이콘을 이름 옆에 달면 은은하게 빛남 */
+        .name-icon.hidden-icon { display: inline-block; animation: hiddenNameGlow 2s ease-in-out infinite; }
+        @keyframes hiddenNameGlow { 0%, 100% { filter: drop-shadow(0 0 2px #ff4fd8); } 50% { filter: drop-shadow(0 0 6px #4fd8ff); } }
+
+        /* 히든 획득 전체 화면 연출 */
+        .hidden-reveal { position: fixed; inset: 0; z-index: 20000; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(40,0,70,0.85), rgba(0,0,0,0.95)); overflow: hidden; cursor: pointer; animation: hrIn 0.4s ease; transition: opacity 0.6s; }
+        .hidden-reveal.out { opacity: 0; }
+        .hidden-reveal .hr-rays { position: absolute; width: 1600px; height: 1600px; background: repeating-conic-gradient(rgba(255,79,216,0.28) 0deg 8deg, transparent 8deg 20deg, rgba(79,216,255,0.22) 20deg 28deg, transparent 28deg 40deg); animation: hiddenSpin 8s linear infinite; }
+        .hidden-reveal .hr-card { position: relative; text-align: center; animation: hrPop 0.8s cubic-bezier(.2,1.6,.4,1); }
+        .hidden-reveal .hr-title { font-size: 44px; font-weight: 900; letter-spacing: 10px; background: linear-gradient(90deg, #ff4fd8, #4fd8ff, #ffe14f, #ff4fd8); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: hrShine 2s linear infinite; }
+        .hidden-reveal .hr-emoji { font-size: 140px; line-height: 1.2; filter: drop-shadow(0 0 30px #ff4fd8) drop-shadow(0 0 60px #4fd8ff); animation: hiddenFloat 2s ease-in-out infinite; }
+        .hidden-reveal .hr-name { font-size: 30px; font-weight: bold; color: #fff; text-shadow: 0 0 12px #ff4fd8; }
+        .hidden-reveal .hr-sub { margin-top: 6px; color: rgba(255,255,255,0.8); font-size: 14px; }
+        @keyframes hrIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes hrPop { 0% { transform: scale(0.2) rotate(-10deg); opacity: 0; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+        @keyframes hrShine { to { background-position: 300% 0; } }
+        .gacha-rates { margin-top: 14px; font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.8; }
+
+        /* ===== 오목/체스 전적 + 채팅 ===== */
+        .game-stats-mini, .game-chat-mini { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 12px 15px; }
+        .game-stats-mini h4, .game-chat-mini h4 { margin-bottom: 8px; font-size: 13px; }
+        .game-stats-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .game-stats-table th { color: rgba(255,255,255,0.55); font-weight: normal; text-align: right; padding: 3px 4px; }
+        .game-stats-table th:first-child, .game-stats-table td:first-child { text-align: left; }
+        .game-stats-table td { padding: 4px; text-align: right; border-top: 1px solid rgba(255,255,255,0.07); }
+        .game-stats-table td.gs-win { color: #4cd137; } .game-stats-table td.gs-loss { color: #ff6b6b; }
+        .game-stats-table td.gs-rate { color: #ffd700; font-weight: bold; }
+        .game-stats-table .gs-empty { font-size: 12px; color: rgba(255,255,255,0.45); }
+        .game-chat-list { height: 150px; overflow-y: auto; font-size: 12px; display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+        .game-chat-list .gc-msg { line-height: 1.45; word-break: break-all; }
+        .game-chat-list .gc-name { font-weight: bold; color: #8ab4ff; margin-right: 4px; }
+        .game-chat-list .gc-msg.mine .gc-name { color: #00ff88; }
+        .game-chat-list .gc-time { color: rgba(255,255,255,0.35); font-size: 10px; margin-left: 4px; }
+        .game-chat-list .gc-empty { color: rgba(255,255,255,0.45); }
+        .game-chat-input { display: flex; gap: 6px; }
+        .game-chat-input input { flex: 1; min-width: 0; padding: 7px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: #fff; font-size: 12px; }
+        .game-chat-input button { padding: 7px 12px; border: none; border-radius: 8px; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; cursor: pointer; }
+
+        /* 모바일: 오목/체스 판이 화면보다 넓어 페이지가 가로로 밀리던 문제 → 판만 좌우 스크롤, 정보·채팅은 아래로 */
+        @media (max-width: 768px) {
+            .game-container-mini { grid-template-columns: minmax(0, 1fr); }
+            .game-board-wrapper-mini { overflow-x: auto; justify-content: flex-start; max-width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -4182,6 +4281,13 @@
                             <span class="gacha-btn-icon">🎰</span>
                             <span>뽑기! (1<span class="coin-ico"></span>)</span>
                         </button>
+                        <div class="gacha-rates">
+                            <span class="grade-text-bronze">🥉 브론즈 60%</span> ·
+                            <span class="grade-text-silver">🥈 실버 25%</span> ·
+                            <span class="grade-text-gold">🥇 골드 12%</span> ·
+                            <span class="grade-text-emerald">💚 에메랄드 2.7%</span> ·
+                            <span class="grade-text-hidden">❓ 히든 0.3%</span>
+                        </div>
                     </div>
                     <div class="gacha-history">
                         <h4>최근 뽑기 내역</h4>
@@ -4270,6 +4376,18 @@
                                 <h4><i class="fas fa-list"></i> 게임 로그</h4>
                                 <div id="gameLogMini"></div>
                             </div>
+                            <div class="game-stats-mini">
+                                <h4><i class="fas fa-trophy"></i> 전적 (승/패/승률)</h4>
+                                <div id="omokStatsMini" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                            </div>
+                            <div class="game-chat-mini">
+                                <h4><i class="fas fa-comments"></i> 채팅</h4>
+                                <div id="omokChatMini" class="game-chat-list"></div>
+                                <div class="game-chat-input">
+                                    <input type="text" id="omokChatInput" maxlength="200" placeholder="메시지 입력 후 Enter" onkeydown="if(event.key==='Enter' && !event.isComposing) sendGameChat('omok')">
+                                    <button onclick="sendGameChat('omok')"><i class="fas fa-paper-plane"></i></button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -4312,12 +4430,12 @@
                     </div>
                     <div class="game-players-info" id="chessPlayersInfo">
                         <div class="player-slot" id="chessWhitePlayerInfo">
-                            <span class="stone-icon">⚪</span>
+                            <span class="stone-icon">🔴</span>
                             <span class="player-name">대기 중...</span>
                         </div>
                         <span class="vs-text">VS</span>
                         <div class="player-slot" id="chessBlackPlayerInfo">
-                            <span class="stone-icon">⚫</span>
+                            <span class="stone-icon">🔵</span>
                             <span class="player-name">대기 중...</span>
                         </div>
                     </div>
@@ -4337,25 +4455,37 @@
                                 <div id="chessCheckWarningMini"></div>
                                 <p style="font-size: 12px; margin-bottom: 8px;">내 진영 선택:</p>
                                 <div class="player-select-mini">
-                                    <button class="player-btn-mini" onclick="selectChessSideIntegrated('white')" id="chessBtnWhiteMini">⚪ 백</button>
-                                    <button class="player-btn-mini" onclick="selectChessSideIntegrated('black')" id="chessBtnBlackMini">⚫ 흑</button>
+                                    <button class="player-btn-mini" onclick="selectChessSideIntegrated('white')" id="chessBtnWhiteMini">🔴 빨강</button>
+                                    <button class="player-btn-mini" onclick="selectChessSideIntegrated('black')" id="chessBtnBlackMini">🔵 파랑</button>
                                 </div>
                                 <div class="current-turn-mini" id="chessCurrentTurnMini">
-                                    백 차례 (White)
+                                    🔴 빨강 차례
                                 </div>
                             </div>
                             <div class="captured-pieces-mini">
                                 <span>잡힌 말:</span>
                                 <div class="captured-row">
-                                    <span>⚪</span><span id="capturedWhiteMini"></span>
+                                    <span>🔴</span><span id="capturedWhiteMini"></span>
                                 </div>
                                 <div class="captured-row">
-                                    <span>⚫</span><span id="capturedBlackMini"></span>
+                                    <span>🔵</span><span id="capturedBlackMini"></span>
                                 </div>
                             </div>
                             <div class="game-log-mini">
                                 <h4><i class="fas fa-list"></i> 기보</h4>
                                 <div id="chessGameLogMini"></div>
+                            </div>
+                            <div class="game-stats-mini">
+                                <h4><i class="fas fa-trophy"></i> 전적 (승/패/승률)</h4>
+                                <div id="chessStatsMini" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                            </div>
+                            <div class="game-chat-mini">
+                                <h4><i class="fas fa-comments"></i> 채팅</h4>
+                                <div id="chessChatMini" class="game-chat-list"></div>
+                                <div class="game-chat-input">
+                                    <input type="text" id="chessChatInput" maxlength="200" placeholder="메시지 입력 후 Enter" onkeydown="if(event.key==='Enter' && !event.isComposing) sendGameChat('chess')">
+                                    <button onclick="sendGameChat('chess')"><i class="fas fa-paper-plane"></i></button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -7652,7 +7782,8 @@ ${text}
         }
         function nameWithIcon(name) {
             const ic = iconOf(name);
-            return (ic ? `<span class="name-icon">${ic}</span>` : '') + escapeHtml(name);
+            const hidden = ic && GACHA_ITEMS.some(it => it.emoji === ic && it.rarity === 'hidden');
+            return (ic ? `<span class="name-icon${hidden ? ' hidden-icon' : ''}">${ic}</span>` : '') + escapeHtml(name);
         }
         function refreshIconViews() {
             const me = localStorage.getItem('chat_nickname') || '';
@@ -7669,6 +7800,7 @@ ${text}
             if (typeof renderStudyMaterials === 'function') safe(renderStudyMaterials);
             if (typeof loadLeaderboard === 'function') safe(loadLeaderboard);
             if (typeof renderCheckinToday === 'function') safe(renderCheckinToday);
+            if (typeof renderGameStats === 'function') ['omok', 'chess'].forEach(g => { safe(() => renderGameStats(g)); safe(() => renderGameChat(g)); });
         }
         function setupUserIconListener() {
             if (!db) return;
@@ -7694,6 +7826,7 @@ ${text}
             setupOmokIntegratedListener();
             setupChessListener();
             setupChessIntegratedListener();
+            setupGameStatsAndChat();
             setupChatListener();
             setupYieldListener();
             // 고정 지연(setTimeout) 대신 Firebase 연결 직후 로드 → SDK 로딩이 늦어도 누락되지 않음
@@ -7707,8 +7840,10 @@ ${text}
         // 체스 게임
         // =====================================================
         const CHESS_PIECES = {
-            white: { king: '♔', queen: '♕', rook: '♖', bishop: '♗', knight: '♘', pawn: '♙' },
-            black: { king: '♚', queen: '♛', rook: '♜', bishop: '♝', knight: '♞', pawn: '♟' }
+            // 양쪽 모두 꽉 찬 모양을 쓰고 색(빨강=white 진영, 파랑=black 진영)으로 구분
+            // \uFE0E: 이모지가 아닌 글자로 그려야 CSS 색이 적용됨
+            white: { king: '♚\uFE0E', queen: '♛\uFE0E', rook: '♜\uFE0E', bishop: '♝\uFE0E', knight: '♞\uFE0E', pawn: '♟\uFE0E' },
+            black: { king: '♚\uFE0E', queen: '♛\uFE0E', rook: '♜\uFE0E', bishop: '♝\uFE0E', knight: '♞\uFE0E', pawn: '♟\uFE0E' }
         };
 
         let chessBoard = [];
@@ -7797,7 +7932,7 @@ ${text}
             if (chessGameOver) return;
             
             if (myChessSide && myChessSide !== chessCurrentPlayer) {
-                alert(`지금은 ${chessCurrentPlayer === 'white' ? '백' : '흑'} 차례입니다!`);
+                alert(`지금은 ${chessCurrentPlayer === 'white' ? '빨강' : '파랑'} 차례입니다!`);
                 return;
             }
             
@@ -7838,23 +7973,28 @@ ${text}
             if (piece.type === 'pawn') {
                 if ((piece.color === 'white' && toRow === 0) || (piece.color === 'black' && toRow === 7)) {
                     chessBoard[toRow][toCol] = { type: 'queen', color: piece.color };
-                    addChessLog(`${piece.color === 'white' ? '백' : '흑'} 폰 → 퀸 승격!`);
+                    addChessLog(`${piece.color === 'white' ? '빨강' : '파랑'} 폰 → 퀸 승격!`);
                 }
             }
             
             const colNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
             const pieceName = getChessPieceName(piece.type);
-            addChessLog(`${piece.color === 'white' ? '백' : '흑'}: ${pieceName} ${colNames[fromCol]}${8-fromRow} → ${colNames[toCol]}${8-toRow}`);
+            addChessLog(`${piece.color === 'white' ? '빨강' : '파랑'}: ${pieceName} ${colNames[fromCol]}${8-fromRow} → ${colNames[toCol]}${8-toRow}`);
             
             chessCurrentPlayer = chessCurrentPlayer === 'white' ? 'black' : 'white';
             chessIsInCheck = isChessKingInCheck(chessCurrentPlayer);
             
             if (isChessCheckmate(chessCurrentPlayer)) {
                 chessGameOver = true;
-                const winner = chessCurrentPlayer === 'white' ? '흑' : '백';
+                const winner = chessCurrentPlayer === 'white' ? '파랑' : '빨강';
                 const banner = document.getElementById('chessWinnerBannerMini');
                 if (banner) banner.innerHTML = `<div class="winner-banner">🎉 체크메이트! ${winner} 승리! 🎉</div>`;
                 addChessLog(`🏆 체크메이트! ${winner} 승리!`);
+            }
+            // 게임 탭(2인 모드)에서 내가 둔 수로 체크메이트면 전적 기록 (방금 둔 쪽이 승자)
+            let chessResult = null;
+            if (chessGameOver && piece.color !== chessCurrentPlayer && chessPlayers[piece.color] === myPlayerId) {
+                chessResult = [seatName(chessPlayers[piece.color], chessPlayerNames), seatName(chessPlayers[chessCurrentPlayer], chessPlayerNames)];
             }
             
             // Firebase 동기화
@@ -7867,6 +8007,7 @@ ${text}
                     isInCheck: chessIsInCheck
                 });
             }
+            if (chessResult) recordGameResult('chess', chessResult[0], chessResult[1]);
             
             updateChessDisplay();
         }
@@ -8041,7 +8182,7 @@ ${text}
             const turnEl = document.getElementById('chessCurrentTurn');
             if (turnEl) {
                 turnEl.className = `current-turn ${chessCurrentPlayer === 'white' ? 'white' : 'black'}`;
-                turnEl.textContent = `${chessCurrentPlayer === 'white' ? '백' : '흑'} 차례 (${chessCurrentPlayer === 'white' ? 'White' : 'Black'})`;
+                turnEl.textContent = `${chessCurrentPlayer === 'white' ? '🔴 빨강' : '🔵 파랑'} 차례`;
             }
             
             const checkEl = document.getElementById('chessCheckWarningMini');
@@ -8053,8 +8194,8 @@ ${text}
             const capturedBlackEl = document.getElementById('capturedBlackMini');
             const whiteCaptures = chessCapturedPieces && Array.isArray(chessCapturedPieces.white) ? chessCapturedPieces.white : [];
             const blackCaptures = chessCapturedPieces && Array.isArray(chessCapturedPieces.black) ? chessCapturedPieces.black : [];
-            if (capturedWhiteEl) capturedWhiteEl.textContent = whiteCaptures.map(p => CHESS_PIECES.white[p.type]).join('');
-            if (capturedBlackEl) capturedBlackEl.textContent = blackCaptures.map(p => CHESS_PIECES.black[p.type]).join('');
+            if (capturedWhiteEl) { capturedWhiteEl.textContent = whiteCaptures.map(p => CHESS_PIECES.white[p.type]).join(''); capturedWhiteEl.className = 'chess-piece-red'; }
+            if (capturedBlackEl) { capturedBlackEl.textContent = blackCaptures.map(p => CHESS_PIECES.black[p.type]).join(''); capturedBlackEl.className = 'chess-piece-blue'; }
         }
 
         function addChessLog(text) {
@@ -8075,7 +8216,7 @@ ${text}
             myChessSide = side;
             document.getElementById('chessBtnWhite').classList.toggle('selected', side === 'white');
             document.getElementById('chessBtnBlack').classList.toggle('selected', side === 'black');
-            addChessLog(`나는 ${side === 'white' ? '백' : '흑'}을 선택했습니다.`);
+            addChessLog(`나는 ${side === 'white' ? '빨강' : '파랑'}을 선택했습니다.`);
         }
 
         function resetChessGame() {
@@ -8116,7 +8257,7 @@ ${text}
                     // 상대가 둔 수가 게임 탭(미니 보드)에 바로 보이도록 갱신
                     const banner = document.getElementById('chessWinnerBannerMini');
                     if (banner) banner.innerHTML = chessGameOver
-                        ? `<div class="winner-banner">🎉 체크메이트! ${chessCurrentPlayer === 'white' ? '흑' : '백'} 승리! 🎉</div>`
+                        ? `<div class="winner-banner">🎉 체크메이트! ${chessCurrentPlayer === 'white' ? '🔵 파랑' : '🔴 빨강'} 승리! 🎉</div>`
                         : '';
                     renderChessBoardMini();
                 }
@@ -8389,38 +8530,72 @@ ${text}
         };
 
         // 뽑기 아이템 목록
+        // 등급(테두리): 브론즈 20 · 실버 10 · 골드 5 · 에메랄드 3 · 히든 3
+        // 확률: 브론즈 60% · 실버 25% · 골드 12% · 에메랄드 2.7% · 히든 0.3%
+        // 구버전 Windows에서도 보이도록 2018년 이전 이모지만 사용
         const GACHA_ITEMS = [
-            // 일반 (60%)
-            { emoji: '🐻', name: '곰돌이', rarity: 'normal', rate: 15 },
-            { emoji: '🐰', name: '토끼', rarity: 'normal', rate: 15 },
-            { emoji: '🐱', name: '고양이', rarity: 'normal', rate: 15 },
-            { emoji: '🐶', name: '강아지', rarity: 'normal', rate: 15 },
-            // 레어 (25%)
-            { emoji: '🦊', name: '여우', rarity: 'rare', rate: 8 },
-            { emoji: '🐼', name: '판다', rarity: 'rare', rate: 8 },
-            { emoji: '🦁', name: '사자', rarity: 'rare', rate: 5 },
-            { emoji: '🐯', name: '호랑이', rarity: 'rare', rate: 4 },
-            // 에픽 (12%)
-            { emoji: '🦄', name: '유니콘', rarity: 'epic', rate: 5 },
-            { emoji: '🐉', name: '용', rarity: 'epic', rate: 4 },
-            { emoji: '🦋', name: '나비', rarity: 'epic', rate: 3 },
-            // 전설 (3%)
-            { emoji: '🌟', name: '황금별', rarity: 'legendary', rate: 1.5 },
-            { emoji: '👑', name: '왕관', rarity: 'legendary', rate: 1 },
-            { emoji: '💎', name: '다이아몬드', rarity: 'legendary', rate: 0.5 },
+            // 브론즈 (각 3%)
+            { emoji: '🐻', name: '곰돌이', rarity: 'bronze', rate: 3 },
+            { emoji: '🐰', name: '토끼', rarity: 'bronze', rate: 3 },
+            { emoji: '🐱', name: '고양이', rarity: 'bronze', rate: 3 },
+            { emoji: '🐶', name: '강아지', rarity: 'bronze', rate: 3 },
+            { emoji: '🐭', name: '생쥐', rarity: 'bronze', rate: 3 },
+            { emoji: '🐹', name: '햄스터', rarity: 'bronze', rate: 3 },
+            { emoji: '🐷', name: '돼지', rarity: 'bronze', rate: 3 },
+            { emoji: '🐸', name: '개구리', rarity: 'bronze', rate: 3 },
+            { emoji: '🐵', name: '원숭이', rarity: 'bronze', rate: 3 },
+            { emoji: '🐔', name: '닭', rarity: 'bronze', rate: 3 },
+            { emoji: '🐧', name: '펭귄', rarity: 'bronze', rate: 3 },
+            { emoji: '🐤', name: '병아리', rarity: 'bronze', rate: 3 },
+            { emoji: '🐮', name: '젖소', rarity: 'bronze', rate: 3 },
+            { emoji: '🐨', name: '코알라', rarity: 'bronze', rate: 3 },
+            { emoji: '🐺', name: '늑대', rarity: 'bronze', rate: 3 },
+            { emoji: '🐗', name: '멧돼지', rarity: 'bronze', rate: 3 },
+            { emoji: '🐴', name: '말', rarity: 'bronze', rate: 3 },
+            { emoji: '🐌', name: '달팽이', rarity: 'bronze', rate: 3 },
+            { emoji: '🐞', name: '무당벌레', rarity: 'bronze', rate: 3 },
+            { emoji: '🐢', name: '거북이', rarity: 'bronze', rate: 3 },
+            // 실버 (각 2.5%)
+            { emoji: '🦊', name: '여우', rarity: 'silver', rate: 2.5 },
+            { emoji: '🐼', name: '판다', rarity: 'silver', rate: 2.5 },
+            { emoji: '🦁', name: '사자', rarity: 'silver', rate: 2.5 },
+            { emoji: '🐯', name: '호랑이', rarity: 'silver', rate: 2.5 },
+            { emoji: '🐬', name: '돌고래', rarity: 'silver', rate: 2.5 },
+            { emoji: '🐳', name: '고래', rarity: 'silver', rate: 2.5 },
+            { emoji: '🦉', name: '부엉이', rarity: 'silver', rate: 2.5 },
+            { emoji: '🦅', name: '독수리', rarity: 'silver', rate: 2.5 },
+            { emoji: '🐙', name: '문어', rarity: 'silver', rate: 2.5 },
+            { emoji: '🐊', name: '악어', rarity: 'silver', rate: 2.5 },
+            // 골드 (각 2.4%)
+            { emoji: '🦄', name: '유니콘', rarity: 'gold', rate: 2.4 },
+            { emoji: '🐉', name: '용', rarity: 'gold', rate: 2.4 },
+            { emoji: '🦋', name: '나비', rarity: 'gold', rate: 2.4 },
+            { emoji: '🐲', name: '청룡', rarity: 'gold', rate: 2.4 },
+            { emoji: '🦈', name: '상어', rarity: 'gold', rate: 2.4 },
+            // 에메랄드 (각 0.9%)
+            { emoji: '🌟', name: '황금별', rarity: 'emerald', rate: 0.9 },
+            { emoji: '👑', name: '왕관', rarity: 'emerald', rate: 0.9 },
+            { emoji: '💎', name: '다이아몬드', rarity: 'emerald', rate: 0.9 },
             // 히든 (각 0.1%) — 뽑기 전까지 컬렉션에 ❓로 표시
-            { emoji: '🦖', name: '티라노', rarity: 'hidden', rate: 0.1 },
-            { emoji: '👽', name: '외계인', rarity: 'hidden', rate: 0.1 },
-            { emoji: '🧞', name: '지니', rarity: 'hidden', rate: 0.1 }
+            { emoji: '🦖', name: '폭군 티라노', rarity: 'hidden', rate: 0.1 },
+            { emoji: '👽', name: '은하의 지배자', rarity: 'hidden', rate: 0.1 },
+            { emoji: '🧞', name: '램프의 마신', rarity: 'hidden', rate: 0.1 }
         ];
 
+        const RARITY_ORDER = ['bronze', 'silver', 'gold', 'emerald', 'hidden'];
+        const RARITY_LABEL = { bronze: '브론즈', silver: '실버', gold: '골드', emerald: '에메랄드', hidden: '히든' };
+        const RARITY_BADGE = { bronze: '🥉', silver: '🥈', gold: '🥇', emerald: '💚', hidden: '❓' };
         const RARITY_COLORS = {
-            normal: '#aaa',
-            rare: '#00d4ff',
-            epic: '#a855f7',
-            legendary: '#ffd700',
-            hidden: '#ff4fd8'
+            bronze: '#cd7f32',
+            silver: '#c9d1d9',
+            gold: '#ffd700',
+            emerald: '#2ee59d',
+            hidden: '#ff4fd8',
+            // 이전 등급 이름으로 저장된 뽑기 내역 호환
+            normal: '#cd7f32', rare: '#c9d1d9', epic: '#ffd700', legendary: '#2ee59d'
         };
+        const LEGACY_RARITY = { normal: 'bronze', rare: 'silver', epic: 'gold', legendary: 'emerald' };
+        const rarityOf = (r) => LEGACY_RARITY[r] || r;
 
         const ENHANCE_RATES = [90, 90, 90, 70, 70, 70, 50, 50, 50, 30, 15, 5];
 
@@ -8566,30 +8741,18 @@ ${text}
 
             // 애니메이션 표시
             const display = document.getElementById('gachaDisplay');
+            // 등급 테두리로 결과 표시
+            display.className = `gacha-display grade-${result.rarity}`;
             display.innerHTML = `
-                <div class="gacha-result" style="font-size: 78px;">${result.emoji}</div>
-                <div style="color: ${RARITY_COLORS[result.rarity]}; font-weight: bold; margin-top: 10px;">
+                <div class="gacha-result" style="font-size: 70px;">${result.emoji}</div>
+                <div style="color: ${RARITY_COLORS[result.rarity]}; font-weight: bold; margin-top: 6px; font-size: 14px;">
                     ${result.name}
-                    <br><small>${result.rarity.toUpperCase()}</small>
+                    <br><small>${RARITY_BADGE[result.rarity]} ${RARITY_LABEL[result.rarity]}</small>
                 </div>
             `;
 
-            // 히든 등급이면 무지개 효과 + 알림
-            if (result.rarity === 'hidden') {
-                display.innerHTML += `<div style="margin-top: 6px; font-weight: bold; color: #ff4fd8;">🎉 히든 캐릭터 발견!</div>`;
-                display.style.boxShadow = '0 0 60px #ff4fd8';
-                setTimeout(() => {
-                    display.style.boxShadow = '0 0 30px rgba(255,215,0,0.2)';
-                }, 3000);
-            }
-
-            // 전설 등급이면 특별 효과
-            if (result.rarity === 'legendary') {
-                display.style.boxShadow = '0 0 50px rgba(255,215,0,0.8)';
-                setTimeout(() => {
-                    display.style.boxShadow = '0 0 30px rgba(255,215,0,0.2)';
-                }, 2000);
-            }
+            // 히든은 화면 전체 연출
+            if (result.rarity === 'hidden') showHiddenReveal(result);
 
             renderGachaHistory();
             updateMinigameUI();
@@ -8600,8 +8763,8 @@ ${text}
             const history = gameData.gachaHistory || [];
 
             container.innerHTML = history.map(item => `
-                <span style="margin-right: 5px; padding: 3px 8px; background: rgba(255,255,255,0.1); border-radius: 15px; display: inline-block; margin-bottom: 5px;">
-                    ${item.emoji} <small style="color: ${RARITY_COLORS[item.rarity]}">${item.name}</small>
+                <span class="gacha-chip grade-${rarityOf(item.rarity)}">
+                    ${item.emoji} <small style="color: ${RARITY_COLORS[item.rarity] || '#fff'}">${escapeHtml(item.name)}</small>
                 </span>
             `).join('');
         }
@@ -8655,30 +8818,54 @@ ${text}
             const owned = gameData.collection || [];
 
             const selected = iconOf(localStorage.getItem('chat_nickname') || '');
-            grid.innerHTML = GACHA_ITEMS.map(item => {
+            const card = (item) => {
                 const has = owned.includes(item.emoji);
                 const hidden = item.rarity === 'hidden';
                 if (hidden && !has) {
                     // 히든은 뽑기 전까지 정체를 숨김
-                    return `<div class="collection-item hidden-locked" title="??? (히든)">❓</div>`;
+                    return `<div class="collection-item grade-hidden hidden-locked" title="??? (히든)"><span class="ci-emoji">❓</span></div>`;
                 }
                 return `
-                <div class="collection-item ${has ? 'owned' : 'locked'} ${hidden && has ? 'hidden-owned' : ''} ${selected === item.emoji ? 'selected' : ''}" 
-                     style="border-color: ${has ? RARITY_COLORS[item.rarity] : 'transparent'}"
+                <div class="collection-item grade-${item.rarity} ${has ? 'owned' : 'locked'} ${hidden ? 'hidden-owned' : ''} ${selected === item.emoji ? 'selected' : ''}"
                      ${has ? `onclick="selectMyIcon('${item.emoji}')"` : ''}
-                     title="${item.name} (${item.rarity})${has ? ' - 눌러서 내 아이콘으로' : ''}">
-                    ${item.emoji}
+                     title="${item.name} (${RARITY_LABEL[item.rarity]})${has ? ' - 눌러서 내 아이콘으로' : ''}">
+                    <span class="ci-emoji">${item.emoji}</span>
+                    ${hidden ? '<span class="ci-spark s1">✦</span><span class="ci-spark s2">✦</span><span class="ci-spark s3">✦</span>' : ''}
                 </div>`;
+            };
+            // 등급별로 묶어서 표시
+            grid.innerHTML = RARITY_ORDER.map(r => {
+                const items = GACHA_ITEMS.filter(it => it.rarity === r);
+                const got = items.filter(it => owned.includes(it.emoji)).length;
+                return `<div class="ci-section grade-text-${r}">${RARITY_BADGE[r]} ${RARITY_LABEL[r]} <small>${got}/${items.length}</small></div>`
+                    + items.map(card).join('');
             }).join('');
 
             const summary = document.getElementById('collectionSummary');
             if (summary) {
-                const normalItems = GACHA_ITEMS.filter(it => it.rarity !== 'hidden');
+                const total = GACHA_ITEMS.filter(it => owned.includes(it.emoji)).length;
                 const hiddenItems = GACHA_ITEMS.filter(it => it.rarity === 'hidden');
-                const ownNormal = normalItems.filter(it => owned.includes(it.emoji)).length;
                 const ownHidden = hiddenItems.filter(it => owned.includes(it.emoji)).length;
-                summary.innerHTML = `수집 <b>${ownNormal}/${normalItems.length}</b> · <span class="hidden-count">히든 ${ownHidden}/${hiddenItems.length}</span>`;
+                summary.innerHTML = `전체 수집 <b>${total}/${GACHA_ITEMS.length}</b> · <span class="hidden-count">히든 ${ownHidden}/${hiddenItems.length}</span>`;
             }
+        }
+
+        // 히든 획득 연출: 화면 전체에 빛줄기 + 캐릭터 등장
+        function showHiddenReveal(item) {
+            const ov = document.createElement('div');
+            ov.className = 'hidden-reveal';
+            ov.innerHTML = `
+                <div class="hr-rays"></div>
+                <div class="hr-card">
+                    <div class="hr-title">HIDDEN</div>
+                    <div class="hr-emoji">${item.emoji}</div>
+                    <div class="hr-name">${escapeHtml(item.name)}</div>
+                    <div class="hr-sub">히든 캐릭터 획득! (0.1%)</div>
+                </div>`;
+            ov.onclick = () => ov.remove();
+            document.body.appendChild(ov);
+            setTimeout(() => ov.classList.add('out'), 3600);
+            setTimeout(() => ov.remove(), 4200);
         }
 
         function loadLeaderboard() {
@@ -8885,6 +9072,7 @@ ${text}
             PR: 30,          // 피카츄 충돌 반지름
             BR: 18,          // 공 반지름
             MOVE: 4.2,
+            SPIKE_WINDOW: 24, // 스파이크 판정 시간(프레임, 0.4초)
             DIVE_VX: 8,      // 슬라이딩 속도
             DIVE_VY: -4,     // 슬라이딩 시 살짝 뜨는 높이
             DIVE_RECOVER: 18, // 슬라이딩 후 일어나는 시간(프레임)
@@ -9112,7 +9300,18 @@ ${text}
                     p.vy = PIKA.DIVE_VY;
                 } else {
                     if (input.jump && onGround) p.vy = PIKA.JUMP;
-                    if (input.spike && !onGround && p.spikeTimer === 0) p.spikeTimer = 12;
+                    if (input.spike && !onGround) {
+                        // 공중에서 스파이크 키: 누르고 있는 동안 + 뗀 뒤 0.4초까지 공이 닿으면 스파이크
+                        if (p.spikeTimer === 0) p.spikeAim = { up: false, down: false, left: false, right: false };
+                        p.spikeTimer = PIKA.SPIKE_WINDOW;
+                    }
+                }
+                // 스파이크 판정 시간 동안 한 번이라도 누른 방향키를 기억 (짧게 톡 눌러도 반영)
+                if (p.spikeTimer > 0 && p.spikeAim) {
+                    if (input.jump) p.spikeAim.up = true;
+                    if (input.down) p.spikeAim.down = true;
+                    if (input.left) p.spikeAim.left = true;
+                    if (input.right) p.spikeAim.right = true;
                 }
             }
 
@@ -9122,6 +9321,8 @@ ${text}
             if (p.y >= PIKA.GROUND) {
                 p.y = PIKA.GROUND;
                 p.vy = 0;
+                p.spikeTimer = 0; // 착지하면 스파이크 판정 종료
+                p.spikeAim = null;
                 if (p.dive) {
                     p.dive = 0;
                     p.vx = 0;
@@ -9161,17 +9362,23 @@ ${text}
                 // 스파이크 방향 조절 (오리지널처럼 방향키를 누른 채로 때리기)
                 //  앞(상대 쪽) = 빠르고 길게, 뒤 = 느리고 짧게(페인트), 없음 = 기본
                 //  ↑ = 높이 띄우는 로브, ↓ = 네트를 넘기는 한도에서 가장 날카롭게
-                const inp = p.lastInput || {};
-                const fwd = dir > 0 ? inp.right : inp.left;
-                const back = dir > 0 ? inp.left : inp.right;
+                const inp = p.spikeAim || {};
+                const fwdKey = dir > 0 ? inp.right : inp.left;
+                const backKey = dir > 0 ? inp.left : inp.right;
+                const fwd = fwdKey && !backKey, back = backKey && !fwdKey;
                 const speedX = fwd ? 18 : back ? 10 : 16;
                 ball.vx = dir * speedX;
                 const t = Math.max(1, Math.abs(PIKA.NET_X - ball.x) / speedX);
                 const vyMax = (PIKA.NET_TOP - PIKA.BR - 8 - ball.y - 0.5 * PIKA.B_GRAV * t * t) / t;
-                if (inp.jump) {
-                    // 로브: 높이 띄워 상대 코트 깊숙이 떨어뜨림
-                    ball.vx = dir * (fwd ? 7 : back ? 4.5 : 6);
-                    ball.vy = -7;
+                if (inp.up && !inp.down) {
+                    // ↑ 스파이크: 위로 높이 솟구쳤다가 상대 코트 깊숙이 떨어짐
+                    const g = PIKA.B_GRAV;
+                    ball.vy = -Math.min(11, Math.sqrt(2 * g * Math.max(40, ball.y - PIKA.BR - 10)));
+                    const fall = (PIKA.GROUND - PIKA.BR) - ball.y;
+                    const T = (-ball.vy + Math.sqrt(ball.vy * ball.vy + 2 * g * fall)) / g;
+                    const depth = fwd ? 240 : back ? 90 : 170; // 네트에서 떨어질 거리
+                    const landX = PIKA.NET_X + dir * depth;
+                    ball.vx = Math.max(-14, Math.min(14, (landX - ball.x) / T));
                 } else if (inp.down) {
                     ball.vy = Math.min(13, vyMax);
                 } else {
@@ -9961,6 +10168,22 @@ ${text}
         let omokPlayers = { black: null, white: null };
         let chessPlayers = { white: null, black: null };
         const myPlayerId = 'player_' + Math.random().toString(36).substr(2, 9);
+        // 플레이어 ID → 이름 (오목/체스에서 누가 두는지 표시)
+        let omokPlayerNames = {};
+        let chessPlayerNames = {};
+
+        function myGameName() {
+            return (localStorage.getItem('chat_nickname') || '').trim() || '이름 없음';
+        }
+
+        // 자리 표시: "🦖김원근 (나)" / "박규태" / "대기 중..."
+        function renderPlayerSlotName(slot, playerId, names) {
+            const el = slot.querySelector('.player-name');
+            if (!playerId) { el.textContent = '대기 중...'; return; }
+            const isMe = playerId === myPlayerId;
+            const name = isMe ? myGameName() : (names[playerId] || '상대방');
+            el.innerHTML = nameWithIcon(name) + (isMe ? ' <small style="color:#00ff88">(나)</small>' : '');
+        }
 
         // 오목 보드 미니 렌더링
         function renderOmokBoardMini() {
@@ -10011,10 +10234,12 @@ ${text}
             
             myStone = stone;
             omokPlayers[stone] = myPlayerId;
+            omokPlayerNames[myPlayerId] = myGameName();
             
             // Firebase에 저장
             if (db) {
                 db.ref('omok_game/players').set(omokPlayers);
+                db.ref(`omok_game/playerNames/${myPlayerId}`).set(myGameName());
             }
             
             // 버튼 상태 업데이트
@@ -10032,15 +10257,13 @@ ${text}
             const whiteSlot = document.getElementById('omokWhitePlayer');
             
             if (blackSlot) {
-                const isMe = omokPlayers.black === myPlayerId;
-                blackSlot.querySelector('.player-name').textContent = omokPlayers.black ? (isMe ? '나' : '상대방') : '대기 중...';
-                blackSlot.classList.toggle('active', isMe);
+                renderPlayerSlotName(blackSlot, omokPlayers.black, omokPlayerNames);
+                blackSlot.classList.toggle('active', omokPlayers.black === myPlayerId);
             }
             
             if (whiteSlot) {
-                const isMe = omokPlayers.white === myPlayerId;
-                whiteSlot.querySelector('.player-name').textContent = omokPlayers.white ? (isMe ? '나' : '상대방') : '대기 중...';
-                whiteSlot.classList.toggle('active', isMe);
+                renderPlayerSlotName(whiteSlot, omokPlayers.white, omokPlayerNames);
+                whiteSlot.classList.toggle('active', omokPlayers.white === myPlayerId);
             }
         }
 
@@ -10100,15 +10323,21 @@ ${text}
                 gameOver = true;
                 const winner = currentPlayer;
                 showOmokWinner(winner);
+                const loserStone = winner === 'black' ? 'white' : 'black';
+                const winnerName = seatName(omokPlayers[winner], omokPlayerNames);
+                const loserName = seatName(omokPlayers[loserStone], omokPlayerNames);
                 if (db) {
                     db.ref('omok_game').set({
                         board: omokBoard,
                         currentPlayer: currentPlayer,
                         gameOver: true,
                         winner: winner,
-                        players: omokPlayers
+                        players: omokPlayers,
+                        playerNames: omokPlayerNames
                     });
                 }
+                // 판 저장 후 전적 기록
+                recordGameResult('omok', winnerName, loserName);
                 renderOmokBoardMini();
                 return;
             }
@@ -10122,7 +10351,8 @@ ${text}
                     currentPlayer: currentPlayer,
                     gameOver: false,
                     winner: null,
-                    players: omokPlayers
+                    players: omokPlayers,
+                    playerNames: omokPlayerNames
                 });
             }
             
@@ -10172,6 +10402,7 @@ ${text}
                     const piece = chessBoard[row][col];
                     if (piece) {
                         cell.textContent = CHESS_PIECES[piece.color][piece.type];
+                        cell.classList.add(piece.color === 'black' ? 'chess-piece-blue' : 'chess-piece-red');
                     }
                     
                     cell.onclick = () => handleChessCellClickIntegrated(row, col);
@@ -10197,9 +10428,11 @@ ${text}
             
             myChessSide = side;
             chessPlayers[side] = myPlayerId;
+            chessPlayerNames[myPlayerId] = myGameName();
             
             if (db) {
                 db.ref('chess_game/players').set(chessPlayers);
+                db.ref(`chess_game/playerNames/${myPlayerId}`).set(myGameName());
             }
             
             document.getElementById('chessBtnWhiteMini')?.classList.toggle('selected', side === 'white');
@@ -10216,15 +10449,13 @@ ${text}
             const blackSlot = document.getElementById('chessBlackPlayerInfo');
             
             if (whiteSlot) {
-                const isMe = chessPlayers.white === myPlayerId;
-                whiteSlot.querySelector('.player-name').textContent = chessPlayers.white ? (isMe ? '나' : '상대방') : '대기 중...';
-                whiteSlot.classList.toggle('active', isMe);
+                renderPlayerSlotName(whiteSlot, chessPlayers.white, chessPlayerNames);
+                whiteSlot.classList.toggle('active', chessPlayers.white === myPlayerId);
             }
             
             if (blackSlot) {
-                const isMe = chessPlayers.black === myPlayerId;
-                blackSlot.querySelector('.player-name').textContent = chessPlayers.black ? (isMe ? '나' : '상대방') : '대기 중...';
-                blackSlot.classList.toggle('active', isMe);
+                renderPlayerSlotName(blackSlot, chessPlayers.black, chessPlayerNames);
+                blackSlot.classList.toggle('active', chessPlayers.black === myPlayerId);
             }
         }
 
@@ -10246,7 +10477,7 @@ ${text}
                 notice.classList.add('active');
                 notice.querySelector('.mode-status').innerHTML = `
                     <span class="mode-badge player">🎮 플레이어 모드</span>
-                    <p>당신은 ${myChessSide === 'white' ? '⚪ 백' : '⚫ 흑'} 진영입니다.</p>
+                    <p>당신은 ${myChessSide === 'white' ? '🔴 빨강' : '🔵 파랑'} 진영입니다.</p>
                 `;
             } else {
                 notice.classList.remove('active');
@@ -10287,9 +10518,98 @@ ${text}
                     turnEl.textContent = '게임 종료!';
                 } else {
                     const isMyTurn = myChessSide === chessCurrentPlayer && chessPlayers[myChessSide] === myPlayerId;
-                    turnEl.innerHTML = `${chessCurrentPlayer === 'white' ? '⚪ 백' : '⚫ 흑'} 차례 ${isMyTurn ? '<span style="color:#4cd137">(내 차례)</span>' : ''}`;
+                    turnEl.innerHTML = `${chessCurrentPlayer === 'white' ? '🔴 빨강' : '🔵 파랑'} 차례 ${isMyTurn ? '<span style="color:#4cd137">(내 차례)</span>' : ''}`;
                 }
             }
+        }
+
+
+        // =====================================================
+        // 오목/체스 전적(승/패/승률) + 게임 채팅
+        // =====================================================
+        let gameStats = { omok: {}, chess: {} };
+        let gameChats = { omok: [], chess: [] };
+
+        // Firebase 키에 쓸 수 없는 문자 제거
+        function statKey(name) {
+            return String(name || '').replace(/[.#$\[\]\/]/g, '_').trim() || '이름 없음';
+        }
+
+        // 이긴 쪽/진 쪽 이름으로 전적 기록 (승부를 결정한 수를 둔 사람의 브라우저에서 1번만 호출)
+        function recordGameResult(game, winnerName, loserName) {
+            if (!db) return;
+            const bump = (name, field) => {
+                if (!name) return;
+                db.ref(`game_stats/${game}/${statKey(name)}`).transaction(cur => {
+                    cur = cur || { win: 0, loss: 0 };
+                    cur[field] = (cur[field] || 0) + 1;
+                    cur.updatedAt = Date.now();
+                    return cur;
+                });
+            };
+            bump(winnerName, 'win');
+            if (loserName && loserName !== winnerName) bump(loserName, 'loss');
+        }
+
+        function seatName(playerId, names) {
+            if (!playerId) return null;
+            if (playerId === myPlayerId) return myGameName();
+            return names[playerId] || null;
+        }
+
+        function renderGameStats(game) {
+            const el = document.getElementById(`${game}StatsMini`);
+            if (!el) return;
+            const rows = Object.entries(gameStats[game] || {})
+                .map(([name, d]) => {
+                    const win = d.win || 0, loss = d.loss || 0, total = win + loss;
+                    return { name, win, loss, total, rate: total ? win / total : 0 };
+                })
+                .filter(r => r.total > 0)
+                .sort((a, b) => b.win - a.win || b.rate - a.rate)
+                .slice(0, 10);
+            if (!rows.length) { el.innerHTML = '<div class="gs-empty">아직 기록이 없어요</div>'; return; }
+            el.innerHTML = `<table><tr><th>이름</th><th>승</th><th>패</th><th>승률</th></tr>${rows.map(r => `
+                <tr><td>${nameWithIcon(r.name)}</td><td class="gs-win">${r.win}</td><td class="gs-loss">${r.loss}</td>
+                <td class="gs-rate">${Math.round(r.rate * 100)}%</td></tr>`).join('')}</table>`;
+        }
+
+        function renderGameChat(game) {
+            const el = document.getElementById(`${game}ChatMini`);
+            if (!el) return;
+            const me = myGameName();
+            const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 30;
+            const msgs = gameChats[game] || [];
+            el.innerHTML = msgs.length ? msgs.map(m => {
+                const t = new Date(m.time || 0);
+                const hm = `${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`;
+                return `<div class="gc-msg ${m.name === me ? 'mine' : ''}"><span class="gc-name">${nameWithIcon(m.name)}</span>${escapeHtml(m.text)}<span class="gc-time">${hm}</span></div>`;
+            }).join('') : '<div class="gc-empty">첫 메시지를 남겨보세요!</div>';
+            if (atBottom || msgs.length <= 1) el.scrollTop = el.scrollHeight;
+        }
+
+        function sendGameChat(game) {
+            const input = document.getElementById(`${game}ChatInput`);
+            const text = (input.value || '').trim();
+            if (!text) return;
+            if (!(localStorage.getItem('chat_nickname') || '').trim()) { alert('상단에 닉네임을 먼저 입력해주세요!'); return; }
+            if (!db) { alert('서버에 연결되지 않았습니다.'); return; }
+            db.ref(`game_chat/${game}`).push({ name: myGameName(), text: text.slice(0, 200), time: Date.now() });
+            input.value = '';
+        }
+
+        function setupGameStatsAndChat() {
+            if (!db) return;
+            ['omok', 'chess'].forEach(game => {
+                db.ref(`game_stats/${game}`).off();
+                db.ref(`game_stats/${game}`).on('value', snap => { gameStats[game] = snap.val() || {}; renderGameStats(game); });
+                db.ref(`game_chat/${game}`).off();
+                db.ref(`game_chat/${game}`).orderByChild('time').limitToLast(50).on('value', snap => {
+                    const data = snap.val() || {};
+                    gameChats[game] = Object.values(data).sort((a, b) => (a.time || 0) - (b.time || 0));
+                    renderGameChat(game);
+                });
+            });
         }
 
         // 오목 Firebase 리스너 확장
@@ -10306,6 +10626,7 @@ ${text}
                     black: (data.players && data.players.black) || null,
                     white: (data.players && data.players.white) || null
                 };
+                omokPlayerNames = data.playerNames || {};
                 // 다른 사람이 새 게임을 시작해 내 자리가 풀린 경우 내 선택도 해제
                 if (myStone && omokPlayers[myStone] !== myPlayerId) {
                     myStone = null;
@@ -10340,6 +10661,7 @@ ${text}
                     white: (data.players && data.players.white) || null,
                     black: (data.players && data.players.black) || null
                 };
+                chessPlayerNames = data.playerNames || {};
                 if (myChessSide && chessPlayers[myChessSide] !== myPlayerId) {
                     myChessSide = null;
                     document.getElementById('chessBtnWhiteMini')?.classList.remove('selected');
