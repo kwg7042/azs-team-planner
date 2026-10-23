@@ -9845,7 +9845,11 @@ ${text}
             PR: 30,          // 피카츄 충돌 반지름
             BR: 18,          // 공 반지름
             MOVE: 4.2,
-            SPIKE_WINDOW: 24, // 스파이크 판정 시간(프레임, 0.4초)
+            SPIKE_WINDOW: 45, // 스파이크 판정 시간(프레임, 0.75초) — 넉넉하게
+            SPIKE_BUFFER: 12, // 점프 직전(0.2초 안)에 누른 스파이크 키도 인정
+            SPIKE_REACH: 16,  // 사람이 스파이크할 때 공이 이만큼(px) 떨어져 있어도 맞음
+            RECEIVE_SPEED: 12.5, // 몸에 맞고 튀는 속도 (예전 10)
+            RECEIVE_MIN_VY: -10,  // 최소한 이만큼 위로 튐 (예전 -7.5)
             DIVE_VX: 8,      // 슬라이딩 속도
             DIVE_VY: -4,     // 슬라이딩 시 살짝 뜨는 높이
             DIVE_RECOVER: 18, // 슬라이딩 후 일어나는 시간(프레임)
@@ -9874,6 +9878,7 @@ ${text}
                 y: PIKA.GROUND,
                 vx: 0, vy: 0,
                 spikeTimer: 0,
+                spikeBuffer: 0,
                 hitCooldown: 0,
                 dive: 0,          // 1이면 슬라이딩 중
                 diveDir: 0,
@@ -9886,7 +9891,7 @@ ${text}
             [pika.p1, pika.p2].forEach(p => {
                 p.x = p.side === 'left' ? 100 : PIKA.W - 100;
                 p.y = PIKA.GROUND; p.vx = 0; p.vy = 0;
-                p.spikeTimer = 0; p.dive = 0; p.recover = 0;
+                p.spikeTimer = 0; p.spikeBuffer = 0; p.dive = 0; p.recover = 0;
             });
             pika.ball = {
                 x: server === 'left' ? 100 : PIKA.W - 100,
@@ -9937,7 +9942,7 @@ ${text}
             const mode = document.getElementById('pikaMode').value;
             document.getElementById('pikaLevel').style.display = mode === 'cpu' ? '' : 'none';
             document.getElementById('pikaHelp').innerHTML = mode === 'cpu'
-                ? `🎮 <b>나(왼쪽)</b>: ← → 이동 · ↑ 점프 · <b>Space</b> 스파이크(점프 중) / 슬라이딩(땅에서 ← 또는 →와 함께)<br>💥 스파이크 방향: Space와 함께 → 강하게 · ← 짧게 · ↑ 높이 · ↓ 내리꽂기 · ${PIKA.WIN_SCORE}점 먼저 내면 승리`
+                ? `🎮 <b>나(왼쪽)</b>: ← → 이동 · ↑ 점프 · <b>Space</b> 스파이크(점프 중) / 슬라이딩(땅에서 ← 또는 →와 함께)<br>💥 Space는 점프 직전·점프 중 아무 때나 미리 눌러두면 공이 닿을 때 스파이크 · 방향: → 강하게 · ← 짧게 · ↑(다시 눌러) 높이 · ↓ 내리꽂기 · ${PIKA.WIN_SCORE}점 먼저 내면 승리`
                 : `🎮 <b>1P(왼쪽)</b>: A D 이동 · W 점프 · S 아래 · F 스파이크/슬라이딩 &nbsp;|&nbsp; <b>2P(오른쪽)</b>: ← → 이동 · ↑ 점프 · ↓ 아래 · Enter 스파이크/슬라이딩<br>슬라이딩 = 땅에서 방향키 + 스파이크 키 · 스파이크 방향 = 스파이크 키와 함께 앞(강하게)/뒤(짧게)/위(높이)/아래(내리꽂기) · ${PIKA.WIN_SCORE}점 먼저 내면 승리`;
         }
 
@@ -10072,16 +10077,21 @@ ${text}
                     p.vx = p.diveDir * PIKA.DIVE_VX;
                     p.vy = PIKA.DIVE_VY;
                 } else {
-                    if (input.jump && onGround) p.vy = PIKA.JUMP;
-                    if (input.spike && !onGround) {
+                    // 점프하려고 누른 ↑는 손을 뗄 때까지 '위쪽 스파이크' 방향으로 치지 않음
+                    if (input.jump && onGround) { p.vy = PIKA.JUMP; p.jumpLatch = !(pika.mode === 'cpu' && p.side === 'right'); }
+                    // 땅에서 미리 누른 스파이크 키는 잠깐 기억했다가 뜨는 순간 적용
+                    if (input.spike && onGround) p.spikeBuffer = PIKA.SPIKE_BUFFER;
+                    if ((input.spike || p.spikeBuffer > 0) && !onGround) {
+                        p.spikeBuffer = 0;
                         // 공중에서 스파이크 키: 누르고 있는 동안 + 뗀 뒤 0.4초까지 공이 닿으면 스파이크
                         if (p.spikeTimer === 0) p.spikeAim = { up: false, down: false, left: false, right: false };
                         p.spikeTimer = PIKA.SPIKE_WINDOW;
                     }
                 }
                 // 스파이크 판정 시간 동안 한 번이라도 누른 방향키를 기억 (짧게 톡 눌러도 반영)
+                if (!input.jump) p.jumpLatch = false;
                 if (p.spikeTimer > 0 && p.spikeAim) {
-                    if (input.jump) p.spikeAim.up = true;
+                    if (input.jump && !p.jumpLatch) p.spikeAim.up = true;
                     if (input.down) p.spikeAim.down = true;
                     if (input.left) p.spikeAim.left = true;
                     if (input.right) p.spikeAim.right = true;
@@ -10110,6 +10120,7 @@ ${text}
                 p.x = Math.max(PIKA.NET_X + half + PIKA.PR, Math.min(PIKA.W - PIKA.PR, p.x));
             }
             if (p.spikeTimer > 0) p.spikeTimer--;
+            if (p.spikeBuffer > 0) p.spikeBuffer--;
             if (p.hitCooldown > 0) p.hitCooldown--;
         }
 
@@ -10120,7 +10131,11 @@ ${text}
             const dx = ball.x - cx, dy = ball.y - cy;
             const dist = Math.hypot(dx, dy);
             const R = PIKA.PR + PIKA.BR;
-            if (dist >= R || p.hitCooldown > 0) return;
+            const isCpu = pika.mode === 'cpu' && p.side === 'right';
+            const spiking = p.spikeTimer > 0 && p.y < PIKA.GROUND && !lying;
+            // 사람이 스파이크 중이면 판정 범위를 넓혀서 쉽게 맞게 (CPU 난이도는 그대로)
+            const reach = spiking && !isCpu ? R + PIKA.SPIKE_REACH : R;
+            if (dist >= reach || p.hitCooldown > 0) return;
 
             const nx = dist === 0 ? 0 : dx / dist;
             const ny = dist === 0 ? -1 : dy / dist;
@@ -10130,7 +10145,7 @@ ${text}
             if (lying) {
                 // 슬라이딩 리시브: 공을 높이 띄워 살려냄
                 ball.vx = dir * 2 + nx * 3;
-                ball.vy = -10;
+                ball.vy = -11.5;
             } else if (p.spikeTimer > 0 && airborne) {
                 // 스파이크 방향 조절 (오리지널처럼 방향키를 누른 채로 때리기)
                 //  앞(상대 쪽) = 빠르고 길게, 뒤 = 느리고 짧게(페인트), 없음 = 기본
@@ -10159,13 +10174,13 @@ ${text}
                 }
                 p.spikeTimer = 0;
             } else {
-                const speed = 10;
+                const speed = PIKA.RECEIVE_SPEED;
                 // 제자리 리시브도 상대 코트 쪽으로 살짝 넘어가도록 보정
                 ball.vx = nx * speed + p.vx * 0.4 + dir * 1.5 + (Math.random() - 0.5) * 3;
-                ball.vy = Math.min(ny * speed, -7.5);
+                ball.vy = Math.min(ny * speed, PIKA.RECEIVE_MIN_VY);
             }
-            ball.x = cx + nx * (R + 1);
-            ball.y = cy + ny * (R + 1);
+            ball.x = cx + nx * (Math.max(R, dist) + 1);
+            ball.y = cy + ny * (Math.max(R, dist) + 1);
             p.hitCooldown = 8;
         }
 
