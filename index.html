@@ -3716,6 +3716,22 @@
         .mafia-role .mr-head.mafia { color: #ff6b6b; } .mafia-role .mr-head.citizen { color: #8ab4ff; }
         .mafia-role .mr-desc { opacity: 0.8; margin-bottom: 4px; }
         .mafia-role .mr-bad { color: #ff6b6b; } .mafia-role .mr-good { color: #4cd137; } .mafia-role .mr-dead { color: #bbb; }
+        .mafia-role.closed { border-left-color: #ffd700; }
+        .mafia-role .mr-hidden { cursor: pointer; text-align: center; padding: 14px 6px; font-size: 16px; border-radius: 10px; background: repeating-linear-gradient(45deg, rgba(255,215,0,0.08) 0 12px, rgba(255,255,255,0.03) 12px 24px); user-select: none; -webkit-user-select: none; }
+        .mafia-role .mr-hidden small { font-size: 12px; opacity: 0.75; }
+        .mafia-role .mr-hidden:hover { background-color: rgba(255,215,0,0.08); }
+        .mafia-role .mr-hide { margin-left: 8px; vertical-align: middle; }
+        .mafia-setup { width: 100%; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 10px 12px; margin-top: 4px; }
+        .mafia-setup .msu-head { font-weight: bold; font-size: 14px; margin-bottom: 8px; }
+        .mafia-setup .msu-head small { font-weight: normal; opacity: 0.7; font-size: 12px; margin-left: 4px; }
+        .mafia-setup .msu-rows { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; margin-bottom: 6px; }
+        .mafia-setup .msu-row { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.06); border-radius: 8px; padding: 5px 8px; font-size: 13px; }
+        .mafia-setup .msu-row span { flex: 1; }
+        .mafia-setup .msu-row b { min-width: 18px; text-align: center; font-size: 15px; color: #ffd700; }
+        .mafia-setup .msu-row small { opacity: 0.6; font-size: 11px; }
+        .mafia-setup .msu-row button { width: 26px; height: 26px; border-radius: 50%; border: none; background: rgba(255,255,255,0.15); color: #fff; font-size: 16px; line-height: 1; cursor: pointer; }
+        .mafia-setup .msu-row button:hover { background: rgba(255,215,0,0.35); }
+        .mafia-setup .msu-err { color: #ff8a80; font-size: 12px; margin-bottom: 6px; }
         .mafia-players { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 12px; }
         .mafia-card { background: rgba(255,255,255,0.07); border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; min-height: 66px; transition: transform 0.15s, border-color 0.15s; }
         .mafia-card .mc-name { font-weight: bold; font-size: 14px; word-break: break-all; }
@@ -4752,15 +4768,16 @@
                             <details class="mafia-rules">
                                 <summary>📖 규칙 · 직업 설명</summary>
                                 <ol>
-                                    <li><b>대기실</b>: 4~12명이 참가하면 방장(👑)이 시작. 직업은 무작위로 정해지고 나만 볼 수 있어요.</li>
-                                    <li><b>🌙 밤 (30초)</b>: 마피아는 제거할 사람, 의사는 치료할 사람, 경찰은 조사할 사람을 카드를 눌러 고릅니다. 마피아끼리는 몰래 채팅 가능.</li>
-                                    <li><b>☀️ 낮 (생존자 1명당 15초, 최소 60초)</b>: 밤사이 일이 공개되고 자유 토론. 각자 하루 한 번 시간 ±15초.</li>
+                                    <li><b>대기실</b>: 4~12명이 참가하면 방장(👑)이 직업 구성(+/−)을 정하고 시작. 직업은 무작위로 나눠지고, <b>내 직업 카드는 눌러야 보여요</b> (10초 뒤 자동으로 가려짐).</li>
+                                    <li><b>☀️ 낮 (생존자 1명당 15초, 최소 60초)</b>: 게임은 1일째 낮부터 시작해요. 밤사이 일이 공개되고 자유 토론. 각자 하루 한 번 시간 ±15초.</li>
                                     <li><b>🗳️ 투표 (30초)</b>: 가장 많은 표를 받은 1명이 지목돼요. 동점·무투표면 바로 밤.</li>
                                     <li><b>⚖️ 최후의 반론 (20초)</b> → <b>👍👎 찬반 투표 (15초)</b>: 찬성이 반대보다 많으면 처형.</li>
+                                    <li><b>🌙 밤 (30초)</b>: 마피아는 제거할 사람, 의사는 치료할 사람, 경찰은 조사할 사람을 카드를 눌러 고릅니다. 마피아끼리는 몰래 채팅 가능. 밤이 지나면 다음 날 낮.</li>
                                     <li><b>승리 조건</b>: 마피아를 모두 처형하면 시민 승리, 살아있는 마피아 수가 시민 수 이상이면 마피아 승리.</li>
                                 </ol>
-                                <div class="mafia-rule-roles">🔪 마피아 (4~5명: 1, 6~9명: 2, 10명 이상: 3) · 👮 경찰 · 💉 의사 · 🎩 정치인 (7명 이상, 2표·투표 처형 면제) · 🪖 군인 (8명 이상, 공격 1회 버팀) · 🙂 시민</div>
-                                <div class="mafia-rule-roles">☠️ 죽은 사람은 죽은 사람끼리만 대화할 수 있고, 게임이 끝나면 모든 직업과 비밀 대화가 공개돼요.</div>
+                                <div class="mafia-rule-roles">🔪 마피아 (4~5명: 1, 6~9명: 2, 10명 이상: 3) · 💉 의사 · 👮 경찰 (5명 이상) · 🎩 정치인 (7명 이상, 2표·투표 처형 면제) · 🪖 군인 (8명 이상, 공격 1회 버팀) · 🙂 시민</div>
+                                <div class="mafia-rule-roles">☠️ 누가 죽으면 '시민이 죽었습니다' / '마피아가 죽었습니다'로 알려줘요. 찬반 투표는 누가 찬성·반대했는지 공개돼요.</div>
+                                <div class="mafia-rule-roles">죽은 사람은 죽은 사람끼리만 대화할 수 있고, 게임이 끝나면 모든 직업과 비밀 대화가 공개돼요.</div>
                             </details>
                         </div>
                     </div>
@@ -8262,6 +8279,12 @@ ${text}
         }
         const RANK_ICON_NOTICE = '🔒 컬렉션에서 아이콘을 지정해야 랭킹에 올라가요 (게임 → 🏆 컬렉션에서 인형 클릭)';
 
+        // 채팅 이름 색: 이름마다 고정된 서로 다른 색
+        function nameColor(name) {
+            let h = 0;
+            for (const ch of String(name || '')) h = (h * 31 + ch.codePointAt(0)) >>> 0;
+            return `hsl(${Math.round((h * 137.508) % 360)}, 80%, 70%)`;
+        }
         function nameWithIcon(name) {
             const ic = iconOf(name);
             const hidden = ic && GACHA_ITEMS.some(it => it.emoji === ic && it.rarity === 'hidden');
@@ -11360,6 +11383,17 @@ ${text}
         const MAFIA_MIN = 4, MAFIA_MAX = 12;
         const MAFIA_PHASE_LABEL = { lobby: '🏠 대기실', night: '🌙 밤', day: '☀️ 낮 (토론)', vote: '🗳️ 투표', defense: '⚖️ 최후의 반론', final: '👍👎 찬반 투표', end: '🏁 게임 종료' };
         let mafiaRoom = null, mafiaChat = [], mafiaOffset = 0, mafiaAdvancing = null, mafiaTimer = null;
+        // 직업 카드는 눌러야 보임 (옆에서 화면을 봐도 안 들키게), 10초 뒤 자동으로 가려짐
+        const MAFIA_REVEAL_MS = 10000;
+        let mafiaRevealUntil = 0, mafiaRevealShown = false;
+        const mafiaRevealed = () => Date.now() < mafiaRevealUntil;
+        function mafiaToggleReveal() {
+            mafiaRevealUntil = mafiaRevealed() ? 0 : Date.now() + MAFIA_REVEAL_MS;
+            renderMafia();
+        }
+        function mafiaKeepRevealed() { if (mafiaRevealed()) mafiaRevealUntil = Date.now() + MAFIA_REVEAL_MS; }
+        // 방장이 고르는 직업 구성 (시민은 남는 인원)
+        const MAFIA_SETUP_ROLES = ['mafia', 'doctor', 'police', 'politician', 'soldier'];
 
         const mafiaNow = () => Date.now() + mafiaOffset;
         const mafiaMe = () => statKey(myGameName());
@@ -11374,11 +11408,55 @@ ${text}
         // 인원별 직업 구성
         function mafiaRoleList(n) {
             const m = n >= 10 ? 3 : n >= 6 ? 2 : 1;
-            const list = Array(m).fill('mafia').concat(['police', 'doctor']);
+            const list = Array(m).fill('mafia').concat(['doctor']);
+            if (n >= 5) list.push('police'); // 4명은 마피아1·의사1·시민2
             if (n >= 7) list.push('politician');
             if (n >= 8) list.push('soldier');
             while (list.length < n) list.push('citizen');
             return list;
+        }
+
+        function mafiaAutoSetup(n) {
+            const c = {}; MAFIA_SETUP_ROLES.forEach(k => c[k] = 0);
+            mafiaRoleList(Math.max(n, MAFIA_MIN)).forEach(x => { if (x !== 'citizen') c[x]++; });
+            return c;
+        }
+        function mafiaSetupOf(r, n) {
+            if (!r || !r.setup) return mafiaAutoSetup(n);
+            const c = {}; MAFIA_SETUP_ROLES.forEach(k => c[k] = r.setup[k] || 0);
+            return c;
+        }
+        function mafiaSetupError(c, n) {
+            if (n < MAFIA_MIN) return `${MAFIA_MIN}명 이상 모여야 시작할 수 있어요`;
+            if (c.mafia < 1) return '마피아는 1명 이상이어야 해요';
+            const special = MAFIA_SETUP_ROLES.reduce((a, k) => a + c[k], 0);
+            if (special > n) return `직업 수(${special})가 인원(${n}명)보다 많아요`;
+            if (c.mafia * 2 >= n) return '마피아가 너무 많아요 (마피아 수가 나머지보다 적어야 해요)';
+            return '';
+        }
+        function mafiaChangeSetup(role, delta) {
+            const me = mafiaMe();
+            mafiaTx(cur => {
+                if (!cur || !cur.state || cur.state.phase !== 'lobby' || cur.host !== me) return;
+                const c = mafiaSetupOf(cur, Object.keys(cur.players || {}).length);
+                c[role] = Math.max(role === 'mafia' ? 1 : 0, Math.min(MAFIA_MAX, (c[role] || 0) + delta));
+                cur.setup = c;
+                return cur;
+            });
+        }
+        function mafiaResetSetup() {
+            const me = mafiaMe();
+            mafiaTx(cur => {
+                if (!cur || !cur.state || cur.state.phase !== 'lobby' || cur.host !== me) return;
+                cur.setup = null;
+                return cur;
+            });
+        }
+        // 사망 안내: 마피아가 아니면 '시민이 죽었습니다', 마피아면 '마피아가 죽었습니다'
+        function mafiaKill(r, n, when) {
+            const team = MAFIA_ROLES[(r.roles || {})[n]].team;
+            r.players[n].alive = false; r.players[n].diedOn = when; r.players[n].diedTeam = team;
+            return team === 'mafia' ? '🔪 마피아가 죽었습니다!' : '🙂 시민이 죽었습니다.';
         }
 
         function mafiaLog(r, text) {
@@ -11414,10 +11492,10 @@ ${text}
         }
 
         function mafiaGoNight(r, now) {
-            r.state.day = (r.state.day || 0) + 1;
             r.state.accused = null; r.votes = null; r.finalVotes = null; r.night = null;
             mafiaSetPhase(r, 'night', now);
-            mafiaLog(r, `🌙 ${r.state.day}일째 밤이 되었습니다. 마피아·의사·경찰은 대상을 고르세요.`);
+            const acts = ['mafia', 'doctor', 'police'].filter(x => Object.values(r.roles || {}).includes(x)).map(x => MAFIA_ROLES[x].name).join('·');
+            mafiaLog(r, `🌙 ${r.state.day}일째 밤이 되었습니다. ${acts}: 카드를 눌러 대상을 고르세요.`);
         }
 
         // 현재 단계를 끝내고 다음 단계로 (트랜잭션 안에서 호출)
@@ -11428,10 +11506,11 @@ ${text}
                 if (t && mafiaAlive(r, t)) {
                     if (n.doctor === t) mafiaLog(r, `💉 마피아가 ${t}님을 노렸지만 의사의 치료로 살아났습니다!`);
                     else if (roles[t] === 'soldier' && !st.soldierUsed) { st.soldierUsed = true; mafiaLog(r, `🪖 군인 ${t}님이 마피아의 공격을 버텨냈습니다!`); }
-                    else { r.players[t].alive = false; r.players[t].diedOn = `${st.day}일째 밤`; mafiaLog(r, `🔪 ${t}님이 마피아에게 살해당했습니다.`); }
+                    else { const who = mafiaKill(r, t, `${st.day}일째 밤`); mafiaLog(r, `🔪 ${t}님이 마피아에게 살해당했습니다. ${who}`); }
                 } else mafiaLog(r, '🌙 아무 일도 일어나지 않은 조용한 밤이었습니다.');
                 r.night = null;
                 if (mafiaCheckEnd(r)) return r;
+                st.day = (st.day || 0) + 1;
                 mafiaSetPhase(r, 'day', now);
                 mafiaLog(r, `☀️ ${st.day}일째 낮입니다. ${Math.round((st.endsAt - now) / 1000)}초 동안 토론하세요. (각자 하루 한 번 시간 ±15초)`);
             } else if (st.phase === 'day') {
@@ -11439,13 +11518,15 @@ ${text}
                 mafiaSetPhase(r, 'vote', now);
                 mafiaLog(r, '🗳️ 투표 시간입니다. 마피아로 의심되는 사람을 눌러 투표하세요.');
             } else if (st.phase === 'vote') {
-                const tally = {};
+                const tally = {}, voters = {};
                 Object.entries(r.votes || {}).forEach(([v, t]) => {
-                    if (mafiaAlive(r, v) && mafiaAlive(r, t)) tally[t] = (tally[t] || 0) + (roles[v] === 'politician' ? 2 : 1);
+                    if (!mafiaAlive(r, v) || !mafiaAlive(r, t)) return;
+                    tally[t] = (tally[t] || 0) + (roles[v] === 'politician' ? 2 : 1);
+                    (voters[t] = voters[t] || []).push(v);
                 });
                 const max = Math.max(0, ...Object.values(tally));
                 const top = Object.keys(tally).filter(k => tally[k] === max);
-                const summary = Object.entries(tally).sort((a, b) => b[1] - a[1]).map(([k, c]) => `${k} ${c}표`).join(', ');
+                const summary = Object.entries(tally).sort((a, b) => b[1] - a[1]).map(([k, c]) => `${k} ${c}표(${voters[k].join('·')})`).join(', ');
                 if (max === 0 || top.length !== 1) {
                     mafiaLog(r, max === 0 ? '🗳️ 아무도 투표하지 않아 넘어갑니다.' : `🗳️ 동점(${summary})이라 아무도 지목되지 않았습니다.`);
                     mafiaGoNight(r, now);
@@ -11460,16 +11541,18 @@ ${text}
                 mafiaLog(r, `👍👎 ${st.accused}님을 처형할까요? 찬성/반대를 눌러주세요.`);
             } else if (st.phase === 'final') {
                 let kill = 0, save = 0;
+                const killers = [], savers = [];
                 Object.entries(r.finalVotes || {}).forEach(([v, c]) => {
                     if (!mafiaAlive(r, v) || v === st.accused) return;
                     const w = roles[v] === 'politician' ? 2 : 1;
-                    if (c === 'kill') kill += w; else save += w;
+                    if (c === 'kill') { kill += w; killers.push(v); } else { save += w; savers.push(v); }
                 });
                 const acc = st.accused;
+                const result = `👍 찬성 ${kill}${killers.length ? `(${killers.join('·')})` : ''} : 👎 반대 ${save}${savers.length ? `(${savers.join('·')})` : ''}`;
                 if (kill > save && mafiaAlive(r, acc)) {
-                    if (roles[acc] === 'politician') mafiaLog(r, `🎩 찬성 ${kill} : 반대 ${save} — 하지만 ${acc}님은 정치인이라 투표로 처형되지 않습니다!`);
-                    else { r.players[acc].alive = false; r.players[acc].diedOn = `${st.day}일째 처형`; mafiaLog(r, `☠️ 찬성 ${kill} : 반대 ${save} — ${acc}님이 처형되었습니다.`); }
-                } else mafiaLog(r, `🙅 찬성 ${kill} : 반대 ${save} — 처형이 부결되었습니다.`);
+                    if (roles[acc] === 'politician') mafiaLog(r, `🎩 ${result} — 하지만 ${acc}님은 정치인이라 투표로 처형되지 않습니다!`);
+                    else { const who = mafiaKill(r, acc, `${st.day}일째 처형`); mafiaLog(r, `☠️ ${result} — ${acc}님이 처형되었습니다. ${who}`); }
+                } else mafiaLog(r, `🙅 ${result} — 처형이 부결되었습니다.`);
                 if (mafiaCheckEnd(r)) return r;
                 mafiaGoNight(r, now);
             }
@@ -11537,22 +11620,31 @@ ${text}
         }
 
         function mafiaStart() {
-            const me = mafiaMe();
+            const me = mafiaMe(), r0 = mafiaView(), n0 = Object.keys(r0.players || {}).length;
+            const err0 = mafiaSetupError(mafiaSetupOf(r0, n0), n0);
+            if (err0) { alert(err0); return; }
+            mafiaRevealUntil = 0;
             mafiaTx((cur, after) => {
                 if (!cur || !cur.state || cur.state.phase !== 'lobby' || cur.host !== me) return;
                 const names = Object.keys(cur.players || {});
-                if (names.length < MAFIA_MIN) return;
-                const roles = mafiaRoleList(names.length);
+                const setup = mafiaSetupOf(cur, names.length);
+                if (mafiaSetupError(setup, names.length)) return;
+                const roles = [];
+                MAFIA_SETUP_ROLES.forEach(k => { for (let i = 0; i < setup[k]; i++) roles.push(k); });
+                while (roles.length < names.length) roles.push('citizen');
                 for (let i = roles.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [roles[i], roles[j]] = [roles[j], roles[i]]; }
                 const now = mafiaNow();
-                cur.roles = {}; names.forEach((n, i) => { cur.roles[n] = roles[i]; cur.players[n].alive = true; cur.players[n].diedOn = null; });
+                cur.roles = {}; names.forEach((n, i) => { cur.roles[n] = roles[i]; cur.players[n].alive = true; cur.players[n].diedOn = null; cur.players[n].diedTeam = null; });
                 cur.gid = 'g' + Date.now();
                 cur.log = null; cur.logSeq = 0; cur.votes = null; cur.finalVotes = null; cur.night = null; cur.policeLog = null; cur.timeAdj = null;
                 cur.state = { phase: 'lobby', phaseId: cur.state.phaseId || 1, day: 0 };
                 const cnt = {}; roles.forEach(x => cnt[x] = (cnt[x] || 0) + 1);
                 const comp = Object.keys(MAFIA_ROLES).filter(k => cnt[k]).map(k => `${MAFIA_ROLES[k].emoji}${MAFIA_ROLES[k].name} ${cnt[k]}`).join(' · ');
                 mafiaLog(cur, `🎬 게임 시작! ${names.length}명 — ${comp}. 내 직업은 위 카드에서 확인하세요.`);
-                mafiaGoNight(cur, now);
+                // 첫날은 낮(토론)부터 시작 → 첫날 밤 살해 없이 서로 이야기부터
+                cur.state.day = 1;
+                mafiaSetPhase(cur, 'day', now);
+                mafiaLog(cur, `☀️ 1일째 낮입니다. ${Math.round((cur.state.endsAt - now) / 1000)}초 동안 자유롭게 이야기하세요. (각자 하루 한 번 시간 ±15초)`);
                 after(() => db.ref('mafia/chat').remove()); // 지난 판 채팅 정리
                 return cur;
             });
@@ -11567,7 +11659,7 @@ ${text}
                 const st = cur.state, stale = mafiaIsStale(cur);
                 if (!(st.phase === 'end' || (mafiaInGame(cur) && (cur.host === me || stale)))) return;
                 const wasPlaying = mafiaInGame(cur);
-                Object.values(cur.players || {}).forEach(p => { p.alive = true; p.diedOn = null; });
+                Object.values(cur.players || {}).forEach(p => { p.alive = true; p.diedOn = null; p.diedTeam = null; });
                 cur.roles = null; cur.votes = null; cur.finalVotes = null; cur.night = null; cur.policeLog = null; cur.timeAdj = null;
                 cur.gid = 'g' + Date.now(); cur.log = null; cur.logSeq = 0;
                 cur.state = { phase: 'lobby', phaseId: (st.phaseId || 0) + 1, day: 0 };
@@ -11583,7 +11675,8 @@ ${text}
             if (!mafiaAlive(r, me) || !mafiaAlive(r, target)) return;
             const ph = r.state.phase, role = (r.roles || {})[me];
             if (ph === 'night') {
-                if (!['mafia', 'doctor', 'police'].includes(role)) return;
+                if (!mafiaRevealed() || !['mafia', 'doctor', 'police'].includes(role)) return; // 카드를 열어야 행동
+                mafiaKeepRevealed();
                 if (role === 'mafia' && r.roles[target] === 'mafia') return;
                 if (role === 'police' && (target === me || (r.night || {}).police)) return;
                 mafiaTx(cur => {
@@ -11663,6 +11756,9 @@ ${text}
         function mafiaTick() {
             const r = mafiaRoom;
             if (isMafiaVisible()) mafiaUpdateTimer();
+            if (mafiaRevealShown && !mafiaRevealed()) renderMafia(); // 10초 지나면 직업 카드 다시 가림
+            const left = document.getElementById('mafiaRevealLeft');
+            if (left) left.textContent = Math.max(0, Math.ceil((mafiaRevealUntil - Date.now()) / 1000));
             if (!db || !mafiaInGame(r) || !(r.players || {})[mafiaMe()]) return;
             const st = r.state;
             if (mafiaNow() < st.endsAt && !mafiaCanEndEarly(r)) return;
@@ -11711,6 +11807,9 @@ ${text}
             const players = r.players || {}, roles = r.roles || {}, inGame = mafiaInGame(r), ended = st.phase === 'end';
             const myRole = roles[me], joined = !!players[me], alive = mafiaAlive(r, me);
             const names = Object.keys(players).sort((a, b) => (players[a].joinedAt || 0) - (players[b].joinedAt || 0));
+            // secret: 직업 관련 정보를 보여도 되는지 (카드를 열었거나 게임 종료)
+            const secret = ended || mafiaRevealed();
+            mafiaRevealShown = inGame && mafiaRevealed();
 
             // 상단 상태
             const status = document.getElementById('mafiaStatus');
@@ -11742,8 +11841,11 @@ ${text}
                     extra += logs.length ? `<div>🔍 조사 결과: ${logs.map(([d, x]) => `${d.slice(1)}일째 ${escapeHtml(x.target)} → ${x.mafia ? '<b class="mr-bad">마피아!</b>' : '<span class="mr-good">마피아 아님</span>'}`).join(' · ')}</div>` : '';
                     if (st.phase === 'night' && !(r.night || {}).police) extra += '<div>🔍 아래에서 조사할 사람을 누르세요 (밤마다 1명)</div>';
                 }
-                if (!alive && !ended) extra += '<div class="mr-dead">☠️ 사망했습니다. 죽은 사람끼리만 대화할 수 있어요.</div>';
-                roleEl.innerHTML = `<div class="mr-head ${R.team}">${R.emoji} 내 직업: <b>${R.name}</b></div><div class="mr-desc">${R.desc}</div>${extra}`;
+                const deadMsg = !alive && !ended ? '<div class="mr-dead">☠️ 사망했습니다. 죽은 사람끼리만 대화할 수 있어요.</div>' : '';
+                roleEl.innerHTML = secret
+                    ? `<div class="mr-head ${R.team}">${R.emoji} 내 직업: <b>${R.name}</b>${ended ? '' : ' <button class="mafia-btn ghost small mr-hide" onclick="mafiaToggleReveal()">🙈 가리기 (<span id="mafiaRevealLeft">10</span>초)</button>'}</div><div class="mr-desc">${R.desc}</div>${extra}${deadMsg}`
+                    : `<div class="mr-hidden" onclick="mafiaToggleReveal()">🃏 <b>내 직업 카드</b> — 눌러서 확인<br><small>옆 사람이 안 보게 하고 누르세요 · 10초 뒤 자동으로 가려져요 · 밤 행동도 카드를 연 상태에서 해요</small></div>${deadMsg}`;
+                roleEl.classList.toggle('closed', !secret);
                 roleEl.style.display = '';
             } else if (inGame && !joined) {
                 roleEl.innerHTML = '<div class="mr-head">👀 관전 중</div><div class="mr-desc">게임이 끝나면 대기실에서 참가할 수 있어요.</div>';
@@ -11754,11 +11856,11 @@ ${text}
             const tally = {};
             if (st.phase === 'vote') Object.entries(r.votes || {}).forEach(([v, t]) => { if (mafiaAlive(r, v)) tally[t] = (tally[t] || 0) + (roles[v] === 'politician' ? 2 : 1); });
             const night = r.night || {};
-            const showRole = (n) => ended || n === me || (myRole === 'mafia' && roles[n] === 'mafia');
+            const showRole = (n) => ended || (secret && (n === me || (myRole === 'mafia' && roles[n] === 'mafia')));
             const canAct = (n) => {
                 if (!alive || !mafiaAlive(r, n)) return false;
                 if (st.phase === 'vote') return n !== me;
-                if (st.phase !== 'night') return false;
+                if (st.phase !== 'night' || !secret) return false;
                 if (myRole === 'mafia') return roles[n] !== 'mafia';
                 if (myRole === 'doctor') return true;
                 if (myRole === 'police') return n !== me && !night.police;
@@ -11770,12 +11872,14 @@ ${text}
                 const badges = [];
                 if (r.host === n) badges.push('<span class="mb host">👑 방장</span>');
                 if (showRole(n) && roles[n]) badges.push(`<span class="mb role ${MAFIA_ROLES[roles[n]].team}">${MAFIA_ROLES[roles[n]].emoji}${MAFIA_ROLES[roles[n]].name}</span>`);
-                if (dead) badges.push(`<span class="mb dead">☠️ ${escapeHtml(p.diedOn || '사망')}</span>`);
+                if (dead) badges.push(`<span class="mb dead">☠️ ${escapeHtml(p.diedOn || '사망')}${p.diedTeam ? ` · ${p.diedTeam === 'mafia' ? '마피아' : '시민'}` : ''}</span>`);
                 if (st.phase === 'vote' && tally[n]) badges.push(`<span class="mb vote">🗳️ ${tally[n]}표</span>`);
-                if (st.phase === 'night' && myRole === 'mafia' && night.mafia === n) badges.push('<span class="mb target">🎯 목표</span>');
-                if (st.phase === 'night' && myRole === 'doctor' && night.doctor === n) badges.push('<span class="mb heal">💉 치료</span>');
-                if (myRole === 'police' && !ended) Object.values(policeMine).forEach(x => { if (x.target === n) badges.push(x.mafia ? '<span class="mb target">🔍 마피아!</span>' : '<span class="mb heal">🔍 시민</span>'); });
-                const picked = (st.phase === 'vote' && (r.votes || {})[me] === n) || (st.phase === 'night' && ((myRole === 'mafia' && night.mafia === n) || (myRole === 'doctor' && night.doctor === n) || (myRole === 'police' && night.police === n)));
+                // 찬반 투표는 누가 찬성/반대했는지 실시간 공개
+                if (st.phase === 'final' && (r.finalVotes || {})[n] && mafiaAlive(r, n)) badges.push(r.finalVotes[n] === 'kill' ? '<span class="mb target">👍 찬성</span>' : '<span class="mb heal">👎 반대</span>');
+                if (secret && st.phase === 'night' && myRole === 'mafia' && night.mafia === n) badges.push('<span class="mb target">🎯 목표</span>');
+                if (secret && st.phase === 'night' && myRole === 'doctor' && night.doctor === n) badges.push('<span class="mb heal">💉 치료</span>');
+                if (secret && myRole === 'police' && !ended) Object.values(policeMine).forEach(x => { if (x.target === n) badges.push(x.mafia ? '<span class="mb target">🔍 마피아!</span>' : '<span class="mb heal">🔍 시민</span>'); });
+                const picked = (st.phase === 'vote' && (r.votes || {})[me] === n) || (secret && st.phase === 'night' && ((myRole === 'mafia' && night.mafia === n) || (myRole === 'doctor' && night.doctor === n) || (myRole === 'police' && night.police === n)));
                 const accused = (st.phase === 'defense' || st.phase === 'final') && st.accused === n;
                 return `<div class="mafia-card${dead ? ' dead' : ''}${n === me ? ' me' : ''}${canAct(n) ? ' act' : ''}${picked ? ' picked' : ''}${accused ? ' accused' : ''}" data-name="${escapeHtml(n)}" onclick="mafiaClickPlayer(this.dataset.name)">
                     <div class="mc-name">${nameWithIcon(n)}${n === me ? ' <small>(나)</small>' : ''}</div><div class="mc-badges">${badges.join('')}</div></div>`;
@@ -11786,10 +11890,14 @@ ${text}
             const myVote = (r.votes || {})[me];
             if (st.phase === 'lobby') {
                 acts.push(joined ? '<button class="mafia-btn ghost" onclick="mafiaLeave()">🚪 나가기</button>' : `<button class="mafia-btn" onclick="mafiaJoin()" ${names.length >= MAFIA_MAX ? 'disabled' : ''}>🙋 참가하기</button>`);
-                if (r.host === me) acts.push(`<button class="mafia-btn start" onclick="mafiaStart()" ${names.length < MAFIA_MIN ? 'disabled' : ''}>🎬 게임 시작 ${names.length < MAFIA_MIN ? `(${MAFIA_MIN - names.length}명 더 필요)` : ''}</button>`);
-                if (names.length >= MAFIA_MIN) acts.push(`<div class="mafia-hint">직업 구성: ${(() => { const c = {}; mafiaRoleList(names.length).forEach(x => c[x] = (c[x] || 0) + 1); return Object.keys(MAFIA_ROLES).filter(k => c[k]).map(k => `${MAFIA_ROLES[k].emoji}${MAFIA_ROLES[k].name} ${c[k]}`).join(' · '); })()}</div>`);
+                const setup = mafiaSetupOf(r, names.length), err = mafiaSetupError(setup, names.length), isHost = r.host === me;
+                if (isHost) acts.push(`<button class="mafia-btn start" onclick="mafiaStart()" ${err ? 'disabled' : ''}>🎬 게임 시작 ${names.length < MAFIA_MIN ? `(${MAFIA_MIN - names.length}명 더 필요)` : ''}</button>`);
+                const citizens = names.length - MAFIA_SETUP_ROLES.reduce((a, k) => a + setup[k], 0);
+                acts.push(`<div class="mafia-setup"><div class="msu-head">🎭 직업 구성 <small>${isHost ? '방장이 +/−로 정해요' : `방장${r.host ? `(${escapeHtml(r.host)})` : ''}이 정해요`}${r.setup ? '' : ' · 지금은 자동 추천'}</small></div><div class="msu-rows">${
+                    MAFIA_SETUP_ROLES.map(k => `<div class="msu-row"><span>${MAFIA_ROLES[k].emoji} ${MAFIA_ROLES[k].name}</span>${isHost ? `<button onclick="mafiaChangeSetup('${k}', -1)">−</button>` : ''}<b>${setup[k]}</b>${isHost ? `<button onclick="mafiaChangeSetup('${k}', 1)">+</button>` : ''}</div>`).join('')
+                }<div class="msu-row"><span>🙂 시민</span><b>${Math.max(0, citizens)}</b><small>(남는 인원)</small></div></div>${err && names.length >= MAFIA_MIN ? `<div class="msu-err">⚠️ ${escapeHtml(err)}</div>` : ''}${isHost && r.setup ? '<button class="mafia-btn ghost small" onclick="mafiaResetSetup()">🔄 자동 추천으로</button>' : ''}</div>`);
             } else if (st.phase === 'night') {
-                acts.push(`<div class="mafia-hint">${!alive ? '☠️ 관전 중' : myRole === 'mafia' ? '🔪 제거할 사람을 누르세요 (동료와 마피아 채팅으로 상의)' : myRole === 'doctor' ? '💉 치료할 사람을 누르세요' : myRole === 'police' ? (night.police ? '🔍 오늘 조사를 마쳤어요' : '🔍 조사할 사람을 누르세요') : '🌙 밤입니다… 아침이 올 때까지 기다리세요'}</div>`);
+                acts.push(`<div class="mafia-hint">${!alive ? '☠️ 관전 중' : !secret ? '🌙 밤입니다. 위 직업 카드를 눌러 확인하고, 할 일이 있으면 사람 카드를 누르세요.' : myRole === 'mafia' ? '🔪 제거할 사람을 누르세요 (동료와 마피아 채팅으로 상의)' : myRole === 'doctor' ? '💉 치료할 사람을 누르세요' : myRole === 'police' ? (night.police ? '🔍 오늘 조사를 마쳤어요' : '🔍 조사할 사람을 누르세요') : '🌙 밤입니다… 아침이 올 때까지 기다리세요'}</div>`);
             } else if (st.phase === 'day') {
                 const used = (r.timeAdj || {})[me] === st.day;
                 if (alive) acts.push(`<button class="mafia-btn ghost" onclick="mafiaAdjustTime(1)" ${used ? 'disabled' : ''}>⏫ 시간 +15초</button><button class="mafia-btn ghost" onclick="mafiaAdjustTime(-1)" ${used ? 'disabled' : ''}>⏬ 시간 -15초</button>`);
@@ -11827,7 +11935,7 @@ ${text}
             const ended = r.state.phase === 'end', inGame = mafiaInGame(r);
             const amDead = inGame && (r.players || {})[me] && !mafiaAlive(r, me);
             const visible = (m) => m.ch === 'all' || ended
-                || (m.ch === 'mafia' && roles[me] === 'mafia')
+                || (m.ch === 'mafia' && roles[me] === 'mafia' && mafiaRevealed())
                 || (m.ch === 'dead' && amDead);
             const items = Object.values(r.log || {}).map(l => ({ sys: true, text: l.text, time: l.time }))
                 .concat(mafiaChat.filter(m => m.gid === r.gid && visible(m)))
@@ -11836,14 +11944,16 @@ ${text}
             el.innerHTML = items.length ? items.map(m => {
                 if (m.sys) return `<div class="mc-sys">${escapeHtml(m.text)}</div>`;
                 const tag = m.ch === 'mafia' ? '<span class="mc-tag mafia">마피아</span>' : m.ch === 'dead' ? '<span class="mc-tag dead">사망자</span>' : '';
-                return `<div class="gc-msg ${m.name === me ? 'mine' : ''} ch-${m.ch}">${tag}<span class="gc-name">${nameWithIcon(m.name)}</span>${escapeHtml(m.text)}</div>`;
+                return `<div class="gc-msg ${m.name === me ? 'mine' : ''} ch-${m.ch}">${tag}<span class="gc-name" style="color:${nameColor(m.name)}">${nameWithIcon(m.name)}</span>${escapeHtml(m.text)}</div>`;
             }).join('') : '<div class="gc-empty">참가하고 대화를 시작해 보세요!</div>';
             if (atBottom || items.length <= 1) el.scrollTop = el.scrollHeight;
             // 입력창 상태
-            const ch = mafiaMyChannel(r, me), input = document.getElementById('mafiaChatInput'), hint = document.getElementById('mafiaChatHint');
+            let ch = mafiaMyChannel(r, me);
+            if (ch === 'mafia' && !mafiaRevealed()) ch = null; // 카드를 가리면 마피아 채팅도 잠김 (화면만 봐선 직업을 모르게)
+            const input = document.getElementById('mafiaChatInput'), hint = document.getElementById('mafiaChatHint');
             input.disabled = !ch;
             input.placeholder = ch === 'mafia' ? '🔪 마피아끼리 대화 (다른 사람은 못 봐요)' : ch === 'dead' ? '☠️ 사망자끼리 대화' : ch ? '메시지 입력...' : '지금은 말할 수 없어요';
-            hint.textContent = ch ? '' : !(r.players || {})[me] ? '👀 관전 중에는 대화할 수 없어요' : r.state.phase === 'night' ? '🌙 밤에는 마피아만 몰래 대화할 수 있어요' : '⚖️ 최후의 반론 중에는 지목된 사람만 말할 수 있어요';
+            hint.textContent = ch ? '' : !(r.players || {})[me] ? '👀 관전 중에는 대화할 수 없어요' : r.state.phase === 'night' ? '🌙 밤에는 마피아만 몰래 대화할 수 있어요 (마피아는 직업 카드를 열면 대화 가능)' : '⚖️ 최후의 반론 중에는 지목된 사람만 말할 수 있어요';
         }
 
         function sendMafiaChat() {
@@ -11853,7 +11963,8 @@ ${text}
             if (mafiaNeedName()) return;
             if (!db) { alert('서버에 연결되지 않았습니다.'); return; }
             const r = mafiaView(), ch = mafiaMyChannel(r, mafiaMe());
-            if (!ch) return;
+            if (!ch || (ch === 'mafia' && !mafiaRevealed())) return;
+            mafiaKeepRevealed();
             db.ref('mafia/chat').push({ name: mafiaMe(), text: text.slice(0, 200), ch, time: Date.now(), gid: r.gid || '' });
             input.value = '';
         }
@@ -12738,7 +12849,7 @@ ${text}
             el.innerHTML = msgs.length ? msgs.map(m => {
                 const t = new Date(m.time || 0);
                 const hm = `${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`;
-                return `<div class="gc-msg ${m.name === me ? 'mine' : ''}"><span class="gc-name">${nameWithIcon(m.name)}</span>${escapeHtml(m.text)}<span class="gc-time">${hm}</span></div>`;
+                return `<div class="gc-msg ${m.name === me ? 'mine' : ''}"><span class="gc-name" style="color:${nameColor(m.name)}">${nameWithIcon(m.name)}</span>${escapeHtml(m.text)}<span class="gc-time">${hm}</span></div>`;
             }).join('') : '<div class="gc-empty">첫 메시지를 남겨보세요!</div>';
             if (atBottom || msgs.length <= 1) el.scrollTop = el.scrollHeight;
         }
