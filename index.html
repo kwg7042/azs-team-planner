@@ -3688,6 +3688,75 @@
         .dodge-ranking td.dodge-best { color: #ffd400; font-weight: bold; }
         .dodge-ranking tr.dodge-me td { background: rgba(79,163,255,0.15); }
         .dodge-ranking th:nth-child(2), .dodge-ranking td:nth-child(2) { text-align: left; }
+        /* ===== 쿠키 러너 ===== */
+        .runner-area { text-align: center; padding: 15px; background: linear-gradient(180deg, #3b2412, #1e1209); border-radius: 20px; border: 3px solid rgba(255,180,90,0.45); margin-bottom: 20px; }
+        #runnerCanvas { width: 100%; max-width: 720px; height: auto; display: block; margin: 0 auto; border-radius: 12px; touch-action: none; user-select: none; -webkit-user-select: none; }
+        .runner-pause { padding: 8px 14px; border-radius: 20px; border: none; background: rgba(255,255,255,0.15); color: #fff; font-size: 14px; cursor: pointer; }
+        .runner-pad { display: flex; gap: 12px; justify-content: center; max-width: 720px; margin: 10px auto 0; }
+        .runner-pad-btn { flex: 1; padding: 14px 0; border-radius: 14px; border: none; font-size: 17px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #ffd400, #ff9800); color: #3b2412; touch-action: none; user-select: none; -webkit-user-select: none; }
+        .runner-pad-btn.slide { background: linear-gradient(135deg, #4fc3f7, #1e88e5); color: #fff; }
+        .runner-pad-btn:active { transform: scale(0.97); filter: brightness(0.9); }
+        /* ===== 마피아 ===== */
+        .mafia-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+        @media (max-width: 900px) { .mafia-layout { grid-template-columns: 1fr; } }
+        .mafia-side { display: flex; flex-direction: column; gap: 12px; }
+        .mafia-status { border-radius: 16px; padding: 14px 18px; text-align: center; margin-bottom: 12px; position: relative; background: linear-gradient(135deg, #2d3561, #1f2340); border: 2px solid rgba(255,255,255,0.12); transition: background 0.6s; }
+        .mafia-status.ph-night { background: linear-gradient(135deg, #0b1033, #1b0f2e); border-color: rgba(140,120,255,0.35); }
+        .mafia-status.ph-day { background: linear-gradient(135deg, #f7b733, #fc4a1a); }
+        .mafia-status.ph-vote, .mafia-status.ph-final { background: linear-gradient(135deg, #8e2de2, #4a00e0); }
+        .mafia-status.ph-defense { background: linear-gradient(135deg, #b31217, #e52d27); }
+        .mafia-status.ph-end { background: linear-gradient(135deg, #11998e, #38ef7d); color: #0b1a14; }
+        .mafia-status .ms-title { font-size: 20px; font-weight: bold; }
+        .mafia-status .ms-timer { font-size: 30px; font-weight: bold; font-variant-numeric: tabular-nums; letter-spacing: 1px; min-height: 0; }
+        .mafia-status .ms-timer.urgent { color: #ffeb3b; animation: mafiaPulse 0.5s infinite alternate; }
+        .mafia-status .ms-sub { font-size: 13px; opacity: 0.85; }
+        @keyframes mafiaPulse { from { transform: scale(1); } to { transform: scale(1.12); } }
+        .mafia-role { background: rgba(0,0,0,0.25); border-radius: 14px; padding: 12px 15px; margin-bottom: 12px; font-size: 13px; line-height: 1.6; border-left: 4px solid #8ab4ff; }
+        .mafia-role .mr-head { font-size: 16px; margin-bottom: 2px; }
+        .mafia-role .mr-head.mafia { color: #ff6b6b; } .mafia-role .mr-head.citizen { color: #8ab4ff; }
+        .mafia-role .mr-desc { opacity: 0.8; margin-bottom: 4px; }
+        .mafia-role .mr-bad { color: #ff6b6b; } .mafia-role .mr-good { color: #4cd137; } .mafia-role .mr-dead { color: #bbb; }
+        .mafia-players { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 12px; }
+        .mafia-card { background: rgba(255,255,255,0.07); border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; min-height: 66px; transition: transform 0.15s, border-color 0.15s; }
+        .mafia-card .mc-name { font-weight: bold; font-size: 14px; word-break: break-all; }
+        .mafia-card .mc-name small { color: #00ff88; font-weight: normal; }
+        .mafia-card .mc-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+        .mafia-card.me { border-color: rgba(0,255,136,0.45); }
+        .mafia-card.act { cursor: pointer; border-color: rgba(255,215,0,0.5); }
+        .mafia-card.act:hover { transform: translateY(-2px); border-color: #ffd700; }
+        .mafia-card.picked { border-color: #ffd700; box-shadow: 0 0 12px rgba(255,215,0,0.45); background: rgba(255,215,0,0.12); }
+        .mafia-card.accused { border-color: #ff4757; box-shadow: 0 0 14px rgba(255,71,87,0.6); }
+        .mafia-card.dead { opacity: 0.45; filter: grayscale(0.8); }
+        .mafia-card.dead .mc-name { text-decoration: line-through; }
+        .mafia-card .mb { font-size: 11px; padding: 2px 7px; border-radius: 10px; background: rgba(255,255,255,0.12); white-space: nowrap; }
+        .mafia-card .mb.host { background: rgba(255,215,0,0.2); color: #ffd700; }
+        .mafia-card .mb.role.mafia, .mafia-card .mb.target { background: rgba(255,71,87,0.25); color: #ff8a8a; }
+        .mafia-card .mb.role.citizen, .mafia-card .mb.heal { background: rgba(76,209,55,0.2); color: #7dff6a; }
+        .mafia-card .mb.vote { background: rgba(138,180,255,0.25); color: #b9d0ff; font-weight: bold; }
+        .mafia-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .mafia-btn { padding: 10px 18px; border: none; border-radius: 12px; font-weight: bold; font-size: 14px; cursor: pointer; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+        .mafia-btn.start { background: linear-gradient(135deg, #ffd400, #ff8c00); color: #1a1a2e; }
+        .mafia-btn.ghost { background: rgba(255,255,255,0.12); }
+        .mafia-btn.small { padding: 6px 12px; font-size: 12px; }
+        .mafia-btn.kill { background: rgba(255,71,87,0.3); } .mafia-btn.save { background: rgba(76,209,55,0.25); }
+        .mafia-btn.kill.on { background: #ff4757; box-shadow: 0 0 10px #ff4757; } .mafia-btn.save.on { background: #2ecc71; box-shadow: 0 0 10px #2ecc71; }
+        .mafia-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .mafia-hint { font-size: 13px; color: rgba(255,255,255,0.8); width: 100%; }
+        .mafia-chat .game-chat-list { height: 300px; }
+        .mafia-chat h4 small { font-weight: normal; opacity: 0.6; font-size: 11px; }
+        .mafia-chat .mc-sys { background: rgba(255,215,0,0.1); color: #ffe27a; border-radius: 8px; padding: 4px 8px; font-size: 12px; }
+        .mafia-chat .gc-msg.ch-mafia { background: rgba(255,71,87,0.12); border-radius: 6px; padding: 2px 6px; }
+        .mafia-chat .gc-msg.ch-dead { opacity: 0.75; font-style: italic; }
+        .mafia-chat .mc-tag { font-size: 10px; padding: 1px 5px; border-radius: 6px; margin-right: 4px; }
+        .mafia-chat .mc-tag.mafia { background: #ff4757; color: #fff; } .mafia-chat .mc-tag.dead { background: #666; color: #fff; }
+        .mafia-chat-hint { font-size: 11px; color: #ffb74d; margin-top: 4px; min-height: 0; }
+        .mafia-chat input:disabled { opacity: 0.5; }
+        .mafia-rules { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 10px 15px; font-size: 12px; line-height: 1.6; }
+        .mafia-rules summary { cursor: pointer; font-weight: bold; font-size: 13px; }
+        .mafia-rules ol { padding-left: 18px; margin: 8px 0; }
+        .mafia-rule-roles { margin-top: 6px; opacity: 0.85; }
+        .minigame-tab.mafia-live { box-shadow: 0 0 0 2px #ff4757; animation: mafiaTab 1.2s infinite alternate; }
+        @keyframes mafiaTab { from { box-shadow: 0 0 0 2px rgba(255,71,87,0.9); } to { box-shadow: 0 0 10px 3px rgba(255,71,87,0.35); } }
 
         /* 흑 금수 자리 표시 */
         .cell .forbid-mark { position: relative; z-index: 2; color: #e53935; font-size: 15px; font-weight: 900; pointer-events: none; text-shadow: 0 0 2px #fff; }
@@ -4432,6 +4501,8 @@
                     <button class="minigame-tab" onclick="switchMinigame('chessai')">🤖 AI 체스</button>
                     <button class="minigame-tab" onclick="switchMinigame('pikachu')">⚡ 피카츄배구</button>
                     <button class="minigame-tab" onclick="switchMinigame('dodge')">✈️ 닷지</button>
+                    <button class="minigame-tab" onclick="switchMinigame('runner')">🍪 쿠키 러너</button>
+                    <button class="minigame-tab" id="mafiaTabBtn" onclick="switchMinigame('mafia')">🕵️ 마피아</button>
                 </div>
 
                 <!-- 인형뽑기 -->
@@ -4631,6 +4702,67 @@
                     <div class="leaderboard dodge-ranking">
                         <h4>🏆 닷지 랭킹 (오래 버틴 시간)</h4>
                         <div id="dodgeRanking" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                    </div>
+                </div>
+
+                <!-- 쿠키 러너 패널 -->
+                <div class="minigame-panel" id="panel-runner">
+                    <div class="runner-area">
+                        <div class="dodge-top">
+                            <button class="pika-start" id="runnerStartBtn" onclick="startRunner()">▶ 시작</button>
+                            <button class="runner-pause" onclick="toggleRunnerPause()" title="일시정지 (P)">⏸</button>
+                            <span class="dodge-mybest" id="runnerMyBest">아직 내 기록이 없어요</span>
+                        </div>
+                        <canvas id="runnerCanvas" width="720" height="360"></canvas>
+                        <div class="runner-pad">
+                            <button id="runnerJumpBtn" class="runner-pad-btn">⤒ 점프</button>
+                            <button id="runnerSlideBtn" class="runner-pad-btn slide">⤓ 슬라이드</button>
+                        </div>
+                        <div class="pika-help">🎮 Space/↑ 점프 (공중에서 한 번 더 누르면 2단 점프) · ↓ 누르고 있으면 슬라이드 · P 일시정지<br>📱 화면 왼쪽 터치 = 점프, 오른쪽 누르고 있기 = 슬라이드 · 가시는 점프, 빨간 막대는 슬라이드, 낭떠러지는 2단 점프!<br>체력은 계속 줄어요. 🧪 물약으로 회복하고, 코인(10점)·대왕 코인(100점)을 모으세요. 점수 = 코인×10 + 달린 거리(m)</div>
+                    </div>
+                    <div class="leaderboard dodge-ranking">
+                        <h4>🏆 쿠키 러너 랭킹 (최고 점수)</h4>
+                        <div id="runnerRanking" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                    </div>
+                </div>
+
+                <!-- 마피아 패널 -->
+                <div class="minigame-panel" id="panel-mafia">
+                    <div class="mafia-layout">
+                        <div class="mafia-main">
+                            <div class="mafia-status ph-lobby" id="mafiaStatus"></div>
+                            <div class="mafia-role" id="mafiaRole" style="display:none"></div>
+                            <div class="mafia-players" id="mafiaPlayers"></div>
+                            <div class="mafia-actions" id="mafiaActions"></div>
+                        </div>
+                        <div class="mafia-side">
+                            <div class="game-chat-mini mafia-chat">
+                                <h4><i class="fas fa-comments"></i> 채팅 <small>(한 공간에 모였으면 말로 해도 돼요)</small></h4>
+                                <div id="mafiaChatList" class="game-chat-list"></div>
+                                <div class="game-chat-input">
+                                    <input type="text" id="mafiaChatInput" maxlength="200" placeholder="메시지 입력..." onkeydown="if(event.key==='Enter' && !event.isComposing) sendMafiaChat()">
+                                    <button onclick="sendMafiaChat()"><i class="fas fa-paper-plane"></i></button>
+                                </div>
+                                <div class="mafia-chat-hint" id="mafiaChatHint"></div>
+                            </div>
+                            <div class="game-stats-mini">
+                                <h4><i class="fas fa-trophy"></i> 마피아 전적 (승/패/승률)</h4>
+                                <div id="mafiaStatsMini" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                            </div>
+                            <details class="mafia-rules">
+                                <summary>📖 규칙 · 직업 설명</summary>
+                                <ol>
+                                    <li><b>대기실</b>: 4~12명이 참가하면 방장(👑)이 시작. 직업은 무작위로 정해지고 나만 볼 수 있어요.</li>
+                                    <li><b>🌙 밤 (30초)</b>: 마피아는 제거할 사람, 의사는 치료할 사람, 경찰은 조사할 사람을 카드를 눌러 고릅니다. 마피아끼리는 몰래 채팅 가능.</li>
+                                    <li><b>☀️ 낮 (생존자 1명당 15초, 최소 60초)</b>: 밤사이 일이 공개되고 자유 토론. 각자 하루 한 번 시간 ±15초.</li>
+                                    <li><b>🗳️ 투표 (30초)</b>: 가장 많은 표를 받은 1명이 지목돼요. 동점·무투표면 바로 밤.</li>
+                                    <li><b>⚖️ 최후의 반론 (20초)</b> → <b>👍👎 찬반 투표 (15초)</b>: 찬성이 반대보다 많으면 처형.</li>
+                                    <li><b>승리 조건</b>: 마피아를 모두 처형하면 시민 승리, 살아있는 마피아 수가 시민 수 이상이면 마피아 승리.</li>
+                                </ol>
+                                <div class="mafia-rule-roles">🔪 마피아 (4~5명: 1, 6~9명: 2, 10명 이상: 3) · 👮 경찰 · 💉 의사 · 🎩 정치인 (7명 이상, 2표·투표 처형 면제) · 🪖 군인 (8명 이상, 공격 1회 버팀) · 🙂 시민</div>
+                                <div class="mafia-rule-roles">☠️ 죽은 사람은 죽은 사람끼리만 대화할 수 있고, 게임이 끝나면 모든 직업과 비밀 대화가 공개돼요.</div>
+                            </details>
+                        </div>
                     </div>
                 </div>
 
@@ -8124,6 +8256,12 @@ ${text}
             const e = name ? userIcons[name] : '';
             return GACHA_ITEMS.some(it => it.emoji === e) ? e : '';
         }
+        // 랭킹 등록 조건: 컬렉션 아이콘을 이름 옆에 지정한 사람만
+        function hasRankIcon(name) {
+            return !!iconOf(name);
+        }
+        const RANK_ICON_NOTICE = '🔒 컬렉션에서 아이콘을 지정해야 랭킹에 올라가요 (게임 → 🏆 컬렉션에서 인형 클릭)';
+
         function nameWithIcon(name) {
             const ic = iconOf(name);
             const hidden = ic && GACHA_ITEMS.some(it => it.emoji === ic && it.rarity === 'hidden');
@@ -8147,6 +8285,8 @@ ${text}
             if (typeof renderGameStats === 'function') ['omok', 'chess'].forEach(g => { safe(() => renderGameStats(g)); safe(() => renderGameChat(g)); });
             if (typeof renderOmokAiStats === 'function') safe(renderOmokAiStats);
             if (typeof renderDodgeRanking === 'function') safe(renderDodgeRanking);
+            if (typeof renderRunnerRanking === 'function') safe(renderRunnerRanking);
+            if (typeof renderMafia === 'function') safe(renderMafia);
             if (typeof renderChessAiStats === 'function') safe(renderChessAiStats);
         }
         function setupUserIconListener() {
@@ -8176,6 +8316,8 @@ ${text}
             setupGameStatsAndChat();
             setupOmokAiStats();
             setupDodgeRanking();
+            setupRunnerRanking();
+            setupMafia();
             setupChessAiStats();
             setupChatListener();
             setupYieldListener();
@@ -9317,6 +9459,12 @@ ${text}
             } else if (panel === 'dodge') {
                 drawDodge();
                 renderDodgeRanking();
+            } else if (panel === 'runner') {
+                if (runner && runner.state === 'playing' && runner.paused) runnerLastTs = 0;
+                drawRunner();
+                renderRunnerRanking();
+            } else if (panel === 'mafia') {
+                renderMafia();
             }
         }
 
@@ -9494,14 +9642,16 @@ ${text}
         function loadLeaderboard() {
             if (!db) return;
 
-            db.ref('minigame').orderByChild('weaponLevel').limitToLast(10).once('value', (snapshot) => {
+            db.ref('minigame').orderByChild('weaponLevel').limitToLast(40).once('value', (snapshot) => {
                 const data = snapshot.val() || {};
                 const leaderboard = Object.entries(data)
                     .map(([name, d]) => ({ name, level: d.weaponLevel || 0 }))
+                    .filter(item => hasRankIcon(item.name)) // 컬렉션 아이콘 지정한 사람만
                     .sort((a, b) => b.level - a.level)
                     .slice(0, 5);
 
                 const container = document.getElementById('enhanceLeaderboard');
+                if (!leaderboard.length) { container.innerHTML = `<div class="gs-empty">${RANK_ICON_NOTICE}</div>`; return; }
                 container.innerHTML = leaderboard.map((item, i) => `
                     <div class="leaderboard-item">
                         <span class="leaderboard-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`}</span>
@@ -10132,76 +10282,109 @@ ${text}
                 ctx.rotate(lean * Math.PI * 0.42);
                 ctx.translate(0, 8);
             }
+            const OUT = '#9a6a00';      // 외곽선
+            const BROWN = '#8a5226';
+            // 위에서 빛이 비치는 노란 입체 그라데이션
+            const yellow = (cx, cy, r) => {
+                const g = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.45, r * 0.1, cx, cy, r * 1.15);
+                g.addColorStop(0, '#fff6a8');
+                g.addColorStop(0.45, '#ffd629');
+                g.addColorStop(1, '#e09a00');
+                return g;
+            };
+            const fillStroke = (fill, lw = 1.3) => { ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = lw; ctx.strokeStyle = OUT; ctx.stroke(); };
 
-            // 꼬리
-            ctx.fillStyle = '#c98a00';
+            // ── 번개 꼬리 (몸 뒤) ──
             ctx.beginPath();
-            ctx.moveTo(-20, -18);
-            ctx.lineTo(-38, -30);
-            ctx.lineTo(-30, -38);
-            ctx.lineTo(-48, -58);
-            ctx.lineTo(-28, -48);
-            ctx.lineTo(-34, -40);
-            ctx.lineTo(-16, -28);
-            ctx.closePath();
-            ctx.fill();
+            ctx.moveTo(-14, -18); ctx.lineTo(-27, -25); ctx.lineTo(-21, -32);
+            ctx.lineTo(-40, -45); ctx.lineTo(-33, -51); ctx.lineTo(-56, -72);
+            ctx.lineTo(-27, -58); ctx.lineTo(-33, -51 + 4); ctx.lineTo(-15, -36);
+            ctx.lineTo(-20, -31); ctx.lineTo(-8, -25); ctx.closePath();
+            fillStroke(yellow(-34, -46, 26), 1.4);
+            ctx.beginPath(); // 꼬리 밑동 갈색
+            ctx.moveTo(-14, -18); ctx.lineTo(-27, -25); ctx.lineTo(-21, -32); ctx.lineTo(-8, -25); ctx.closePath();
+            fillStroke(BROWN, 1);
 
-            // 발
-            ctx.fillStyle = '#f2b800';
-            ctx.beginPath(); ctx.ellipse(-12, -3, 10, 5, 0, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.ellipse(12, -3, 10, 5, 0, 0, Math.PI * 2); ctx.fill();
+            // ── 뒷발 ──
+            ctx.beginPath(); ctx.ellipse(-9, -3, 9, 4.5, 0, 0, Math.PI * 2); fillStroke(yellow(-9, -3, 9));
 
-            // 귀
-            const ear = (rot) => {
+            // ── 귀 (머리 뒤) ──
+            const ear = (bx, by, rot, len) => {
                 ctx.save();
-                ctx.translate(0, -50);
-                ctx.rotate(rot);
-                ctx.fillStyle = '#ffd400';
-                ctx.beginPath(); ctx.ellipse(0, -18, 6, 18, 0, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#222';
-                ctx.beginPath(); ctx.ellipse(0, -30, 5, 7, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.translate(bx, by); ctx.rotate(rot);
+                ctx.beginPath();
+                ctx.moveTo(-6, 0);
+                ctx.quadraticCurveTo(-8, -len * 0.6, 0, -len);
+                ctx.quadraticCurveTo(8, -len * 0.6, 6, 0);
+                ctx.closePath();
+                fillStroke(yellow(0, -len * 0.45, len * 0.6));
+                ctx.save(); ctx.clip();                       // 귀 끝 검정
+                ctx.fillStyle = '#1d1d1d';
+                ctx.fillRect(-10, -len - 2, 20, len * 0.38);
+                ctx.restore();
                 ctx.restore();
             };
-            ear(-0.45);
-            ear(0.45);
+            ear(-2, -56, -0.75, 30);   // 뒤쪽 귀
+            ear(12, -60, 0.25, 30);    // 앞쪽 귀
 
-            // 몸
-            ctx.fillStyle = '#ffd400';
-            ctx.beginPath(); ctx.ellipse(0, -30, 27, 29, 0, 0, Math.PI * 2); ctx.fill();
-            ctx.strokeStyle = '#d9a800';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            // 눈
-            ctx.fillStyle = '#222';
-            ctx.beginPath(); ctx.arc(4, -40, 4.5, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.arc(19, -40, 4.5, 0, Math.PI * 2); ctx.fill();
-            ctx.fillStyle = '#fff';
-            ctx.beginPath(); ctx.arc(5.5, -41.5, 1.6, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.arc(20.5, -41.5, 1.6, 0, Math.PI * 2); ctx.fill();
-
-            // 볼
-            ctx.fillStyle = '#ff4d4d';
-            ctx.beginPath(); ctx.arc(-4, -28, 5.5, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.arc(24, -28, 5, 0, Math.PI * 2); ctx.fill();
-
-            // 입
-            ctx.strokeStyle = '#222';
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            if (spiking) {
-                ctx.arc(12, -31, 4, 0, Math.PI);
-            } else {
-                ctx.moveTo(8, -32); ctx.quadraticCurveTo(12, -29, 16, -32);
+            // ── 몸통 + 등 줄무늬 ──
+            ctx.beginPath(); ctx.ellipse(-2, -20, 18, 18, 0, 0, Math.PI * 2); fillStroke(yellow(-2, -20, 18));
+            ctx.save();
+            ctx.beginPath(); ctx.ellipse(-2, -20, 18, 18, 0, 0, Math.PI * 2); ctx.clip();
+            ctx.fillStyle = BROWN;
+            for (const sy of [-27, -18]) {
+                ctx.beginPath();
+                ctx.moveTo(-21, sy - 3); ctx.quadraticCurveTo(-12, sy - 1, -9, sy + 1.5);
+                ctx.quadraticCurveTo(-13, sy + 4, -21, sy + 3); ctx.closePath(); ctx.fill();
             }
-            ctx.stroke();
+            ctx.restore();
 
-            // 팔 (스파이크 시 위로)
-            ctx.fillStyle = '#f2b800';
+            // ── 앞발 ──
+            ctx.beginPath(); ctx.ellipse(8, -3, 9.5, 4.8, 0, 0, Math.PI * 2); fillStroke(yellow(8, -3, 9.5));
+
+            // ── 머리 ──
+            ctx.beginPath(); ctx.ellipse(7, -44, 21, 18, 0, 0, Math.PI * 2); fillStroke(yellow(7, -44, 21), 1.5);
+
+            // 볼 (빨간 전기 주머니)
+            const cheek = (cx, cy, r) => {
+                const g = ctx.createRadialGradient(cx - 1.5, cy - 1.5, 0.5, cx, cy, r);
+                g.addColorStop(0, '#ff8a80'); g.addColorStop(1, '#e53935');
+                ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
+            };
+            cheek(-4, -38, 4.6);
+            cheek(23, -37, 5);
+
+            // 눈 (반짝임 두 개)
+            const eye = (ex, ey) => {
+                ctx.fillStyle = '#1a1a1a';
+                ctx.beginPath(); ctx.ellipse(ex, ey, 3.8, 4.4, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.beginPath(); ctx.arc(ex + 1.1, ey - 1.6, 1.5, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(ex - 1, ey + 1.6, 0.6, 0, Math.PI * 2); ctx.fill();
+            };
+            eye(5, -48);
+            eye(18, -48);
+            // 코
+            ctx.fillStyle = '#3a2a10';
+            ctx.beginPath(); ctx.ellipse(14, -43, 1.2, 0.8, 0, 0, Math.PI * 2); ctx.fill();
+            // 입: 평소엔 ω 모양, 스파이크 땐 크게 벌림
+            ctx.strokeStyle = '#3a2a10'; ctx.lineWidth = 1.2;
+            if (spiking) {
+                ctx.beginPath(); ctx.moveTo(10, -40); ctx.quadraticCurveTo(14, -32, 18, -40); ctx.closePath();
+                ctx.fillStyle = '#b71c1c'; ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#ff8a80'; ctx.beginPath(); ctx.ellipse(14, -36.5, 2.2, 1.4, 0, 0, Math.PI * 2); ctx.fill();
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(10, -40.5); ctx.quadraticCurveTo(12, -38, 14, -40.5);
+                ctx.quadraticCurveTo(16, -38, 18, -40.5);
+                ctx.stroke();
+            }
+
+            // ── 팔 (스파이크 시 번쩍 위로) ──
             ctx.beginPath();
-            if (spiking) ctx.ellipse(22, -62, 5, 11, 0.4, 0, Math.PI * 2);
-            else ctx.ellipse(16, -18, 6, 4, 0.3, 0, Math.PI * 2);
-            ctx.fill();
+            if (spiking) ctx.ellipse(27, -31, 4.2, 9.5, 0.75, 0, Math.PI * 2); // 공을 향해 앞으로 뻗은 팔
+            else ctx.ellipse(13, -19, 5.5, 3.6, 0.5, 0, Math.PI * 2);
+            fillStroke(yellow(spiking ? 27 : 15, spiking ? -33 : -22, 6), 1.1);
 
             ctx.restore();
         }
@@ -10377,6 +10560,7 @@ ${text}
         const dodgeKeys = {};
         let dodgeRaf = null, dodgeLastTs = 0, dodgeAcc = 0;
         let dodgeScores = {};
+        const DODGE_PATH = 'dodge_scores_s2'; // 2026-10-23 랭킹 리셋 → 시즌 2 (예전 기록은 dodge_scores에 그대로 보관)
         let dodgeTouch = null;       // 터치 드래그 시작점
 
         function isDodgeVisible() {
@@ -10468,8 +10652,10 @@ ${text}
             const key = statKey(name);
             const prevBest = (dodgeScores[key] && dodgeScores[key].best) || 0;
             dodge.newBest = sec > prevBest;
+            dodge.noIcon = !hasRankIcon(name);
+            if (dodge.noIcon) { dodge.newBest = false; return; } // 아이콘 없으면 랭킹에 저장 안 함
             if (!db) return;
-            db.ref(`dodge_scores/${key}`).transaction(cur => {
+            db.ref(`${DODGE_PATH}/${key}`).transaction(cur => {
                 cur = cur || { best: 0, plays: 0 };
                 cur.plays = (cur.plays || 0) + 1;
                 if (sec > (cur.best || 0)) { cur.best = sec; cur.bestAt = Date.now(); }
@@ -10484,7 +10670,7 @@ ${text}
             const me = statKey(myGameName());
             const rows = Object.entries(dodgeScores)
                 .map(([name, d]) => ({ name, best: d.best || 0, plays: d.plays || 0 }))
-                .filter(r => r.best > 0)
+                .filter(r => r.best > 0 && hasRankIcon(r.name))
                 .sort((a, b) => b.best - a.best);
             const medal = (i) => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
             el.innerHTML = rows.length
@@ -10494,15 +10680,17 @@ ${text}
                 : '<div class="gs-empty">아직 기록이 없어요. 첫 기록의 주인공이 되어 보세요!</div>';
             const mine = dodgeScores[me];
             const myRank = rows.findIndex(r => r.name === me);
-            document.getElementById('dodgeMyBest').innerHTML = mine && mine.best
-                ? `내 최고 <b>${mine.best.toFixed(2)}초</b>${myRank >= 0 ? ` · ${myRank + 1}위` : ''} · ${mine.plays || 0}판`
-                : '아직 내 기록이 없어요';
+            document.getElementById('dodgeMyBest').innerHTML = !hasRankIcon(myGameName())
+                ? RANK_ICON_NOTICE
+                : mine && mine.best
+                    ? `내 최고 <b>${mine.best.toFixed(2)}초</b>${myRank >= 0 ? ` · ${myRank + 1}위` : ''} · ${mine.plays || 0}판`
+                    : '아직 내 기록이 없어요';
         }
 
         function setupDodgeRanking() {
             if (!db) return;
-            db.ref('dodge_scores').off();
-            db.ref('dodge_scores').on('value', snap => { dodgeScores = snap.val() || {}; renderDodgeRanking(); });
+            db.ref(DODGE_PATH).off();
+            db.ref(DODGE_PATH).on('value', snap => { dodgeScores = snap.val() || {}; renderDodgeRanking(); });
         }
 
         function drawDodgePlane(ctx, x, y, t) {
@@ -10586,8 +10774,8 @@ ${text}
                 ctx.font = 'bold 26px "Segoe UI", sans-serif';
                 ctx.fillText(`${g.final.toFixed(2)}초 버팀${g.newBest ? '  🎉 최고 기록!' : ''}`, W / 2, H / 2 + 12);
                 ctx.font = '14px "Segoe UI", sans-serif';
-                ctx.fillStyle = 'rgba(255,255,255,0.75)';
-                ctx.fillText('Space 또는 ↻ 다시 시작', W / 2, H / 2 + 45);
+                ctx.fillStyle = g.noIcon ? '#ffb74d' : 'rgba(255,255,255,0.75)';
+                ctx.fillText(g.noIcon ? '🔒 컬렉션 아이콘을 지정해야 랭킹에 올라가요' : 'Space 또는 ↻ 다시 시작', W / 2, H / 2 + 45);
             }
             if (g.paused) {
                 ctx.fillStyle = 'rgba(0,0,0,0.5)';
@@ -10668,6 +10856,942 @@ ${text}
             document.addEventListener('DOMContentLoaded', initDodge);
         } else {
             initDodge();
+        }
+
+
+        // =====================================================
+        // 🍪 쿠키 러너 (쿠키런 스타일): 자동으로 달리며 점프·슬라이드로 피하고 코인 모으기
+        // =====================================================
+        const RUN = {
+            W: 720, H: 360, GROUND: 300,
+            PX: 140, PW: 34, PH: 48, SLIDE_H: 24,
+            GRAV: 0.9, JUMP1: -14.5, JUMP2: -12.5,
+            SPEED0: 6, SPEED_MAX: 13, ACCEL: 0.1 / 60, // 초당 +0.1
+            DRAIN: 2.6,       // 초당 체력 감소 (시간이 지날수록 조금씩 빨라짐)
+            HIT: 25,          // 장애물 피해
+            POTION: 30,
+            BAR_BOTTOM: 266   // 머리 높이 막대의 아래 끝 (서 있으면 부딪히고, 슬라이드하면 통과)
+        };
+        const RUNNER_PATH = 'runner_scores';
+        let runner = null;
+        let runnerRaf = null, runnerLastTs = 0, runnerAcc = 0;
+        let runnerScores = {};
+        const runnerKeys = { jump: false, slide: false };
+
+        function isRunnerVisible() {
+            const panel = document.getElementById('panel-runner');
+            const tab = document.getElementById('tab-minigame');
+            return panel && tab && panel.classList.contains('active') && tab.classList.contains('active');
+        }
+
+        function startRunner() {
+            runner = {
+                state: 'playing', t: 0, dist: 0, speed: RUN.SPEED0, coins: 0, energy: 100,
+                y: RUN.GROUND - RUN.PH, vy: 0, jumps: 0, sliding: false, inv: 0, anim: 0,
+                ground: [{ x: -50, w: 1100 }], items: [], obstacles: [], nextX: 1050, paused: false, popups: [],
+                hills: [0, 0]
+            };
+            const btn = document.getElementById('runnerStartBtn');
+            btn.textContent = '↻ 다시 시작'; btn.blur(); // Space가 버튼을 다시 누르지 않도록
+            runnerLastTs = 0; runnerAcc = 0;
+            if (!runnerRaf) runnerRaf = requestAnimationFrame(runnerLoop);
+        }
+
+        // 앞쪽 지형·장애물·코인을 덩어리(패턴) 단위로 생성
+        function runnerGenerate(g) {
+            const lv = Math.min(1, g.t / 60); // 0 → 1 (1분에 걸쳐 어려워짐)
+            const pats = ['coins', 'spike', 'bar', 'coins', 'spike', 'bar', 'potion'];
+            if (g.t > 12) pats.push('gap', 'double', 'gap');
+            if (g.t > 25) pats.push('gapSpike', 'barSpike', 'bigcoin', 'potion');
+            const pick = pats[Math.floor(Math.random() * pats.length)];
+            const x0 = g.nextX, G = RUN.GROUND;
+            const coinLine = (x, n, y, gap = 34) => { for (let i = 0; i < n; i++) g.items.push({ type: 'coin', x: x + i * gap, y }); };
+            const coinArc = (x, w, h, n) => { for (let i = 0; i < n; i++) { const t = i / (n - 1); g.items.push({ type: 'coin', x: x + t * w, y: G - 30 - Math.sin(t * Math.PI) * h }); } };
+            let w = 0;
+            if (pick === 'coins') { w = 380; coinLine(x0 + 30, 9, G - 30); }
+            else if (pick === 'spike') {
+                w = 360; g.obstacles.push({ type: 'spike', x: x0 + 170, w: 34 });
+                coinLine(x0 + 20, 3, G - 30); coinArc(x0 + 120, 130, 95, 6);
+            } else if (pick === 'double') {
+                w = 420; g.obstacles.push({ type: 'spike', x: x0 + 160, w: 34 }, { type: 'spike', x: x0 + 194, w: 34 });
+                coinArc(x0 + 110, 170, 130, 7);
+            } else if (pick === 'bar') {
+                w = 380; g.obstacles.push({ type: 'bar', x: x0 + 160, w: 80 });
+                coinLine(x0 + 130, 5, G - 12, 30);
+            } else if (pick === 'gap') {
+                const gw = 110 + Math.round(lv * 60);
+                w = 300 + gw; g.gapAt = { x: x0 + 150, w: gw };
+                coinArc(x0 + 110, gw + 80, 110, 7);
+            } else if (pick === 'gapSpike') {
+                const gw = 100 + Math.round(lv * 40);
+                w = 420 + gw; g.gapAt = { x: x0 + 120, w: gw };
+                g.obstacles.push({ type: 'spike', x: x0 + 120 + gw + 120, w: 34 });
+                coinArc(x0 + 80, gw + 80, 110, 6);
+            } else if (pick === 'barSpike') {
+                w = 520; g.obstacles.push({ type: 'bar', x: x0 + 140, w: 70 }, { type: 'spike', x: x0 + 350, w: 34 });
+                coinLine(x0 + 120, 4, G - 12, 30); coinArc(x0 + 300, 130, 95, 5);
+            } else if (pick === 'potion') {
+                w = 340; g.items.push({ type: 'potion', x: x0 + 180, y: G - 34 }); coinLine(x0 + 40, 4, G - 30);
+            } else if (pick === 'bigcoin') {
+                w = 340; g.items.push({ type: 'big', x: x0 + 180, y: G - 150 }); coinLine(x0 + 40, 4, G - 30);
+            }
+            // 지형: 구멍이 있으면 땅을 두 조각으로
+            if (g.gapAt) {
+                g.ground.push({ x: x0, w: g.gapAt.x - x0 }, { x: g.gapAt.x + g.gapAt.w, w: x0 + w - (g.gapAt.x + g.gapAt.w) });
+                g.gapAt = null;
+            } else {
+                g.ground.push({ x: x0, w });
+            }
+            g.nextX = x0 + w;
+        }
+
+        function runnerOnGround(g) {
+            const l = RUN.PX + 6, r = RUN.PX + RUN.PW - 6;
+            return g.ground.some(s => r > s.x && l < s.x + s.w);
+        }
+
+        function runnerHitbox(g) {
+            const h = g.sliding ? RUN.SLIDE_H : RUN.PH;
+            return { x: RUN.PX + 5, y: g.sliding ? g.y + RUN.PH - h : g.y + 4, w: RUN.PW - 10, h: h - 4 };
+        }
+
+        function runnerStep() {
+            const g = runner;
+            if (g.state !== 'playing') return;
+            g.t += 1 / 60; g.anim += g.speed / 60;
+            g.speed = Math.min(RUN.SPEED_MAX, g.speed + RUN.ACCEL);
+            const v = g.speed;
+            g.dist += v;
+            g.hills[0] = (g.hills[0] + v * 0.2) % 720; g.hills[1] = (g.hills[1] + v * 0.45) % 720;
+            // 체력 감소
+            g.energy -= RUN.DRAIN / 60 * (1 + g.t / 150);
+            // 월드 이동
+            const move = (o) => { o.x -= v; };
+            g.ground.forEach(move); g.items.forEach(move); g.obstacles.forEach(move);
+            g.nextX -= v;
+            g.ground = g.ground.filter(s => s.x + s.w > -50);
+            g.items = g.items.filter(o => o.x > -40 && !o.got);
+            g.obstacles = g.obstacles.filter(o => o.x + o.w > -40);
+            while (g.nextX < RUN.W + 400) runnerGenerate(g);
+
+            // 입력
+            if (runnerKeys.jumpPressed) {
+                runnerKeys.jumpPressed = false;
+                if (g.jumps < 2) { g.vy = g.jumps === 0 ? RUN.JUMP1 : RUN.JUMP2; g.jumps++; g.sliding = false; }
+            }
+            const grounded = g.y + RUN.PH >= RUN.GROUND - 0.5 && g.vy >= 0 && runnerOnGround(g);
+            g.sliding = runnerKeys.slide && grounded;
+
+            // 중력·착지
+            g.vy += RUN.GRAV;
+            g.y += g.vy;
+            if (g.y + RUN.PH >= RUN.GROUND && g.y + RUN.PH - g.vy <= RUN.GROUND + 2 && runnerOnGround(g)) {
+                g.y = RUN.GROUND - RUN.PH; g.vy = 0; g.jumps = 0;
+            }
+            if (g.y > RUN.H + 40) { g.energy = 0; g.fell = true; }
+
+            // 충돌
+            const hb = runnerHitbox(g);
+            const overlap = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+            if (g.inv > 0) g.inv--;
+            for (const o of g.obstacles) {
+                const box = o.type === 'spike'
+                    ? { x: o.x + 7, y: RUN.GROUND - 26, w: o.w - 14, h: 26 }
+                    : { x: o.x, y: 0, w: o.w, h: RUN.BAR_BOTTOM };
+                if (g.inv === 0 && overlap(hb, box)) {
+                    g.energy -= RUN.HIT; g.inv = 70; g.lastHit = o.type;
+                    g.popups.push({ x: RUN.PX, y: g.y - 10, text: `-${RUN.HIT}`, color: '#ff5252', life: 40 });
+                }
+            }
+            for (const it of g.items) {
+                const r = it.type === 'coin' ? 9 : 14;
+                if (overlap(hb, { x: it.x - r, y: it.y - r, w: r * 2, h: r * 2 })) {
+                    it.got = true;
+                    if (it.type === 'coin') g.coins += 1;
+                    else if (it.type === 'big') { g.coins += 10; g.popups.push({ x: it.x, y: it.y, text: '+10', color: '#ffd400', life: 40 }); }
+                    else if (it.type === 'potion') { g.energy = Math.min(100, g.energy + RUN.POTION); g.popups.push({ x: it.x, y: it.y, text: `+${RUN.POTION} 체력`, color: '#69f0ae', life: 45 }); }
+                }
+            }
+            g.popups.forEach(p => { p.y -= 0.8; p.life--; }); g.popups = g.popups.filter(p => p.life > 0);
+            if (g.energy <= 0) runnerDie();
+        }
+
+        function runnerScore(g) { return g.coins * 10 + Math.floor(g.dist / 10); }
+
+        function runnerDie() {
+            const g = runner;
+            g.energy = 0; g.state = 'dead';
+            g.final = { score: runnerScore(g), coins: g.coins, meters: Math.floor(g.dist / 10) };
+            const name = myGameName(), key = statKey(name);
+            const prev = (runnerScores[key] && runnerScores[key].best) || 0;
+            g.noIcon = !hasRankIcon(name);
+            g.newBest = !g.noIcon && g.final.score > prev;
+            if (g.noIcon || !db) return; // 컬렉션 아이콘 없으면 랭킹에 저장 안 함
+            const f = g.final;
+            db.ref(`${RUNNER_PATH}/${key}`).transaction(cur => {
+                cur = cur || { best: 0, plays: 0 };
+                cur.plays = (cur.plays || 0) + 1;
+                if (f.score > (cur.best || 0)) { cur.best = f.score; cur.bestCoins = f.coins; cur.bestMeters = f.meters; cur.bestAt = Date.now(); }
+                cur.updatedAt = Date.now();
+                return cur;
+            });
+        }
+
+        // ---------- 그리기 ----------
+        function drawCookie(ctx, x, y, g) {
+            const sliding = g && g.sliding, inAir = g && g.vy !== 0 && !sliding;
+            if (g && g.inv > 0 && Math.floor(g.inv / 5) % 2 === 0) return; // 맞으면 깜빡임
+            ctx.save();
+            const body = '#c97a3a', dark = '#8d4e1d', icing = '#fff8ee';
+            const grad = (cx, cy, r) => { const gr = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.4, 1, cx, cy, r * 1.2); gr.addColorStop(0, '#e9a566'); gr.addColorStop(0.6, body); gr.addColorStop(1, dark); return gr; };
+            const t = g ? g.anim : 0;
+            if (sliding) {
+                // 미끄러지기: 몸을 눕힘
+                ctx.translate(x + 17, y + RUN.PH - 12);
+                ctx.rotate(-1.35);
+                ctx.translate(-17, -24);
+            } else {
+                ctx.translate(x, y);
+            }
+            const leg = sliding ? 0 : inAir ? 0.5 : Math.sin(t * 0.9) * 0.7;
+            // 다리
+            const limb = (lx, ly, ang, len) => { ctx.save(); ctx.translate(lx, ly); ctx.rotate(ang); ctx.beginPath(); ctx.ellipse(0, len / 2, 5.5, len / 2 + 2, 0, 0, Math.PI * 2); ctx.fillStyle = grad(0, len / 2, 8); ctx.fill(); ctx.strokeStyle = dark; ctx.lineWidth = 1; ctx.stroke(); ctx.restore(); };
+            limb(12, 34, leg, 12); limb(22, 34, -leg, 12);
+            // 팔
+            const arm = inAir ? -2.4 : -leg * 0.8 - 0.4;
+            limb(6, 22, arm + 0.6, 11); limb(28, 22, -arm - 0.6, 11);
+            // 몸통
+            ctx.beginPath(); ctx.ellipse(17, 28, 12, 11, 0, 0, Math.PI * 2); ctx.fillStyle = grad(17, 28, 12); ctx.fill(); ctx.strokeStyle = dark; ctx.stroke();
+            // 단추
+            ctx.fillStyle = '#ff5c8a'; [24, 31].forEach(by => { ctx.beginPath(); ctx.arc(17, by, 2, 0, Math.PI * 2); ctx.fill(); });
+            // 머리
+            ctx.beginPath(); ctx.arc(18, 11, 12, 0, Math.PI * 2); ctx.fillStyle = grad(18, 11, 12); ctx.fill(); ctx.strokeStyle = dark; ctx.stroke();
+            // 아이싱 테두리 (물결)
+            ctx.strokeStyle = icing; ctx.lineWidth = 1.6; ctx.beginPath();
+            for (let a = 0; a <= Math.PI * 2 + 0.01; a += 0.25) { const rr = 9.5 + Math.sin(a * 6) * 0.8; const px = 18 + Math.cos(a) * rr, py = 11 + Math.sin(a) * rr; a === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py); }
+            ctx.stroke();
+            // 눈·입·볼
+            ctx.fillStyle = '#3a1d08';
+            ctx.beginPath(); ctx.arc(15, 9, 1.8, 0, Math.PI * 2); ctx.arc(23, 9, 1.8, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(15.6, 8.3, 0.6, 0, Math.PI * 2); ctx.arc(23.6, 8.3, 0.6, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = 'rgba(255,120,150,0.75)'; ctx.beginPath(); ctx.arc(12, 13, 2.3, 0, Math.PI * 2); ctx.arc(26, 13, 2.3, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = icing; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(19, 13, 3.2, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawRunner() {
+            const canvas = document.getElementById('runnerCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const { W, H, GROUND } = RUN;
+            const g = runner;
+            // 하늘
+            const sky = ctx.createLinearGradient(0, 0, 0, H);
+            sky.addColorStop(0, '#7fd3ff'); sky.addColorStop(1, '#e8f8ff');
+            ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+            // 먼 언덕 / 가까운 언덕 (패럴랙스)
+            const hills = (off, color, base, amp, period) => {
+                ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(0, H);
+                for (let x = 0; x <= W; x += 10) ctx.lineTo(x, base - Math.sin((x + off) / period) * amp - Math.sin((x + off) / (period * 0.37)) * amp * 0.3);
+                ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+            };
+            hills(g ? g.hills[0] : 0, '#b6e3a8', 230, 28, 110);
+            hills(g ? g.hills[1] : 0, '#8fd18a', 262, 18, 70);
+            // 땅
+            const ground = g ? g.ground : [{ x: 0, w: W }];
+            for (const s of ground) {
+                ctx.fillStyle = '#9c6b3c'; ctx.fillRect(s.x, GROUND, s.w, H - GROUND);
+                ctx.fillStyle = '#7a5230'; for (let i = 0; i < s.w; i += 28) ctx.fillRect(s.x + i + 6, GROUND + 22, 10, 4);
+                ctx.fillStyle = '#5cbf4a'; ctx.fillRect(s.x, GROUND - 4, s.w, 10);
+                ctx.fillStyle = '#7ad66a'; ctx.fillRect(s.x, GROUND - 4, s.w, 3);
+            }
+            if (g) {
+                // 장애물
+                for (const o of g.obstacles) {
+                    if (o.type === 'spike') {
+                        for (let i = 0; i < 2; i++) {
+                            const sx = o.x + i * (o.w / 2);
+                            const gr = ctx.createLinearGradient(sx, GROUND - 30, sx + o.w / 2, GROUND);
+                            gr.addColorStop(0, '#eceff1'); gr.addColorStop(1, '#78909c');
+                            ctx.fillStyle = gr; ctx.beginPath(); ctx.moveTo(sx, GROUND); ctx.lineTo(sx + o.w / 4, GROUND - 30); ctx.lineTo(sx + o.w / 2, GROUND); ctx.closePath(); ctx.fill();
+                            ctx.strokeStyle = '#455a64'; ctx.lineWidth = 1; ctx.stroke();
+                        }
+                    } else {
+                        // 위에서 내려온 막대 (슬라이드로 통과)
+                        const bh = RUN.BAR_BOTTOM;
+                        ctx.fillStyle = '#6d4c41'; ctx.fillRect(o.x + o.w / 2 - 3, 0, 6, bh - 26);
+                        for (let i = 0; i < o.w; i += 16) { ctx.fillStyle = (i / 16) % 2 ? '#fff' : '#e53935'; ctx.fillRect(o.x + i, bh - 26, Math.min(16, o.w - i), 26); }
+                        ctx.strokeStyle = '#7f0000'; ctx.lineWidth = 2; ctx.strokeRect(o.x, bh - 26, o.w, 26);
+                    }
+                }
+                // 아이템
+                const spin = Math.abs(Math.cos(g.t * 4));
+                for (const it of g.items) {
+                    if (it.type === 'coin') {
+                        ctx.save(); ctx.translate(it.x, it.y); ctx.scale(0.35 + 0.65 * spin, 1);
+                        const gr = ctx.createRadialGradient(-3, -3, 1, 0, 0, 9); gr.addColorStop(0, '#fff7b0'); gr.addColorStop(0.6, '#ffd000'); gr.addColorStop(1, '#c79100');
+                        ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2); ctx.fill();
+                        ctx.strokeStyle = '#a07400'; ctx.lineWidth = 1.2; ctx.stroke(); ctx.restore();
+                    } else if (it.type === 'big') {
+                        ctx.save(); ctx.translate(it.x, it.y);
+                        ctx.shadowColor = '#ffd000'; ctx.shadowBlur = 14;
+                        ctx.fillStyle = '#ffc400'; ctx.beginPath(); ctx.arc(0, 0, 14, 0, Math.PI * 2); ctx.fill();
+                        ctx.shadowBlur = 0; ctx.fillStyle = '#fff'; ctx.font = 'bold 16px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('★', 0, 1);
+                        ctx.restore();
+                    } else if (it.type === 'potion') {
+                        ctx.save(); ctx.translate(it.x, it.y + Math.sin(g.t * 5) * 3);
+                        ctx.fillStyle = '#e53935'; ctx.beginPath(); ctx.arc(0, 4, 10, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = '#ffcdd2'; ctx.fillRect(-4, -12, 8, 8);
+                        ctx.fillStyle = '#8d6e63'; ctx.fillRect(-5, -15, 10, 4);
+                        ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.beginPath(); ctx.arc(-4, 0, 3, 0, Math.PI * 2); ctx.fill();
+                        ctx.restore();
+                    }
+                }
+            }
+            drawCookie(ctx, RUN.PX, g ? g.y : GROUND - RUN.PH, g);
+            if (g) {
+                for (const p of g.popups) { ctx.globalAlpha = Math.min(1, p.life / 20); ctx.fillStyle = p.color; ctx.font = 'bold 15px "Segoe UI", sans-serif'; ctx.textAlign = 'center'; ctx.fillText(p.text, p.x + 17, p.y); }
+                ctx.globalAlpha = 1;
+                // HUD: 체력 바 + 점수
+                ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(14, 12, 204, 18);
+                const e = Math.max(0, g.energy) / 100;
+                ctx.fillStyle = e > 0.5 ? '#43d17a' : e > 0.25 ? '#ffb300' : '#ff5252'; ctx.fillRect(16, 14, 200 * e, 14);
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 12px "Segoe UI", sans-serif'; ctx.textAlign = 'left'; ctx.fillText(`❤ 체력 ${Math.ceil(Math.max(0, g.energy))}`, 20, 25);
+                ctx.textAlign = 'right'; ctx.font = 'bold 18px "Segoe UI", sans-serif'; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(0,0,0,0.45)';
+                const hud = `${g.coins}  ·  ${Math.floor(g.dist / 10)}m  ·  ${runnerScore(g)}점`;
+                ctx.strokeText(hud, W - 14, 27); ctx.fillStyle = '#fff'; ctx.fillText(hud, W - 14, 27);
+                // 동전 이모지는 구버전 Windows에서 네모로 깨져서 직접 그림
+                const cx = W - 14 - ctx.measureText(hud).width - 12;
+                ctx.fillStyle = '#ffd000'; ctx.beginPath(); ctx.arc(cx, 21, 8, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = '#a07400'; ctx.lineWidth = 1.5; ctx.stroke();
+            }
+            ctx.textAlign = 'center';
+            const overlay = (lines) => {
+                ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(0, H / 2 - 70, W, 140);
+                lines.forEach(([txt, font, color], i) => { ctx.font = font; ctx.fillStyle = color; ctx.fillText(txt, W / 2, H / 2 - 30 + i * 34); });
+            };
+            if (!g) overlay([['🍪 쿠키 러너', 'bold 30px "Segoe UI", sans-serif', '#ffd400'], ['Space/↑ 점프(2단 점프) · ↓ 슬라이드', '15px "Segoe UI", sans-serif', '#fff'], ['▶ 시작 버튼 또는 Space', '14px "Segoe UI", sans-serif', 'rgba(255,255,255,0.8)']]);
+            else if (g.state === 'dead') overlay([
+                [g.fell ? '낭떠러지로 떨어졌어요!' : '체력이 다 떨어졌어요!', 'bold 24px "Segoe UI", sans-serif', '#ff8a80'],
+                [`${g.final.score}점 (코인 ${g.final.coins}개 · ${g.final.meters}m)${g.newBest ? '  🎉 최고 기록!' : ''}`, 'bold 22px "Segoe UI", sans-serif', '#fff'],
+                [g.noIcon ? '🔒 컬렉션 아이콘을 지정해야 랭킹에 올라가요' : 'Space 또는 ↻ 다시 시작', '14px "Segoe UI", sans-serif', g.noIcon ? '#ffb74d' : 'rgba(255,255,255,0.8)']
+            ]);
+            else if (g.paused) overlay([['⏸ 일시정지', 'bold 26px "Segoe UI", sans-serif', '#fff'], ['P 또는 ⏸ 버튼으로 계속', '14px "Segoe UI", sans-serif', 'rgba(255,255,255,0.8)']]);
+        }
+
+        function runnerLoop(ts) {
+            runnerRaf = null;
+            if (!runner) return;
+            if (!isRunnerVisible()) { if (runner.state === 'playing') runner.paused = true; return; }
+            if (runner.paused) { drawRunner(); return; }
+            if (!runnerLastTs) runnerLastTs = ts;
+            runnerAcc += Math.min(100, ts - runnerLastTs);
+            runnerLastTs = ts;
+            const STEP = 1000 / 60;
+            while (runnerAcc >= STEP) { runnerStep(); runnerAcc -= STEP; }
+            drawRunner();
+            if (runner.state === 'playing') runnerRaf = requestAnimationFrame(runnerLoop);
+        }
+
+        function toggleRunnerPause() {
+            if (!runner || runner.state !== 'playing') return;
+            runner.paused = !runner.paused;
+            if (!runner.paused) { runnerLastTs = 0; if (!runnerRaf) runnerRaf = requestAnimationFrame(runnerLoop); }
+            drawRunner();
+        }
+
+        function runnerJump() {
+            if (!runner || runner.state === 'dead') { startRunner(); return; }
+            if (runner.paused) { toggleRunnerPause(); return; }
+            runnerKeys.jumpPressed = true;
+        }
+
+        function renderRunnerRanking() {
+            const el = document.getElementById('runnerRanking');
+            if (!el) return;
+            const me = statKey(myGameName());
+            const rows = Object.entries(runnerScores)
+                .map(([name, d]) => ({ name, best: d.best || 0, coins: d.bestCoins || 0, meters: d.bestMeters || 0, plays: d.plays || 0 }))
+                .filter(r => r.best > 0 && hasRankIcon(r.name)) // 컬렉션 아이콘 지정한 사람만
+                .sort((a, b) => b.best - a.best);
+            const medal = (i) => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+            el.innerHTML = rows.length
+                ? `<table><tr><th>순위</th><th>이름</th><th>최고 점수</th><th>코인 · 거리</th><th>판수</th></tr>${rows.slice(0, 10).map((r, i) => `
+                    <tr class="${r.name === me ? 'dodge-me' : ''}"><td>${medal(i)}</td><td>${nameWithIcon(r.name)}</td>
+                    <td class="dodge-best">${r.best.toLocaleString()}점</td><td><span class="coin-ico"></span>${r.coins} · ${r.meters}m</td><td>${r.plays}</td></tr>`).join('')}</table>`
+                : '<div class="gs-empty">아직 기록이 없어요. 첫 기록의 주인공이 되어 보세요!</div>';
+            const mine = runnerScores[me];
+            const myRank = rows.findIndex(r => r.name === me);
+            document.getElementById('runnerMyBest').innerHTML = !hasRankIcon(myGameName())
+                ? RANK_ICON_NOTICE
+                : mine && mine.best
+                    ? `내 최고 <b>${mine.best.toLocaleString()}점</b>${myRank >= 0 ? ` · ${myRank + 1}위` : ''} · ${mine.plays || 0}판`
+                    : '아직 내 기록이 없어요';
+        }
+
+        function setupRunnerRanking() {
+            if (!db) return;
+            db.ref(RUNNER_PATH).off();
+            db.ref(RUNNER_PATH).on('value', snap => { runnerScores = snap.val() || {}; renderRunnerRanking(); });
+        }
+
+        let runnerInited = false;
+        function initRunner() {
+            if (runnerInited || !document.getElementById('runnerCanvas')) return;
+            runnerInited = true;
+            const isTyping = (e) => { const t = e.target; return t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable); };
+            document.addEventListener('keydown', (e) => {
+                if (!isRunnerVisible() || isTyping(e)) return;
+                if (['Space', 'ArrowUp', 'KeyW'].includes(e.code)) { e.preventDefault(); if (!e.repeat) runnerJump(); }
+                else if (['ArrowDown', 'KeyS'].includes(e.code)) { e.preventDefault(); runnerKeys.slide = true; }
+                else if (e.code === 'KeyP') toggleRunnerPause();
+            });
+            document.addEventListener('keyup', (e) => { if (['ArrowDown', 'KeyS'].includes(e.code)) runnerKeys.slide = false; });
+            window.addEventListener('blur', () => { runnerKeys.slide = false; });
+            // 모바일 버튼 + 화면 터치(왼쪽 절반 점프 / 오른쪽 절반 누르고 있으면 슬라이드)
+            const jb = document.getElementById('runnerJumpBtn'), sb = document.getElementById('runnerSlideBtn');
+            jb.addEventListener('pointerdown', (e) => { e.preventDefault(); runnerJump(); });
+            sb.addEventListener('pointerdown', (e) => { e.preventDefault(); runnerKeys.slide = true; });
+            ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => sb.addEventListener(ev, () => { runnerKeys.slide = false; }));
+            const canvas = document.getElementById('runnerCanvas');
+            canvas.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                if (e.clientX - rect.left < rect.width / 2) runnerJump(); else runnerKeys.slide = true;
+            });
+            ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => canvas.addEventListener(ev, () => { runnerKeys.slide = false; }));
+            drawRunner();
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initRunner); else initRunner();
+
+        // =====================================================
+        // 🕵️ 마피아 (채팅/대화로 하는 마피아 게임, 마피아42 스타일)
+        //  - 방 하나(mafia/room)를 모두가 공유, 단계 전환은 참가자 브라우저가 트랜잭션으로 처리
+        //  - 밤 → 낮(토론) → 투표 → 최후의 반론 → 찬반 투표 → 밤 ...
+        // =====================================================
+        const MAFIA_ROLES = {
+            mafia:      { name: '마피아', emoji: '🔪', team: 'mafia',   desc: '밤마다 동료 마피아와 상의해 한 명을 제거합니다. 살아있는 마피아 수가 시민 수 이상이 되면 승리!' },
+            police:     { name: '경찰',   emoji: '👮', team: 'citizen', desc: '밤마다 한 명을 조사해 마피아인지 바로 알 수 있습니다. (밤마다 1번)' },
+            doctor:     { name: '의사',   emoji: '💉', team: 'citizen', desc: '밤마다 한 명을 치료합니다. 마피아가 그 사람을 노리면 살려냅니다. (자기 자신도 가능)' },
+            soldier:    { name: '군인',   emoji: '🪖', team: 'citizen', desc: '마피아의 공격을 한 번 버텨냅니다. (버티면 군인인 게 공개돼요)' },
+            politician: { name: '정치인', emoji: '🎩', team: 'citizen', desc: '투표할 때 2표로 계산되고, 투표로는 처형되지 않습니다.' },
+            citizen:    { name: '시민',   emoji: '🙂', team: 'citizen', desc: '토론과 투표로 마피아를 찾아내 모두 처형하면 승리!' }
+        };
+        const MAFIA_TIME = { night: 30, vote: 30, defense: 20, final: 15 }; // 낮은 생존자 수에 따라 (1인 15초, 최소 60초)
+        const MAFIA_MIN = 4, MAFIA_MAX = 12;
+        const MAFIA_PHASE_LABEL = { lobby: '🏠 대기실', night: '🌙 밤', day: '☀️ 낮 (토론)', vote: '🗳️ 투표', defense: '⚖️ 최후의 반론', final: '👍👎 찬반 투표', end: '🏁 게임 종료' };
+        let mafiaRoom = null, mafiaChat = [], mafiaOffset = 0, mafiaAdvancing = null, mafiaTimer = null;
+
+        const mafiaNow = () => Date.now() + mafiaOffset;
+        const mafiaMe = () => statKey(myGameName());
+        const mafiaClean = (o) => JSON.parse(JSON.stringify(o)); // Firebase는 undefined 값을 거부
+        const mafiaAlive = (r, n) => !!(r && r.players && r.players[n] && r.players[n].alive);
+        const mafiaAliveList = (r) => Object.keys((r && r.players) || {}).filter(n => r.players[n].alive);
+        const mafiaInGame = (r) => !!(r && r.state && !['lobby', 'end'].includes(r.state.phase));
+        // 참가자가 모두 나가 2분 넘게 멈춘 게임 → 아무나 정리 가능
+        const mafiaIsStale = (r) => mafiaInGame(r) && !!r.state.endsAt && mafiaNow() - r.state.endsAt > 120000;
+        const mafiaView = () => (mafiaRoom && mafiaRoom.state) ? mafiaRoom : mafiaNewRoom();
+
+        // 인원별 직업 구성
+        function mafiaRoleList(n) {
+            const m = n >= 10 ? 3 : n >= 6 ? 2 : 1;
+            const list = Array(m).fill('mafia').concat(['police', 'doctor']);
+            if (n >= 7) list.push('politician');
+            if (n >= 8) list.push('soldier');
+            while (list.length < n) list.push('citizen');
+            return list;
+        }
+
+        function mafiaLog(r, text) {
+            r.logSeq = (r.logSeq || 0) + 1;
+            r.log = r.log || {};
+            r.log['s' + String(r.logSeq).padStart(4, '0')] = { text, time: Date.now() };
+        }
+
+        function mafiaSetPhase(r, phase, now) {
+            const sec = phase === 'day' ? Math.max(60, mafiaAliveList(r).length * 15) : MAFIA_TIME[phase];
+            r.state.phase = phase;
+            r.state.phaseId = (r.state.phaseId || 0) + 1;
+            r.state.endsAt = sec ? now + sec * 1000 : null;
+            r.state.defenseDone = null;
+        }
+
+        function mafiaWinner(r) {
+            const alive = mafiaAliveList(r);
+            const m = alive.filter(n => r.roles[n] === 'mafia').length;
+            if (m === 0) return 'citizen';
+            if (m >= alive.length - m) return 'mafia';
+            return null;
+        }
+
+        // 승패가 났으면 종료 처리하고 true
+        function mafiaCheckEnd(r) {
+            const w = mafiaWinner(r);
+            if (!w) return false;
+            r.state.phase = 'end'; r.state.phaseId = (r.state.phaseId || 0) + 1; r.state.endsAt = null; r.state.winner = w;
+            const mafias = Object.keys(r.roles).filter(n => r.roles[n] === 'mafia');
+            mafiaLog(r, w === 'mafia' ? `🔪 마피아 승리! 마피아는 ${mafias.join(', ')}님이었습니다.` : `🎉 시민 승리! 마피아 ${mafias.join(', ')}님을 모두 찾아냈습니다.`);
+            return true;
+        }
+
+        function mafiaGoNight(r, now) {
+            r.state.day = (r.state.day || 0) + 1;
+            r.state.accused = null; r.votes = null; r.finalVotes = null; r.night = null;
+            mafiaSetPhase(r, 'night', now);
+            mafiaLog(r, `🌙 ${r.state.day}일째 밤이 되었습니다. 마피아·의사·경찰은 대상을 고르세요.`);
+        }
+
+        // 현재 단계를 끝내고 다음 단계로 (트랜잭션 안에서 호출)
+        function mafiaNextPhase(r, now) {
+            const st = r.state, roles = r.roles || {};
+            if (st.phase === 'night') {
+                const n = r.night || {}, t = n.mafia;
+                if (t && mafiaAlive(r, t)) {
+                    if (n.doctor === t) mafiaLog(r, `💉 마피아가 ${t}님을 노렸지만 의사의 치료로 살아났습니다!`);
+                    else if (roles[t] === 'soldier' && !st.soldierUsed) { st.soldierUsed = true; mafiaLog(r, `🪖 군인 ${t}님이 마피아의 공격을 버텨냈습니다!`); }
+                    else { r.players[t].alive = false; r.players[t].diedOn = `${st.day}일째 밤`; mafiaLog(r, `🔪 ${t}님이 마피아에게 살해당했습니다.`); }
+                } else mafiaLog(r, '🌙 아무 일도 일어나지 않은 조용한 밤이었습니다.');
+                r.night = null;
+                if (mafiaCheckEnd(r)) return r;
+                mafiaSetPhase(r, 'day', now);
+                mafiaLog(r, `☀️ ${st.day}일째 낮입니다. ${Math.round((st.endsAt - now) / 1000)}초 동안 토론하세요. (각자 하루 한 번 시간 ±15초)`);
+            } else if (st.phase === 'day') {
+                r.votes = null;
+                mafiaSetPhase(r, 'vote', now);
+                mafiaLog(r, '🗳️ 투표 시간입니다. 마피아로 의심되는 사람을 눌러 투표하세요.');
+            } else if (st.phase === 'vote') {
+                const tally = {};
+                Object.entries(r.votes || {}).forEach(([v, t]) => {
+                    if (mafiaAlive(r, v) && mafiaAlive(r, t)) tally[t] = (tally[t] || 0) + (roles[v] === 'politician' ? 2 : 1);
+                });
+                const max = Math.max(0, ...Object.values(tally));
+                const top = Object.keys(tally).filter(k => tally[k] === max);
+                const summary = Object.entries(tally).sort((a, b) => b[1] - a[1]).map(([k, c]) => `${k} ${c}표`).join(', ');
+                if (max === 0 || top.length !== 1) {
+                    mafiaLog(r, max === 0 ? '🗳️ 아무도 투표하지 않아 넘어갑니다.' : `🗳️ 동점(${summary})이라 아무도 지목되지 않았습니다.`);
+                    mafiaGoNight(r, now);
+                } else {
+                    st.accused = top[0];
+                    mafiaLog(r, `⚖️ ${summary} → ${top[0]}님이 지목되었습니다. 최후의 반론을 들어보세요.`);
+                    mafiaSetPhase(r, 'defense', now);
+                }
+            } else if (st.phase === 'defense') {
+                r.finalVotes = null;
+                mafiaSetPhase(r, 'final', now);
+                mafiaLog(r, `👍👎 ${st.accused}님을 처형할까요? 찬성/반대를 눌러주세요.`);
+            } else if (st.phase === 'final') {
+                let kill = 0, save = 0;
+                Object.entries(r.finalVotes || {}).forEach(([v, c]) => {
+                    if (!mafiaAlive(r, v) || v === st.accused) return;
+                    const w = roles[v] === 'politician' ? 2 : 1;
+                    if (c === 'kill') kill += w; else save += w;
+                });
+                const acc = st.accused;
+                if (kill > save && mafiaAlive(r, acc)) {
+                    if (roles[acc] === 'politician') mafiaLog(r, `🎩 찬성 ${kill} : 반대 ${save} — 하지만 ${acc}님은 정치인이라 투표로 처형되지 않습니다!`);
+                    else { r.players[acc].alive = false; r.players[acc].diedOn = `${st.day}일째 처형`; mafiaLog(r, `☠️ 찬성 ${kill} : 반대 ${save} — ${acc}님이 처형되었습니다.`); }
+                } else mafiaLog(r, `🙅 찬성 ${kill} : 반대 ${save} — 처형이 부결되었습니다.`);
+                if (mafiaCheckEnd(r)) return r;
+                mafiaGoNight(r, now);
+            }
+            return r;
+        }
+
+        // 시간이 다 되기 전에 넘어가도 되는지 (모두 투표 완료 등)
+        function mafiaCanEndEarly(r) {
+            const st = r.state;
+            if (st.phase === 'vote') { const a = mafiaAliveList(r); return a.length > 0 && a.every(n => (r.votes || {})[n]); }
+            if (st.phase === 'final') { const a = mafiaAliveList(r).filter(n => n !== st.accused); return a.length > 0 && a.every(n => (r.finalVotes || {})[n]); }
+            if (st.phase === 'defense') return !!st.defenseDone;
+            return false;
+        }
+
+        // mafia/room 트랜잭션 (fn이 undefined를 돌려주면 취소)
+        function mafiaTx(fn, onDone, allowCreate) {
+            if (!db) { alert('서버에 연결되지 않았습니다.'); return; }
+            let after = null;
+            db.ref('mafia/room').transaction(cur => {
+                after = null;
+                if (!cur && !allowCreate) return null; // 캐시가 비었을 때: 서버 값으로 다시 시도하게 둠
+                const res = fn(cur, (f) => { after = f; });
+                return res === undefined ? undefined : mafiaClean(res);
+            }, (err, committed, snap) => {
+                if (err) console.warn('마피아 처리 실패', err);
+                if (committed && after) after(snap && snap.val());
+                if (onDone) onDone(committed);
+            });
+        }
+
+        function mafiaNewRoom() {
+            return { gid: 'g' + Date.now(), state: { phase: 'lobby', phaseId: 1, day: 0 }, players: {}, logSeq: 0 };
+        }
+
+        function mafiaNeedName() {
+            if (!(localStorage.getItem('chat_nickname') || '').trim()) { alert('상단에 닉네임을 먼저 입력해주세요!'); return true; }
+            return false;
+        }
+
+        function mafiaJoin() {
+            if (mafiaNeedName()) return;
+            const me = mafiaMe();
+            mafiaTx(cur => {
+                if (!cur || !cur.state) cur = mafiaNewRoom();
+                if (cur.state.phase !== 'lobby') return;
+                cur.players = cur.players || {};
+                if (cur.players[me] || Object.keys(cur.players).length >= MAFIA_MAX) return;
+                cur.players[me] = { alive: true, joinedAt: Date.now() };
+                if (!cur.host || !cur.players[cur.host]) cur.host = me;
+                mafiaLog(cur, `🙋 ${me}님이 참가했습니다.`);
+                return cur;
+            }, null, true);
+        }
+
+        function mafiaLeave() {
+            const me = mafiaMe();
+            mafiaTx(cur => {
+                if (!cur || !cur.state || cur.state.phase !== 'lobby' || !(cur.players || {})[me]) return;
+                delete cur.players[me];
+                if (cur.host === me) cur.host = Object.keys(cur.players).sort((a, b) => cur.players[a].joinedAt - cur.players[b].joinedAt)[0] || null;
+                mafiaLog(cur, `👋 ${me}님이 나갔습니다.`);
+                return cur;
+            });
+        }
+
+        function mafiaStart() {
+            const me = mafiaMe();
+            mafiaTx((cur, after) => {
+                if (!cur || !cur.state || cur.state.phase !== 'lobby' || cur.host !== me) return;
+                const names = Object.keys(cur.players || {});
+                if (names.length < MAFIA_MIN) return;
+                const roles = mafiaRoleList(names.length);
+                for (let i = roles.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [roles[i], roles[j]] = [roles[j], roles[i]]; }
+                const now = mafiaNow();
+                cur.roles = {}; names.forEach((n, i) => { cur.roles[n] = roles[i]; cur.players[n].alive = true; cur.players[n].diedOn = null; });
+                cur.gid = 'g' + Date.now();
+                cur.log = null; cur.logSeq = 0; cur.votes = null; cur.finalVotes = null; cur.night = null; cur.policeLog = null; cur.timeAdj = null;
+                cur.state = { phase: 'lobby', phaseId: cur.state.phaseId || 1, day: 0 };
+                const cnt = {}; roles.forEach(x => cnt[x] = (cnt[x] || 0) + 1);
+                const comp = Object.keys(MAFIA_ROLES).filter(k => cnt[k]).map(k => `${MAFIA_ROLES[k].emoji}${MAFIA_ROLES[k].name} ${cnt[k]}`).join(' · ');
+                mafiaLog(cur, `🎬 게임 시작! ${names.length}명 — ${comp}. 내 직업은 위 카드에서 확인하세요.`);
+                mafiaGoNight(cur, now);
+                after(() => db.ref('mafia/chat').remove()); // 지난 판 채팅 정리
+                return cur;
+            });
+        }
+
+        // 대기실로 (게임 끝난 뒤 / 방장 강제 종료 / 오래 멈춘 게임)
+        function mafiaToLobby() {
+            const me = mafiaMe(), r = mafiaRoom;
+            if (r && mafiaInGame(r) && !mafiaIsStale(r) && !confirm('진행 중인 게임을 끝내고 대기실로 돌아갈까요?')) return;
+            mafiaTx(cur => {
+                if (!cur || !cur.state) return;
+                const st = cur.state, stale = mafiaIsStale(cur);
+                if (!(st.phase === 'end' || (mafiaInGame(cur) && (cur.host === me || stale)))) return;
+                const wasPlaying = mafiaInGame(cur);
+                Object.values(cur.players || {}).forEach(p => { p.alive = true; p.diedOn = null; });
+                cur.roles = null; cur.votes = null; cur.finalVotes = null; cur.night = null; cur.policeLog = null; cur.timeAdj = null;
+                cur.gid = 'g' + Date.now(); cur.log = null; cur.logSeq = 0;
+                cur.state = { phase: 'lobby', phaseId: (st.phaseId || 0) + 1, day: 0 };
+                if (!cur.host || !(cur.players || {})[cur.host]) cur.host = Object.keys(cur.players || {})[0] || null;
+                mafiaLog(cur, wasPlaying ? `⛔ ${me}님이 게임을 중단했습니다. 대기실로 돌아왔어요.` : '🏠 대기실로 돌아왔습니다. 방장이 시작하면 새 게임이 시작돼요.');
+                return cur;
+            });
+        }
+
+        // 밤 행동 / 투표 (플레이어 카드 클릭)
+        function mafiaClickPlayer(target) {
+            const r = mafiaView(), me = mafiaMe();
+            if (!mafiaAlive(r, me) || !mafiaAlive(r, target)) return;
+            const ph = r.state.phase, role = (r.roles || {})[me];
+            if (ph === 'night') {
+                if (!['mafia', 'doctor', 'police'].includes(role)) return;
+                if (role === 'mafia' && r.roles[target] === 'mafia') return;
+                if (role === 'police' && (target === me || (r.night || {}).police)) return;
+                mafiaTx(cur => {
+                    if (!cur || cur.state.phase !== 'night' || cur.state.phaseId !== r.state.phaseId || !mafiaAlive(cur, me) || !mafiaAlive(cur, target)) return;
+                    cur.night = cur.night || {};
+                    if (role === 'mafia') { cur.night.mafia = target; cur.night.mafiaBy = me; }
+                    else if (role === 'doctor') cur.night.doctor = target;
+                    else {
+                        if (cur.night.police) return;
+                        cur.night.police = target;
+                        cur.policeLog = cur.policeLog || {}; cur.policeLog[me] = cur.policeLog[me] || {};
+                        cur.policeLog[me]['d' + cur.state.day] = { target, mafia: cur.roles[target] === 'mafia' };
+                    }
+                    return cur;
+                });
+            } else if (ph === 'vote') {
+                if (target === me) return;
+                mafiaTx(cur => {
+                    if (!cur || cur.state.phase !== 'vote' || cur.state.phaseId !== r.state.phaseId || !mafiaAlive(cur, me) || !mafiaAlive(cur, target)) return;
+                    cur.votes = cur.votes || {};
+                    if (cur.votes[me] === target) delete cur.votes[me]; else cur.votes[me] = target;
+                    return cur;
+                });
+            }
+        }
+
+        function mafiaFinalVote(choice) {
+            const r = mafiaView(), me = mafiaMe();
+            if (r.state.phase !== 'final' || !mafiaAlive(r, me) || r.state.accused === me) return;
+            mafiaTx(cur => {
+                if (!cur || cur.state.phase !== 'final' || cur.state.phaseId !== r.state.phaseId || !mafiaAlive(cur, me)) return;
+                cur.finalVotes = cur.finalVotes || {}; cur.finalVotes[me] = choice;
+                return cur;
+            });
+        }
+
+        function mafiaAdjustTime(sign) {
+            const r = mafiaView(), me = mafiaMe();
+            if (r.state.phase !== 'day' || !mafiaAlive(r, me)) return;
+            mafiaTx(cur => {
+                if (!cur || cur.state.phase !== 'day' || !mafiaAlive(cur, me)) return;
+                cur.timeAdj = cur.timeAdj || {};
+                if (cur.timeAdj[me] === cur.state.day) return;
+                cur.timeAdj[me] = cur.state.day;
+                cur.state.endsAt = Math.max(mafiaNow() + 3000, cur.state.endsAt + sign * 15000);
+                mafiaLog(cur, sign > 0 ? `⏫ ${me}님이 토론 시간을 15초 늘렸습니다.` : `⏬ ${me}님이 토론 시간을 15초 줄였습니다.`);
+                return cur;
+            });
+        }
+
+        function mafiaDefenseDone() {
+            const r = mafiaView(), me = mafiaMe();
+            if (r.state.phase !== 'defense' || r.state.accused !== me) return;
+            mafiaTx(cur => {
+                if (!cur || cur.state.phase !== 'defense' || cur.state.accused !== me) return;
+                cur.state.defenseDone = true;
+                return cur;
+            });
+        }
+
+        // 게임 결과 전적 (종료를 확정한 브라우저에서 1번만)
+        function mafiaRecordStats(r) {
+            if (!db || !r || !r.roles || !r.state.winner) return;
+            Object.entries(r.roles).forEach(([name, role]) => {
+                const win = MAFIA_ROLES[role].team === r.state.winner;
+                db.ref(`game_stats/mafia/${statKey(name)}`).transaction(cur => {
+                    cur = cur || { win: 0, loss: 0 };
+                    cur[win ? 'win' : 'loss'] = (cur[win ? 'win' : 'loss'] || 0) + 1;
+                    if (role === 'mafia') cur.asMafia = (cur.asMafia || 0) + 1;
+                    cur.updatedAt = Date.now();
+                    return cur;
+                });
+            });
+        }
+
+        // 0.5초마다: 시간이 다 됐으면 다음 단계로 (참가자 브라우저만)
+        function mafiaTick() {
+            const r = mafiaRoom;
+            if (isMafiaVisible()) mafiaUpdateTimer();
+            if (!db || !mafiaInGame(r) || !(r.players || {})[mafiaMe()]) return;
+            const st = r.state;
+            if (mafiaNow() < st.endsAt && !mafiaCanEndEarly(r)) return;
+            if (mafiaAdvancing === st.phaseId) return;
+            mafiaAdvancing = st.phaseId;
+            mafiaTx((cur, after) => {
+                if (!cur || !cur.state || cur.state.phaseId !== st.phaseId || !mafiaInGame(cur)) return;
+                const now = mafiaNow();
+                if (now < cur.state.endsAt && !mafiaCanEndEarly(cur)) return;
+                mafiaNextPhase(cur, now);
+                if (cur.state.phase === 'end') after(mafiaRecordStats);
+                return cur;
+            }, (ok) => { if (!ok) setTimeout(() => { if (mafiaAdvancing === st.phaseId) mafiaAdvancing = null; }, 1500); });
+        }
+
+        function isMafiaVisible() {
+            const panel = document.getElementById('panel-mafia'), tab = document.getElementById('tab-minigame');
+            return !!(panel && tab && panel.classList.contains('active') && tab.classList.contains('active'));
+        }
+
+        // ---------- 화면 ----------
+        function mafiaUpdateTimer() {
+            const el = document.getElementById('mafiaTimer');
+            const r = mafiaRoom;
+            if (!el) return;
+            if (!r || !mafiaInGame(r) || !r.state.endsAt) { el.textContent = ''; return; }
+            const s = Math.max(0, Math.ceil((r.state.endsAt - mafiaNow()) / 1000));
+            el.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+            el.classList.toggle('urgent', s <= 5);
+        }
+
+        function mafiaMyChannel(r, me) {
+            if (!r || !r.state || !mafiaInGame(r)) return 'all';
+            const p = (r.players || {})[me];
+            if (!p) return null;
+            if (!p.alive) return 'dead';
+            if (r.state.phase === 'night') return r.roles[me] === 'mafia' ? 'mafia' : null;
+            if (r.state.phase === 'defense') return r.state.accused === me ? 'all' : null;
+            return 'all';
+        }
+
+        function renderMafia() {
+            const root = document.getElementById('panel-mafia');
+            if (!root) return;
+            const r = mafiaView(), me = mafiaMe(), st = r.state;
+            const players = r.players || {}, roles = r.roles || {}, inGame = mafiaInGame(r), ended = st.phase === 'end';
+            const myRole = roles[me], joined = !!players[me], alive = mafiaAlive(r, me);
+            const names = Object.keys(players).sort((a, b) => (players[a].joinedAt || 0) - (players[b].joinedAt || 0));
+
+            // 상단 상태
+            const status = document.getElementById('mafiaStatus');
+            status.className = `mafia-status ph-${st.phase}`;
+            let title = MAFIA_PHASE_LABEL[st.phase] || '';
+            if (inGame) title = `${st.day}일째 ${title}`;
+            if (ended) title = st.winner === 'mafia' ? '🔪 마피아 승리!' : '🎉 시민 승리!';
+            const sub = st.phase === 'lobby' ? `참가 ${names.length}/${MAFIA_MAX}명 · ${MAFIA_MIN}명 이상 모이면 방장${r.host ? `(${escapeHtml(r.host)})` : ''}이 시작할 수 있어요`
+                : st.phase === 'defense' || st.phase === 'final' ? `지목된 사람: <b>${escapeHtml(st.accused || '')}</b>`
+                : ended ? '모든 직업이 공개되었습니다' : `생존 ${mafiaAliveList(r).length}명`;
+            status.innerHTML = `<div class="ms-title">${title}</div><div class="ms-timer" id="mafiaTimer"></div><div class="ms-sub">${sub}</div>`;
+            mafiaUpdateTimer();
+
+            // 내 직업 카드
+            const roleEl = document.getElementById('mafiaRole');
+            if ((inGame || ended) && joined && myRole) {
+                const R = MAFIA_ROLES[myRole];
+                let extra = '';
+                if (myRole === 'mafia') {
+                    const mates = Object.keys(roles).filter(n => roles[n] === 'mafia' && n !== me);
+                    extra += `<div>🤝 동료 마피아: ${mates.length ? mates.map(nameWithIcon).join(', ') : '없음 (혼자예요)'}</div>`;
+                    const n = r.night || {};
+                    if (st.phase === 'night') extra += `<div>🎯 오늘 밤 목표: ${n.mafia ? `<b>${escapeHtml(n.mafia)}</b> <small>(${escapeHtml(n.mafiaBy)}님 선택)</small>` : '아직 없음 — 아래에서 사람을 누르세요'}</div>`;
+                } else if (myRole === 'doctor' && st.phase === 'night') {
+                    const d = (r.night || {}).doctor;
+                    extra += `<div>💉 오늘 밤 치료: ${d ? `<b>${escapeHtml(d)}</b>` : '아직 없음 — 아래에서 사람을 누르세요'}</div>`;
+                } else if (myRole === 'police') {
+                    const logs = Object.entries((r.policeLog || {})[me] || {}).sort((a, b) => parseInt(a[0].slice(1)) - parseInt(b[0].slice(1)));
+                    extra += logs.length ? `<div>🔍 조사 결과: ${logs.map(([d, x]) => `${d.slice(1)}일째 ${escapeHtml(x.target)} → ${x.mafia ? '<b class="mr-bad">마피아!</b>' : '<span class="mr-good">마피아 아님</span>'}`).join(' · ')}</div>` : '';
+                    if (st.phase === 'night' && !(r.night || {}).police) extra += '<div>🔍 아래에서 조사할 사람을 누르세요 (밤마다 1명)</div>';
+                }
+                if (!alive && !ended) extra += '<div class="mr-dead">☠️ 사망했습니다. 죽은 사람끼리만 대화할 수 있어요.</div>';
+                roleEl.innerHTML = `<div class="mr-head ${R.team}">${R.emoji} 내 직업: <b>${R.name}</b></div><div class="mr-desc">${R.desc}</div>${extra}`;
+                roleEl.style.display = '';
+            } else if (inGame && !joined) {
+                roleEl.innerHTML = '<div class="mr-head">👀 관전 중</div><div class="mr-desc">게임이 끝나면 대기실에서 참가할 수 있어요.</div>';
+                roleEl.style.display = '';
+            } else roleEl.style.display = 'none';
+
+            // 플레이어 카드
+            const tally = {};
+            if (st.phase === 'vote') Object.entries(r.votes || {}).forEach(([v, t]) => { if (mafiaAlive(r, v)) tally[t] = (tally[t] || 0) + (roles[v] === 'politician' ? 2 : 1); });
+            const night = r.night || {};
+            const showRole = (n) => ended || n === me || (myRole === 'mafia' && roles[n] === 'mafia');
+            const canAct = (n) => {
+                if (!alive || !mafiaAlive(r, n)) return false;
+                if (st.phase === 'vote') return n !== me;
+                if (st.phase !== 'night') return false;
+                if (myRole === 'mafia') return roles[n] !== 'mafia';
+                if (myRole === 'doctor') return true;
+                if (myRole === 'police') return n !== me && !night.police;
+                return false;
+            };
+            const policeMine = (r.policeLog || {})[me] || {};
+            document.getElementById('mafiaPlayers').innerHTML = names.length ? names.map(n => {
+                const p = players[n], dead = (inGame || ended) && !p.alive;
+                const badges = [];
+                if (r.host === n) badges.push('<span class="mb host">👑 방장</span>');
+                if (showRole(n) && roles[n]) badges.push(`<span class="mb role ${MAFIA_ROLES[roles[n]].team}">${MAFIA_ROLES[roles[n]].emoji}${MAFIA_ROLES[roles[n]].name}</span>`);
+                if (dead) badges.push(`<span class="mb dead">☠️ ${escapeHtml(p.diedOn || '사망')}</span>`);
+                if (st.phase === 'vote' && tally[n]) badges.push(`<span class="mb vote">🗳️ ${tally[n]}표</span>`);
+                if (st.phase === 'night' && myRole === 'mafia' && night.mafia === n) badges.push('<span class="mb target">🎯 목표</span>');
+                if (st.phase === 'night' && myRole === 'doctor' && night.doctor === n) badges.push('<span class="mb heal">💉 치료</span>');
+                if (myRole === 'police' && !ended) Object.values(policeMine).forEach(x => { if (x.target === n) badges.push(x.mafia ? '<span class="mb target">🔍 마피아!</span>' : '<span class="mb heal">🔍 시민</span>'); });
+                const picked = (st.phase === 'vote' && (r.votes || {})[me] === n) || (st.phase === 'night' && ((myRole === 'mafia' && night.mafia === n) || (myRole === 'doctor' && night.doctor === n) || (myRole === 'police' && night.police === n)));
+                const accused = (st.phase === 'defense' || st.phase === 'final') && st.accused === n;
+                return `<div class="mafia-card${dead ? ' dead' : ''}${n === me ? ' me' : ''}${canAct(n) ? ' act' : ''}${picked ? ' picked' : ''}${accused ? ' accused' : ''}" data-name="${escapeHtml(n)}" onclick="mafiaClickPlayer(this.dataset.name)">
+                    <div class="mc-name">${nameWithIcon(n)}${n === me ? ' <small>(나)</small>' : ''}</div><div class="mc-badges">${badges.join('')}</div></div>`;
+            }).join('') : '<div class="gs-empty">아직 참가자가 없어요. 첫 번째로 참가해 보세요!</div>';
+
+            // 행동 버튼
+            const acts = [];
+            const myVote = (r.votes || {})[me];
+            if (st.phase === 'lobby') {
+                acts.push(joined ? '<button class="mafia-btn ghost" onclick="mafiaLeave()">🚪 나가기</button>' : `<button class="mafia-btn" onclick="mafiaJoin()" ${names.length >= MAFIA_MAX ? 'disabled' : ''}>🙋 참가하기</button>`);
+                if (r.host === me) acts.push(`<button class="mafia-btn start" onclick="mafiaStart()" ${names.length < MAFIA_MIN ? 'disabled' : ''}>🎬 게임 시작 ${names.length < MAFIA_MIN ? `(${MAFIA_MIN - names.length}명 더 필요)` : ''}</button>`);
+                if (names.length >= MAFIA_MIN) acts.push(`<div class="mafia-hint">직업 구성: ${(() => { const c = {}; mafiaRoleList(names.length).forEach(x => c[x] = (c[x] || 0) + 1); return Object.keys(MAFIA_ROLES).filter(k => c[k]).map(k => `${MAFIA_ROLES[k].emoji}${MAFIA_ROLES[k].name} ${c[k]}`).join(' · '); })()}</div>`);
+            } else if (st.phase === 'night') {
+                acts.push(`<div class="mafia-hint">${!alive ? '☠️ 관전 중' : myRole === 'mafia' ? '🔪 제거할 사람을 누르세요 (동료와 마피아 채팅으로 상의)' : myRole === 'doctor' ? '💉 치료할 사람을 누르세요' : myRole === 'police' ? (night.police ? '🔍 오늘 조사를 마쳤어요' : '🔍 조사할 사람을 누르세요') : '🌙 밤입니다… 아침이 올 때까지 기다리세요'}</div>`);
+            } else if (st.phase === 'day') {
+                const used = (r.timeAdj || {})[me] === st.day;
+                if (alive) acts.push(`<button class="mafia-btn ghost" onclick="mafiaAdjustTime(1)" ${used ? 'disabled' : ''}>⏫ 시간 +15초</button><button class="mafia-btn ghost" onclick="mafiaAdjustTime(-1)" ${used ? 'disabled' : ''}>⏬ 시간 -15초</button>`);
+                acts.push('<div class="mafia-hint">💬 누가 마피아인지 이야기해 보세요. 시간이 끝나면 투표가 시작돼요.</div>');
+            } else if (st.phase === 'vote') {
+                const voted = mafiaAliveList(r).filter(n => (r.votes || {})[n]).length;
+                acts.push(`<div class="mafia-hint">${alive ? (myVote ? `🗳️ 내 투표: <b>${escapeHtml(myVote)}</b> (다시 누르면 취소, 다른 사람을 누르면 변경)` : '🗳️ 마피아로 의심되는 사람을 누르세요') : '☠️ 관전 중'} · ${voted}/${mafiaAliveList(r).length}명 투표</div>`);
+            } else if (st.phase === 'defense') {
+                if (st.accused === me) acts.push('<button class="mafia-btn ghost" onclick="mafiaDefenseDone()">✅ 반론 마치기</button>');
+                acts.push(`<div class="mafia-hint">⚖️ ${escapeHtml(st.accused)}님의 최후의 반론 시간입니다. 지목된 사람만 말할 수 있어요.</div>`);
+            } else if (st.phase === 'final') {
+                const fv = (r.finalVotes || {})[me];
+                const eligible = mafiaAliveList(r).filter(n => n !== st.accused);
+                if (alive && st.accused !== me) acts.push(`<button class="mafia-btn kill${fv === 'kill' ? ' on' : ''}" onclick="mafiaFinalVote('kill')">👍 찬성 (처형)</button><button class="mafia-btn save${fv === 'save' ? ' on' : ''}" onclick="mafiaFinalVote('save')">👎 반대 (살림)</button>`);
+                acts.push(`<div class="mafia-hint">${st.accused === me ? '🙏 다른 사람들이 투표 중이에요…' : ''} ${eligible.filter(n => (r.finalVotes || {})[n]).length}/${eligible.length}명 투표</div>`);
+            } else if (ended) {
+                acts.push('<button class="mafia-btn start" onclick="mafiaToLobby()">🔄 대기실로 (새 게임)</button>');
+            }
+            const stale = mafiaIsStale(r);
+            if (inGame && (r.host === me || stale)) acts.push(`<button class="mafia-btn ghost small" onclick="mafiaToLobby()">${stale ? '🧹 멈춘 게임 정리' : '⛔ 게임 중단 (방장)'}</button>`);
+            document.getElementById('mafiaActions').innerHTML = acts.join('');
+
+            // 게임 중인데 다른 화면에 있으면 마피아 탭 버튼이 깜빡임
+            const tabBtn = document.getElementById('mafiaTabBtn');
+            if (tabBtn) tabBtn.classList.toggle('mafia-live', inGame && joined);
+
+            renderMafiaChat();
+            if (typeof renderGameStats === 'function') renderGameStats('mafia');
+        }
+
+        function renderMafiaChat() {
+            const el = document.getElementById('mafiaChatList');
+            if (!el) return;
+            const r = mafiaView(), me = mafiaMe(), roles = r.roles || {};
+            const ended = r.state.phase === 'end', inGame = mafiaInGame(r);
+            const amDead = inGame && (r.players || {})[me] && !mafiaAlive(r, me);
+            const visible = (m) => m.ch === 'all' || ended
+                || (m.ch === 'mafia' && roles[me] === 'mafia')
+                || (m.ch === 'dead' && amDead);
+            const items = Object.values(r.log || {}).map(l => ({ sys: true, text: l.text, time: l.time }))
+                .concat(mafiaChat.filter(m => m.gid === r.gid && visible(m)))
+                .sort((a, b) => (a.time || 0) - (b.time || 0)).slice(-150);
+            const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
+            el.innerHTML = items.length ? items.map(m => {
+                if (m.sys) return `<div class="mc-sys">${escapeHtml(m.text)}</div>`;
+                const tag = m.ch === 'mafia' ? '<span class="mc-tag mafia">마피아</span>' : m.ch === 'dead' ? '<span class="mc-tag dead">사망자</span>' : '';
+                return `<div class="gc-msg ${m.name === me ? 'mine' : ''} ch-${m.ch}">${tag}<span class="gc-name">${nameWithIcon(m.name)}</span>${escapeHtml(m.text)}</div>`;
+            }).join('') : '<div class="gc-empty">참가하고 대화를 시작해 보세요!</div>';
+            if (atBottom || items.length <= 1) el.scrollTop = el.scrollHeight;
+            // 입력창 상태
+            const ch = mafiaMyChannel(r, me), input = document.getElementById('mafiaChatInput'), hint = document.getElementById('mafiaChatHint');
+            input.disabled = !ch;
+            input.placeholder = ch === 'mafia' ? '🔪 마피아끼리 대화 (다른 사람은 못 봐요)' : ch === 'dead' ? '☠️ 사망자끼리 대화' : ch ? '메시지 입력...' : '지금은 말할 수 없어요';
+            hint.textContent = ch ? '' : !(r.players || {})[me] ? '👀 관전 중에는 대화할 수 없어요' : r.state.phase === 'night' ? '🌙 밤에는 마피아만 몰래 대화할 수 있어요' : '⚖️ 최후의 반론 중에는 지목된 사람만 말할 수 있어요';
+        }
+
+        function sendMafiaChat() {
+            const input = document.getElementById('mafiaChatInput');
+            const text = (input.value || '').trim();
+            if (!text) return;
+            if (mafiaNeedName()) return;
+            if (!db) { alert('서버에 연결되지 않았습니다.'); return; }
+            const r = mafiaView(), ch = mafiaMyChannel(r, mafiaMe());
+            if (!ch) return;
+            db.ref('mafia/chat').push({ name: mafiaMe(), text: text.slice(0, 200), ch, time: Date.now(), gid: r.gid || '' });
+            input.value = '';
+        }
+
+        function setupMafia() {
+            if (!db) return;
+            db.ref('.info/serverTimeOffset').on('value', s => { mafiaOffset = s.val() || 0; });
+            db.ref('mafia/room').off();
+            db.ref('mafia/room').on('value', snap => { mafiaRoom = snap.val(); renderMafia(); });
+            db.ref('mafia/chat').off();
+            db.ref('mafia/chat').orderByChild('time').limitToLast(200).on('value', snap => {
+                mafiaChat = Object.values(snap.val() || {}).sort((a, b) => (a.time || 0) - (b.time || 0));
+                renderMafiaChat();
+            });
+            db.ref('game_stats/mafia').off();
+            db.ref('game_stats/mafia').on('value', snap => { gameStats.mafia = snap.val() || {}; renderGameStats('mafia'); });
+            if (!mafiaTimer) mafiaTimer = setInterval(mafiaTick, 500);
         }
 
         // =====================================================
