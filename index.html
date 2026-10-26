@@ -3576,6 +3576,7 @@
         .grade-text-bronze { color: #e0a060; } .grade-text-silver { color: #dfe6ee; } .grade-text-gold { color: #ffd700; }
         .grade-text-emerald { color: #2ee59d; } .grade-text-hidden { color: #ff4fd8; }
         .collection-item { position: relative; border-width: 3px; border-style: solid; }
+        .collection-item .ci-count { position: absolute; top: 2px; right: 3px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: #ff4757; color: #fff; font-size: 12px; font-weight: bold; line-height: 20px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.5); z-index: 2; }
         .collection-item.locked { filter: none; opacity: 0.7; }
         .collection-item.locked .ci-emoji { filter: grayscale(100%) brightness(0.35); }
         .collection-item.grade-bronze { border-color: #cd7f32; }
@@ -4771,8 +4772,8 @@
                                     <li><b>대기실</b>: 4~12명이 참가하면 방장(👑)이 직업 구성(+/−)을 정하고 시작. 직업은 무작위로 나눠지고, <b>내 직업 카드는 눌러야 보여요</b> (10초 뒤 자동으로 가려짐).</li>
                                     <li><b>☀️ 낮 (생존자 1명당 15초, 최소 60초)</b>: 게임은 1일째 낮부터 시작해요. 밤사이 일이 공개되고 자유 토론. 각자 하루 한 번 시간 ±15초.</li>
                                     <li><b>🗳️ 투표 (30초)</b>: 가장 많은 표를 받은 1명이 지목돼요. 동점·무투표면 바로 밤.</li>
-                                    <li><b>⚖️ 최후의 반론 (20초)</b> → <b>👍👎 찬반 투표 (15초)</b>: 찬성이 반대보다 많으면 처형.</li>
-                                    <li><b>🌙 밤 (30초)</b>: 마피아는 제거할 사람, 의사는 치료할 사람, 경찰은 조사할 사람을 카드를 눌러 고릅니다. 마피아끼리는 몰래 채팅 가능. 밤이 지나면 다음 날 낮.</li>
+                                    <li><b>⚖️ 최후의 반론 (8초)</b> → <b>👍👎 찬반 투표 (15초)</b>: 찬성이 반대보다 많으면 처형.</li>
+                                    <li><b>🌙 밤 (10초)</b>: 마피아는 제거할 사람, 의사는 치료할 사람, 경찰은 조사할 사람을 카드를 눌러 고릅니다. 마피아끼리는 몰래 채팅 가능. 밤이 지나면 다음 날 낮.</li>
                                     <li><b>승리 조건</b>: 마피아를 모두 처형하면 시민 승리, 살아있는 마피아 수가 시민 수 이상이면 마피아 승리.</li>
                                 </ol>
                                 <div class="mafia-rule-roles">🔪 마피아 (4~5명: 1, 6~9명: 2, 10명 이상: 3) · 💉 의사 · 👮 경찰 (5명 이상) · 🎩 정치인 (7명 이상, 2표·투표 처형 면제) · 🪖 군인 (8명 이상, 공격 1회 버팀) · 🙂 시민</div>
@@ -8279,11 +8280,18 @@ ${text}
         }
         const RANK_ICON_NOTICE = '🔒 컬렉션에서 아이콘을 지정해야 랭킹에 올라가요 (게임 → 🏆 컬렉션에서 인형 클릭)';
 
-        // 채팅 이름 색: 이름마다 고정된 서로 다른 색
-        function nameColor(name) {
+        // 채팅 이름 색: 무지개 12색을 사람 순서대로 배정 (이웃한 색끼리 확실히 다르게 섞은 순서)
+        const NAME_COLORS = ['#ff4d4d', '#00e5ff', '#ffe600', '#d966ff', '#4dff88', '#ff9f1a', '#4d8dff', '#ff66c4', '#b4ff1a', '#1affd5', '#a98bff', '#ffc94d'];
+        function nameColorMap(names) {
+            const m = {}; let i = 0;
+            names.forEach(n => { if (n && !(n in m)) m[n] = NAME_COLORS[i++ % NAME_COLORS.length]; });
+            return m;
+        }
+        function nameColor(name, map) {
+            if (map && map[name]) return map[name];
             let h = 0;
             for (const ch of String(name || '')) h = (h * 31 + ch.codePointAt(0)) >>> 0;
-            return `hsl(${Math.round((h * 137.508) % 360)}, 80%, 70%)`;
+            return NAME_COLORS[h % NAME_COLORS.length];
         }
         function nameWithIcon(name) {
             const ic = iconOf(name);
@@ -9515,9 +9523,12 @@ ${text}
 
             // 컬렉션에 추가
             if (!gameData.collection) gameData.collection = [];
-            if (!gameData.collection.includes(result.emoji)) {
-                gameData.collection.push(result.emoji);
-            }
+            const alreadyOwned = gameData.collection.includes(result.emoji);
+            if (!alreadyOwned) gameData.collection.push(result.emoji);
+            // 같은 인형을 몇 번 뽑았는지 (이 기능 전에 가진 인형은 1개로 시작)
+            gameData.collectionCount = gameData.collectionCount || {};
+            const ownedCount = (gameData.collectionCount[result.emoji] || (alreadyOwned ? 1 : 0)) + 1;
+            gameData.collectionCount[result.emoji] = ownedCount;
 
             // 히스토리에 추가
             if (!gameData.gachaHistory) gameData.gachaHistory = [];
@@ -9541,7 +9552,7 @@ ${text}
                 <div class="gacha-result" style="font-size: 70px;">${result.emoji}</div>
                 <div style="color: ${RARITY_COLORS[result.rarity]}; font-weight: bold; margin-top: 6px; font-size: 14px;">
                     ${result.name}
-                    <br><small>${RARITY_BADGE[result.rarity]} ${RARITY_LABEL[result.rarity]}</small>
+                    <br><small>${RARITY_BADGE[result.rarity]} ${RARITY_LABEL[result.rarity]}${ownedCount >= 2 ? ` · ${ownedCount}개째` : ''}</small>
                 </div>
             `;
 
@@ -9612,6 +9623,7 @@ ${text}
             const owned = gameData.collection || [];
 
             const selected = iconOf(localStorage.getItem('chat_nickname') || '');
+            const countOf = (emoji) => (gameData.collectionCount || {})[emoji] || 1;
             const card = (item) => {
                 const has = owned.includes(item.emoji);
                 const hidden = item.rarity === 'hidden';
@@ -9624,6 +9636,7 @@ ${text}
                      ${has ? `onclick="selectMyIcon('${item.emoji}')"` : ''}
                      title="${item.name} (${RARITY_LABEL[item.rarity]})${has ? ' - 눌러서 내 아이콘으로' : ''}">
                     <span class="ci-emoji">${item.emoji}</span>
+                    ${has && countOf(item.emoji) >= 2 ? `<span class="ci-count" title="${countOf(item.emoji)}개 보유">${countOf(item.emoji)}</span>` : ''}
                     ${hidden ? '<span class="ci-spark s1">✦</span><span class="ci-spark s2">✦</span><span class="ci-spark s3">✦</span>' : ''}
                 </div>`;
             };
@@ -11379,7 +11392,7 @@ ${text}
             politician: { name: '정치인', emoji: '🎩', team: 'citizen', desc: '투표할 때 2표로 계산되고, 투표로는 처형되지 않습니다.' },
             citizen:    { name: '시민',   emoji: '🙂', team: 'citizen', desc: '토론과 투표로 마피아를 찾아내 모두 처형하면 승리!' }
         };
-        const MAFIA_TIME = { night: 30, vote: 30, defense: 20, final: 15 }; // 낮은 생존자 수에 따라 (1인 15초, 최소 60초)
+        const MAFIA_TIME = { night: 10, vote: 30, defense: 8, final: 15 }; // 낮은 생존자 수에 따라 (1인 15초, 최소 60초)
         const MAFIA_MIN = 4, MAFIA_MAX = 12;
         const MAFIA_PHASE_LABEL = { lobby: '🏠 대기실', night: '🌙 밤', day: '☀️ 낮 (토론)', vote: '🗳️ 투표', defense: '⚖️ 최후의 반론', final: '👍👎 찬반 투표', end: '🏁 게임 종료' };
         let mafiaRoom = null, mafiaChat = [], mafiaOffset = 0, mafiaAdvancing = null, mafiaTimer = null;
@@ -11867,6 +11880,7 @@ ${text}
                 return false;
             };
             const policeMine = (r.policeLog || {})[me] || {};
+            const cmap = mafiaColorMap(r);
             document.getElementById('mafiaPlayers').innerHTML = names.length ? names.map(n => {
                 const p = players[n], dead = (inGame || ended) && !p.alive;
                 const badges = [];
@@ -11882,7 +11896,7 @@ ${text}
                 const picked = (st.phase === 'vote' && (r.votes || {})[me] === n) || (secret && st.phase === 'night' && ((myRole === 'mafia' && night.mafia === n) || (myRole === 'doctor' && night.doctor === n) || (myRole === 'police' && night.police === n)));
                 const accused = (st.phase === 'defense' || st.phase === 'final') && st.accused === n;
                 return `<div class="mafia-card${dead ? ' dead' : ''}${n === me ? ' me' : ''}${canAct(n) ? ' act' : ''}${picked ? ' picked' : ''}${accused ? ' accused' : ''}" data-name="${escapeHtml(n)}" onclick="mafiaClickPlayer(this.dataset.name)">
-                    <div class="mc-name">${nameWithIcon(n)}${n === me ? ' <small>(나)</small>' : ''}</div><div class="mc-badges">${badges.join('')}</div></div>`;
+                    <div class="mc-name" style="color:${nameColor(n, cmap)}">${nameWithIcon(n)}${n === me ? ' <small>(나)</small>' : ''}</div><div class="mc-badges">${badges.join('')}</div></div>`;
             }).join('') : '<div class="gs-empty">아직 참가자가 없어요. 첫 번째로 참가해 보세요!</div>';
 
             // 행동 버튼
@@ -11928,6 +11942,12 @@ ${text}
             if (typeof renderGameStats === 'function') renderGameStats('mafia');
         }
 
+        // 참가 순서대로 색 배정 → 채팅과 사람 카드의 이름 색이 같음
+        function mafiaColorMap(r, extra = []) {
+            const ps = (r && r.players) || {};
+            return nameColorMap(Object.keys(ps).sort((a, b) => (ps[a].joinedAt || 0) - (ps[b].joinedAt || 0)).concat(extra));
+        }
+
         function renderMafiaChat() {
             const el = document.getElementById('mafiaChatList');
             if (!el) return;
@@ -11941,10 +11961,11 @@ ${text}
                 .concat(mafiaChat.filter(m => m.gid === r.gid && visible(m)))
                 .sort((a, b) => (a.time || 0) - (b.time || 0)).slice(-150);
             const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
+            const cmap = mafiaColorMap(r, items.filter(m => !m.sys).map(m => m.name));
             el.innerHTML = items.length ? items.map(m => {
                 if (m.sys) return `<div class="mc-sys">${escapeHtml(m.text)}</div>`;
                 const tag = m.ch === 'mafia' ? '<span class="mc-tag mafia">마피아</span>' : m.ch === 'dead' ? '<span class="mc-tag dead">사망자</span>' : '';
-                return `<div class="gc-msg ${m.name === me ? 'mine' : ''} ch-${m.ch}">${tag}<span class="gc-name" style="color:${nameColor(m.name)}">${nameWithIcon(m.name)}</span>${escapeHtml(m.text)}</div>`;
+                return `<div class="gc-msg ${m.name === me ? 'mine' : ''} ch-${m.ch}">${tag}<span class="gc-name" style="color:${nameColor(m.name, cmap)}">${nameWithIcon(m.name)}</span>${escapeHtml(m.text)}</div>`;
             }).join('') : '<div class="gc-empty">참가하고 대화를 시작해 보세요!</div>';
             if (atBottom || items.length <= 1) el.scrollTop = el.scrollHeight;
             // 입력창 상태
@@ -12846,10 +12867,11 @@ ${text}
             const me = myGameName();
             const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 30;
             const msgs = gameChats[game] || [];
+            const cmap = nameColorMap(msgs.map(m => m.name));
             el.innerHTML = msgs.length ? msgs.map(m => {
                 const t = new Date(m.time || 0);
                 const hm = `${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`;
-                return `<div class="gc-msg ${m.name === me ? 'mine' : ''}"><span class="gc-name" style="color:${nameColor(m.name)}">${nameWithIcon(m.name)}</span>${escapeHtml(m.text)}<span class="gc-time">${hm}</span></div>`;
+                return `<div class="gc-msg ${m.name === me ? 'mine' : ''}"><span class="gc-name" style="color:${nameColor(m.name, cmap)}">${nameWithIcon(m.name)}</span>${escapeHtml(m.text)}<span class="gc-time">${hm}</span></div>`;
             }).join('') : '<div class="gc-empty">첫 메시지를 남겨보세요!</div>';
             if (atBottom || msgs.length <= 1) el.scrollTop = el.scrollHeight;
         }
