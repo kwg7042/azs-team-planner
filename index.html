@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="app-version" content="2026-10-28">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -3576,6 +3577,10 @@
         .grade-text-bronze { color: #e0a060; } .grade-text-silver { color: #dfe6ee; } .grade-text-gold { color: #ffd700; }
         .grade-text-emerald { color: #2ee59d; } .grade-text-hidden { color: #ff4fd8; }
         .collection-item { position: relative; border-width: 3px; border-style: solid; }
+        .app-update-bar { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 100000; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; padding: 10px 16px; border-radius: 14px; box-shadow: 0 6px 24px rgba(0,0,0,0.45); font-size: 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; max-width: calc(100vw - 32px); }
+        .app-update-bar button { border: none; border-radius: 10px; padding: 6px 12px; font-weight: bold; background: #ffd400; color: #1a1a2e; cursor: pointer; }
+        .app-update-bar small { opacity: 0.8; font-size: 11px; width: 100%; text-align: center; }
+        .collection-summary .app-ver { margin-left: 8px; font-size: 11px; opacity: 0.5; }
         .collection-item .ci-count { position: absolute; top: 2px; right: 3px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: #ff4757; color: #fff; font-size: 12px; font-weight: bold; line-height: 20px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.5); z-index: 2; }
         .collection-item.locked { filter: none; opacity: 0.7; }
         .collection-item.locked .ci-emoji { filter: grayscale(100%) brightness(0.35); }
@@ -9653,7 +9658,7 @@ ${text}
                 const total = GACHA_ITEMS.filter(it => owned.includes(it.emoji)).length;
                 const hiddenItems = GACHA_ITEMS.filter(it => it.rarity === 'hidden');
                 const ownHidden = hiddenItems.filter(it => owned.includes(it.emoji)).length;
-                summary.innerHTML = `전체 수집 <b>${total}/${GACHA_ITEMS.length}</b> · <span class="hidden-count">히든 ${ownHidden}/${hiddenItems.length}</span>`;
+                summary.innerHTML = `전체 수집 <b>${total}/${GACHA_ITEMS.length}</b> · <span class="hidden-count">히든 ${ownHidden}/${hiddenItems.length}</span>${typeof APP_FP !== 'undefined' && APP_FP ? `<span class="app-ver" title="사람마다 이 코드가 같으면 같은 버전이에요">버전 ${APP_FP}</span>` : ''}`;
             }
         }
 
@@ -13498,6 +13503,77 @@ ${text}
 
         // Firebase 없이 열린 경우에도 기본 학습 자료는 표시
         setTimeout(() => { if (!db) { loadStudyData(); loadTechReviewsLocal(); try { userIcons = JSON.parse(localStorage.getItem('planner_userIcons') || '{}'); } catch (e) {} refreshIconViews(); } }, 1500);
+
+        // =====================================================
+        // 🔄 새 버전 자동 반영
+        //  탭을 오래 켜두면 예전 코드가 계속 돌아서 사람마다 화면이 달라짐 →
+        //  3분마다 사이트의 최신 코드와 비교해서, 바뀌었으면 새로고침 (보던 탭은 그대로)
+        // =====================================================
+        let APP_FP = '', appUpdateReady = false, appLastActive = Date.now();
+        // 앱 코드 지문: 페이지 안 스크립트 전체 + app-version 메타 (CSS만 바꿀 땐 메타 값을 올리면 됨)
+        function appFingerprint(doc) {
+            let h = 0;
+            const add = (t) => { for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0; };
+            const meta = doc.querySelector('meta[name="app-version"]');
+            add(meta ? meta.content : '');
+            doc.querySelectorAll('script:not([src])').forEach(el => add(el.textContent));
+            return (h >>> 0).toString(36);
+        }
+        async function checkAppUpdate() {
+            if (appUpdateReady || location.protocol === 'file:') return;
+            try {
+                const res = await fetch(location.pathname + '?v=' + Date.now(), { cache: 'no-store' });
+                if (!res.ok) return;
+                const latest = appFingerprint(new DOMParser().parseFromString(await res.text(), 'text/html'));
+                if (APP_FP && latest !== APP_FP) { appUpdateReady = true; showAppUpdate(); }
+            } catch (e) { /* 오프라인 등은 다음 확인 때 다시 */ }
+        }
+        function reloadToLatest() {
+            // 보고 있던 탭 기억 → 새로고침 후 복원
+            const tab = document.querySelector('.tab-btn.active');
+            const mg = document.querySelector('.minigame-panel.active');
+            try { sessionStorage.setItem('azs_restore_view', JSON.stringify({ tab: tab && tab.dataset.tab, mg: mg && mg.id.replace('panel-', '') })); } catch (e) {}
+            location.replace(location.pathname + '?r=' + Date.now() + location.hash);
+        }
+        function showAppUpdate() {
+            if (document.hidden) { reloadToLatest(); return; }
+            if (document.getElementById('appUpdateBar')) return;
+            const bar = document.createElement('div');
+            bar.id = 'appUpdateBar'; bar.className = 'app-update-bar';
+            bar.innerHTML = '🔄 새 버전이 나왔어요! <button onclick="reloadToLatest()">지금 새로고침</button><small>다른 탭에 갔다 오거나 2분간 조작이 없으면 자동으로 바뀌어요</small>';
+            document.body.appendChild(bar);
+        }
+        function initAppUpdateCheck() {
+            APP_FP = appFingerprint(document);
+            if (/^\?r=\d+$/.test(location.search)) history.replaceState(null, '', location.pathname + location.hash);
+            // 새로고침 전에 보던 탭으로 돌아가기
+            try {
+                const v = JSON.parse(sessionStorage.getItem('azs_restore_view') || 'null');
+                sessionStorage.removeItem('azs_restore_view');
+                if (v) setTimeout(() => {
+                    const t = v.tab && document.querySelector(`.tab-btn[data-tab="${v.tab}"]`);
+                    if (t) t.click();
+                    const m = v.mg && document.querySelector(`.minigame-tab[onclick="switchMinigame('${v.mg}')"]`);
+                    if (m && v.tab === 'minigame') m.click();
+                }, 600);
+            } catch (e) {}
+            ['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, () => { appLastActive = Date.now(); }, true));
+            setTimeout(checkAppUpdate, 5000);
+            setInterval(() => {
+                if (document.hidden) return;
+                if (!appUpdateReady) { checkAppUpdate(); return; }
+                // 2분간 조작이 없고 입력 중이 아니면 자동 새로고침
+                const a = document.activeElement, typing = a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.isContentEditable) && a.value;
+                if (Date.now() - appLastActive > 120000 && !typing) reloadToLatest();
+            }, 3 * 60 * 1000);
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) return;
+                if (appUpdateReady) reloadToLatest(); else checkAppUpdate();
+            });
+            const sum = document.getElementById('collectionSummary');
+            if (sum && typeof renderCollection === 'function') renderCollection();
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAppUpdateCheck); else initAppUpdateCheck();
     </script>
 
     <!-- 카톡 이슈 데이터: 평문(로컬 전용·gitignore) / 암호문(배포용·AES-GCM) -->
