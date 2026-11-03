@@ -9485,7 +9485,7 @@ ${text}
         //  글꼴 이모지는 기기마다 작고 납작하게 보여서 그림으로 통일. 못 불러오면 글자 이모지로 대체
         const emojiCode = (e) => [...String(e)].map(c => c.codePointAt(0)).filter(c => c !== 0xfe0f).map(c => c.toString(16)).join('-');
         let EMOJI_3D = null;
-        const EMOJI_3D_VER = 3; // 그림을 바꾸면 올려서 브라우저에 남은 예전 그림 대신 새 그림을 받게 함 (3: 주작·현무 다시 그림)
+        const EMOJI_3D_VER = 4; // 그림을 바꾸면 올려서 브라우저에 남은 예전 그림 대신 새 그림을 받게 함 (4: 사신수 사용자 제공 그림)
         function emojiArt(e, cls = '') {
             if (!e) return '';
             if (!EMOJI_3D) EMOJI_3D = new Set(GACHA_ITEMS.map(it => emojiCode(it.emoji)));
