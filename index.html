@@ -8345,7 +8345,8 @@ ${text}
 
         // ===== 컬렉션 아이콘 (이름 옆 표시) =====
         function iconOf(name) {
-            const e = name ? userIcons[name] : '';
+            let e = name ? userIcons[name] : '';
+            if (e && !GACHA_ITEMS.some(it => it.emoji === e) && COLLECTION_V2_MAP[e]) e = COLLECTION_V2_MAP[e]; // 개편 전 아이콘
             return GACHA_ITEMS.some(it => it.emoji === e) ? e : '';
         }
         // 랭킹 등록 조건: 컬렉션 아이콘을 이름 옆에 지정한 사람만
@@ -8397,7 +8398,7 @@ ${text}
         function setupUserIconListener() {
             if (!db) return;
             db.ref('userIcons').off();
-            db.ref('userIcons').on('value', snap => { userIcons = snap.val() || {}; refreshIconViews(); });
+            db.ref('userIcons').on('value', snap => { userIcons = snap.val() || {}; migrateMyIconV2(); refreshIconViews(); });
         }
         function selectMyIcon(emoji) {
             const me = localStorage.getItem('chat_nickname') || '';
@@ -9390,58 +9391,103 @@ ${text}
             gachaHistory: []
         };
 
-        // 뽑기 아이템 목록
-        // 등급(테두리): 브론즈 20 · 실버 10 · 골드 5 · 에메랄드 3 · 히든 3
-        // 확률: 브론즈 60% · 실버 20% · 골드 10% · 에메랄드 6.5% · 히든 3.5% (합계 100)
-        // 구버전 Windows에서도 보이도록 2018년 이전 이모지만 사용
+        // 뽑기 아이템 목록 (2026-11 개편)
+        // 등급(테두리): 브론즈 20 · 실버 10 · 골드 6 · 에메랄드 4 · 히든 4
+        // 확률(등급 합계): 브론즈 60% · 실버 20% · 골드 10% · 에메랄드 6.5% · 히든 3.5%
+        // 구버전 Windows에서도 보이도록 2018년 이전 이모지만 사용 (맘모스 🦣·불새는 2020년 이후라 제외)
         const GACHA_ITEMS = [
-            // 브론즈 (각 3%)
-            { emoji: '🐻', name: '곰돌이', rarity: 'bronze', rate: 3 },
-            { emoji: '🐰', name: '토끼', rarity: 'bronze', rate: 3 },
-            { emoji: '🐱', name: '고양이', rarity: 'bronze', rate: 3 },
+            // 브론즈: 엄청 흔한 동물 (각 3%)
+            { emoji: '🐿️', name: '다람쥐', rarity: 'bronze', rate: 3 },
             { emoji: '🐶', name: '강아지', rarity: 'bronze', rate: 3 },
+            { emoji: '🐱', name: '고양이', rarity: 'bronze', rate: 3 },
             { emoji: '🐭', name: '생쥐', rarity: 'bronze', rate: 3 },
             { emoji: '🐹', name: '햄스터', rarity: 'bronze', rate: 3 },
+            { emoji: '🐰', name: '토끼', rarity: 'bronze', rate: 3 },
             { emoji: '🐷', name: '돼지', rarity: 'bronze', rate: 3 },
-            { emoji: '🐸', name: '개구리', rarity: 'bronze', rate: 3 },
-            { emoji: '🐵', name: '원숭이', rarity: 'bronze', rate: 3 },
             { emoji: '🐔', name: '닭', rarity: 'bronze', rate: 3 },
-            { emoji: '🐧', name: '펭귄', rarity: 'bronze', rate: 3 },
             { emoji: '🐤', name: '병아리', rarity: 'bronze', rate: 3 },
-            { emoji: '🐮', name: '젖소', rarity: 'bronze', rate: 3 },
-            { emoji: '🐨', name: '코알라', rarity: 'bronze', rate: 3 },
-            { emoji: '🐺', name: '늑대', rarity: 'bronze', rate: 3 },
-            { emoji: '🐗', name: '멧돼지', rarity: 'bronze', rate: 3 },
-            { emoji: '🐴', name: '말', rarity: 'bronze', rate: 3 },
+            { emoji: '🐸', name: '개구리', rarity: 'bronze', rate: 3 },
+            { emoji: '🦆', name: '오리', rarity: 'bronze', rate: 3 },
+            { emoji: '🐦', name: '참새', rarity: 'bronze', rate: 3 },
+            { emoji: '🐟', name: '붕어', rarity: 'bronze', rate: 3 },
             { emoji: '🐌', name: '달팽이', rarity: 'bronze', rate: 3 },
             { emoji: '🐞', name: '무당벌레', rarity: 'bronze', rate: 3 },
-            { emoji: '🐢', name: '거북이', rarity: 'bronze', rate: 3 },
-            // 실버 (각 2%)
-            { emoji: '🦊', name: '여우', rarity: 'silver', rate: 2 },
-            { emoji: '🐼', name: '판다', rarity: 'silver', rate: 2 },
+            { emoji: '🐝', name: '꿀벌', rarity: 'bronze', rate: 3 },
+            { emoji: '🐮', name: '젖소', rarity: 'bronze', rate: 3 },
+            { emoji: '🐑', name: '양', rarity: 'bronze', rate: 3 },
+            { emoji: '🐜', name: '개미', rarity: 'bronze', rate: 3 },
+            { emoji: '🦋', name: '나비', rarity: 'bronze', rate: 3 },
+            // 실버: 동물원의 큰 동물 (각 2%)
             { emoji: '🦁', name: '사자', rarity: 'silver', rate: 2 },
             { emoji: '🐯', name: '호랑이', rarity: 'silver', rate: 2 },
-            { emoji: '🐬', name: '돌고래', rarity: 'silver', rate: 2 },
-            { emoji: '🐳', name: '고래', rarity: 'silver', rate: 2 },
-            { emoji: '🦉', name: '부엉이', rarity: 'silver', rate: 2 },
-            { emoji: '🦅', name: '독수리', rarity: 'silver', rate: 2 },
-            { emoji: '🐙', name: '문어', rarity: 'silver', rate: 2 },
+            { emoji: '🐘', name: '코끼리', rarity: 'silver', rate: 2 },
+            { emoji: '🦍', name: '고릴라', rarity: 'silver', rate: 2 },
+            { emoji: '🐻', name: '불곰', rarity: 'silver', rate: 2 },
+            { emoji: '🐺', name: '늑대', rarity: 'silver', rate: 2 },
+            { emoji: '🦏', name: '코뿔소', rarity: 'silver', rate: 2 },
             { emoji: '🐊', name: '악어', rarity: 'silver', rate: 2 },
-            // 골드 (각 2%)
-            { emoji: '🦄', name: '유니콘', rarity: 'gold', rate: 2 },
-            { emoji: '🐉', name: '용', rarity: 'gold', rate: 2 },
-            { emoji: '🦋', name: '나비', rarity: 'gold', rate: 2 },
-            { emoji: '🐲', name: '청룡', rarity: 'gold', rate: 2 },
-            { emoji: '🦈', name: '상어', rarity: 'gold', rate: 2 },
-            // 에메랄드 (3개 합계 6.5%, 각 약 2.17%)
-            { emoji: '🌟', name: '황금별', rarity: 'emerald', rate: 6.5 / 3 },
-            { emoji: '👑', name: '왕관', rarity: 'emerald', rate: 6.5 / 3 },
-            { emoji: '💎', name: '다이아몬드', rarity: 'emerald', rate: 6.5 / 3 },
-            // 히든 (3개 합계 3.5%, 각 약 1.17%) — 뽑기 전까지 컬렉션에 ❓로 표시
-            { emoji: '🦖', name: '폭군 티라노', rarity: 'hidden', rate: 3.5 / 3 },
-            { emoji: '👽', name: '은하의 지배자', rarity: 'hidden', rate: 3.5 / 3 },
-            { emoji: '🧞', name: '램프의 마신', rarity: 'hidden', rate: 3.5 / 3 }
+            { emoji: '🐼', name: '판다', rarity: 'silver', rate: 2 },
+            { emoji: '🐃', name: '들소', rarity: 'silver', rate: 2 },
+            // 골드: 흔하지 않은 센 녀석들 (6개 합계 10%)
+            { emoji: '🦄', name: '유니콘', rarity: 'gold', rate: 10 / 6 },
+            { emoji: '🦈', name: '메가로돈', rarity: 'gold', rate: 10 / 6 },
+            { emoji: '🦖', name: '티라노사우루스', rarity: 'gold', rate: 10 / 6 },
+            { emoji: '🦕', name: '브라키오사우루스', rarity: 'gold', rate: 10 / 6 },
+            { emoji: '🦑', name: '크라켄', rarity: 'gold', rate: 10 / 6 },
+            { emoji: '🐳', name: '대왕고래', rarity: 'gold', rate: 10 / 6 },
+            // 에메랄드: 사신수 (4개 합계 6.5%)
+            { emoji: '🐉', name: '청룡', rarity: 'emerald', rate: 6.5 / 4 },
+            { emoji: '🐅', name: '백호', rarity: 'emerald', rate: 6.5 / 4 },
+            { emoji: '🦅', name: '주작', rarity: 'emerald', rate: 6.5 / 4 },
+            { emoji: '🐢', name: '현무', rarity: 'emerald', rate: 6.5 / 4 },
+            // 히든 (4개 합계 3.5%) — 뽑기 전까지 컬렉션에 ❓로 표시
+            { emoji: '🐙', name: '심해의 크툴루', rarity: 'hidden', rate: 3.5 / 4 },
+            { emoji: '🤖', name: '최종병기 메카', rarity: 'hidden', rate: 3.5 / 4 },
+            { emoji: '🧛', name: '밤의 군주', rarity: 'hidden', rate: 3.5 / 4 },
+            { emoji: '🧙', name: '대마법사', rarity: 'hidden', rate: 3.5 / 4 }
         ];
+        // 개편 전 인형 → 같은 등급의 새 인형 (가진 인형·개수·이름 옆 아이콘을 1:1로 옮김)
+        const COLLECTION_V2_MAP = {
+            '🐻': '🐿️', '🐵': '🦆', '🐧': '🐦', '🐨': '🐟', '🐺': '🐝', '🐗': '🐑', '🐴': '🐜', '🐢': '🦋',   // 브론즈
+            '🦊': '🐘', '🐬': '🦍', '🐳': '🐻', '🦉': '🐺', '🦅': '🦏', '🐙': '🐃',                            // 실버
+            '🐉': '🦖', '🦋': '🦕', '🐲': '🦑',                                                                // 골드
+            '🌟': '🐉', '👑': '🐅', '💎': '🦅',                                                                // 에메랄드
+            '🦖': '🐙', '👽': '🤖', '🧞': '🧛'                                                                 // 히든
+        };
+        // 내 컬렉션을 새 목록으로 한 번만 변환 (바뀌었으면 true)
+        function migrateCollectionV2(data) {
+            if (!data || data.collectionVer >= 2) return false;
+            const map = (e) => COLLECTION_V2_MAP[e] || e; // 같은 등급 그대로인 인형은 그대로
+            const valid = new Set(GACHA_ITEMS.map(it => it.emoji));
+            const oldCount = data.collectionCount || {};
+            const col = [], cnt = {};
+            (data.collection || []).forEach(e => {
+                const n = map(e);
+                if (!valid.has(n)) return;
+                if (!col.includes(n)) col.push(n);
+                cnt[n] = (cnt[n] || 0) + (oldCount[e] || 1);
+            });
+            data.collection = col;
+            data.collectionCount = cnt;
+            data.collectionVer = 2;
+            data.iconMigrateFrom = true; // 이름 옆 아이콘도 한 번 변환해야 함
+            return true;
+        }
+        // 이름 옆 아이콘이 개편 전 인형이면 새 인형으로 바꿔 저장 (내 것만)
+        function migrateMyIconV2() {
+            const me = localStorage.getItem('chat_nickname') || '';
+            const cur = me && userIcons[me];
+            if (!cur || !gameData || gameData.collectionVer !== 2 || !gameData.iconMigrateFrom) return;
+            if ((gameData.collection || []).includes(cur) && !COLLECTION_V2_MAP[cur]) { delete gameData.iconMigrateFrom; saveGameData(); return; }
+            const next = COLLECTION_V2_MAP[cur];
+            if (next && (gameData.collection || []).includes(next)) {
+                userIcons[me] = next;
+                if (db) db.ref(`userIcons/${me}`).set(next);
+            }
+            delete gameData.iconMigrateFrom;
+            saveGameData();
+            if (typeof refreshIconViews === 'function') refreshIconViews();
+        }
 
         const RARITY_ORDER = ['bronze', 'silver', 'gold', 'emerald', 'hidden'];
         const RARITY_LABEL = { bronze: '브론즈', silver: '실버', gold: '골드', emerald: '에메랄드', hidden: '히든' };
@@ -9473,6 +9519,7 @@ ${text}
                     const data = snapshot.val();
                     if (data) {
                         gameData = data;
+                        if (migrateCollectionV2(gameData)) { saveGameData(); migrateMyIconV2(); }
                     }
                     updateMinigameUI();
                 });
