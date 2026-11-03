@@ -3702,6 +3702,56 @@
         .runner-pad-btn { flex: 1; padding: 14px 0; border-radius: 14px; border: none; font-size: 17px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #ffd400, #ff9800); color: #3b2412; touch-action: none; user-select: none; -webkit-user-select: none; }
         .runner-pad-btn.slide { background: linear-gradient(135deg, #4fc3f7, #1e88e5); color: #fff; }
         .runner-pad-btn:active { transform: scale(0.97); filter: brightness(0.9); }
+        /* ===== 운세 ===== */
+        .fortune-area { max-width: 760px; margin: 0 auto 20px; padding: 18px; border-radius: 20px; background: linear-gradient(160deg, #2b1055, #1a1446 55%, #0f1c3f); border: 2px solid rgba(200,160,255,0.35); }
+        .fortune-top { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; margin-bottom: 12px; }
+        .fortune-birth { font-size: 14px; display: flex; align-items: center; gap: 6px; }
+        .fortune-birth input { padding: 7px 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.1); color: #fff; font-size: 14px; color-scheme: dark; }
+        .fortune-profile { font-size: 14px; color: #e0c3ff; font-weight: bold; }
+        .fortune-go { padding: 8px 18px; border-radius: 18px; border: none; background: linear-gradient(135deg, #ffd400, #ff8c00); color: #1a1a2e; font-weight: bold; font-size: 14px; cursor: pointer; }
+        .fortune-tabs { display: flex; justify-content: center; gap: 6px; margin-bottom: 14px; }
+        .fortune-tabs button { padding: 7px 18px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; font-size: 13px; }
+        .fortune-tabs button.active { background: linear-gradient(135deg, #b06ab3, #4568dc); border-color: transparent; font-weight: bold; }
+        .fortune-empty { text-align: center; padding: 30px 10px; color: rgba(255,255,255,0.8); line-height: 1.8; }
+        .fortune-card { background: rgba(0,0,0,0.25); border-radius: 16px; padding: 16px; }
+        .fortune-card .fc-head { text-align: center; margin-bottom: 10px; }
+        .fortune-card .fc-date { font-size: 13px; color: rgba(255,255,255,0.75); }
+        .fortune-card .fc-score b { font-size: 44px; color: #ffd700; text-shadow: 0 0 18px rgba(255,215,0,0.45); }
+        .fortune-card .fc-stars { color: #ffd700; letter-spacing: 3px; font-size: 18px; }
+        .fortune-card .fc-summary { text-align: center; font-size: 15px; line-height: 1.6; margin: 6px 0 14px; padding: 10px; background: rgba(255,255,255,0.06); border-radius: 12px; }
+        .fortune-card .fc-cats { display: grid; gap: 10px; margin-bottom: 14px; }
+        .fortune-card .fc-cat-head { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+        .fortune-card .fc-cat-head span { width: 120px; flex-shrink: 0; }
+        .fortune-card .fc-cat-head b { width: 28px; text-align: right; }
+        .fortune-card .fc-bar { flex: 1; height: 10px; border-radius: 5px; background: rgba(255,255,255,0.1); overflow: hidden; }
+        .fortune-card .fc-bar i { display: block; height: 100%; border-radius: 5px; }
+        .fortune-card .fc-cat p { margin: 4px 0 0 130px; font-size: 13px; color: rgba(255,255,255,0.8); }
+        .fortune-card .fc-lucky { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+        .fortune-card .fc-lucky div { background: rgba(255,255,255,0.07); border-radius: 10px; padding: 8px; text-align: center; }
+        .fortune-card .fc-lucky small { display: block; font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 2px; }
+        .fortune-card .fc-lucky b { font-size: 14px; }
+        .fortune-card .fc-swatch { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; border: 1px solid rgba(255,255,255,0.5); }
+        .fortune-card .fc-advice { background: rgba(255,215,0,0.1); color: #ffe27a; border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+        .fortune-card .fw-keyword { text-align: center; margin-bottom: 10px; font-size: 14px; }
+        .fortune-card .fw-keyword b { color: #e0c3ff; font-size: 17px; }
+        .fortune-card .fw-chart { display: flex; gap: 8px; align-items: flex-end; height: 150px; padding: 0 4px; margin-bottom: 10px; }
+        .fortune-card .fw-day { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; }
+        .fortune-card .fw-col { flex: 1; width: 100%; max-width: 44px; display: flex; align-items: flex-end; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden; }
+        .fortune-card .fw-col i { display: block; width: 100%; border-radius: 8px 8px 0 0; }
+        .fortune-card .fw-val { font-size: 12px; margin-bottom: 3px; }
+        .fortune-card .fw-label { font-size: 13px; margin-top: 4px; }
+        .fortune-card .fw-day.today .fw-label { color: #ffd700; font-weight: bold; }
+        .fortune-card .fw-day.today .fw-col { box-shadow: 0 0 0 2px #ffd700; }
+        .fortune-card .fw-day.best .fw-val::before { content: '👍'; }
+        .fortune-card .fw-day.worst .fw-val::before { content: '⚠️'; }
+        .fortune-card .fw-best { text-align: center; font-size: 13px; margin-bottom: 10px; }
+        .fortune-note { text-align: center; font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 10px; }
+        @media (max-width: 520px) {
+            .fortune-card .fc-lucky { grid-template-columns: repeat(2, 1fr); }
+            .fortune-card .fc-cat-head span { width: 96px; font-size: 13px; }
+            .fortune-card .fc-cat p { margin-left: 0; }
+            .fortune-card .fw-chart { gap: 4px; }
+        }
         /* ===== 마피아 ===== */
         .mafia-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
         @media (max-width: 900px) { .mafia-layout { grid-template-columns: 1fr; } }
@@ -4525,6 +4575,7 @@
                     <button class="minigame-tab" onclick="switchMinigame('dodge')">✈️ 닷지</button>
                     <button class="minigame-tab" onclick="switchMinigame('runner')">🍪 쿠키 러너</button>
                     <button class="minigame-tab" id="mafiaTabBtn" onclick="switchMinigame('mafia')">🕵️ 마피아</button>
+                    <button class="minigame-tab" onclick="switchMinigame('fortune')">🔮 운세</button>
                 </div>
 
                 <!-- 인형뽑기 -->
@@ -4539,11 +4590,11 @@
                             <span>뽑기! (1<span class="coin-ico"></span>)</span>
                         </button>
                         <div class="gacha-rates">
-                            <span class="grade-text-bronze">🥉 브론즈 60%</span> ·
+                            <span class="grade-text-bronze">🥉 브론즈 57.3%</span> ·
                             <span class="grade-text-silver">🥈 실버 25%</span> ·
                             <span class="grade-text-gold">🥇 골드 12%</span> ·
                             <span class="grade-text-emerald">💚 에메랄드 2.7%</span> ·
-                            <span class="grade-text-hidden">❓ 히든 0.3%</span>
+                            <span class="grade-text-hidden">❓ 히든 3%</span>
                         </div>
                     </div>
                     <div class="gacha-history">
@@ -4724,6 +4775,24 @@
                     <div class="leaderboard dodge-ranking">
                         <h4>🏆 닷지 랭킹 (오래 버틴 시간)</h4>
                         <div id="dodgeRanking" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                    </div>
+                </div>
+
+                <!-- 운세 패널 -->
+                <div class="minigame-panel" id="panel-fortune">
+                    <div class="fortune-area">
+                        <div class="fortune-top">
+                            <label class="fortune-birth">🎂 생년월일 <input type="date" id="fortuneBirth" min="1900-01-01"></label>
+                            <button class="fortune-go" onclick="saveFortuneBirth()">🔮 운세 보기</button>
+                            <span class="fortune-profile" id="fortuneProfile"></span>
+                        </div>
+                        <div class="fortune-tabs">
+                            <button data-view="today" class="active" onclick="setFortuneView('today')">오늘</button>
+                            <button data-view="tomorrow" onclick="setFortuneView('tomorrow')">내일</button>
+                            <button data-view="week" onclick="setFortuneView('week')">이번 주</button>
+                        </div>
+                        <div id="fortuneBody"></div>
+                        <div class="fortune-note">🔮 재미로 보는 운세예요. 생년월일은 이 기기에만 저장되고 서버에는 올라가지 않아요. (띠는 양력 연도 기준)</div>
                     </div>
                 </div>
 
@@ -9323,30 +9392,30 @@ ${text}
 
         // 뽑기 아이템 목록
         // 등급(테두리): 브론즈 20 · 실버 10 · 골드 5 · 에메랄드 3 · 히든 3
-        // 확률: 브론즈 60% · 실버 25% · 골드 12% · 에메랄드 2.7% · 히든 0.3%
+        // 확률: 브론즈 57.3% · 실버 25% · 골드 12% · 에메랄드 2.7% · 히든 3%
         // 구버전 Windows에서도 보이도록 2018년 이전 이모지만 사용
         const GACHA_ITEMS = [
-            // 브론즈 (각 3%)
-            { emoji: '🐻', name: '곰돌이', rarity: 'bronze', rate: 3 },
-            { emoji: '🐰', name: '토끼', rarity: 'bronze', rate: 3 },
-            { emoji: '🐱', name: '고양이', rarity: 'bronze', rate: 3 },
-            { emoji: '🐶', name: '강아지', rarity: 'bronze', rate: 3 },
-            { emoji: '🐭', name: '생쥐', rarity: 'bronze', rate: 3 },
-            { emoji: '🐹', name: '햄스터', rarity: 'bronze', rate: 3 },
-            { emoji: '🐷', name: '돼지', rarity: 'bronze', rate: 3 },
-            { emoji: '🐸', name: '개구리', rarity: 'bronze', rate: 3 },
-            { emoji: '🐵', name: '원숭이', rarity: 'bronze', rate: 3 },
-            { emoji: '🐔', name: '닭', rarity: 'bronze', rate: 3 },
-            { emoji: '🐧', name: '펭귄', rarity: 'bronze', rate: 3 },
-            { emoji: '🐤', name: '병아리', rarity: 'bronze', rate: 3 },
-            { emoji: '🐮', name: '젖소', rarity: 'bronze', rate: 3 },
-            { emoji: '🐨', name: '코알라', rarity: 'bronze', rate: 3 },
-            { emoji: '🐺', name: '늑대', rarity: 'bronze', rate: 3 },
-            { emoji: '🐗', name: '멧돼지', rarity: 'bronze', rate: 3 },
-            { emoji: '🐴', name: '말', rarity: 'bronze', rate: 3 },
-            { emoji: '🐌', name: '달팽이', rarity: 'bronze', rate: 3 },
-            { emoji: '🐞', name: '무당벌레', rarity: 'bronze', rate: 3 },
-            { emoji: '🐢', name: '거북이', rarity: 'bronze', rate: 3 },
+            // 브론즈 (각 2.865%)
+            { emoji: '🐻', name: '곰돌이', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐰', name: '토끼', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐱', name: '고양이', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐶', name: '강아지', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐭', name: '생쥐', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐹', name: '햄스터', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐷', name: '돼지', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐸', name: '개구리', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐵', name: '원숭이', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐔', name: '닭', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐧', name: '펭귄', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐤', name: '병아리', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐮', name: '젖소', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐨', name: '코알라', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐺', name: '늑대', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐗', name: '멧돼지', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐴', name: '말', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐌', name: '달팽이', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐞', name: '무당벌레', rarity: 'bronze', rate: 2.865 },
+            { emoji: '🐢', name: '거북이', rarity: 'bronze', rate: 2.865 },
             // 실버 (각 2.5%)
             { emoji: '🦊', name: '여우', rarity: 'silver', rate: 2.5 },
             { emoji: '🐼', name: '판다', rarity: 'silver', rate: 2.5 },
@@ -9368,10 +9437,10 @@ ${text}
             { emoji: '🌟', name: '황금별', rarity: 'emerald', rate: 0.9 },
             { emoji: '👑', name: '왕관', rarity: 'emerald', rate: 0.9 },
             { emoji: '💎', name: '다이아몬드', rarity: 'emerald', rate: 0.9 },
-            // 히든 (각 0.1%) — 뽑기 전까지 컬렉션에 ❓로 표시
-            { emoji: '🦖', name: '폭군 티라노', rarity: 'hidden', rate: 0.1 },
-            { emoji: '👽', name: '은하의 지배자', rarity: 'hidden', rate: 0.1 },
-            { emoji: '🧞', name: '램프의 마신', rarity: 'hidden', rate: 0.1 }
+            // 히든 (각 1%) — 뽑기 전까지 컬렉션에 ❓로 표시
+            { emoji: '🦖', name: '폭군 티라노', rarity: 'hidden', rate: 1 },
+            { emoji: '👽', name: '은하의 지배자', rarity: 'hidden', rate: 1 },
+            { emoji: '🧞', name: '램프의 마신', rarity: 'hidden', rate: 1 }
         ];
 
         const RARITY_ORDER = ['bronze', 'silver', 'gold', 'emerald', 'hidden'];
@@ -9501,6 +9570,8 @@ ${text}
                 renderRunnerRanking();
             } else if (panel === 'mafia') {
                 renderMafia();
+            } else if (panel === 'fortune') {
+                renderFortune();
             }
         }
 
@@ -9672,7 +9743,7 @@ ${text}
                     <div class="hr-title">HIDDEN</div>
                     <div class="hr-emoji">${item.emoji}</div>
                     <div class="hr-name">${escapeHtml(item.name)}</div>
-                    <div class="hr-sub">히든 캐릭터 획득! (0.1%)</div>
+                    <div class="hr-sub">히든 캐릭터 획득! (1%)</div>
                 </div>`;
             ov.onclick = () => ov.remove();
             document.body.appendChild(ov);
@@ -11383,6 +11454,193 @@ ${text}
             drawRunner();
         }
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initRunner); else initRunner();
+
+        // =====================================================
+        // 🔮 운세 (재미로 보는 오늘·내일·이번 주 운세)
+        //  생년월일 + 날짜로 정해지는 값이라 같은 날엔 언제 다시 봐도 같은 결과
+        //  생년월일은 이 브라우저(localStorage)에만 저장하고 서버에는 올리지 않음
+        // =====================================================
+        const FORTUNE_ZODIAC = [['원숭이', '🐵'], ['닭', '🐔'], ['개', '🐶'], ['돼지', '🐷'], ['쥐', '🐭'], ['소', '🐮'], ['호랑이', '🐯'], ['토끼', '🐰'], ['용', '🐲'], ['뱀', '🐍'], ['말', '🐴'], ['양', '🐑']]; // 연도 % 12
+        // [이름, 기호, 시작 월, 시작 일] — 시작일 이전이면 앞 별자리
+        const FORTUNE_STARS = [['염소자리', '♑', 1, 1], ['물병자리', '♒', 1, 20], ['물고기자리', '♓', 2, 19], ['양자리', '♈', 3, 21], ['황소자리', '♉', 4, 20], ['쌍둥이자리', '♊', 5, 21], ['게자리', '♋', 6, 22], ['사자자리', '♌', 7, 23], ['처녀자리', '♍', 8, 23], ['천칭자리', '♎', 9, 23], ['전갈자리', '♏', 10, 23], ['사수자리', '♐', 11, 23], ['염소자리', '♑', 12, 22]];
+        const FORTUNE_CATS = [
+            { key: 'money', label: '💰 금전운' },
+            { key: 'work', label: '💼 업무운' },
+            { key: 'love', label: '💕 애정·인간관계' },
+            { key: 'health', label: '💪 건강운' }
+        ];
+        // 등급별 문구: [좋음(75+), 보통(50~74), 주의(~49)]
+        const FORTUNE_TEXT = {
+            total: [
+                ['하는 일마다 술술 풀리는 날이에요. 미뤄둔 일을 시작하기 딱 좋아요.', '주변의 도움이 자연스럽게 모이는 날. 먼저 말을 걸어보세요.', '작은 행운이 연달아 찾아와요. 자신감을 가지고 밀어붙이세요!', '오래 고민하던 문제의 실마리가 보이는 날이에요.'],
+                ['무난하고 평온한 하루. 기본에 충실하면 좋은 결과가 따라와요.', '큰 변화보다는 차근차근 정리하는 게 어울리는 날이에요.', '오전엔 조금 답답해도 오후로 갈수록 나아져요.', '익숙한 방식이 가장 좋은 답이 되는 날이에요.'],
+                ['서두르면 실수가 생기기 쉬워요. 한 번 더 확인하는 습관이 행운을 지켜줘요.', '오늘은 무리하지 말고 컨디션 관리에 집중하세요.', '예상 밖의 일이 생겨도 당황하지 마세요. 침착하면 금방 지나가요.', '말 한마디가 오해를 부를 수 있어요. 부드럽게 표현해 보세요.']
+            ],
+            money: [
+                ['뜻밖의 수입이나 득템 운이 있어요.', '아껴둔 정보가 돈이 되는 날이에요.', '좋은 조건의 기회를 잡을 수 있어요.'],
+                ['큰 지출 없이 무난해요. 계획대로만 쓰면 OK.', '작은 절약이 쌓여 뿌듯해지는 날이에요.', '충동구매만 조심하면 괜찮아요.'],
+                ['충동구매 주의! 장바구니는 내일 다시 보세요.', '빌려주거나 빌리는 돈은 오늘은 피하세요.', '예상 못한 지출이 생길 수 있어요. 여유 자금을 챙겨두세요.']
+            ],
+            work: [
+                ['집중력이 최고조! 어려운 분석도 막힘없이 풀려요.', '아이디어가 인정받기 좋은 날이에요. 회의에서 적극적으로 의견을 내보세요.', '미뤄둔 보고서를 끝내면 좋은 평가가 따라와요.'],
+                ['루틴 업무를 꼼꼼히 처리하면 충분한 날이에요.', '협업이 잘 맞는 날. 혼자보다 같이 하면 빨라요.', '큰 성과보단 착실한 진척이 있는 하루예요.'],
+                ['숫자·데이터 확인을 두 번씩 하세요. 작은 실수가 생기기 쉬워요.', '일정이 꼬일 수 있어요. 우선순위를 먼저 정리하세요.', '오늘은 새 일을 벌이기보다 마무리에 집중하세요.']
+            ],
+            love: [
+                ['주변 사람들과 웃을 일이 많은 날이에요.', '평소 고마웠던 사람에게 마음을 전하기 좋은 날이에요.', '새로운 인연이나 반가운 연락이 올 수 있어요.'],
+                ['편안하고 무난한 관계 운이에요.', '가벼운 커피 한 잔이 분위기를 좋게 만들어요.', '먼저 안부를 물으면 좋은 반응이 돌아와요.'],
+                ['사소한 말에 서운해질 수 있어요. 한 박자 쉬고 대답하세요.', '오늘은 듣는 쪽이 되어 주면 관계가 좋아져요.', '의견 충돌이 생기면 결론을 내일로 미루세요.']
+            ],
+            health: [
+                ['몸이 가볍고 활력이 넘쳐요. 운동하기 좋은 날!', '컨디션 최고! 계단 오르기도 거뜬해요.', '잘 먹고 잘 자서 에너지가 충전된 상태예요.'],
+                ['무난한 컨디션. 물을 자주 마셔 주세요.', '오후에 살짝 피곤할 수 있어요. 스트레칭 한 번!', '가벼운 산책이 컨디션을 올려줘요.'],
+                ['피로가 쌓였어요. 오늘은 일찍 쉬는 게 좋아요.', '눈과 어깨가 뻐근할 수 있어요. 틈틈이 쉬어 주세요.', '과식·과음은 피하고 따뜻한 음식을 드세요.']
+            ]
+        };
+        const FORTUNE_ADVICE = ['오늘의 행운은 "확인 한 번 더"에서 시작돼요.', '먼저 웃으며 인사하면 하루가 부드러워져요.', '점심 후 5분 산책이 오후를 살려줘요.', '메모하는 습관이 큰 실수를 막아줘요.', '어려운 일은 오전에 먼저 끝내세요.', '오늘 받은 도움은 꼭 고맙다고 말해 보세요.', '책상 정리가 머릿속 정리로 이어져요.', '완벽보다 완료! 일단 끝내는 게 이기는 날이에요.', '물 한 잔, 심호흡 한 번이 행운을 불러요.', '궁금한 건 바로 물어보세요. 답이 빨리 와요.', '오늘은 칭찬 한마디가 큰 힘이 돼요.', '일정표를 한 번 훑어보면 놓친 일이 보여요.'];
+        const FORTUNE_COLORS = [['빨강', '#ff4d4d'], ['주황', '#ff9f1a'], ['노랑', '#ffd400'], ['초록', '#2ecc71'], ['하늘색', '#4fc3f7'], ['파랑', '#3f7bff'], ['남색', '#3949ab'], ['보라', '#9b59b6'], ['분홍', '#ff7eb3'], ['흰색', '#ffffff'], ['검정', '#222222'], ['금색', '#d4af37'], ['은색', '#c0c0c0'], ['베이지', '#e8d5b0']];
+        const FORTUNE_ITEMS = ['텀블러', '볼펜', '수첩', '이어폰', '손수건', '우산', '열쇠고리', '사탕', '커피', '안경', '손목시계', '포스트잇', '머그컵', '운동화', '핸드크림', '보조배터리'];
+        const FORTUNE_FOODS = ['김치찌개', '돈가스', '짜장면', '비빔밥', '국밥', '떡볶이', '샐러드', '라면', '초밥', '제육볶음', '칼국수', '쌀국수', '햄버거', '된장찌개', '카레', '냉면'];
+        const FORTUNE_DIRS = ['동쪽', '서쪽', '남쪽', '북쪽', '동남쪽', '동북쪽', '남서쪽', '북서쪽'];
+        const FORTUNE_TIMES = ['아침 7~9시', '오전 9~11시', '점심 11~1시', '오후 1~3시', '오후 3~5시', '저녁 5~7시', '밤 7~9시'];
+        const FORTUNE_KEYWORDS = ['도약', '정리', '협력', '인내', '발견', '휴식', '도전', '균형', '소통', '집중', '행운', '성장'];
+        const FORTUNE_DAYS = ['일', '월', '화', '수', '목', '금', '토'];
+        let fortuneView = 'today';
+
+        function fortuneHash(str) {
+            let h = 2166136261 >>> 0;
+            for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+            return h >>> 0;
+        }
+        function fortuneRng(seed) {
+            let a = seed >>> 0;
+            return () => {
+                a = (a + 0x6D2B79F5) >>> 0;
+                let t = a;
+                t = Math.imul(t ^ (t >>> 15), t | 1);
+                t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            };
+        }
+        const fortunePick = (rng, arr) => arr[Math.floor(rng() * arr.length)];
+        // 받침 유무에 따라 조사 선택 (금전운이 / 애정·인간관계가)
+        const fortuneJosa = (w, a, b) => { const c = w.charCodeAt(w.length - 1); return w + (c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 ? a : b); };
+        const fortuneTier = (score) => score >= 75 ? 0 : score >= 50 ? 1 : 2;
+        const fortuneStars = (score) => { const n = Math.max(1, Math.min(5, Math.ceil(score / 20))); return '★'.repeat(n) + '☆'.repeat(5 - n); };
+        const fortuneDateKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const fortuneDateLabel = (d) => `${d.getMonth() + 1}월 ${d.getDate()}일 (${FORTUNE_DAYS[d.getDay()]})`;
+        const fortuneBirthKey = () => `azs_fortune_birth_${myGameName()}`;
+
+        function fortuneProfile(birth) {
+            const [y, m, d] = birth.split('-').map(Number);
+            const z = FORTUNE_ZODIAC[((y % 12) + 12) % 12];
+            let star = FORTUNE_STARS[0];
+            FORTUNE_STARS.forEach(s => { if (m > s[2] || (m === s[2] && d >= s[3])) star = s; });
+            return { zodiac: z, star };
+        }
+
+        // 하루 운세: 생년월일 + 날짜로 정해짐
+        function fortuneDay(birth, date) {
+            const rng = fortuneRng(fortuneHash(`${birth}|${fortuneDateKey(date)}`));
+            const score = () => Math.round(30 + 70 * Math.pow(rng(), 0.75)); // 좋은 날이 조금 더 많게
+            const cats = {};
+            FORTUNE_CATS.forEach(c => { const s = score(); cats[c.key] = { score: s, text: fortunePick(rng, FORTUNE_TEXT[c.key][fortuneTier(s)]) }; });
+            const avg = FORTUNE_CATS.reduce((a, c) => a + cats[c.key].score, 0) / FORTUNE_CATS.length;
+            const total = Math.max(20, Math.min(100, Math.round(avg + (rng() - 0.5) * 16)));
+            const color = fortunePick(rng, FORTUNE_COLORS);
+            const n1 = 1 + Math.floor(rng() * 45);
+            let n2 = 1 + Math.floor(rng() * 45); if (n2 === n1) n2 = (n1 % 45) + 1;
+            return {
+                date, total, cats,
+                summary: fortunePick(rng, FORTUNE_TEXT.total[fortuneTier(total)]),
+                advice: fortunePick(rng, FORTUNE_ADVICE),
+                lucky: { color, numbers: [n1, n2].sort((a, b) => a - b), dir: fortunePick(rng, FORTUNE_DIRS), item: fortunePick(rng, FORTUNE_ITEMS), food: fortunePick(rng, FORTUNE_FOODS), time: fortunePick(rng, FORTUNE_TIMES) }
+            };
+        }
+
+        // 이번 주(월~일) 운세
+        function fortuneWeek(birth, today) {
+            const mon = new Date(today); mon.setHours(0, 0, 0, 0); mon.setDate(mon.getDate() - ((mon.getDay() + 6) % 7));
+            const days = [...Array(7)].map((_, i) => { const d = new Date(mon); d.setDate(mon.getDate() + i); return fortuneDay(birth, d); });
+            const rng = fortuneRng(fortuneHash(`${birth}|week|${fortuneDateKey(mon)}`));
+            const avg = Math.round(days.reduce((a, d) => a + d.total, 0) / 7);
+            const catAvg = {};
+            FORTUNE_CATS.forEach(c => { catAvg[c.key] = Math.round(days.reduce((a, d) => a + d.cats[c.key].score, 0) / 7); });
+            const sortedCats = [...FORTUNE_CATS].sort((a, b) => catAvg[b.key] - catAvg[a.key]);
+            const best = days.reduce((a, d) => d.total > a.total ? d : a), worst = days.reduce((a, d) => d.total < a.total ? d : a);
+            const tierText = [`기운이 좋은 한 주예요. 평균 ${avg}점으로 계획했던 일을 밀어붙이기 좋아요.`, `오르락내리락하지만 무난한 한 주예요. 좋은 날에 중요한 일을 몰아 보세요.`, `조금 지치기 쉬운 한 주예요. 무리한 일정은 줄이고 컨디션을 챙기세요.`][fortuneTier(avg)];
+            return {
+                mon, days, avg, catAvg, best, worst,
+                keyword: fortunePick(rng, FORTUNE_KEYWORDS),
+                summary: `${tierText} 이번 주는 ${fortuneJosa(sortedCats[0].label.split(' ')[1], '이', '가')} 가장 좋고, ${fortuneJosa(sortedCats[sortedCats.length - 1].label.split(' ')[1], '은', '는')} 조금 신경 써 주세요.`,
+                advice: fortunePick(rng, FORTUNE_ADVICE)
+            };
+        }
+
+        function saveFortuneBirth() {
+            const v = document.getElementById('fortuneBirth').value;
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) { alert('생년월일을 입력해 주세요.'); return; }
+            if (v > fortuneDateKey(new Date()) || v < '1900-01-01') { alert('생년월일을 다시 확인해 주세요.'); return; }
+            try { localStorage.setItem(fortuneBirthKey(), v); } catch (e) {}
+            renderFortune();
+        }
+        function setFortuneView(view) { fortuneView = view; renderFortune(); }
+
+        function renderFortune() {
+            const body = document.getElementById('fortuneBody');
+            if (!body) return;
+            let birth = '';
+            try { birth = localStorage.getItem(fortuneBirthKey()) || ''; } catch (e) {}
+            const input = document.getElementById('fortuneBirth');
+            if (input && !input.value && birth) input.value = birth;
+            if (input) input.max = fortuneDateKey(new Date());
+            document.querySelectorAll('.fortune-tabs button').forEach(b => b.classList.toggle('active', b.dataset.view === fortuneView));
+            const prof = document.getElementById('fortuneProfile');
+            if (!birth) {
+                prof.textContent = '';
+                body.innerHTML = '<div class="fortune-empty">🎂 생년월일을 입력하고 <b>운세 보기</b>를 눌러 주세요.<br><small>한 번 입력하면 이 기기에 기억해 둬요.</small></div>';
+                return;
+            }
+            const p = fortuneProfile(birth);
+            prof.innerHTML = `${p.zodiac[1]} ${p.zodiac[0]}띠 · ${p.star[1]} ${p.star[0]}`;
+            const bar = (score) => `<div class="fc-bar"><i style="width:${score}%;background:${score >= 75 ? '#4cd137' : score >= 50 ? '#ffd400' : '#ff6b6b'}"></i></div>`;
+            if (fortuneView === 'week') {
+                const w = fortuneWeek(birth, new Date());
+                const todayKey = fortuneDateKey(new Date());
+                const sun = w.days[6].date;
+                body.innerHTML = `<div class="fortune-card">
+                    <div class="fc-head"><div class="fc-date">${w.mon.getMonth() + 1}월 ${w.mon.getDate()}일 ~ ${sun.getMonth() + 1}월 ${sun.getDate()}일 · 이번 주 운세</div>
+                        <div class="fc-score"><b>${w.avg}</b>점</div><div class="fc-stars">${fortuneStars(w.avg)}</div></div>
+                    <div class="fw-keyword">이번 주 키워드 <b>「${w.keyword}」</b></div>
+                    <div class="fw-chart">${w.days.map(d => `<div class="fw-day${fortuneDateKey(d.date) === todayKey ? ' today' : ''}${d === w.best ? ' best' : ''}${d === w.worst ? ' worst' : ''}">
+                        <span class="fw-val">${d.total}</span><div class="fw-col"><i style="height:${d.total}%;background:${d.total >= 75 ? '#4cd137' : d.total >= 50 ? '#ffd400' : '#ff6b6b'}"></i></div>
+                        <span class="fw-label">${FORTUNE_DAYS[d.date.getDay()]}</span></div>`).join('')}</div>
+                    <div class="fw-best">👍 가장 좋은 날 <b>${fortuneDateLabel(w.best.date)}</b> ${w.best.total}점 · ⚠️ 조심할 날 <b>${fortuneDateLabel(w.worst.date)}</b> ${w.worst.total}점</div>
+                    <div class="fc-summary">${w.summary}</div>
+                    <div class="fc-cats">${FORTUNE_CATS.map(c => `<div class="fc-cat"><div class="fc-cat-head"><span>${c.label}</span>${bar(w.catAvg[c.key])}<b>${w.catAvg[c.key]}</b></div></div>`).join('')}</div>
+                    <div class="fc-advice">💡 이번 주 조언: ${w.advice}</div>
+                </div>`;
+                return;
+            }
+            const date = new Date(); if (fortuneView === 'tomorrow') date.setDate(date.getDate() + 1);
+            const f = fortuneDay(birth, date);
+            const L = f.lucky;
+            body.innerHTML = `<div class="fortune-card">
+                <div class="fc-head"><div class="fc-date">${fortuneDateLabel(date)} · ${fortuneView === 'tomorrow' ? '내일' : '오늘'}의 운세</div>
+                    <div class="fc-score"><b>${f.total}</b>점</div><div class="fc-stars">${fortuneStars(f.total)}</div></div>
+                <div class="fc-summary">${f.summary}</div>
+                <div class="fc-cats">${FORTUNE_CATS.map(c => `<div class="fc-cat"><div class="fc-cat-head"><span>${c.label}</span>${bar(f.cats[c.key].score)}<b>${f.cats[c.key].score}</b></div><p>${f.cats[c.key].text}</p></div>`).join('')}</div>
+                <div class="fc-lucky">
+                    <div><small>행운의 색</small><b><span class="fc-swatch" style="background:${L.color[1]}"></span>${L.color[0]}</b></div>
+                    <div><small>행운의 숫자</small><b>${L.numbers.join(', ')}</b></div>
+                    <div><small>행운의 방향</small><b>${L.dir}</b></div>
+                    <div><small>행운의 아이템</small><b>${L.item}</b></div>
+                    <div><small>추천 점심</small><b>${L.food}</b></div>
+                    <div><small>좋은 시간</small><b>${L.time}</b></div>
+                </div>
+                <div class="fc-advice">💡 ${f.advice}</div>
+            </div>`;
+        }
 
         // =====================================================
         // 🕵️ 마피아 (채팅/대화로 하는 마피아 게임, 마피아42 스타일)
