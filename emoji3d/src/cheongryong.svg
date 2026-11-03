@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 256">
+  <defs>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0a1020" flood-opacity="0.5"/>
+    </filter>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="bigglow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+
+    <radialGradient id="aura" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#b9fff4" stop-opacity="0.85"/><stop offset="0.5" stop-color="#2fd6c8" stop-opacity="0.3"/><stop offset="1" stop-color="#2fd6c8" stop-opacity="0"/></radialGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe9a0"/><stop offset="0.5" stop-color="#4ff0e0"/><stop offset="1" stop-color="#ffe9a0"/></linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5ee6ea"/><stop offset="0.45" stop-color="#1b98c9"/><stop offset="1" stop-color="#0b4a86"/></linearGradient>
+    <radialGradient id="skinHi" cx="50%" cy="25%" r="60%"><stop offset="0" stop-color="#ffffff" stop-opacity="0.45"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="mane" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cf5d8"/><stop offset="1" stop-color="#0e7c8c"/></linearGradient>
+    <linearGradient id="horn" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#c98a2b"/><stop offset="0.6" stop-color="#ffd978"/><stop offset="1" stop-color="#fff6d6"/></linearGradient>
+    <radialGradient id="eye" cx="45%" cy="40%" r="65%"><stop offset="0" stop-color="#fffbe0"/><stop offset="0.4" stop-color="#ffd23f"/><stop offset="1" stop-color="#ff7a00"/></radialGradient>
+    <linearGradient id="belly" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1b8"/><stop offset="1" stop-color="#e2b04a"/></linearGradient>
+    <linearGradient id="mouth" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a0816"/><stop offset="1" stop-color="#b52842"/></linearGradient>
+    <radialGradient id="pearl" cx="40%" cy="35%" r="65%"><stop offset="0" stop-color="#ffffff"/><stop offset="0.5" stop-color="#bff6ff"/><stop offset="1" stop-color="#4fb6ff"/></radialGradient>
+    <linearGradient id="whisker" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffd978"/><stop offset="1" stop-color="#ffd978" stop-opacity="0.2"/></linearGradient>
+    <g id="half">
+      <!-- 갈기 -->
+      <path d="M82 112 L40 92 L66 120 L22 124 L62 138 L28 158 L72 152 L54 182 L88 160 Z" fill="url(#mane)" stroke="#0b6070" stroke-width="1.5"/>
+      <!-- 사슴뿔 -->
+      <path d="M104 64 C96 44 84 30 64 14 C70 26 78 36 84 46 C74 42 62 42 50 46 C64 50 78 54 88 60 C92 66 94 70 96 74 Z" fill="url(#horn)" stroke="#9a6418" stroke-width="1.5"/>
+      <!-- 볼 지느러미 -->
+      <path d="M70 128 L44 134 L64 142 L42 152 L72 150 Z" fill="url(#mane)" stroke="#0b6070" stroke-width="1.2"/>
+      <!-- 수염 -->
+      <path d="M90 190 C64 186 38 172 26 152 C30 170 42 188 62 198 C46 204 30 216 24 236" fill="none" stroke="url(#whisker)" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <g id="face">
+      <!-- 눈썹 뼈 -->
+      <path d="M78 100 C92 86 112 88 122 104 C108 100 94 102 82 112 Z" fill="#0b3a6e"/>
+      <!-- 눈 -->
+      <path d="M84 112 C94 104 110 106 118 116 C110 124 94 124 84 112 Z" fill="#081a33"/>
+      <path d="M88 113 C96 107 108 109 114 116 C107 121 95 121 88 113 Z" fill="url(#eye)" filter="url(#glow)"/>
+      <ellipse cx="101" cy="115" rx="2" ry="5.5" fill="#2a0e00"/>
+      <circle cx="96" cy="112" r="1.8" fill="#fff"/>
+      <!-- 콧구멍 -->
+      <path d="M110 182 C104 178 104 170 112 170 C118 172 116 180 110 182 Z" fill="#082a4f"/>
+    </g>
+  </defs>
+  <circle cx="128" cy="128" r="126" fill="url(#aura)"/>
+  <circle cx="128" cy="122" r="104" fill="none" stroke="url(#ring)" stroke-width="5" opacity="0.9" filter="url(#glow)"/>
+  <g filter="url(#soft)">
+    <use xlink:href="#half"/>
+    <use xlink:href="#half" transform="translate(256 0) scale(-1 1)"/>
+    <!-- 정수리 갈기 -->
+    <path d="M110 58 L118 30 L128 50 L138 30 L146 58 Z" fill="url(#mane)" stroke="#0b6070" stroke-width="1.5"/>
+    <!-- 머리 -->
+    <path d="M128 52 C168 52 194 74 196 104 C198 128 184 144 170 152 C166 182 150 202 128 204 C106 202 90 182 86 152 C72 144 58 128 60 104 C62 74 88 52 128 52 Z" fill="url(#skin)" stroke="#073766" stroke-width="2"/>
+    <path d="M128 56 C164 56 188 76 190 102 C170 92 150 88 128 88 C106 88 86 92 66 102 C68 76 92 56 128 56 Z" fill="url(#skinHi)"/>
+    <!-- 이마 비늘 -->
+    <g fill="none" stroke="#9ff3ff" stroke-width="2" opacity="0.6">
+      <path d="M116 72 q6 6 12 0 q6 6 12 0"/><path d="M110 84 q6 6 12 0 q6 6 12 0 q6 6 12 0"/><path d="M116 96 q6 6 12 0 q6 6 12 0"/>
+    </g>
+    <!-- 콧등 판 -->
+    <path d="M108 128 C120 122 136 122 148 128 L146 136 C136 131 120 131 110 136 Z M106 144 C120 138 136 138 150 144 L148 152 C136 147 120 147 108 152 Z M106 160 C120 154 136 154 150 160 L148 168 C136 163 120 163 108 168 Z" fill="url(#belly)" opacity="0.9"/>
+    <use xlink:href="#face"/>
+    <use xlink:href="#face" transform="translate(256 0) scale(-1 1)"/>
+    <!-- 벌린 입 + 송곳니 -->
+    <path d="M100 188 C110 196 146 196 156 188 C156 208 144 222 128 222 C112 222 100 208 100 188 Z" fill="url(#mouth)" stroke="#073766" stroke-width="2"/>
+    <path d="M104 190 L110 206 L114 194 Z M152 190 L146 206 L142 194 Z M118 220 L122 208 L126 220 Z M138 220 L134 208 L130 220 Z" fill="#fff"/>
+    <!-- 턱수염 -->
+    <path d="M108 220 C112 236 120 244 128 248 C136 244 144 236 148 220 C140 228 116 228 108 220 Z" fill="url(#mane)" stroke="#0b6070" stroke-width="1.2"/>
+  </g>
+  <!-- 여의주 -->
+  <circle cx="128" cy="240" r="11" fill="url(#pearl)" filter="url(#glow)"/>
+</svg>

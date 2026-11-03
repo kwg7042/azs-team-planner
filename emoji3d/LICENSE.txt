@@ -1,5 +1,6 @@
 인형뽑기 3D 그림: Microsoft Fluent Emoji (https://github.com/microsoft/fluentui-emoji)
 160px WebP로 줄여서 사용. 파일 이름은 이모지 유니코드 코드포인트.
+예외: 에메랄드 사신수 4종(1f409 청룡, 1f405 백호, 1f985 주작, 1f422 현무)은 이 프로젝트에서 직접 그린 그림 (원본 SVG: emoji3d/src/).
 
     MIT License
 
