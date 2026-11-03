@@ -3635,7 +3635,7 @@
         .gacha-display.grade-emerald .emo-result { filter: drop-shadow(0 0 18px rgba(46,229,157,0.95)) drop-shadow(0 10px 10px rgba(0,0,0,0.5)); }
         .gacha-display.grade-hidden .emo-result { filter: drop-shadow(0 0 18px #ff4fd8) drop-shadow(0 0 30px #4fd8ff); }
         @keyframes emoFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
-        .hidden-reveal .emo-reveal { width: 200px; height: 200px; }
+        .hidden-reveal .emo-reveal { width: 180px; height: 180px; margin-top: 12px; border-radius: 26px; }
         .gacha-chip .emo3d { width: 22px; height: 22px; vertical-align: middle; }
         .collection-item.hidden-locked { border: 3px dashed rgba(255,79,216,0.55); background: rgba(255,79,216,0.08); opacity: 1; animation: hiddenLockPulse 2.4s ease-in-out infinite; }
         .collection-item.hidden-locked .ci-emoji { filter: none; }
@@ -9468,8 +9468,8 @@ ${text}
             { emoji: '🦅', name: '주작', rarity: 'emerald', rate: 6.5 / 4 },
             { emoji: '🐢', name: '현무', rarity: 'emerald', rate: 6.5 / 4 },
             // 히든 (4개 합계 3.5%) — 뽑기 전까지 컬렉션에 ❓로 표시
-            { emoji: '🐙', name: '심해의 크툴루', rarity: 'hidden', rate: 3.5 / 4 },
-            { emoji: '🤖', name: '최종병기 메카', rarity: 'hidden', rate: 3.5 / 4 },
+            { emoji: '🐙', name: '심연의 지배자', rarity: 'hidden', rate: 3.5 / 4 },
+            { emoji: '🤖', name: '기계신 오메가', rarity: 'hidden', rate: 3.5 / 4 },
             { emoji: '🧛', name: '밤의 군주', rarity: 'hidden', rate: 3.5 / 4 },
             { emoji: '🧙', name: '대마법사', rarity: 'hidden', rate: 3.5 / 4 }
         ];
@@ -9485,7 +9485,7 @@ ${text}
         //  글꼴 이모지는 기기마다 작고 납작하게 보여서 그림으로 통일. 못 불러오면 글자 이모지로 대체
         const emojiCode = (e) => [...String(e)].map(c => c.codePointAt(0)).filter(c => c !== 0xfe0f).map(c => c.toString(16)).join('-');
         let EMOJI_3D = null;
-        const EMOJI_3D_VER = 4; // 그림을 바꾸면 올려서 브라우저에 남은 예전 그림 대신 새 그림을 받게 함 (4: 사신수 사용자 제공 그림)
+        const EMOJI_3D_VER = 5; // 그림을 바꾸면 올려서 브라우저에 남은 예전 그림 대신 새 그림을 받게 함 (5: 히든 새 그림)
         function emojiArt(e, cls = '') {
             if (!e) return '';
             if (!EMOJI_3D) EMOJI_3D = new Set(GACHA_ITEMS.map(it => emojiCode(it.emoji)));
