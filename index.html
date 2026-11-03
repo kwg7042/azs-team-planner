@@ -9485,12 +9485,13 @@ ${text}
         //  글꼴 이모지는 기기마다 작고 납작하게 보여서 그림으로 통일. 못 불러오면 글자 이모지로 대체
         const emojiCode = (e) => [...String(e)].map(c => c.codePointAt(0)).filter(c => c !== 0xfe0f).map(c => c.toString(16)).join('-');
         let EMOJI_3D = null;
+        const EMOJI_3D_VER = 2; // 그림을 바꾸면 올려서 브라우저에 남은 예전 그림 대신 새 그림을 받게 함 (2: 사신수 직접 그림)
         function emojiArt(e, cls = '') {
             if (!e) return '';
             if (!EMOJI_3D) EMOJI_3D = new Set(GACHA_ITEMS.map(it => emojiCode(it.emoji)));
             const code = emojiCode(e);
             if (!EMOJI_3D.has(code)) return escapeHtml(e);
-            return `<img class="emo3d ${cls}" src="emoji3d/${code}.webp" alt="${e}" draggable="false" onerror="this.replaceWith(document.createTextNode(this.alt))">`;
+            return `<img class="emo3d ${cls}" src="emoji3d/${code}.webp?v=${EMOJI_3D_VER}" alt="${e}" draggable="false" onerror="this.replaceWith(document.createTextNode(this.alt))">`;
         }
 
         // 내 컬렉션을 새 목록으로 한 번만 변환 (바뀌었으면 true)
