@@ -11,62 +11,70 @@
       <feGaussianBlur stdDeviation="6"/>
     </filter>
 
-    <radialGradient id="aura" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffe0a0" stop-opacity="0.9"/><stop offset="0.5" stop-color="#ff6a2a" stop-opacity="0.35"/><stop offset="1" stop-color="#ff6a2a" stop-opacity="0"/></radialGradient>
-    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2a8"/><stop offset="0.5" stop-color="#ff5a2a"/><stop offset="1" stop-color="#fff2a8"/></linearGradient>
-    <linearGradient id="wing" x1="1" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#c8102e"/><stop offset="0.55" stop-color="#ff5a1f"/><stop offset="1" stop-color="#ffd23f"/></linearGradient>
-    <linearGradient id="wing2" x1="1" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff7a1a"/><stop offset="1" stop-color="#fff0a0"/></linearGradient>
-    <linearGradient id="tail" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8102e"/><stop offset="0.6" stop-color="#ff6a1f"/><stop offset="1" stop-color="#ffd23f"/></linearGradient>
-    <radialGradient id="body" cx="45%" cy="30%" r="70%"><stop offset="0" stop-color="#ff7a5a"/><stop offset="0.5" stop-color="#e01b2f"/><stop offset="1" stop-color="#7a0618"/></radialGradient>
-    <linearGradient id="chest" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0a0"/><stop offset="1" stop-color="#ff9a1f"/></linearGradient>
-    <linearGradient id="beak" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset="1" stop-color="#e09a12"/></linearGradient>
-    <radialGradient id="eye" cx="45%" cy="40%" r="65%"><stop offset="0" stop-color="#ffffff"/><stop offset="0.4" stop-color="#ffe34a"/><stop offset="1" stop-color="#ff8a00"/></radialGradient>
-    <radialGradient id="spot" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#18c7d8"/><stop offset="0.55" stop-color="#0b5e9c"/><stop offset="0.6" stop-color="#ffd23f"/><stop offset="1" stop-color="#ff9a1f"/></radialGradient>
+    <radialGradient id="aura" cx="50%" cy="48%" r="50%"><stop offset="0" stop-color="#fff3c0" stop-opacity="0.95"/><stop offset="0.45" stop-color="#ff7a2a" stop-opacity="0.45"/><stop offset="1" stop-color="#ff3a1a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="flame" cx="50%" cy="48%" r="50%"><stop offset="0.7" stop-color="#ffd23f"/><stop offset="0.85" stop-color="#ff6a1f"/><stop offset="1" stop-color="#d4102a"/></radialGradient>
+    <radialGradient id="sun" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fffbe0"/><stop offset="0.6" stop-color="#ffcf3f"/><stop offset="1" stop-color="#ff7a1a"/></radialGradient>
+    <linearGradient id="wing" x1="1" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#b80c28"/><stop offset="0.45" stop-color="#ff4a1a"/><stop offset="0.8" stop-color="#ffa21f"/><stop offset="1" stop-color="#fff07a"/></linearGradient>
+    <linearGradient id="wing2" x1="1" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff6a1a"/><stop offset="1" stop-color="#fff3b0"/></linearGradient>
+    <linearGradient id="wing3" x1="1" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffe066"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+    <linearGradient id="tail" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b80c28"/><stop offset="0.55" stop-color="#ff5a1f"/><stop offset="1" stop-color="#ffe066"/></linearGradient>
+    <radialGradient id="body" cx="45%" cy="30%" r="72%"><stop offset="0" stop-color="#ff8a5a"/><stop offset="0.5" stop-color="#e01b2f"/><stop offset="1" stop-color="#6a0414"/></radialGradient>
+    <linearGradient id="chest" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset="1" stop-color="#ff9a1f"/></linearGradient>
+    <linearGradient id="beak" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset="1" stop-color="#d48a0a"/></linearGradient>
+    <radialGradient id="eye" cx="45%" cy="40%" r="65%"><stop offset="0" stop-color="#ffffff"/><stop offset="0.4" stop-color="#ffe34a"/><stop offset="1" stop-color="#ff7a00"/></radialGradient>
+    <radialGradient id="spot" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#2fe0ea"/><stop offset="0.5" stop-color="#0b5e9c"/><stop offset="0.58" stop-color="#ffe066"/><stop offset="1" stop-color="#ff8a1f"/></radialGradient>
+    <!-- 왼쪽 날개: 하늘로 치켜든 V자, 깃털 3겹 -->
     <g id="wingL">
-      <path d="M112 120 C90 96 62 78 18 70 C40 84 52 92 60 100 C36 98 18 104 4 116 C28 114 46 116 58 122 C38 128 24 140 16 156 C36 146 56 142 72 144 C60 154 54 166 52 180 C70 164 88 154 108 150 Z" fill="url(#wing)" stroke="#8a0a1e" stroke-width="1.8" stroke-linejoin="round"/>
-      <path d="M110 124 C92 108 72 98 46 92 C64 104 74 112 80 120 C64 120 52 124 42 132 C60 132 74 134 84 138 C74 146 68 154 66 164 C80 154 94 148 108 146 Z" fill="url(#wing2)" opacity="0.85"/>
+      <path d="M112 118 C100 86 76 56 40 26 C46 42 52 52 58 60 C40 46 22 40 2 40 C20 52 32 60 42 70 C26 66 12 68 0 76 C18 82 32 88 44 96 C30 100 18 108 10 120 C28 116 44 116 58 120 C46 130 40 142 38 156 C54 142 70 134 88 132 C80 142 78 152 80 164 C92 148 104 138 114 134 Z" fill="url(#wing)" stroke="#7a0618" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M112 122 C100 98 82 78 58 60 C64 72 70 80 74 88 C60 84 46 84 34 90 C50 96 62 102 70 108 C58 112 50 118 44 128 C60 124 74 124 86 128 C80 136 78 144 78 152 C88 142 100 136 112 134 Z" fill="url(#wing2)" opacity="0.92"/>
+      <path d="M112 126 C104 110 94 98 80 88 C84 98 88 106 90 112 C80 112 72 114 66 120 C78 122 88 124 94 128 C90 134 90 140 90 146 C98 138 106 134 112 132 Z" fill="url(#wing3)" opacity="0.9"/>
+      <g stroke="#8a0a1e" stroke-width="1.3" opacity="0.55" fill="none"><path d="M100 104 L44 44"/><path d="M98 112 L30 78"/><path d="M98 120 L28 118"/><path d="M100 128 L52 146"/></g>
+    </g>
+    <g id="tailL">
+      <path d="M116 176 C96 198 70 216 34 236 C62 238 90 226 112 206 Z" fill="url(#tail)" stroke="#7a0618" stroke-width="1.5"/>
+      <path d="M120 180 C110 206 100 228 82 254 C104 246 118 228 124 206 Z" fill="url(#tail)" stroke="#7a0618" stroke-width="1.5"/>
+      <circle cx="58" cy="230" r="7" fill="url(#spot)"/>
+      <circle cx="98" cy="238" r="6" fill="url(#spot)"/>
     </g>
     <g id="eyeL">
-      <path d="M104 92 C110 86 120 86 124 92 C120 98 110 98 104 92 Z" fill="#2a0508"/>
-      <path d="M106 92 C111 88 119 88 122 92 C119 96 111 96 106 92 Z" fill="url(#eye)" filter="url(#glow)"/>
-      <circle cx="114" cy="92" r="2" fill="#2a0508"/>
-      <path d="M100 84 C108 80 118 82 126 88 C116 86 108 86 100 90 Z" fill="#5a0410"/>
+      <path d="M103 90 C109 83 120 84 125 91 C120 98 109 97 103 90 Z" fill="#2a0508"/>
+      <path d="M105 90 C110 85 119 86 123 91 C119 95 110 95 105 90 Z" fill="url(#eye)" filter="url(#glow)"/>
+      <circle cx="114" cy="90.5" r="2.2" fill="#2a0508"/>
+      <path d="M98 82 C108 77 120 80 128 88 C117 84 108 84 98 88 Z" fill="#4a0410"/>
     </g>
   </defs>
-  <circle cx="128" cy="128" r="126" fill="url(#aura)"/>
-  <circle cx="128" cy="124" r="104" fill="none" stroke="url(#ring)" stroke-width="5" opacity="0.9" filter="url(#glow)"/>
+  <circle cx="128" cy="124" r="126" fill="url(#aura)"/>
+  <!-- 불꽃 후광 + 태양 -->
+  <path d="M116.5 28.7 Q125.7 10.0 128.0 0.0 Q138.6 18.5 139.5 28.7 Z M153.9 31.5 Q169.5 17.8 171.6 18.7 Q178.1 30.6 175.1 40.3 Z M187.3 48.5 Q207.0 41.8 215.7 36.3 Q210.1 56.9 203.5 64.7 Z M211.7 76.9 Q232.4 78.3 233.3 80.4 Q229.5 93.4 220.5 98.1 Z M223.3 112.5 Q242.0 121.7 252.0 124.0 Q233.5 134.6 223.3 135.5 Z M220.5 149.9 Q234.2 165.5 233.3 167.6 Q221.4 174.1 211.7 171.1 Z M203.5 183.3 Q210.2 203.0 215.7 211.7 Q195.1 206.1 187.3 199.5 Z M175.1 207.7 Q173.7 228.4 171.6 229.3 Q158.6 225.5 153.9 216.5 Z M139.5 219.3 Q130.3 238.0 128.0 248.0 Q117.4 229.5 116.5 219.3 Z M102.1 216.5 Q86.5 230.2 84.4 229.3 Q77.9 217.4 80.9 207.7 Z M68.7 199.5 Q49.0 206.2 40.3 211.7 Q45.9 191.1 52.5 183.3 Z M44.3 171.1 Q23.6 169.7 22.7 167.6 Q26.5 154.6 35.5 149.9 Z M32.7 135.5 Q14.0 126.3 4.0 124.0 Q22.5 113.4 32.7 112.5 Z M35.5 98.1 Q21.8 82.5 22.7 80.4 Q34.6 73.9 44.3 76.9 Z M52.5 64.7 Q45.8 45.0 40.3 36.3 Q60.9 41.9 68.7 48.5 Z M80.9 40.3 Q82.3 19.6 84.4 18.7 Q97.4 22.5 102.1 31.5 Z" fill="url(#flame)" opacity="0.9" filter="url(#glow)"/>
+  <circle cx="128" cy="124" r="96" fill="url(#sun)" opacity="0.35"/>
+  <circle cx="128" cy="124" r="96" fill="none" stroke="#fff2a8" stroke-width="3" opacity="0.85" filter="url(#glow)"/>
   <g filter="url(#soft)">
-    <!-- 꼬리 깃털 -->
-    <path d="M118 170 C104 196 88 220 70 244 C92 236 108 222 118 206 Z" fill="url(#tail)" stroke="#8a0a1e" stroke-width="1.5"/>
-    <path d="M138 170 C152 196 168 220 186 244 C164 236 148 222 138 206 Z" fill="url(#tail)" stroke="#8a0a1e" stroke-width="1.5"/>
-    <path d="M120 172 C116 200 118 226 128 252 C138 226 140 200 136 172 Z" fill="url(#tail)" stroke="#8a0a1e" stroke-width="1.5"/>
-    <circle cx="128" cy="228" r="8" fill="url(#spot)"/>
-    <circle cx="92" cy="224" r="6" fill="url(#spot)"/>
-    <circle cx="164" cy="224" r="6" fill="url(#spot)"/>
-    <!-- 날개 -->
+    <use xlink:href="#tailL"/>
+    <use xlink:href="#tailL" transform="translate(256 0) scale(-1 1)"/>
+    <path d="M120 180 C118 206 120 230 128 256 C136 230 138 206 136 180 Z" fill="url(#tail)" stroke="#7a0618" stroke-width="1.5"/>
+    <circle cx="128" cy="232" r="8" fill="url(#spot)"/>
     <use xlink:href="#wingL"/>
     <use xlink:href="#wingL" transform="translate(256 0) scale(-1 1)"/>
     <!-- 몸 -->
-    <path d="M128 92 C154 92 166 120 162 150 C158 174 144 186 128 186 C112 186 98 174 94 150 C90 120 102 92 128 92 Z" fill="url(#body)" stroke="#6a0414" stroke-width="2"/>
-    <!-- 가슴 깃털 -->
+    <path d="M128 96 C158 96 172 124 166 154 C162 178 146 192 128 192 C110 192 94 178 90 154 C84 124 98 96 128 96 Z" fill="url(#body)" stroke="#5a0310" stroke-width="2"/>
     <g fill="url(#chest)" stroke="#d4570e" stroke-width="1">
-      <path d="M112 124 q8 10 16 0 q8 10 16 0 q-2 12 -16 14 q-14 -2 -16 -14z"/>
-      <path d="M114 142 q7 9 14 0 q7 9 14 0 q-2 11 -14 13 q-12 -2 -14 -13z"/>
-      <path d="M118 158 q5 8 10 0 q5 8 10 0 q-2 10 -10 11 q-8 -1 -10 -11z"/>
+      <path d="M108 126 q10 11 20 0 q10 11 20 0 q-3 14 -20 16 q-17 -2 -20 -16z"/>
+      <path d="M110 146 q9 10 18 0 q9 10 18 0 q-3 13 -18 15 q-15 -2 -18 -15z"/>
+      <path d="M115 164 q6.5 9 13 0 q6.5 9 13 0 q-2 11 -13 13 q-11 -2 -13 -13z"/>
     </g>
-    <!-- 볏 -->
-    <path d="M118 62 C110 44 112 30 120 18 C122 32 126 40 128 48 C130 36 136 26 146 16 C146 32 142 46 138 60 C144 52 152 48 162 46 C154 56 146 64 138 70 Z" fill="url(#wing)" stroke="#8a0a1e" stroke-width="1.5"/>
+    <!-- 불꽃 볏 (크게) -->
+    <path d="M114 70 C100 50 100 30 110 10 C114 28 120 38 124 48 C122 30 128 14 140 0 C142 20 140 36 136 50 C144 38 156 30 172 26 C164 42 152 54 140 66 C150 62 160 62 170 66 C158 72 146 76 134 78 Z" fill="url(#wing)" stroke="#7a0618" stroke-width="1.6"/>
+    <path d="M120 66 C114 52 114 40 118 28 C122 42 126 50 128 56 C130 44 136 34 142 26 C142 40 140 50 136 60 Z" fill="url(#wing3)" opacity="0.85"/>
     <!-- 머리 -->
-    <circle cx="128" cy="90" r="30" fill="url(#body)" stroke="#6a0414" stroke-width="2"/>
-    <ellipse cx="120" cy="78" rx="12" ry="6" fill="#fff" opacity="0.25"/>
+    <circle cx="128" cy="90" r="32" fill="url(#body)" stroke="#5a0310" stroke-width="2"/>
+    <ellipse cx="119" cy="76" rx="13" ry="6" fill="#fff" opacity="0.28"/>
     <use xlink:href="#eyeL"/>
     <use xlink:href="#eyeL" transform="translate(256 0) scale(-1 1)"/>
-    <!-- 부리 -->
-    <path d="M118 100 C122 96 134 96 138 100 L128 122 Z" fill="url(#beak)" stroke="#a8660a" stroke-width="1.5"/>
+    <path d="M116 100 C121 95 135 95 140 100 L128 126 Z" fill="url(#beak)" stroke="#a0620a" stroke-width="1.5"/>
+    <path d="M122 104 L128 118" stroke="#fff6c8" stroke-width="2" opacity="0.7"/>
+    <!-- 금장식 목걸이 -->
+    <path d="M104 116 C116 124 140 124 152 116" stroke="#ffd23f" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <circle cx="128" cy="123" r="5" fill="#2fe0ea" stroke="#ffd23f" stroke-width="2.5"/>
   </g>
-  <!-- 불씨 -->
-  <g fill="#ffd23f" filter="url(#glow)" opacity="0.95">
-    <path d="M36 196 c4 -6 2 -12 -2 -16 c8 2 12 10 8 18 c-2 4 -8 2 -6 -2z"/>
-    <path d="M220 190 c-4 -6 -2 -12 2 -16 c-8 2 -12 10 -8 18 c2 4 8 2 6 -2z"/>
-    <circle cx="200" cy="40" r="3"/><circle cx="58" cy="44" r="2.5"/>
-  </g>
+  <g fill="#fff2a8" filter="url(#glow)"><circle cx="40" cy="186" r="3"/><circle cx="218" cy="190" r="3"/><circle cx="24" cy="140" r="2"/><circle cx="234" cy="138" r="2"/></g>
 </svg>
