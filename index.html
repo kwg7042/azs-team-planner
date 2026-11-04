@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-10-28">
+    <meta name="app-version" content="2026-11-04b">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -901,6 +901,28 @@
         .attendance-badge.business { background: rgba(118,75,162,0.3); color: #a855f7; }
         .attendance-badge.training { background: rgba(102,126,234,0.3); color: #667eea; }
         .attendance-badge.official { background: rgba(156,163,175,0.3); color: #9ca3af; }
+
+        /* 공통 모달 (AI 설정·텍스트 파싱·이슈 수정) — 예전엔 스타일이 없어서 페이지 아래에 그냥 붙어 보였음 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+        .modal-overlay > .modal-content {
+            background: #1a1a2e;
+            color: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+        }
 
         /* 근태 입력 모달 */
         .attendance-modal {
@@ -4297,11 +4319,18 @@
                     <!-- EXAONE API 설정 -->
                     <div id="exaoneSettings" style="display: none;">
                         <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 15px;">
-                            <strong style="color: #00d4ff;">EXAONE 4.5</strong>를 이슈 분석에 사용합니다.<br>
-                            API 키는 Cloudflare Worker Secret에 보관하고 프록시 URL만 입력하는 방식을 권장합니다.
+                            <strong style="color: #00d4ff;">EXAONE 4.5</strong>를 이슈 분석·특허 모션에 사용합니다.
                         </p>
+                        <div style="font-size: 12px; line-height: 1.7; background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.3); border-radius: 8px; padding: 10px 12px; margin-bottom: 15px;">
+                            <strong>내 PC에서 쓰려면 (처음 한 번)</strong><br>
+                            ① <a href="tools/exaone-proxy/exaone_proxy.py" download style="color:#00d4ff;">exaone_proxy.py</a> 와
+                               <a href="tools/exaone-proxy/EXAONE_proxy_start.bat" download style="color:#00d4ff;">EXAONE_proxy_start.bat</a> 을 같은 폴더에 내려받기 (Python 3 필요)<br>
+                            ② <b>EXAONE_proxy_start.bat</b> 더블클릭 → 처음 한 번 API 키 입력 → 창은 켜 둔 채로 사용<br>
+                            ③ 아래 '연결 테스트'로 확인. 브라우저가 '이 기기의 다른 앱·서비스 접근' 권한을 물으면 <b>허용</b><br>
+                            <span style="color: rgba(255,255,255,0.55);">프록시 URL 칸을 비워 두면: 설정한 API 키로 직접 호출 → 안 되면 이 PC의 로컬 프록시(localhost:8787) 순서로 자동 연결</span>
+                        </div>
                         <div class="form-group" style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 8px; font-size: 13px;">EXAONE API Key (프록시 미사용 시에만)</label>
+                            <label style="display: block; margin-bottom: 8px; font-size: 13px;">EXAONE API Key (선택 · 로컬 프록시를 쓰면 비워 둬도 됨)</label>
                             <input type="password" id="exaoneApiKey" placeholder="API 키를 입력하세요"
                                    style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 13px;">
                             <div style="display: flex; gap: 10px; margin-top: 10px;">
@@ -4311,8 +4340,8 @@
                             <div id="exaoneTestResult" style="margin-top: 10px; font-size: 12px;"></div>
                         </div>
                         <div class="form-group" style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 8px; font-size: 13px;"><i class="fas fa-server" style="color: #00d4ff;"></i> EXAONE 보안 프록시 URL (권장)</label>
-                            <input type="text" id="exaoneProxyUrl" placeholder="https://your-exaone-proxy.workers.dev"
+                            <label style="display: block; margin-bottom: 8px; font-size: 13px;"><i class="fas fa-server" style="color: #00d4ff;"></i> EXAONE 프록시 URL (선택 · 비우면 이 PC의 로컬 프록시)</label>
+                            <input type="text" id="exaoneProxyUrl" placeholder="비워 두면 http://localhost:8787 (공용 프록시 서버가 있으면 그 주소)"
                                    style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 13px;">
                             <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 8px;">프록시를 사용하면 브라우저에 API 키를 저장하거나 전송하지 않습니다.</p>
                         </div>
@@ -6221,6 +6250,65 @@
             return (localStorage.getItem('exaoneProxyUrl') || DEFAULT_EXAONE_PROXY_URL || '').trim();
         }
 
+        // ===== EXAONE 연결 (2026-11-04) =====
+        //  예전엔 기본 프록시가 'http://localhost:8787'(내 PC에서만 켜 둔 프록시)로 고정이라
+        //  다른 사람 PC에서는 프록시가 없어서 항상 연결 오류가 났고, API 키를 넣어도 키를 쓰지 않았음.
+        //  → 경로를 순서대로 시도: ① 설정에 직접 넣은 프록시 ② API 키가 있으면 직접 호출 ③ 이 PC의 로컬 프록시
+        const EXAONE_API_URL = 'https://api.lgresearch.ai/v1/chat/completions';
+        const EXAONE_PROXY_KIT = 'tools/exaone-proxy/';
+        function exaoneRoutes(override) {
+            const o = override || {};
+            const explicit = String(o.proxy !== undefined ? o.proxy : (localStorage.getItem('exaoneProxyUrl') || '')).trim();
+            const key = String(o.key !== undefined ? o.key : (localStorage.getItem('exaoneApiKey') || '')).trim();
+            const routes = [];
+            if (explicit) routes.push({ kind: 'proxy', url: explicit, label: `프록시 ${explicit}` });
+            if (key) routes.push({ kind: 'direct', url: EXAONE_API_URL, key, label: 'API 키로 직접 호출' });
+            if (DEFAULT_EXAONE_PROXY_URL && explicit.replace(/\/+$/, '') !== DEFAULT_EXAONE_PROXY_URL) routes.push({ kind: 'proxy', url: DEFAULT_EXAONE_PROXY_URL, label: `이 PC의 로컬 프록시 ${DEFAULT_EXAONE_PROXY_URL}` });
+            return routes;
+        }
+        function exaoneConnectHelp(tried) {
+            const lines = ['EXAONE에 연결하지 못했습니다.'];
+            tried.forEach(r => lines.push(`· ${r.label}: ${r.kind === 'direct' ? '브라우저에서 막힘(CORS·회사망)' : '응답 없음 (프록시가 꺼져 있음)'}`));
+            lines.push('', '해결 방법');
+            lines.push(`1) 이 PC에서 EXAONE 로컬 프록시 켜기: AI 설정 > EXAONE > '로컬 프록시 내려받기'로 받은 EXAONE_proxy_start.bat 실행 (처음 한 번 API 키 입력, 창은 켜 둔 채로)`);
+            lines.push(`2) 프록시를 켰는데도 안 되면: 브라우저가 '이 기기의 다른 앱·서비스 접근(로컬 네트워크)' 권한을 물을 때 '허용' (주소창 왼쪽 아이콘 > 사이트 설정에서 바꿀 수 있음)`);
+            return lines.join('\n');
+        }
+        function exaoneHttpHint(status, text) {
+            const t = String(text || '');
+            if (/Forbidden origin|허용되지 않은 주소/i.test(t)) return '프록시가 이 주소를 허용하지 않습니다. 최신 로컬 프록시(AI 설정 > 로컬 프록시 내려받기)로 다시 실행하세요.';
+            if (status === 401) return 'API 키가 틀렸거나 만료되었습니다. (로컬 프록시면 창을 닫고 EXAONE_proxy_start.bat --reset 으로 키를 다시 입력)';
+            if (status === 403) return '이 키로 EXAONE 접근이 허용되지 않았습니다.';
+            if (status === 404) return '엔드포인트 주소나 모델명이 맞지 않습니다.';
+            if (status === 413) return '보내는 내용이 너무 큽니다. 도면(이미지) 수를 줄여 보세요.';
+            if (status === 429) return '요청이 너무 많습니다. 잠시 후 다시 시도하세요.';
+            if (status === 502) return '프록시는 켜져 있지만 EXAONE 서버에 연결하지 못했습니다 (회사망/인터넷 확인).';
+            if (status >= 500) return 'EXAONE 서버 쪽 오류입니다. 잠시 후 다시 시도하세요.';
+            return '';
+        }
+        // 공통 호출: 연결이 안 되는 경로는 건너뛰고 다음 경로로. 응답을 받으면 { res, route }
+        async function exaoneFetch(payload, opt) {
+            const o = opt || {};
+            const routes = exaoneRoutes(o.override);
+            const tried = [];
+            for (const r of routes) {
+                const headers = { 'Content-Type': 'application/json' };
+                if (r.kind === 'direct') headers.Authorization = `Bearer ${r.key}`;
+                try {
+                    const res = await fetch(r.url, { method: 'POST', headers, body: JSON.stringify(payload), signal: o.signal });
+                    return { res, route: r };
+                } catch (e) {
+                    if (e && e.name === 'AbortError') throw e;
+                    tried.push(r);
+                }
+            }
+            const err = new Error(exaoneConnectHelp(tried));
+            err.code = 'connect';
+            throw err;
+        }
+        window.exaoneFetch = exaoneFetch;
+        window.exaoneHttpHint = exaoneHttpHint;
+
         let currentApiTab = localStorage.getItem('preferredAiApi') || 'groq';
         
         // 탭 전환
@@ -6239,11 +6327,16 @@
         
         // AI 설정 모달 열기/닫기
         function openAiSettingsModal() {
-            document.getElementById('aiSettingsModal').style.display = 'flex';
+            const modal = document.getElementById('aiSettingsModal');
+            // 설정창이 ESHG 이슈 탭 안에 있어서 다른 탭(특허 모션 등)에서 열면 안 보였음 → body로 옮겨서 어디서나 보이게
+            if (modal.parentElement !== document.body) document.body.appendChild(modal);
+            modal.style.display = 'flex';
             document.getElementById('groqApiKey').value = localStorage.getItem('groqApiKey') || '';
             document.getElementById('groqProxyUrl').value = localStorage.getItem('groqProxyUrl') || '';
             document.getElementById('exaoneApiKey').value = localStorage.getItem('exaoneApiKey') || '';
-            document.getElementById('exaoneProxyUrl').value = localStorage.getItem('exaoneProxyUrl') || DEFAULT_EXAONE_PROXY_URL;
+            // 기본 로컬 프록시는 칸에 채우지 않음 (저장하면 '직접 지정'으로 굳어서 API 키 직접 호출을 막았음)
+            const savedProxy = localStorage.getItem('exaoneProxyUrl') || '';
+            document.getElementById('exaoneProxyUrl').value = savedProxy === DEFAULT_EXAONE_PROXY_URL ? '' : savedProxy;
             document.getElementById('geminiApiKey').value = localStorage.getItem('geminiApiKey') || '';
             // Groq가 설정되어 있으면 Groq 탭, 아니면 저장된 선호 탭
             const preferredApi = localStorage.getItem('preferredAiApi') || 'groq';
@@ -6287,7 +6380,7 @@
                 localStorage.removeItem('groqProxyUrl');
             }
 
-            if (exaoneProxyUrl) localStorage.setItem('exaoneProxyUrl', exaoneProxyUrl);
+            if (exaoneProxyUrl && exaoneProxyUrl.replace(/\/+$/, '') !== DEFAULT_EXAONE_PROXY_URL) localStorage.setItem('exaoneProxyUrl', exaoneProxyUrl);
             else localStorage.removeItem('exaoneProxyUrl');
 
             localStorage.setItem('preferredAiApi', currentApiTab);
@@ -6347,28 +6440,20 @@
 
         async function testExaoneApi() {
             const apiKey = document.getElementById('exaoneApiKey').value.trim();
-            const proxyUrl = (document.getElementById('exaoneProxyUrl').value.trim() || DEFAULT_EXAONE_PROXY_URL || '').trim();
+            const proxyUrl = document.getElementById('exaoneProxyUrl').value.trim();
             const resultDiv = document.getElementById('exaoneTestResult');
-            const usingProxy = !!proxyUrl;
-            if (!usingProxy && !apiKey) {
-                resultDiv.innerHTML = '<span style="color: #ff6b6b;"><i class="fas fa-times-circle"></i> 보안 프록시 URL 또는 API 키를 입력해주세요.</span>';
-                return;
-            }
-            const headers = { 'Content-Type': 'application/json' };
-            if (!usingProxy) headers['Authorization'] = `Bearer ${apiKey}`;
-            resultDiv.innerHTML = `<span style="color: #ffa500;"><i class="fas fa-spinner fa-spin"></i> ${usingProxy ? '프록시 경유 ' : ''}테스트 중...</span>`;
+            resultDiv.innerHTML = `<span style="color: #ffa500;"><i class="fas fa-spinner fa-spin"></i> 테스트 중...</span>`;
             try {
-                const response = await fetch(proxyUrl || 'https://api.lgresearch.ai/v1/chat/completions', {
-                    method: 'POST', headers,
-                    body: JSON.stringify({ model: 'exaone-v4.5_33b', messages: [{ role: 'user', content: '안녕' }], max_tokens: 16, chat_template_kwargs: { enable_thinking: false } })
-                });
-                if (response.ok) resultDiv.innerHTML = `<span style="color: #00ff88;"><i class="fas fa-check-circle"></i> 연결 성공! ${usingProxy ? '(프록시 경유) ' : ''}EXAONE API가 정상 작동합니다.</span>`;
+                const { res: response, route } = await exaoneFetch({ model: 'exaone-v4.5_33b', messages: [{ role: 'user', content: '안녕' }], max_tokens: 16, chat_template_kwargs: { enable_thinking: false } },
+                    { override: { proxy: proxyUrl, key: apiKey } });
+                if (response.ok) resultDiv.innerHTML = `<span style="color: #00ff88;"><i class="fas fa-check-circle"></i> 연결 성공! (${escapeHtml(route.label)}) EXAONE API가 정상 작동합니다.</span>`;
                 else {
                     const errorText = await response.text();
-                    resultDiv.innerHTML = `<span style="color: #ff6b6b;"><i class="fas fa-times-circle"></i> 오류: ${response.status} ${errorText.slice(0, 160)}</span>`;
+                    const hint = exaoneHttpHint(response.status, errorText);
+                    resultDiv.innerHTML = `<span style="color: #ff6b6b;"><i class="fas fa-times-circle"></i> ${escapeHtml(route.label)} → 오류 ${response.status}${hint ? ': ' + escapeHtml(hint) : ''}<br><small>${escapeHtml(errorText.slice(0, 160))}</small></span>`;
                 }
             } catch (err) {
-                resultDiv.innerHTML = `<span style="color: #ff6b6b;"><i class="fas fa-times-circle"></i> ${usingProxy ? '프록시 오류' : '직접 호출 오류(CORS일 수 있음)'}: ${err.message}</span>`;
+                resultDiv.innerHTML = `<span style="color: #ff6b6b; white-space: pre-line;"><i class="fas fa-times-circle"></i> ${escapeHtml(err.message)}</span>`;
             }
         }
 
@@ -6636,28 +6721,20 @@ ${text}
         }
 
         async function callExaoneApi(apiKey, prompt) {
-            const proxyUrl = getExaoneProxyUrl();
-            const usingProxy = !!proxyUrl;
-            const apiUrl = proxyUrl || 'https://api.lgresearch.ai/v1/chat/completions';
-            const headers = { 'Content-Type': 'application/json' };
-            if (!usingProxy && apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 30000);
             try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST', headers,
-                    body: JSON.stringify({
-                        model: 'exaone-v4.5_33b',
-                        messages: [{ role: 'user', content: prompt }],
-                        temperature: 0.1,
-                        max_tokens: 2048,
-                        chat_template_kwargs: { enable_thinking: false }
-                    }),
-                    signal: controller.signal
-                });
+                const { res: response } = await exaoneFetch({
+                    model: 'exaone-v4.5_33b',
+                    messages: [{ role: 'user', content: prompt }],
+                    temperature: 0.1,
+                    max_tokens: 2048,
+                    chat_template_kwargs: { enable_thinking: false }
+                }, { signal: controller.signal });
                 if (!response.ok) {
                     const errorText = await response.text();
-                    throw new Error(`EXAONE ${response.status} ${response.statusText}${errorText ? ': ' + errorText.slice(0, 200) : ''}`);
+                    const hint = exaoneHttpHint(response.status, errorText);
+                    throw new Error(`EXAONE ${response.status} ${response.statusText}${errorText ? ': ' + errorText.slice(0, 200) : ''}${hint ? ' → ' + hint : ''}`);
                 }
                 const data = await response.json();
                 return parseAiResponse(data.choices?.[0]?.message?.content || '');
@@ -9375,7 +9452,7 @@ ${text}
                     const newNickname = this.value.trim();
                     if (newNickname !== myNickname) {
                         myNickname = newNickname;
-                        localStorage.setItem('chat_nickname', newNickname);
+                        localStorage.setItem('chat_nickname', newNickname); if (typeof onMyNicknameChanged === 'function') onMyNicknameChanged();
                         updateMyPresence(newNickname);
                         // 채팅 닉네임 동기화
                         if (chatNicknameInput) chatNicknameInput.value = newNickname;
@@ -9397,7 +9474,7 @@ ${text}
                     const newNickname = this.value.trim();
                     if (newNickname !== myNickname) {
                         myNickname = newNickname;
-                        localStorage.setItem('chat_nickname', newNickname);
+                        localStorage.setItem('chat_nickname', newNickname); if (typeof onMyNicknameChanged === 'function') onMyNicknameChanged();
                         updateMyPresence(newNickname);
                         // 헤더 닉네임 동기화
                         if (headerNicknameInput) headerNicknameInput.value = newNickname;
@@ -9430,7 +9507,7 @@ ${text}
             // 닉네임 저장
             if (nickname !== myNickname) {
                 myNickname = nickname;
-                localStorage.setItem('chat_nickname', nickname);
+                localStorage.setItem('chat_nickname', nickname); if (typeof onMyNicknameChanged === 'function') onMyNicknameChanged();
             }
             
             const chatData = {
@@ -9738,22 +9815,20 @@ ${text}
             return true;
         }
         function migrateMyIconV4() {
-            const me = localStorage.getItem('chat_nickname') || '';
-            if (!me || !userIconsLoaded || !gameData || !gameData.iconCheckV4) return;
+            const me = myMinigameName();
+            if (!gameMine(me) || !userIconsLoaded || !gameData.iconCheckV4) return;
             const next = COLLECTION_V4_MAP[userIcons[me]];
             if (next && (gameData.collection || []).includes(next)) {
                 userIcons[me] = next;
                 if (db) db.ref(`userIcons/${me}`).set(next);
             }
-            delete gameData.iconCheckV4;
-            saveGameData();
+            clearGameFlag('iconCheckV4');
             if (typeof refreshIconViews === 'function') refreshIconViews();
         }
 
         // 정리 예외: 이 사람들은 이 인형을 그대로 가짐 (아이콘도 그대로) — 2026-11-04 요청
         const COLLECTION_V3_KEEP = { '박규태': ['🦋'], '최다영': ['🦅'] };
-        function applyCollectionKeepV3(data) {
-            const me = localStorage.getItem('chat_nickname') || '';
+        function applyCollectionKeepV3(data, me) {
             const keep = COLLECTION_V3_KEEP[me];
             if (!keep || !data || (data.collectionVer || 0) < 3 || data.keepV3Done) return false;
             const bc = ((data.collectionBackupV3 || {}).collectionCount) || {};
@@ -9766,22 +9841,21 @@ ${text}
             return true;
         }
         function applyKeepIconV3() {
-            const me = localStorage.getItem('chat_nickname') || '';
-            if (!me || !userIconsLoaded || !gameData || !gameData.keepIconV3) return;
+            const me = myMinigameName();
+            if (!gameMine(me) || !userIconsLoaded || !gameData.keepIconV3) return;
             const e = gameData.keepIconV3;
             if ((gameData.collection || []).includes(e) && userIcons[me] !== e) {
                 userIcons[me] = e;
                 if (db) db.ref(`userIcons/${me}`).set(e);
             }
-            delete gameData.keepIconV3;
-            saveGameData();
+            clearGameFlag('keepIconV3');
             if (typeof refreshIconViews === 'function') refreshIconViews();
         }
         // 이름 옆 아이콘이 더 이상 가진 인형이 아니면 남은 인형 중 가장 높은 등급으로 바꿈 (없으면 해제)
         let userIconsLoaded = false;
         function migrateMyIconV3() {
-            const me = localStorage.getItem('chat_nickname') || '';
-            if (!me || !userIconsLoaded || !gameData || !gameData.iconCheckV3) return;
+            const me = myMinigameName();
+            if (!gameMine(me) || !userIconsLoaded || !gameData.iconCheckV3) return;
             const cur = userIcons[me], owned = gameData.collection || [];
             if (cur && !owned.includes(cur)) {
                 const order = ['hidden', 'emerald', 'gold', 'silver', 'bronze'];
@@ -9790,24 +9864,22 @@ ${text}
                 if (best) userIcons[me] = best; else delete userIcons[me];
                 if (db) db.ref(`userIcons/${me}`).set(best);
             }
-            delete gameData.iconCheckV3;
-            saveGameData();
+            clearGameFlag('iconCheckV3');
             if (typeof refreshIconViews === 'function') refreshIconViews();
         }
 
         // 이름 옆 아이콘이 개편 전 인형이면 새 인형으로 바꿔 저장 (내 것만)
         function migrateMyIconV2() {
-            const me = localStorage.getItem('chat_nickname') || '';
-            const cur = me && userIcons[me];
-            if (!cur || !gameData || gameData.collectionVer !== 2 || !gameData.iconMigrateFrom) return;
-            if ((gameData.collection || []).includes(cur) && !COLLECTION_V2_MAP[cur]) { delete gameData.iconMigrateFrom; saveGameData(); return; }
+            const me = myMinigameName();
+            const cur = gameMine(me) && userIcons[me];
+            if (!cur || gameData.collectionVer !== 2 || !gameData.iconMigrateFrom) return;
+            if ((gameData.collection || []).includes(cur) && !COLLECTION_V2_MAP[cur]) { clearGameFlag('iconMigrateFrom'); return; }
             const next = COLLECTION_V2_MAP[cur];
             if (next && (gameData.collection || []).includes(next)) {
                 userIcons[me] = next;
                 if (db) db.ref(`userIcons/${me}`).set(next);
             }
-            delete gameData.iconMigrateFrom;
-            saveGameData();
+            clearGameFlag('iconMigrateFrom');
             if (typeof refreshIconViews === 'function') refreshIconViews();
         }
 
@@ -9834,22 +9906,76 @@ ${text}
             '천상의 검', '전설의 마검', '신의 검'
         ];
 
-        function initMinigame() {
-            const myName = localStorage.getItem('chat_nickname') || '익명';
-            if (db) {
-                db.ref(`minigame/${myName}`).on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    if (data) {
+        // ===== 내 미니게임 데이터 불러오기·저장 (2026-11-04 안전장치) =====
+        //  예전엔 페이지를 연 순간의 닉네임으로만 불러오고, 저장은 '지금' 닉네임에 통째로 덮어써서
+        //  닉네임을 나중에 입력/변경하면 다른 이름(익명 등)의 데이터나 빈 데이터가 내 컬렉션을 덮어쓸 수 있었음.
+        //  → 데이터 주인(gameDataOwner)을 기억하고, 닉네임이 바뀌면 다시 불러오며,
+        //    저장은 트랜잭션으로 서버 값을 확인해 '가진 인형이 사라지는 저장'은 거부함.
+        let gameDataOwner = null;   // 지금 gameData가 누구 것인지
+        let gameDataLoaded = false; // 서버에서 한 번이라도 불러왔는지
+        let minigameRef = null;
+        const myMinigameName = () => (localStorage.getItem('chat_nickname') || '').trim() || '익명';
+        const gameMine = (me) => !!(me && gameDataLoaded && gameDataOwner === me && gameData);
+        // 플래그 하나만 지움 (데이터 전체를 다시 쓰지 않음)
+        function clearGameFlag(k) {
+            if (gameData) delete gameData[k];
+            const me = myMinigameName();
+            if (db && gameMine(me)) db.ref(`minigame/${me}/${k}`).remove();
+        }
+        // 컬렉션 변환(2→3→4차)과 정리 예외를 한 번에 (바뀌었으면 true)
+        function runCollectionMigrations(d, me) {
+            let changed = migrateCollectionV2(d) | migrateCollectionV3(d) | migrateCollectionV4(d);
+            if (applyCollectionKeepV3(d, me)) changed = 1;
+            return !!changed;
+        }
+
+        function bindMinigame() {
+            if (!db) return;
+            const myName = myMinigameName();
+            if (minigameRef && gameDataOwner === myName) return; // 이미 내 데이터를 보고 있음
+            if (minigameRef) minigameRef.off();
+            gameDataOwner = myName;
+            gameDataLoaded = false;
+            gameData = { coins: 0, weaponLevel: 0, collection: [], gachaHistory: [] };
+            const ref = db.ref(`minigame/${myName}`);
+            minigameRef = ref;
+            ref.on('value', (snapshot) => {
+                if (minigameRef !== ref) return; // 닉네임이 바뀐 뒤 늦게 온 예전 이름의 값은 무시
+                const data = snapshot.val();
+                if (data) {
+                    const probe = JSON.parse(JSON.stringify(data));
+                    if (runCollectionMigrations(probe, myName)) {
+                        gameData = probe;
+                        // 변환은 서버 값 기준 트랜잭션으로 (잠깐 보이는 임시 값으로 덮어쓰지 않게)
+                        ref.transaction(cur => {
+                            if (!cur) return;
+                            return runCollectionMigrations(cur, myName) ? cur : undefined;
+                        });
+                    } else {
                         gameData = data;
-                        const changed = migrateCollectionV2(gameData) | migrateCollectionV3(gameData) | migrateCollectionV4(gameData);
-                        if (changed) { saveGameData(); migrateMyIconV2(); }
-                        if (applyCollectionKeepV3(gameData)) saveGameData();
-                        migrateMyIconV3();
-                        applyKeepIconV3();
-                        migrateMyIconV4();
                     }
-                    updateMinigameUI();
-                });
+                    gameDataLoaded = true;
+                    migrateMyIconV2();
+                    migrateMyIconV3();
+                    applyKeepIconV3();
+                    migrateMyIconV4();
+                } else {
+                    gameData = { coins: 0, weaponLevel: 0, collection: [], gachaHistory: [] };
+                    gameDataLoaded = true;
+                }
+                updateMinigameUI();
+            });
+            updateMinigameUI();
+            if (typeof renderCheckin === 'function') renderCheckin();
+        }
+        // 닉네임 입력·변경 시 호출: 바뀐 이름의 데이터를 다시 불러옴
+        function onMyNicknameChanged() {
+            try { bindMinigame(); } catch (e) { console.warn('minigame rebind', e); }
+        }
+
+        function initMinigame() {
+            if (db) {
+                bindMinigame();
 
                 // 리더보드 로드
                 loadLeaderboard();
@@ -9860,11 +9986,33 @@ ${text}
             renderCheckin();
         }
 
-        function saveGameData() {
-            const myName = localStorage.getItem('chat_nickname') || '익명';
-            if (db && myName) {
-                db.ref(`minigame/${myName}`).set(gameData);
+        // 뽑기·강화 결과 저장. 서버 값을 확인해서
+        //  · 다른 사람 데이터이거나 아직 못 불러왔으면 저장 안 함
+        //  · 서버에 있는 인형이 빠지는 저장(예전/빈 데이터로 덮어쓰기)은 거부 → 서버 값으로 다시 맞춤
+        function saveGameData(onDone) {
+            const me = myMinigameName();
+            if (!db || !gameMine(me)) {
+                if (gameDataOwner !== me) bindMinigame();
+                if (onDone) onDone(false);
+                return false;
             }
+            const next = JSON.parse(JSON.stringify(gameData));
+            const mine = new Set(next.collection || []);
+            db.ref(`minigame/${me}`).transaction(cur => {
+                if (cur) {
+                    if ((cur.collectionVer || 0) > (next.collectionVer || 0)) return;
+                    if ((cur.collection || []).some(e => !mine.has(e))) return;
+                }
+                return next;
+            }, (err, committed, snap) => {
+                if (!err && !committed) {
+                    // 다른 탭/기기에서 먼저 바뀜 → 서버 값으로 되돌림
+                    if (snap && snap.val() && gameDataOwner === me) { gameData = snap.val(); updateMinigameUI(); if (typeof renderGachaHistory === 'function') renderGachaHistory(); }
+                    if (typeof showCoinNotification === 'function') showCoinNotification(0, '', '다른 탭/기기와 겹쳐서 이번 결과는 저장되지 않았어요. 다시 시도해주세요.');
+                }
+                if (onDone) onDone(!err && committed);
+            });
+            return true;
         }
 
         function updateMinigameUI() {
@@ -9950,6 +10098,7 @@ ${text}
         }
 
         function doGacha() {
+            if (!gameMine(myMinigameName())) { bindMinigame(); alert('내 미니게임 데이터를 불러오는 중이에요. 잠시 후 다시 시도해주세요.'); return; }
             if ((gameData.coins || 0) < 1) {
                 alert('코인이 부족합니다! 신기술 검토 등록(3), 특허 모션 생성(3), QnA 안건(2), 학습 링크 공유(1), 출석체크(1)로 코인을 얻을 수 있어요.');
                 return;
@@ -10025,6 +10174,7 @@ ${text}
         }
 
         function doEnhance() {
+            if (!gameMine(myMinigameName())) { bindMinigame(); alert('내 미니게임 데이터를 불러오는 중이에요. 잠시 후 다시 시도해주세요.'); return; }
             // 도전 시작할 때만 1코인, 성공하는 동안은 무료로 계속 강화
             if (!gameData.enhancePaid) {
                 if ((gameData.coins || 0) < 1) {
@@ -10349,7 +10499,7 @@ ${text}
                     return;
                 }
                 db.ref(`checkin/${today}/${myName}`).set(Date.now());
-                gameData = snapshot.val();
+                if (gameDataOwner === myName && snapshot.val()) gameData = snapshot.val();
                 updateMinigameUI();
                 showCoinNotification(1, '출석체크');
             });
@@ -14453,6 +14603,6 @@ ${text}
     })();
     </script>
     <!-- 특허 모션 탭: PDF → EXAONE 해석 → 동작 애니메이션 -->
-    <script src="patent_motion.js"></script>
+    <script src="patent_motion.js?v=2026-11-04b"></script>
 </body>
 </html>
