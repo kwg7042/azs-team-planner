@@ -3721,6 +3721,10 @@
         .dodge-ranking td.dodge-best { color: #ffd400; font-weight: bold; }
         .dodge-ranking tr.dodge-me td { background: rgba(79,163,255,0.15); }
         .dodge-ranking th:nth-child(2), .dodge-ranking td:nth-child(2) { text-align: left; }
+        .weekly-ranking { margin-top: 14px; border: 1px solid rgba(255,215,0,0.25); }
+        .weekly-ranking h4 small { font-weight: normal; opacity: 0.75; font-size: 12px; }
+        .weekly-last { margin-top: 8px; font-size: 13px; color: #ffe27a; }
+        .ai-reward-note { text-align: center; font-size: 12px; color: #ffe27a; margin: -6px 0 10px; }
         /* ===== 쿠키 러너 ===== */
         .runner-area { text-align: center; padding: 15px; background: linear-gradient(180deg, #3b2412, #1e1209); border-radius: 20px; border: 3px solid rgba(255,180,90,0.45); margin-bottom: 20px; }
         #runnerCanvas { width: 100%; max-width: 720px; height: auto; display: block; margin: 0 auto; border-radius: 12px; touch-action: none; user-select: none; -webkit-user-select: none; }
@@ -4586,7 +4590,7 @@
                 <!-- 코인 획득 방법 안내 -->
                 <div class="coin-guide">
                     <span class="coin-guide-icon">💡</span>
-                    <span class="coin-guide-text">업무를 완료하거나 매일 출첵하면 <strong>1코인</strong>을 받아요!</span>
+                    <span class="coin-guide-text">코인 얻는 법: 매일 출첵 <strong>1</strong> · AI 오목/체스 승리 (보통 <strong>1</strong> · 어려움 <strong>2</strong>, 하루 최대 5) · 주간 닷지/쿠키 러너 1등 <strong>10</strong></span>
                 </div>
 
                 <!-- 게임 선택 -->
@@ -4770,6 +4774,7 @@
                         </select>
                         <button class="btn btn-primary" onclick="startOmokAi()"><i class="fas fa-redo"></i> 새 게임</button>
                     </div>
+                    <div class="ai-reward-note">🎁 승리 보상: 🙂 보통 <span class="coin-ico"></span>1 · 🧠 어려움 <span class="coin-ico"></span>2 (오목·체스 합쳐 하루 최대 5개, 쉬움은 없음)</div>
                     <div class="omokai-info" id="omokAiInfo">AI와 1:1 오목 · 정확히 5목이면 승리(6목 이상 무효) · 흑은 3-3·6목 금지(✕ 표시) · 진행 중 새 게임은 1패</div>
                     <div class="game-container-mini">
                         <div class="game-board-wrapper-mini">
@@ -4802,6 +4807,11 @@
                     <div class="leaderboard dodge-ranking">
                         <h4>🏆 닷지 랭킹 (오래 버틴 시간)</h4>
                         <div id="dodgeRanking" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                    </div>
+                    <div class="leaderboard dodge-ranking weekly-ranking">
+                        <h4>📅 이번 주 닷지 랭킹 <small>(월~일 · 1등은 다음 주에 <span class="coin-ico"></span>10)</small></h4>
+                        <div id="dodgeWeekly" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                        <div class="weekly-last" id="dodgeWeeklyLast"></div>
                     </div>
                 </div>
 
@@ -4841,6 +4851,11 @@
                     <div class="leaderboard dodge-ranking">
                         <h4>🏆 쿠키 러너 랭킹 (최고 점수)</h4>
                         <div id="runnerRanking" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                    </div>
+                    <div class="leaderboard dodge-ranking weekly-ranking">
+                        <h4>📅 이번 주 쿠키 러너 랭킹 <small>(월~일 · 1등은 다음 주에 <span class="coin-ico"></span>10)</small></h4>
+                        <div id="runnerWeekly" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                        <div class="weekly-last" id="runnerWeeklyLast"></div>
                     </div>
                 </div>
 
@@ -4899,6 +4914,7 @@
                         </select>
                         <button class="btn btn-primary" onclick="startChessAi()"><i class="fas fa-redo"></i> 새 게임</button>
                     </div>
+                    <div class="ai-reward-note">🎁 승리 보상: 🙂 보통 <span class="coin-ico"></span>1 · 🧠 어려움 <span class="coin-ico"></span>2 (오목·체스 합쳐 하루 최대 5개, 쉬움은 없음)</div>
                     <div class="omokai-info" id="chessAiInfo">AI와 1:1 체스 · 정식 규칙(캐슬링·앙파상·승격 선택·3회 반복·50수 무승부) · 진행 중 새 게임은 1패</div>
                     <div class="game-container-mini">
                         <div class="game-board-wrapper-mini">
@@ -5583,13 +5599,10 @@
             const task = tasks.find(t => t.id === id);
             if (task) {
                 task.completed = !task.completed;
-                // 업무 완료 시 코인 지급 (같은 업무로 중복 지급 방지)
-                const earnsCoin = task.completed && !task.coinAwarded;
-                if (earnsCoin) task.coinAwarded = true;
+                // (2026-11) 업무 완료 코인은 악용돼서 폐지 — 코인은 출석체크·AI 대전·주간 1등으로만
                 saveTasks([task]);
                 renderWeeklyGrid();
                 renderCalendar();
-                if (earnsCoin) earnCoin(1, '업무 완료');
             }
         }
 
@@ -8419,13 +8432,14 @@ ${text}
             if (typeof renderOmokAiStats === 'function') safe(renderOmokAiStats);
             if (typeof renderDodgeRanking === 'function') safe(renderDodgeRanking);
             if (typeof renderRunnerRanking === 'function') safe(renderRunnerRanking);
+            if (typeof renderWeeklyRanking === 'function') ['dodge', 'runner'].forEach(g => safe(() => renderWeeklyRanking(g)));
             if (typeof renderMafia === 'function') safe(renderMafia);
             if (typeof renderChessAiStats === 'function') safe(renderChessAiStats);
         }
         function setupUserIconListener() {
             if (!db) return;
             db.ref('userIcons').off();
-            db.ref('userIcons').on('value', snap => { userIcons = snap.val() || {}; migrateMyIconV2(); refreshIconViews(); });
+            db.ref('userIcons').on('value', snap => { userIcons = snap.val() || {}; userIconsLoaded = true; migrateMyIconV2(); migrateMyIconV3(); refreshIconViews(); });
         }
         function selectMyIcon(emoji) {
             const me = localStorage.getItem('chat_nickname') || '';
@@ -8450,6 +8464,8 @@ ${text}
             setupOmokAiStats();
             setupDodgeRanking();
             setupRunnerRanking();
+            setupWeeklyRankings();
+            setTimeout(settleWeeklyRewards, 3000); // 지난주 1등 보상 (여러 명이 동시에 열어도 한 번만 지급)
             setupMafia();
             setupChessAiStats();
             setupChatListener();
@@ -9513,6 +9529,41 @@ ${text}
             data.iconMigrateFrom = true; // 이름 옆 아이콘도 한 번 변환해야 함
             return true;
         }
+        // 2026-11 부정 코인 정리: 에메랄드·히든은 전부 삭제, 남은 인형은 종류의 절반만 무작위로 남김 (한 번만)
+        //  예전 상태는 collectionBackupV3에 보관 (필요하면 되돌릴 수 있게)
+        function migrateCollectionV3(data) {
+            if (!data || (data.collectionVer || 0) >= 3) return false;
+            const rarity = (e) => (GACHA_ITEMS.find(it => it.emoji === e) || {}).rarity;
+            const col = data.collection || [], cnt = data.collectionCount || {};
+            data.collectionBackupV3 = { collection: col.slice(), collectionCount: Object.assign({}, cnt), at: Date.now() };
+            const rest = col.filter(e => rarity(e) && rarity(e) !== 'emerald' && rarity(e) !== 'hidden');
+            for (let i = rest.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [rest[i], rest[j]] = [rest[j], rest[i]]; }
+            const keep = rest.slice(0, Math.ceil(rest.length / 2));
+            data.collection = GACHA_ITEMS.map(it => it.emoji).filter(e => keep.includes(e));
+            const nc = {}; keep.forEach(e => { nc[e] = cnt[e] || 1; });
+            data.collectionCount = nc;
+            data.collectionVer = 3;
+            data.iconCheckV3 = true;
+            return true;
+        }
+        // 이름 옆 아이콘이 더 이상 가진 인형이 아니면 남은 인형 중 가장 높은 등급으로 바꿈 (없으면 해제)
+        let userIconsLoaded = false;
+        function migrateMyIconV3() {
+            const me = localStorage.getItem('chat_nickname') || '';
+            if (!me || !userIconsLoaded || !gameData || !gameData.iconCheckV3) return;
+            const cur = userIcons[me], owned = gameData.collection || [];
+            if (cur && !owned.includes(cur)) {
+                const order = ['hidden', 'emerald', 'gold', 'silver', 'bronze'];
+                const rank = (e) => order.indexOf((GACHA_ITEMS.find(it => it.emoji === e) || {}).rarity);
+                const best = owned.slice().sort((a, b) => rank(a) - rank(b))[0] || null;
+                if (best) userIcons[me] = best; else delete userIcons[me];
+                if (db) db.ref(`userIcons/${me}`).set(best);
+            }
+            delete gameData.iconCheckV3;
+            saveGameData();
+            if (typeof refreshIconViews === 'function') refreshIconViews();
+        }
+
         // 이름 옆 아이콘이 개편 전 인형이면 새 인형으로 바꿔 저장 (내 것만)
         function migrateMyIconV2() {
             const me = localStorage.getItem('chat_nickname') || '';
@@ -9559,7 +9610,10 @@ ${text}
                     const data = snapshot.val();
                     if (data) {
                         gameData = data;
-                        if (migrateCollectionV2(gameData)) { saveGameData(); migrateMyIconV2(); }
+                        const changed = migrateCollectionV2(gameData) | migrateCollectionV3(gameData);
+                        if (changed) { saveGameData(); migrateMyIconV2(); }
+                        migrateMyIconV3();
+                        notifyMyWeeklyRewards();
                     }
                     updateMinigameUI();
                 });
@@ -9664,7 +9718,7 @@ ${text}
 
         function doGacha() {
             if ((gameData.coins || 0) < 1) {
-                alert('코인이 부족합니다! 업무를 완료하면 코인을 얻을 수 있어요.');
+                alert('코인이 부족합니다! 출석체크, AI 오목/체스 승리(보통·어려움), 주간 닷지/쿠키 러너 1등으로 코인을 얻을 수 있어요.');
                 return;
             }
 
@@ -9861,21 +9915,133 @@ ${text}
             });
         }
 
-        // 코인 획득 함수 (업무 완료 시 호출)
-        function earnCoin(amount = 1, reason = '활동') {
-            const myName = localStorage.getItem('chat_nickname') || '익명';
-            if (!myName) return;
+        // =====================================================
+        // 🪙 코인 정책 (2026-11 개편 — 업무 완료 코인은 악용돼서 폐지)
+        //  · 출석체크 하루 1개
+        //  · AI 오목/체스 승리: 보통 1 · 어려움 2 (쉬움 0), 하루 최대 5개
+        //  · 주간(월~일) 닷지 / 쿠키 러너 1등: 다음 주에 각 10개
+        //  코인은 모두 minigame/{이름} 트랜잭션으로 지급 (여러 탭에서 동시에 받아도 중복 없음)
+        // =====================================================
+        const AI_WIN_COINS = { easy: 0, normal: 1, hard: 2 };
+        const AI_COIN_DAILY_MAX = 5;
+        const WEEKLY_TOP_COINS = 10;
+        const WEEKLY_PATH = { dodge: 'dodge_weekly', runner: 'runner_weekly' };
+        const WEEKLY_LABEL = { dodge: '닷지', runner: '쿠키 러너' };
 
-            if (!gameData.coins) gameData.coins = 0;
-            gameData.coins += amount;
-            saveGameData();
-            updateMinigameUI();
-
-            // 알림 표시
-            showCoinNotification(amount, reason);
+        function rewardAiWin(game, level) {
+            const base = AI_WIN_COINS[level] || 0;
+            const myName = localStorage.getItem('chat_nickname') || '';
+            if (!base) { showCoinNotification(0, '', '🐣 쉬움 난이도는 코인 보상이 없어요 (보통 1 · 어려움 2)'); return; }
+            if (!db || !myName) return;
+            const today = getLocalDateKey();
+            let granted = 0, usedAfter = 0;
+            db.ref(`minigame/${myName}`).transaction(cur => {
+                cur = cur || { coins: 0, weaponLevel: 0, collection: [], gachaHistory: [] };
+                const used = cur.aiCoinDay === today ? (cur.aiCoinToday || 0) : 0;
+                granted = Math.max(0, Math.min(base, AI_COIN_DAILY_MAX - used));
+                if (!granted) return; // 오늘 한도 다 받음
+                cur.coins = (cur.coins || 0) + granted;
+                cur.aiCoinDay = today;
+                cur.aiCoinToday = usedAfter = used + granted;
+                return cur;
+            }, (err, committed) => {
+                if (err) return;
+                if (committed && granted) showCoinNotification(granted, `AI ${game} 승리 · 오늘 ${usedAfter}/${AI_COIN_DAILY_MAX}`);
+                else showCoinNotification(0, '', `오늘 AI 승리 보상(${AI_COIN_DAILY_MAX}개)을 다 받았어요. 내일 또 도전!`);
+            });
         }
 
-        function showCoinNotification(amount, reason) {
+        // ----- 주간 랭킹 (월~일) -----
+        function weekKeyOf(d = new Date()) {
+            const m = new Date(d); m.setHours(0, 0, 0, 0);
+            m.setDate(m.getDate() - ((m.getDay() + 6) % 7));
+            return getLocalDateKey(m);
+        }
+        function recordWeeklyScore(game, name, score, extra) {
+            if (!db || !(score > 0)) return;
+            db.ref(`${WEEKLY_PATH[game]}/${weekKeyOf()}/${statKey(name)}`).transaction(cur => {
+                if (cur && (cur.best || 0) >= score) return; // 이번 주 기록을 넘지 못하면 그대로
+                return Object.assign({ best: score, at: Date.now() }, extra || {});
+            });
+        }
+        let weeklyScores = { dodge: {}, runner: {} }, weeklyLast = null, weeklySubKey = '';
+        function setupWeeklyRankings() {
+            if (!db) return;
+            const wk = weekKeyOf();
+            if (weeklySubKey === wk) return;
+            if (weeklySubKey) Object.values(WEEKLY_PATH).forEach(path => db.ref(`${path}/${weeklySubKey}`).off());
+            weeklySubKey = wk;
+            Object.entries(WEEKLY_PATH).forEach(([game, path]) => {
+                db.ref(`${path}/${wk}`).on('value', snap => { weeklyScores[game] = snap.val() || {}; renderWeeklyRanking(game); });
+            });
+            const prev = new Date(); prev.setDate(prev.getDate() - 7);
+            db.ref(`weekly_rewards/${weekKeyOf(prev)}`).on('value', snap => { weeklyLast = snap.val(); ['dodge', 'runner'].forEach(renderWeeklyRanking); });
+        }
+        function weeklyTop(obj) {
+            return Object.entries(obj || {})
+                .map(([name, d]) => ({ name, best: (d && d.best) || 0, at: (d && d.at) || 0, d }))
+                .filter(r => r.best > 0)
+                .sort((a, b) => b.best - a.best || a.at - b.at);
+        }
+        function renderWeeklyRanking(game) {
+            const el = document.getElementById(`${game}Weekly`);
+            if (!el) return;
+            if (weeklySubKey && weeklySubKey !== weekKeyOf()) setupWeeklyRankings(); // 주가 바뀌면 다시 구독
+            const fmt = (r) => game === 'dodge' ? `${r.best.toFixed(2)}초` : `${r.best.toLocaleString()}점`;
+            const me = statKey(myGameName());
+            const rows = weeklyTop(weeklyScores[game]).filter(r => hasRankIcon(r.name)).slice(0, 5);
+            const medal = (i) => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+            el.innerHTML = rows.length
+                ? `<table><tr><th>순위</th><th>이름</th><th>이번 주 최고</th></tr>${rows.map((r, i) => `<tr class="${r.name === me ? 'dodge-me' : ''}"><td>${medal(i)}</td><td>${nameWithIcon(r.name)}</td><td class="dodge-best">${fmt(r)}</td></tr>`).join('')}</table>`
+                : '<div class="gs-empty">이번 주 기록이 아직 없어요. 지금 1등을 차지해 보세요!</div>';
+            const last = document.getElementById(`${game}WeeklyLast`);
+            if (last) {
+                const w = weeklyLast && weeklyLast[game];
+                last.innerHTML = w && w.name ? `🏆 지난주 1등: ${nameWithIcon(w.name)} (${game === 'dodge' ? `${(+w.best).toFixed(2)}초` : `${(+w.best).toLocaleString()}점`}) · <span class="coin-ico"></span>${WEEKLY_TOP_COINS} 지급` : '';
+            }
+        }
+        // 지난주 1등에게 코인 지급: 우승자는 weekly_rewards/{주}에 한 번만 확정, 지급은 사람마다 표시를 남겨 중복 없음
+        function settleWeeklyRewards() {
+            if (!db) return;
+            const prev = new Date(); prev.setDate(prev.getDate() - 7);
+            const wk = weekKeyOf(prev);
+            const recRef = db.ref(`weekly_rewards/${wk}`);
+            const pay = (rec) => ['dodge', 'runner'].forEach(game => { const w = rec && rec[game]; if (w && w.name) payWeeklyReward(wk, game, w.name); });
+            recRef.once('value').then(snap => {
+                if (snap.val()) { pay(snap.val()); return; }
+                return Promise.all(['dodge', 'runner'].map(game => db.ref(`${WEEKLY_PATH[game]}/${wk}`).once('value'))).then(([ds, rs]) => {
+                    const top = (obj) => { const r = weeklyTop(obj)[0]; return r ? { name: r.name, best: r.best } : null; };
+                    const winners = { dodge: top(ds.val()), runner: top(rs.val()), decidedAt: Date.now() };
+                    recRef.transaction(cur => cur ? undefined : winners, (err, committed, s2) => { if (!err) pay(s2 && s2.val()); });
+                });
+            }).catch(e => console.warn('주간 보상 확인 실패', e));
+        }
+        function payWeeklyReward(wk, game, name) {
+            const flag = `${wk}_${game}`;
+            db.ref(`minigame/${name}`).transaction(cur => {
+                cur = cur || { coins: 0, weaponLevel: 0, collection: [], gachaHistory: [] };
+                cur.weeklyRewards = cur.weeklyRewards || {};
+                if (cur.weeklyRewards[flag]) return; // 이미 받음
+                cur.weeklyRewards[flag] = { coins: WEEKLY_TOP_COINS, at: Date.now() };
+                cur.coins = (cur.coins || 0) + WEEKLY_TOP_COINS;
+                return cur;
+            });
+        }
+        // 내가 받은 주간 보상을 처음 볼 때 한 번 알림
+        function notifyMyWeeklyRewards() {
+            const got = (gameData && gameData.weeklyRewards) || {};
+            let seen = {};
+            try { seen = JSON.parse(localStorage.getItem('azs_weekly_seen') || '{}'); } catch (e) {}
+            Object.keys(got).forEach(k => {
+                if (seen[k]) return;
+                seen[k] = 1;
+                const game = k.split('_')[1];
+                showCoinNotification(got[k].coins || WEEKLY_TOP_COINS, `지난주 ${WEEKLY_LABEL[game] || ''} 1등 보상`);
+            });
+            try { localStorage.setItem('azs_weekly_seen', JSON.stringify(seen)); } catch (e) {}
+        }
+
+        function showCoinNotification(amount, reason, text) {
             const notification = document.createElement('div');
             notification.style.cssText = `
                 position: fixed;
@@ -9889,7 +10055,7 @@ ${text}
                 z-index: 10000;
                 animation: slideIn 0.5s ease, slideOut 0.5s ease 2s forwards;
             `;
-            notification.innerHTML = `<span class="coin-ico"></span> +${amount} 코인 획득! (${reason})`;
+            notification.innerHTML = text ? escapeHtml(text) : `<span class="coin-ico"></span> +${amount} 코인 획득! (${escapeHtml(reason)})`;
             document.body.appendChild(notification);
 
             setTimeout(() => notification.remove(), 2500);
@@ -10876,6 +11042,7 @@ ${text}
                 cur.updatedAt = Date.now();
                 return cur;
             });
+            recordWeeklyScore('dodge', name, Math.round(sec * 100) / 100);
         }
 
         function renderDodgeRanking() {
@@ -11285,6 +11452,7 @@ ${text}
                 cur.updatedAt = Date.now();
                 return cur;
             });
+            recordWeeklyScore('runner', name, f.score, { coins: f.coins, meters: f.meters });
         }
 
         // ---------- 그리기 ----------
@@ -13439,7 +13607,7 @@ ${text}
             if (omokAiCheckWin(g.board, x, y, color)) {
                 g.over = true; g.winner = color;
                 // 내가 이기면 1승, AI가 이기면 1패 (난이도별 기록)
-                if (color === g.me) recordGameResult(`omok_ai_${g.level}`, myGameName(), null);
+                if (color === g.me) { recordGameResult(`omok_ai_${g.level}`, myGameName(), null); rewardAiWin('오목', g.level); }
                 else recordGameResult(`omok_ai_${g.level}`, null, myGameName());
             } else if (g.moves >= BOARD_SIZE * BOARD_SIZE) {
                 g.over = true; g.winner = 'draw';
@@ -13602,7 +13770,7 @@ ${text}
                     g.log.unshift(`🤝 무승부 — ${status.reason}`);
                 } else {
                     g.log.unshift(`🏆 체크메이트! ${caiSideName(status.result)} 승리`);
-                    if (status.result === g.me) recordGameResult(`chess_ai_${g.level}`, myGameName(), null);
+                    if (status.result === g.me) { recordGameResult(`chess_ai_${g.level}`, myGameName(), null); rewardAiWin('체스', g.level); }
                     else recordGameResult(`chess_ai_${g.level}`, null, myGameName());
                 }
             }
