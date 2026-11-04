@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 256">
+  <defs>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0a1020" flood-opacity="0.5"/>
+    </filter>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="bigglow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+
+    <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7d97b3"/><stop offset="0.45" stop-color="#3d5570"/><stop offset="1" stop-color="#1a2636"/></linearGradient>
+    <linearGradient id="belly" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8eef5"/><stop offset="1" stop-color="#9fb0c4"/></linearGradient>
+    <radialGradient id="mouth" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#1a0004"/><stop offset="0.7" stop-color="#5a0612"/><stop offset="1" stop-color="#a3152a"/></radialGradient>
+    <linearGradient id="tooth" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d8d2bf"/></linearGradient>
+    <radialGradient id="eye" cx="40%" cy="40%" r="60%"><stop offset="0" stop-color="#3a3a3a"/><stop offset="1" stop-color="#000"/></radialGradient>
+    <radialGradient id="splash" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#bfe9ff" stop-opacity="0.6"/><stop offset="1" stop-color="#3a8ad0" stop-opacity="0"/></radialGradient>
+  </defs>
+  <circle cx="128" cy="140" r="122" fill="url(#splash)"/>
+  <g filter="url(#soft)">
+    <!-- 등지느러미 -->
+    <path d="M110 40 C118 14 140 4 160 2 C150 18 146 32 148 48 Z" fill="url(#skin)" stroke="#0e1622" stroke-width="2"/>
+    <!-- 가슴지느러미 -->
+    <path d="M40 176 C20 196 8 222 4 246 C26 230 46 214 64 196 Z" fill="url(#skin)" stroke="#0e1622" stroke-width="2"/>
+    <path d="M216 176 C236 196 248 222 252 246 C230 230 210 214 192 196 Z" fill="url(#skin)" stroke="#0e1622" stroke-width="2"/>
+    <!-- 머리 -->
+    <path d="M128 36 C186 36 230 74 236 122 C240 162 214 214 172 234 C150 244 106 244 84 234 C42 214 16 162 20 122 C26 74 70 36 128 36 Z" fill="url(#skin)" stroke="#0e1622" stroke-width="2.5"/>
+    <!-- 아래턱 흰 배 -->
+    <path d="M48 176 C66 222 104 240 128 240 C152 240 190 222 208 176 C186 206 160 216 128 216 C96 216 70 206 48 176 Z" fill="url(#belly)"/>
+    <!-- 아가미 -->
+    <g stroke="#152132" stroke-width="2.5" fill="none" stroke-linecap="round"><path d="M34 120 C30 132 30 146 34 158"/><path d="M42 116 C38 130 38 146 42 162"/><path d="M222 120 C226 132 226 146 222 158"/><path d="M214 116 C218 130 218 146 214 162"/></g>
+    <!-- 흉터 -->
+    <g stroke="#c9d6e4" stroke-width="2" opacity="0.6" stroke-linecap="round"><path d="M150 54 L170 74"/><path d="M158 50 L176 70"/><path d="M84 66 L98 60"/></g>
+    <!-- 입 -->
+    <ellipse cx="128" cy="150" rx="72" ry="60" fill="url(#mouth)" stroke="#5a0612" stroke-width="3"/>
+    <ellipse cx="128" cy="156" rx="57.6" ry="45.0" fill="none" stroke="#c42a40" stroke-width="5" opacity="0.6"/>
+    <path d="M75.4 134.7 L82.5 134.7 L90.2 133.4 L86.0 126.9 L81.2 121.6 Z M82.7 123.5 L89.6 125.3 L97.4 125.9 L94.9 118.5 L91.6 112.3 Z M93.2 114.1 L99.3 117.7 L106.6 120.5 L106.3 112.7 L104.8 105.7 Z M106.2 107.2 L110.9 112.4 L117.1 117.2 L119.1 109.7 L119.7 102.6 Z M120.8 103.2 L123.7 109.7 L128.0 116.2 L132.3 109.7 L135.1 103.2 Z M136.3 102.6 L136.9 109.7 L138.9 117.2 L145.1 112.4 L149.8 107.2 Z M151.2 105.7 L149.7 112.7 L149.4 120.5 L156.7 117.7 L162.8 114.1 Z M164.4 112.3 L161.1 118.5 L158.6 125.9 L166.4 125.3 L173.3 123.5 Z M174.8 121.6 L170.0 126.9 L165.8 133.4 L173.5 134.7 L180.6 134.7 Z M178.2 169.8 L171.7 169.2 L164.5 169.8 L167.9 176.2 L171.9 181.4 Z M169.2 180.8 L163.0 178.5 L156.0 177.2 L157.5 184.2 L160.0 190.3 Z M157.0 189.5 L151.8 185.5 L145.4 182.1 L144.8 189.2 L145.4 195.8 Z M142.4 195.2 L138.8 189.7 L133.9 184.5 L131.0 191.1 L129.4 197.4 Z M126.6 197.4 L125.0 191.1 L122.1 184.5 L117.2 189.7 L113.6 195.2 Z M110.6 195.8 L111.2 189.2 L110.6 182.1 L104.2 185.5 L99.0 189.5 Z M96.0 190.3 L98.5 184.2 L100.0 177.2 L93.0 178.5 L86.8 180.8 Z M84.1 181.4 L88.1 176.2 L91.5 169.8 L84.3 169.2 L77.8 169.8 Z" fill="url(#tooth)" stroke="#8a8270" stroke-width="0.8" opacity="0.9"/>
+    <path d="M56.6 142.0 L68.5 140.4 L81.1 136.5 L72.5 126.4 L63.3 118.7 Z M62.0 127.7 L74.0 128.7 L87.1 127.6 L80.9 116.0 L73.6 106.5 Z M71.2 114.8 L82.6 118.6 L95.6 120.6 L92.3 107.8 L87.4 96.8 Z M83.6 103.8 L93.7 110.4 L105.8 115.7 L105.9 102.5 L104.0 90.6 Z M98.8 95.3 L106.6 104.5 L116.7 112.9 L120.5 100.2 L121.9 88.3 Z M115.9 90.0 L120.7 101.0 L128.0 112.0 L135.3 101.0 L140.1 90.0 Z M134.1 88.3 L135.5 100.2 L139.3 112.9 L149.4 104.5 L157.2 95.3 Z M152.0 90.6 L150.1 102.5 L150.2 115.7 L162.3 110.4 L172.4 103.8 Z M168.6 96.8 L163.7 107.8 L160.4 120.6 L173.4 118.6 L184.8 114.8 Z M182.4 106.5 L175.1 116.0 L168.9 127.6 L182.0 128.7 L194.0 127.7 Z M192.7 118.7 L183.5 126.4 L174.9 136.5 L187.5 140.4 L199.4 142.0 Z M198.4 161.6 L187.5 162.7 L176.0 165.8 L183.4 175.2 L191.5 182.5 Z M191.5 176.6 L180.7 175.1 L168.7 175.4 L173.7 186.3 L179.8 195.3 Z M180.4 189.8 L170.3 185.5 L158.6 182.7 L160.7 194.5 L164.3 204.8 Z M165.7 200.4 L157.3 193.4 L146.9 187.5 L145.5 199.4 L146.1 210.3 Z M148.4 207.7 L142.5 198.6 L134.4 189.7 L129.4 200.6 L126.7 211.2 Z M129.3 211.2 L126.6 200.6 L121.6 189.7 L113.5 198.6 L107.6 207.7 Z M109.9 210.3 L110.5 199.4 L109.1 187.5 L98.7 193.4 L90.3 200.4 Z M91.7 204.8 L95.3 194.5 L97.4 182.7 L85.7 185.5 L75.6 189.8 Z M76.2 195.3 L82.3 186.3 L87.3 175.4 L75.3 175.1 L64.5 176.6 Z M64.5 182.5 L72.6 175.2 L80.0 165.8 L68.5 162.7 L57.6 161.6 Z" fill="url(#tooth)" stroke="#8a8270" stroke-width="1"/>
+    <!-- 목구멍 -->
+    <ellipse cx="128" cy="158" rx="22" ry="16" fill="#050002"/>
+    <!-- 주둥이 끝·콧구멍 -->
+    <path d="M104 74 C110 70 116 72 118 76 M152 74 C146 70 140 72 138 76" stroke="#0e1622" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <!-- 눈 (검고 텅 빈) -->
+    <ellipse cx="64" cy="100" rx="11" ry="9" fill="url(#eye)" stroke="#0e1622" stroke-width="2" transform="rotate(-18 64 100)"/>
+    <ellipse cx="192" cy="100" rx="11" ry="9" fill="url(#eye)" stroke="#0e1622" stroke-width="2" transform="rotate(18 192 100)"/>
+    <circle cx="61" cy="97" r="2.4" fill="#fff" opacity="0.85"/><circle cx="189" cy="97" r="2.4" fill="#fff" opacity="0.85"/>
+    <path d="M48 88 L80 98 M208 88 L176 98" stroke="#0e1622" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <!-- 물방울 -->
+  <g fill="#e0f4ff" opacity="0.8"><circle cx="20" cy="70" r="4"/><circle cx="34" cy="50" r="2.5"/><circle cx="236" cy="66" r="3.5"/><circle cx="222" cy="44" r="2"/></g>
+</svg>

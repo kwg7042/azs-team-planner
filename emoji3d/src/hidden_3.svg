@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 256">
+  <defs>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0a1020" flood-opacity="0.5"/>
+    </filter>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="bigglow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+
+    <clipPath id="rr"><rect x="0" y="0" width="256" height="256" rx="34"/></clipPath>
+    <radialGradient id="vign" cx="50%" cy="45%" r="70%"><stop offset="0.55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.75"/></radialGradient>
+    <linearGradient id="sky3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1a4a"/><stop offset="0.45" stop-color="#c4462a"/><stop offset="0.7" stop-color="#ff9a3a"/><stop offset="1" stop-color="#1a2a4a"/></linearGradient>
+    <radialGradient id="sun3" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff2b0"/><stop offset="0.5" stop-color="#ff6a2a"/><stop offset="1" stop-color="#ff3a1a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="helm3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a8090"/><stop offset="0.5" stop-color="#2e333e"/><stop offset="1" stop-color="#0e1016"/></linearGradient>
+    <linearGradient id="gold3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2a8"/><stop offset="0.5" stop-color="#e0a82a"/><stop offset="1" stop-color="#8a5a0a"/></linearGradient>
+    <radialGradient id="skin3" cx="45%" cy="35%" r="70%"><stop offset="0" stop-color="#f6d2b0"/><stop offset="0.65" stop-color="#d8a07a"/><stop offset="1" stop-color="#8a5a40"/></radialGradient>
+    <linearGradient id="armor3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c0182a"/><stop offset="1" stop-color="#5a0612"/></linearGradient>
+    <linearGradient id="armorB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a3a8a"/><stop offset="1" stop-color="#0e1640"/></linearGradient>
+    <linearGradient id="plume" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff3a3a"/><stop offset="1" stop-color="#8a0010"/></linearGradient>
+    <g id="flapL"><path d="M78 102 C70 128 68 156 74 180 L96 176 C92 152 92 126 96 104 Z" fill="url(#armorB)" stroke="#0a0e24" stroke-width="1.5"/>
+      <g fill="url(#gold3)"><circle cx="82" cy="118" r="2.2"/><circle cx="88" cy="118" r="2.2"/><circle cx="80" cy="134" r="2.2"/><circle cx="87" cy="134" r="2.2"/><circle cx="80" cy="150" r="2.2"/><circle cx="87" cy="150" r="2.2"/><circle cx="81" cy="166" r="2.2"/><circle cx="88" cy="166" r="2.2"/></g></g>
+  </defs>
+  <g clip-path="url(#rr)">
+    <rect width="256" height="256" fill="url(#sky3)"/>
+    <circle cx="128" cy="150" r="70" fill="url(#sun3)" opacity="0.9"/>
+    <!-- 바다 + 거북선 -->
+    <path d="M0 178 L256 178 L256 256 L0 256 Z" fill="#14244a"/>
+    <path d="M0 180 q16 -6 32 0 t32 0 t32 0 t32 0 t32 0 t32 0 t32 0 t32 0" stroke="#ffb06a" stroke-width="2" fill="none" opacity="0.5"/>
+    <g fill="#0a0e18">
+      <path d="M8 176 L58 176 L52 168 L14 168 Z"/><path d="M16 168 C22 156 48 156 52 168 Z"/><path d="M58 172 L66 164 L62 176 Z"/>
+      <path d="M198 176 L248 176 L242 168 L204 168 Z"/><path d="M206 168 C212 156 238 156 242 168 Z"/><path d="M198 172 L190 164 L194 176 Z"/>
+    </g>
+    <!-- 투구 -->
+    <path d="M128 14 L132 4 L136 14 Z" fill="url(#gold3)"/>
+    <path d="M122 18 C110 20 104 30 108 40 C114 30 120 26 128 26 C136 26 142 30 148 40 C152 30 146 20 134 18 Z" fill="url(#plume)"/>
+    <path d="M78 100 C78 60 100 34 128 34 C156 34 178 60 178 100 Z" fill="url(#helm3)" stroke="#05060a" stroke-width="2"/>
+    <path d="M128 36 L128 98" stroke="url(#gold3)" stroke-width="5"/>
+    <path d="M74 98 L182 98 L178 108 L78 108 Z" fill="url(#gold3)" stroke="#6a420c" stroke-width="1"/>
+    <path d="M96 56 C104 48 116 44 128 44 M160 56 C152 48 140 44 128 44" stroke="#aab0c0" stroke-width="2" fill="none" opacity="0.6"/>
+    <use xlink:href="#flapL"/><use xlink:href="#flapL" transform="translate(256 0) scale(-1 1)"/>
+    <!-- 얼굴 -->
+    <path d="M128 106 C152 106 164 124 162 150 C160 176 146 194 128 198 C110 194 96 176 94 150 C92 124 104 106 128 106 Z" fill="url(#skin3)" stroke="#5a3a24" stroke-width="1.5"/>
+    <!-- 굳센 눈썹·눈 -->
+    <path d="M102 128 C110 122 118 122 124 128 M154 128 C146 122 138 122 132 128" stroke="#1a0e08" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M106 138 C110 134 118 134 122 138 C118 141 110 141 106 138 Z M150 138 C146 134 138 134 134 138 C138 141 146 141 150 138 Z" fill="#1a0e08"/>
+    <circle cx="113" cy="137.5" r="1.2" fill="#fff"/><circle cx="141" cy="137.5" r="1.2" fill="#fff"/>
+    <path d="M128 142 L124 158 L130 159" stroke="#8a5a40" stroke-width="2" fill="none"/>
+    <!-- 수염 -->
+    <path d="M108 166 C116 160 124 162 128 166 C132 162 140 160 148 166 C142 172 134 170 128 168 C122 170 114 172 108 166 Z" fill="#14100c"/>
+    <path d="M118 176 C120 196 124 214 128 226 C132 214 136 196 138 176 C132 180 124 180 118 176 Z" fill="#14100c"/>
+    <path d="M100 160 C98 176 104 190 112 196 M156 160 C158 176 152 190 144 196" stroke="#14100c" stroke-width="3" fill="none"/>
+    <!-- 갑옷 -->
+    <path d="M40 256 C44 220 70 202 100 198 L128 210 L156 198 C186 202 212 220 216 256 Z" fill="url(#armor3)" stroke="#2a0206" stroke-width="2"/>
+    <circle cx="62" cy="214" r="2.6" fill="url(#gold3)"/><circle cx="76" cy="214" r="2.6" fill="url(#gold3)"/><circle cx="90" cy="214" r="2.6" fill="url(#gold3)"/><circle cx="104" cy="214" r="2.6" fill="url(#gold3)"/><circle cx="118" cy="214" r="2.6" fill="url(#gold3)"/><circle cx="132" cy="214" r="2.6" fill="url(#gold3)"/><circle cx="146" cy="214" r="2.6" fill="url(#gold3)"/><circle cx="160" cy="214" r="2.6" fill="url(#gold3)"/><circle cx="174" cy="214" r="2.6" fill="url(#gold3)"/><circle cx="188" cy="214" r="2.6" fill="url(#gold3)"/><circle cx="202" cy="214" r="2.6" fill="url(#gold3)"/><circle cx="56" cy="226" r="2.6" fill="url(#gold3)"/><circle cx="70" cy="226" r="2.6" fill="url(#gold3)"/><circle cx="84" cy="226" r="2.6" fill="url(#gold3)"/><circle cx="98" cy="226" r="2.6" fill="url(#gold3)"/><circle cx="112" cy="226" r="2.6" fill="url(#gold3)"/><circle cx="126" cy="226" r="2.6" fill="url(#gold3)"/><circle cx="140" cy="226" r="2.6" fill="url(#gold3)"/><circle cx="154" cy="226" r="2.6" fill="url(#gold3)"/><circle cx="168" cy="226" r="2.6" fill="url(#gold3)"/><circle cx="182" cy="226" r="2.6" fill="url(#gold3)"/><circle cx="196" cy="226" r="2.6" fill="url(#gold3)"/><circle cx="62" cy="238" r="2.6" fill="url(#gold3)"/><circle cx="76" cy="238" r="2.6" fill="url(#gold3)"/><circle cx="90" cy="238" r="2.6" fill="url(#gold3)"/><circle cx="104" cy="238" r="2.6" fill="url(#gold3)"/><circle cx="118" cy="238" r="2.6" fill="url(#gold3)"/><circle cx="132" cy="238" r="2.6" fill="url(#gold3)"/><circle cx="146" cy="238" r="2.6" fill="url(#gold3)"/><circle cx="160" cy="238" r="2.6" fill="url(#gold3)"/><circle cx="174" cy="238" r="2.6" fill="url(#gold3)"/><circle cx="188" cy="238" r="2.6" fill="url(#gold3)"/><circle cx="202" cy="238" r="2.6" fill="url(#gold3)"/><circle cx="56" cy="250" r="2.6" fill="url(#gold3)"/><circle cx="70" cy="250" r="2.6" fill="url(#gold3)"/><circle cx="84" cy="250" r="2.6" fill="url(#gold3)"/><circle cx="98" cy="250" r="2.6" fill="url(#gold3)"/><circle cx="112" cy="250" r="2.6" fill="url(#gold3)"/><circle cx="126" cy="250" r="2.6" fill="url(#gold3)"/><circle cx="140" cy="250" r="2.6" fill="url(#gold3)"/><circle cx="154" cy="250" r="2.6" fill="url(#gold3)"/><circle cx="168" cy="250" r="2.6" fill="url(#gold3)"/><circle cx="182" cy="250" r="2.6" fill="url(#gold3)"/><circle cx="196" cy="250" r="2.6" fill="url(#gold3)"/>
+    <path d="M100 198 L128 236 L156 198" stroke="url(#gold3)" stroke-width="4" fill="none"/>
+    <!-- 칼자루 -->
+    <path d="M196 256 L224 196" stroke="#2a1a0a" stroke-width="8" stroke-linecap="round"/>
+    <path d="M214 214 L234 224" stroke="url(#gold3)" stroke-width="6" stroke-linecap="round"/>
+    <rect width="256" height="256" fill="url(#vign)"/>
+  </g>
+  <rect x="3" y="3" width="250" height="250" rx="32" fill="none" stroke="#e0a82a" stroke-width="5" opacity="0.9"/>
+</svg>

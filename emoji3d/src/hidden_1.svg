@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 256">
+  <defs>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0a1020" flood-opacity="0.5"/>
+    </filter>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="bigglow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+
+    <clipPath id="rr"><rect x="0" y="0" width="256" height="256" rx="34"/></clipPath>
+    <radialGradient id="vign" cx="50%" cy="45%" r="70%"><stop offset="0.55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.75"/></radialGradient>
+    <radialGradient id="bg1" cx="50%" cy="45%" r="75%"><stop offset="0" stop-color="#4a1a6e"/><stop offset="0.6" stop-color="#1c0a2e"/><stop offset="1" stop-color="#05020a"/></radialGradient>
+    <radialGradient id="face1" cx="45%" cy="35%" r="70%"><stop offset="0" stop-color="#ffffff"/><stop offset="0.65" stop-color="#e2dce8"/><stop offset="1" stop-color="#8f84a0"/></radialGradient>
+    <linearGradient id="hatP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b06ad6"/><stop offset="1" stop-color="#4a1670"/></linearGradient>
+    <linearGradient id="hatG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fe39a"/><stop offset="1" stop-color="#0f6a3a"/></linearGradient>
+    <radialGradient id="bell" cx="40%" cy="35%" r="60%"><stop offset="0" stop-color="#fff6c0"/><stop offset="1" stop-color="#c98a10"/></radialGradient>
+    <radialGradient id="eye1" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffffff"/><stop offset="0.4" stop-color="#7aff9a"/><stop offset="1" stop-color="#00ff6a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="lips1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff3a4a"/><stop offset="1" stop-color="#8a0618"/></linearGradient>
+  </defs>
+  <g clip-path="url(#rr)">
+    <rect width="256" height="256" fill="url(#bg1)"/>
+    <rect x="14" y="14" width="228" height="228" rx="20" fill="none" stroke="#d9b3ff" stroke-width="1.5" opacity="0.35"/>
+    <text x="18" y="60" font-size="22" fill="#c9a0ff" opacity="0.55" filter="url(#glow)" font-family="serif">♠</text><text x="214" y="58" font-size="20" fill="#ff5a7a" opacity="0.55" filter="url(#glow)" font-family="serif">♥</text><text x="24" y="214" font-size="20" fill="#ff5a7a" opacity="0.55" filter="url(#glow)" font-family="serif">♦</text><text x="212" y="216" font-size="22" fill="#c9a0ff" opacity="0.55" filter="url(#glow)" font-family="serif">♣</text><text x="40" y="128" font-size="14" fill="#7affb0" opacity="0.55" filter="url(#glow)" font-family="serif">♦</text><text x="204" y="130" font-size="14" fill="#7affb0" opacity="0.55" filter="url(#glow)" font-family="serif">♠</text>
+    <!-- 광대 모자 -->
+    <path d="M78 96 C66 70 42 54 18 52 C40 64 54 82 62 104 Z" fill="url(#hatP)" stroke="#1a0626" stroke-width="2"/>
+    <path d="M178 96 C190 70 214 54 238 52 C216 64 202 82 194 104 Z" fill="url(#hatP)" stroke="#1a0626" stroke-width="2"/>
+    <path d="M96 84 C100 52 116 26 128 10 C140 26 156 52 160 84 Z" fill="url(#hatG)" stroke="#06200f" stroke-width="2"/>
+    <circle cx="18" cy="52" r="8" fill="url(#bell)"/><circle cx="238" cy="52" r="8" fill="url(#bell)"/><circle cx="128" cy="10" r="8" fill="url(#bell)"/>
+    <path d="M62 104 C80 80 176 80 194 104 L190 116 C170 98 86 98 66 116 Z" fill="#2a0a3e" stroke="#d9b3ff" stroke-width="1.5"/>
+    <g fill="#ffd23f"><path d="M92 96 l6 -6 6 6 -6 6z"/><path d="M122 92 l6 -6 6 6 -6 6z"/><path d="M152 96 l6 -6 6 6 -6 6z"/></g>
+    <!-- 얼굴 -->
+    <path d="M128 100 C166 100 184 124 182 156 C180 190 158 214 128 218 C98 214 76 190 74 156 C72 124 90 100 128 100 Z" fill="url(#face1)" stroke="#2a1a3a" stroke-width="2"/>
+    <!-- 다이아 눈 화장 -->
+    <path d="M102 120 L110 140 L102 160 L94 140 Z M154 120 L162 140 L154 160 L146 140 Z" fill="#14081e"/>
+    <g filter="url(#glow)"><ellipse cx="102" cy="140" rx="7" ry="4" fill="url(#eye1)"/><ellipse cx="154" cy="140" rx="7" ry="4" fill="url(#eye1)"/></g>
+    <path d="M86 122 C96 114 108 116 116 124 M170 122 C160 114 148 116 140 124" stroke="#14081e" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <!-- 소름 끼치는 미소 -->
+    <path d="M86 172 C100 200 156 200 170 172 C174 168 180 160 184 150 C178 168 172 176 166 180 C150 196 106 196 90 180 C84 176 78 168 72 150 C76 160 82 168 86 172 Z" fill="url(#lips1)"/>
+    <path d="M94 178 C108 192 148 192 162 178 C150 184 106 184 94 178 Z" fill="#14040a"/>
+    <path d="M100 180 L104 186 L108 181 L112 187 L116 182 L120 188 L124 183 L128 188 L132 183 L136 188 L140 182 L144 187 L148 181 L152 186 L156 180" stroke="#fff" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+    <path d="M128 156 L124 166 L128 168" stroke="#8f84a0" stroke-width="2" fill="none"/>
+    <!-- 주름 깃 -->
+    <path d="M60 256 C64 228 84 214 100 214 L128 226 L156 214 C172 214 192 228 196 256 Z" fill="#2a0a3e"/>
+    <path d="M70 230 q10 -12 20 0 q10 -12 20 0 q9 -12 18 0 q9 -12 18 0 q10 -12 20 0 q10 -12 20 0 l0 12 l-116 0 Z" fill="#f0e6ff" stroke="#9a7cff" stroke-width="1.2"/>
+    <!-- 카드 모서리 -->
+    <text x="22" y="40" font-size="18" font-weight="bold" fill="#ffd23f" font-family="serif">J</text>
+    <text x="234" y="246" font-size="18" font-weight="bold" fill="#ffd23f" font-family="serif" transform="rotate(180 228 240)">J</text>
+    <rect width="256" height="256" fill="url(#vign)"/>
+  </g>
+  <rect x="3" y="3" width="250" height="250" rx="32" fill="none" stroke="#b06ad6" stroke-width="5" opacity="0.9"/>
+</svg>

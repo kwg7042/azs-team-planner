@@ -8560,6 +8560,7 @@ ${text}
         function iconOf(name) {
             let e = name ? userIcons[name] : '';
             if (e && !GACHA_ITEMS.some(it => it.emoji === e) && COLLECTION_V2_MAP[e]) e = COLLECTION_V2_MAP[e]; // 개편 전 아이콘
+            if (e && !GACHA_ITEMS.some(it => it.emoji === e) && COLLECTION_V4_MAP[e]) e = COLLECTION_V4_MAP[e];
             return GACHA_ITEMS.some(it => it.emoji === e) ? e : '';
         }
         // 랭킹 등록 조건: 컬렉션 아이콘을 이름 옆에 지정한 사람만
@@ -8612,7 +8613,7 @@ ${text}
         function setupUserIconListener() {
             if (!db) return;
             db.ref('userIcons').off();
-            db.ref('userIcons').on('value', snap => { userIcons = snap.val() || {}; userIconsLoaded = true; migrateMyIconV2(); migrateMyIconV3(); applyKeepIconV3(); refreshIconViews(); });
+            db.ref('userIcons').on('value', snap => { userIcons = snap.val() || {}; userIconsLoaded = true; migrateMyIconV2(); migrateMyIconV3(); applyKeepIconV3(); migrateMyIconV4(); refreshIconViews(); });
         }
         function selectMyIcon(emoji) {
             const me = localStorage.getItem('chat_nickname') || '';
@@ -9610,7 +9611,7 @@ ${text}
         // 뽑기 아이템 목록 (2026-11 개편)
         // 등급(테두리): 브론즈 20 · 실버 10 · 골드 6 · 에메랄드 4 · 히든 4
         // 확률(등급 합계): 브론즈 60% · 실버 20% · 골드 10% · 에메랄드 6.5% · 히든 3.5%
-        // 구버전 Windows에서도 보이도록 2018년 이전 이모지만 사용 (맘모스 🦣·불새는 2020년 이후라 제외)
+        // 화면에는 emoji3d/ 그림으로 보여주고, 그림을 못 불러올 때만 글자 이모지가 보임
         const GACHA_ITEMS = [
             // 브론즈: 엄청 흔한 동물 (각 3%)
             { emoji: '🐿️', name: '다람쥐', rarity: 'bronze', rate: 3 },
@@ -9648,7 +9649,7 @@ ${text}
             { emoji: '🦄', name: '유니콘', rarity: 'gold', rate: 10 / 6 },
             { emoji: '🦈', name: '메가로돈', rarity: 'gold', rate: 10 / 6 },
             { emoji: '🦖', name: '티라노사우루스', rarity: 'gold', rate: 10 / 6 },
-            { emoji: '🦕', name: '브라키오사우루스', rarity: 'gold', rate: 10 / 6 },
+            { emoji: '🦣', name: '맘모스', rarity: 'gold', rate: 10 / 6 },
             { emoji: '🦑', name: '크라켄', rarity: 'gold', rate: 10 / 6 },
             { emoji: '🐳', name: '대왕고래', rarity: 'gold', rate: 10 / 6 },
             // 에메랄드: 사신수 (4개 합계 6.5%)
@@ -9657,11 +9658,13 @@ ${text}
             { emoji: '🦅', name: '주작', rarity: 'emerald', rate: 6.5 / 4 },
             { emoji: '🐢', name: '현무', rarity: 'emerald', rate: 6.5 / 4 },
             // 히든 (4개 합계 3.5%) — 뽑기 전까지 컬렉션에 ❓로 표시
-            { emoji: '🐙', name: '심연의 지배자', rarity: 'hidden', rate: 3.5 / 4 },
-            { emoji: '🤖', name: '기계신 오메가', rarity: 'hidden', rate: 3.5 / 4 },
-            { emoji: '🧛', name: '밤의 군주', rarity: 'hidden', rate: 3.5 / 4 },
-            { emoji: '🧙', name: '대마법사', rarity: 'hidden', rate: 3.5 / 4 }
+            { emoji: '🃏', name: '조커', rarity: 'hidden', rate: 3.5 / 4 },
+            { emoji: '🤡', name: '공포의 삐에로', rarity: 'hidden', rate: 3.5 / 4 },
+            { emoji: '⚔️', name: '성웅 이순신', rarity: 'hidden', rate: 3.5 / 4 },
+            { emoji: '💀', name: '저승사자', rarity: 'hidden', rate: 3.5 / 4 }
         ];
+        // 2026-11-04 개편: 브라키오사우루스 → 맘모스, 히든 4종 교체 (같은 등급끼리 1:1)
+        const COLLECTION_V4_MAP = { '🦕': '🦣', '🐙': '🃏', '🤖': '🤡', '🧛': '⚔️', '🧙': '💀' };
         // 개편 전 인형 → 같은 등급의 새 인형 (가진 인형·개수·이름 옆 아이콘을 1:1로 옮김)
         const COLLECTION_V2_MAP = {
             '🐻': '🐿️', '🐵': '🦆', '🐧': '🐦', '🐨': '🐟', '🐺': '🐝', '🐗': '🐑', '🐴': '🐜', '🐢': '🦋',   // 브론즈
@@ -9674,7 +9677,7 @@ ${text}
         //  글꼴 이모지는 기기마다 작고 납작하게 보여서 그림으로 통일. 못 불러오면 글자 이모지로 대체
         const emojiCode = (e) => [...String(e)].map(c => c.codePointAt(0)).filter(c => c !== 0xfe0f).map(c => c.toString(16)).join('-');
         let EMOJI_3D = null;
-        const EMOJI_3D_VER = 5; // 그림을 바꾸면 올려서 브라우저에 남은 예전 그림 대신 새 그림을 받게 함 (5: 히든 새 그림)
+        const EMOJI_3D_VER = 6; // 그림을 바꾸면 올려서 브라우저에 남은 예전 그림 대신 새 그림을 받게 함 (6: 메가로돈·맘모스·히든 교체)
         function emojiArt(e, cls = '') {
             if (!e) return '';
             if (!EMOJI_3D) EMOJI_3D = new Set(GACHA_ITEMS.map(it => emojiCode(it.emoji)));
@@ -9719,6 +9722,34 @@ ${text}
             data.iconCheckV3 = true;
             return true;
         }
+        // 4차: 바뀐 인형을 같은 등급의 새 인형으로 (정리(3차) 뒤에 한 번만)
+        function migrateCollectionV4(data) {
+            if (!data || (data.collectionVer || 0) !== 3) return false;
+            const oc = data.collectionCount || {}, col = [], cnt = {};
+            (data.collection || []).forEach(e => {
+                const n = COLLECTION_V4_MAP[e] || e;
+                if (!col.includes(n)) col.push(n);
+                cnt[n] = (cnt[n] || 0) + (oc[e] || 1);
+            });
+            data.collection = GACHA_ITEMS.map(it => it.emoji).filter(e => col.includes(e));
+            data.collectionCount = cnt;
+            data.collectionVer = 4;
+            data.iconCheckV4 = true;
+            return true;
+        }
+        function migrateMyIconV4() {
+            const me = localStorage.getItem('chat_nickname') || '';
+            if (!me || !userIconsLoaded || !gameData || !gameData.iconCheckV4) return;
+            const next = COLLECTION_V4_MAP[userIcons[me]];
+            if (next && (gameData.collection || []).includes(next)) {
+                userIcons[me] = next;
+                if (db) db.ref(`userIcons/${me}`).set(next);
+            }
+            delete gameData.iconCheckV4;
+            saveGameData();
+            if (typeof refreshIconViews === 'function') refreshIconViews();
+        }
+
         // 정리 예외: 이 사람들은 이 인형을 그대로 가짐 (아이콘도 그대로) — 2026-11-04 요청
         const COLLECTION_V3_KEEP = { '박규태': ['🦋'], '최다영': ['🦅'] };
         function applyCollectionKeepV3(data) {
@@ -9810,11 +9841,12 @@ ${text}
                     const data = snapshot.val();
                     if (data) {
                         gameData = data;
-                        const changed = migrateCollectionV2(gameData) | migrateCollectionV3(gameData);
+                        const changed = migrateCollectionV2(gameData) | migrateCollectionV3(gameData) | migrateCollectionV4(gameData);
                         if (changed) { saveGameData(); migrateMyIconV2(); }
                         if (applyCollectionKeepV3(gameData)) saveGameData();
                         migrateMyIconV3();
                         applyKeepIconV3();
+                        migrateMyIconV4();
                     }
                     updateMinigameUI();
                 });

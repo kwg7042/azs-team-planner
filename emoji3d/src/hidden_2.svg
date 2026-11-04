@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 256 256">
+  <defs>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0a1020" flood-opacity="0.5"/>
+    </filter>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="bigglow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+
+    <clipPath id="rr"><rect x="0" y="0" width="256" height="256" rx="34"/></clipPath>
+    <radialGradient id="vign" cx="50%" cy="45%" r="70%"><stop offset="0.55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.75"/></radialGradient>
+    <radialGradient id="bg2" cx="50%" cy="40%" r="75%"><stop offset="0" stop-color="#5a0a0a"/><stop offset="0.55" stop-color="#1e0404"/><stop offset="1" stop-color="#040101"/></radialGradient>
+    <radialGradient id="face2" cx="45%" cy="35%" r="72%"><stop offset="0" stop-color="#f4f0ea"/><stop offset="0.6" stop-color="#cfc6ba"/><stop offset="1" stop-color="#6e655c"/></radialGradient>
+    <radialGradient id="hair2" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ff6a2a"/><stop offset="1" stop-color="#8a1a06"/></radialGradient>
+    <radialGradient id="nose2" cx="40%" cy="35%" r="60%"><stop offset="0" stop-color="#ff8a8a"/><stop offset="0.5" stop-color="#e0101e"/><stop offset="1" stop-color="#6a0008"/></radialGradient>
+    <radialGradient id="eye2" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fffbe0"/><stop offset="0.35" stop-color="#ffcc00"/><stop offset="1" stop-color="#ff6a00" stop-opacity="0"/></radialGradient>
+    <linearGradient id="lips2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d0101e"/><stop offset="1" stop-color="#5a0008"/></linearGradient>
+    <g id="tuftL"><path d="M70 110 C40 96 22 104 10 120 C26 118 34 124 36 132 C20 132 10 142 6 156 C22 150 34 152 42 160 C30 166 26 178 28 190 C42 176 58 168 72 166 Z" fill="url(#hair2)" stroke="#3a0a02" stroke-width="1.5"/></g>
+  </defs>
+  <g clip-path="url(#rr)">
+    <rect width="256" height="256" fill="url(#bg2)"/>
+    <circle cx="128" cy="40" r="70" fill="#ff3a2a" opacity="0.08"/>
+    <use xlink:href="#tuftL"/><use xlink:href="#tuftL" transform="translate(256 0) scale(-1 1)"/>
+    <!-- 얼굴 -->
+    <path d="M128 52 C172 52 194 86 192 130 C190 176 164 210 128 214 C92 210 66 176 64 130 C62 86 84 52 128 52 Z" fill="url(#face2)" stroke="#2a1a14" stroke-width="2"/>
+    <!-- 갈라진 분장 -->
+    <g stroke="#5a5048" stroke-width="1.2" fill="none" opacity="0.7"><path d="M90 74 L98 86 L94 96"/><path d="M164 70 L156 84 L162 92"/><path d="M78 150 L88 158 L84 168"/><path d="M178 146 L170 156 L176 166"/></g>
+    <!-- 눈: 검은 구멍 + 붉은 세로 분장 -->
+    <path d="M100 82 L104 100 M156 82 L152 100 M100 132 L104 150 M156 132 L152 150" stroke="#b0101e" stroke-width="5" stroke-linecap="round"/>
+    <path d="M84 116 C88 100 116 100 120 116 C116 132 88 132 84 116 Z M136 116 C140 100 168 100 172 116 C168 132 140 132 136 116 Z" fill="#0a0202"/>
+    <g filter="url(#glow)"><circle cx="102" cy="117" r="5" fill="url(#eye2)"/><circle cx="154" cy="117" r="5" fill="url(#eye2)"/></g>
+    <path d="M80 98 C92 88 110 92 120 104 M176 98 C164 88 146 92 136 104" stroke="#0a0202" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <!-- 빨간 코 -->
+    <circle cx="128" cy="140" r="13" fill="url(#nose2)"/>
+    <ellipse cx="124" cy="135" rx="4" ry="3" fill="#fff" opacity="0.6"/>
+    <!-- 찢어진 미소 + 날카로운 이 -->
+    <path d="M76 158 C92 196 164 196 180 158 C176 176 166 192 150 200 C140 206 116 206 106 200 C90 192 80 176 76 158 Z" fill="url(#lips2)"/>
+    <path d="M90 166 C102 190 154 190 166 166 C152 178 104 178 90 166 Z" fill="#100204"/>
+    <path d="M94 168 L100 180 L104 170 L110 184 L114 172 L120 186 L124 173 L130 187 L134 173 L140 186 L144 172 L150 184 L154 170 L160 180 L162 168" fill="#f0eadc" stroke="#8a8070" stroke-width="0.8"/>
+    <path d="M104 184 L108 176 L112 186 Z M140 186 L146 176 L150 184 Z" fill="#f0eadc"/>
+    <!-- 주름 깃 + 방울 -->
+    <path d="M56 256 C60 230 84 214 104 212 L128 222 L152 212 C172 214 196 230 200 256 Z" fill="#2a0606"/>
+    <path d="M64 232 q11 -13 22 0 q11 -13 22 0 q10 -13 20 0 q10 -13 20 0 q11 -13 22 0 q11 -13 22 0 l0 10 l-128 0 Z" fill="#d9cfc0" stroke="#6e655c" stroke-width="1.2"/>
+    <circle cx="128" cy="246" r="7" fill="#e0101e"/>
+    <ellipse cx="116" cy="231" rx="58" ry="11" fill="#ffffff" opacity="0.05"/><ellipse cx="130" cy="233" rx="36" ry="11" fill="#ffffff" opacity="0.05"/><ellipse cx="161" cy="244" rx="33" ry="10" fill="#ffffff" opacity="0.05"/><ellipse cx="23" cy="245" rx="51" ry="8" fill="#ffffff" opacity="0.05"/><ellipse cx="251" cy="254" rx="50" ry="12" fill="#ffffff" opacity="0.05"/><ellipse cx="40" cy="201" rx="46" ry="8" fill="#ffffff" opacity="0.05"/><ellipse cx="49" cy="214" rx="31" ry="11" fill="#ffffff" opacity="0.05"/><ellipse cx="113" cy="247" rx="46" ry="12" fill="#ffffff" opacity="0.05"/>
+    <rect width="256" height="256" fill="url(#vign)"/>
+  </g>
+  <rect x="3" y="3" width="250" height="250" rx="32" fill="none" stroke="#e0101e" stroke-width="5" opacity="0.9"/>
+</svg>
