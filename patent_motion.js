@@ -1271,6 +1271,7 @@
     try {
       const pdf = await readPdf(file, (i, n) => setLog('pmLog', `PDF를 읽는 중… ${i}/${n}쪽`));
       pdf.name = file.name;
+      pdf.size = file.size;
       state.pdf = pdf;
       const sel = pdf.pages.filter((p) => p.sel).length;
       $('pmPdfInfo').textContent = `${file.name} · ${pdf.total}쪽${pdf.total > 40 ? ' (앞 40쪽만 사용)' : ''} · 도면으로 보이는 페이지 ${sel}장 자동 선택`;
@@ -1304,6 +1305,8 @@
       } finally { ticker.stop(); }
       applySpec(raw);
       setLog('pmLog', `해석 완료 (${Math.round((Date.now() - t0) / 1000)}초). 아래 동작과 '근거/추정'을 확인하고, 다르면 4번에서 수정 요청하세요.`);
+      // 모션 생성 성공 → 코인 (같은 PDF는 한 번만, index.html의 코인 정책)
+      if (typeof window.awardPatentMotionCoin === 'function') window.awardPatentMotionCoin(`${state.pdf.name}|${state.pdf.size}|${state.pdf.total}`);
     } catch (e) {
       setLog('pmLog', e.message, true);
       if (e.code === 'no_config' && typeof window.openAiSettingsModal === 'function') {

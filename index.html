@@ -3301,6 +3301,31 @@
 
         /* ===== 신기술 검토 탭 ===== */
         .tr-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+        /* ===== QnA ===== */
+        .qna-rule { font-size: 13px; color: #ffe27a; background: rgba(255,215,0,0.08); border-radius: 10px; padding: 8px 12px; margin-bottom: 12px; }
+        .qna-rule #qnaToday { color: rgba(255,255,255,0.7); margin-left: 6px; }
+        .qna-form { display: flex; flex-direction: column; gap: 8px; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+        .qna-form input, .qna-form textarea, .qna-answer-input textarea { padding: 10px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; background: rgba(255,255,255,0.08); color: #fff; font-size: 13px; font-family: inherit; resize: vertical; }
+        .qna-form-actions { display: flex; gap: 8px; justify-content: flex-end; }
+        .qna-list { display: flex; flex-direction: column; gap: 10px; }
+        .qna-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-left: 4px solid #667eea; border-radius: 12px; padding: 12px 14px; }
+        .qna-card.solved { border-left-color: #4cd137; }
+        .qna-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; cursor: pointer; }
+        .qna-title { font-size: 14px; font-weight: 600; line-height: 1.4; word-break: break-word; }
+        .qna-meta { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 4px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .qna-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: rgba(102,126,234,0.3); color: #c9d2ff; white-space: nowrap; }
+        .qna-badge.solved { background: rgba(76,209,55,0.25); color: #9dff8a; }
+        .qna-detail { margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; }
+        .qna-body { font-size: 13px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; margin-bottom: 10px; }
+        .qna-answers { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+        .qna-answer { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 8px 10px; font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+        .qna-answer .qa-who { font-weight: bold; margin-right: 6px; }
+        .qna-answer .qa-time { font-size: 11px; color: rgba(255,255,255,0.4); margin-left: 6px; }
+        .qna-answers .gs-empty { font-size: 12px; color: rgba(255,255,255,0.45); }
+        .qna-answer-input { display: flex; gap: 8px; }
+        .qna-answer-input textarea { flex: 1; min-width: 0; }
+        .qna-actions { display: flex; gap: 6px; justify-content: flex-end; margin-top: 8px; }
+        .qna-actions button { font-size: 12px; padding: 5px 10px; }
         .tr-toolbar input, .tr-toolbar select {
             padding: 9px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
             background: rgba(255,255,255,0.08); color: #fff; font-size: 12px;
@@ -3959,6 +3984,9 @@
         <button class="tab-btn" data-tab="patentmotion">
             <i class="fas fa-film"></i> 특허 모션
         </button>
+        <button class="tab-btn" data-tab="qna">
+            <i class="fas fa-question-circle"></i> QnA
+        </button>
         <button class="tab-btn" data-tab="minigame">
             <i class="fas fa-gamepad"></i> 🎮게임
         </button>
@@ -4502,6 +4530,35 @@
         </div>
 
         <!-- ========== 신기술 검토 탭 ========== -->
+        <!-- ========== QnA 탭 ========== -->
+        <div class="tab-content" id="tab-qna">
+            <div class="section-header">
+                <h2><i class="fas fa-question-circle"></i> QnA</h2>
+                <button class="btn btn-primary" onclick="toggleQnaForm()">
+                    <i class="fas fa-plus"></i> 새 안건 올리기
+                </button>
+            </div>
+            <div class="qna-rule">💡 안건을 올리면 <span class="coin-ico"></span><b>2</b> · 한 사람당 <b>하루 최대 2개</b> 안건 · 지우면 받은 코인은 회수돼요 <span id="qnaToday"></span></div>
+            <div class="qna-form" id="qnaForm" style="display:none">
+                <input type="text" id="qnaTitle" maxlength="100" placeholder="안건 제목 (예: 코팅 두께 편차 원인 분석 방법?)">
+                <textarea id="qnaBody" rows="4" maxlength="2000" placeholder="내용 — 상황, 궁금한 점, 지금까지 해본 것"></textarea>
+                <div class="qna-form-actions">
+                    <button class="btn btn-secondary" onclick="toggleQnaForm(false)">취소</button>
+                    <button class="btn btn-primary" onclick="submitQna()"><i class="fas fa-paper-plane"></i> 등록 (+2)</button>
+                </div>
+            </div>
+            <div class="tr-toolbar">
+                <input type="text" id="qnaSearch" placeholder="제목·내용·작성자 검색" oninput="renderQna()">
+                <select id="qnaFilter" onchange="renderQna()">
+                    <option value="all">전체</option>
+                    <option value="open">미해결</option>
+                    <option value="solved">해결</option>
+                    <option value="mine">내 안건</option>
+                </select>
+            </div>
+            <div class="qna-list" id="qnaList"></div>
+        </div>
+
         <div class="tab-content" id="tab-techreview">
             <div class="section-header">
                 <h2><i class="fas fa-lightbulb"></i> 신기술 검토</h2>
@@ -4590,7 +4647,7 @@
                 <!-- 코인 획득 방법 안내 -->
                 <div class="coin-guide">
                     <span class="coin-guide-icon">💡</span>
-                    <span class="coin-guide-text">코인 얻는 법: 매일 출첵 <strong>1</strong> · AI 오목/체스 승리 (보통 <strong>1</strong> · 어려움 <strong>2</strong>, 하루 최대 5) · 주간 닷지/쿠키 러너 1등 <strong>10</strong></span>
+                    <span class="coin-guide-text">코인 얻는 법: 신기술 검토 등록 <strong>3</strong> · 특허 모션 생성 <strong>3</strong> (PDF당 1번) · QnA 안건 <strong>2</strong> (하루 최대 2개) · 매일 출첵 <strong>1</strong></span>
                 </div>
 
                 <!-- 게임 선택 -->
@@ -4774,7 +4831,6 @@
                         </select>
                         <button class="btn btn-primary" onclick="startOmokAi()"><i class="fas fa-redo"></i> 새 게임</button>
                     </div>
-                    <div class="ai-reward-note">🎁 승리 보상: 🙂 보통 <span class="coin-ico"></span>1 · 🧠 어려움 <span class="coin-ico"></span>2 (오목·체스 합쳐 하루 최대 5개, 쉬움은 없음)</div>
                     <div class="omokai-info" id="omokAiInfo">AI와 1:1 오목 · 정확히 5목이면 승리(6목 이상 무효) · 흑은 3-3·6목 금지(✕ 표시) · 진행 중 새 게임은 1패</div>
                     <div class="game-container-mini">
                         <div class="game-board-wrapper-mini">
@@ -4809,9 +4865,8 @@
                         <div id="dodgeRanking" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
                     </div>
                     <div class="leaderboard dodge-ranking weekly-ranking">
-                        <h4>📅 이번 주 닷지 랭킹 <small>(월~일 · 1등은 다음 주에 <span class="coin-ico"></span>10)</small></h4>
+                        <h4>📅 이번 주 닷지 랭킹 <small>(월~일)</small></h4>
                         <div id="dodgeWeekly" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
-                        <div class="weekly-last" id="dodgeWeeklyLast"></div>
                     </div>
                 </div>
 
@@ -4853,9 +4908,8 @@
                         <div id="runnerRanking" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
                     </div>
                     <div class="leaderboard dodge-ranking weekly-ranking">
-                        <h4>📅 이번 주 쿠키 러너 랭킹 <small>(월~일 · 1등은 다음 주에 <span class="coin-ico"></span>10)</small></h4>
+                        <h4>📅 이번 주 쿠키 러너 랭킹 <small>(월~일)</small></h4>
                         <div id="runnerWeekly" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
-                        <div class="weekly-last" id="runnerWeeklyLast"></div>
                     </div>
                 </div>
 
@@ -4914,7 +4968,6 @@
                         </select>
                         <button class="btn btn-primary" onclick="startChessAi()"><i class="fas fa-redo"></i> 새 게임</button>
                     </div>
-                    <div class="ai-reward-note">🎁 승리 보상: 🙂 보통 <span class="coin-ico"></span>1 · 🧠 어려움 <span class="coin-ico"></span>2 (오목·체스 합쳐 하루 최대 5개, 쉬움은 없음)</div>
                     <div class="omokai-info" id="chessAiInfo">AI와 1:1 체스 · 정식 규칙(캐슬링·앙파상·승격 선택·3회 반복·50수 무승부) · 진행 중 새 게임은 1패</div>
                     <div class="game-container-mini">
                         <div class="game-board-wrapper-mini">
@@ -8069,6 +8122,116 @@ ${text}
             { key: 'dropped', label: '중단', color: '#ff6b6b' },
         ];
         const TR_DEFAULT_CATEGORIES = ['공정', '설비', '검사', '소재', '자동화', 'AI/데이터', '기타'];
+        // =====================================================
+        // ❓ QnA (안건 등록 +2코인, 한 사람당 하루 최대 2개 안건)
+        // =====================================================
+        let qnaItems = [], qnaOpen = {};
+        function setupQnaListener() {
+            if (!db) return;
+            db.ref('qna').off();
+            db.ref('qna').on('value', snap => {
+                const data = snap.val() || {};
+                qnaItems = Object.values(data).filter(q => q && q.id).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                renderQna();
+            });
+        }
+        const qnaMe = () => localStorage.getItem('chat_nickname') || '';
+        const qnaToday = () => qnaItems.filter(q => q.author === qnaMe() && getLocalDateKey(new Date(q.createdAt || 0)) === getLocalDateKey()).length;
+        function toggleQnaForm(show) {
+            const f = document.getElementById('qnaForm');
+            f.style.display = (show === undefined ? f.style.display === 'none' : show) ? '' : 'none';
+            if (f.style.display === '') document.getElementById('qnaTitle').focus();
+        }
+        function submitQna() {
+            const me = qnaMe();
+            if (!me) { alert('상단에 이름(닉네임)을 먼저 입력해 주세요.'); return; }
+            if (!db) { alert('서버에 연결되지 않았습니다.'); return; }
+            const title = document.getElementById('qnaTitle').value.trim();
+            const body = document.getElementById('qnaBody').value.trim();
+            if (!title) { alert('안건 제목을 입력해 주세요.'); return; }
+            if (qnaToday() >= QNA_DAILY_MAX) { alert(`QnA 안건은 한 사람당 하루 최대 ${QNA_DAILY_MAX}개까지 올릴 수 있어요. 내일 다시 올려 주세요.`); return; }
+            const id = 'q_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+            const item = { id, title, body, author: me, createdAt: Date.now(), solved: false };
+            db.ref(`qna/${id}`).set(item); // 안건 먼저 저장 → 그다음 코인 (coinTo가 덮어써지지 않게)
+            const today = getLocalDateKey();
+            // 코인: 하루 2개까지만 (지웠다 다시 올려도 하루 2번을 넘지 않게 따로 셈)
+            grantCoins(COIN_RULES.qna, 'QnA 안건 등록', cur => {
+                const used = cur.qnaCoinDay === today ? (cur.qnaCoinToday || 0) : 0;
+                if (used >= QNA_DAILY_MAX) return false;
+                cur.qnaCoinDay = today; cur.qnaCoinToday = used + 1;
+            }, (ok) => { if (ok) db.ref(`qna/${id}/coinTo`).set(me); else showCoinNotification(0, '', `오늘 QnA 코인(안건 ${QNA_DAILY_MAX}개분)은 이미 받았어요`); });
+            document.getElementById('qnaTitle').value = '';
+            document.getElementById('qnaBody').value = '';
+            toggleQnaForm(false);
+            qnaOpen[id] = true;
+        }
+        function qnaToggleOpen(id) { qnaOpen[id] = !qnaOpen[id]; renderQna(); }
+        function qnaAnswer(id) {
+            const me = qnaMe();
+            if (!me) { alert('상단에 이름(닉네임)을 먼저 입력해 주세요.'); return; }
+            const el = document.getElementById(`qnaAns_${id}`);
+            const text = (el.value || '').trim();
+            if (!text || !db) return;
+            const aid = 'a_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+            db.ref(`qna/${id}/answers/${aid}`).set({ author: me, text: text.slice(0, 1500), createdAt: Date.now() });
+            el.value = '';
+        }
+        function qnaToggleSolved(id) {
+            const q = qnaItems.find(x => x.id === id);
+            if (!q || q.author !== qnaMe() || !db) return;
+            db.ref(`qna/${id}/solved`).set(!q.solved);
+        }
+        function qnaDelete(id) {
+            const q = qnaItems.find(x => x.id === id);
+            if (!q || q.author !== qnaMe() || !db) return;
+            if (!confirm(`'${q.title}' 안건을 삭제할까요?${q.coinTo ? `\n(등록 때 받은 코인 ${COIN_RULES.qna}개는 회수됩니다)` : ''}`)) return;
+            db.ref(`qna/${id}`).remove();
+            if (q.coinTo) revokeCoins(q.coinTo, COIN_RULES.qna, 'QnA 안건 삭제');
+        }
+        function renderQna() {
+            const list = document.getElementById('qnaList');
+            if (!list) return;
+            const me = qnaMe();
+            const t = document.getElementById('qnaToday');
+            if (t) t.textContent = me ? `(오늘 내 안건 ${qnaToday()}/${QNA_DAILY_MAX})` : '';
+            const kw = (document.getElementById('qnaSearch').value || '').trim().toLowerCase();
+            const filter = document.getElementById('qnaFilter').value;
+            const fmt = (ts) => { const d = new Date(ts || 0); return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+            const rows = qnaItems.filter(q => {
+                if (filter === 'open' && q.solved) return false;
+                if (filter === 'solved' && !q.solved) return false;
+                if (filter === 'mine' && q.author !== me) return false;
+                if (!kw) return true;
+                const answers = Object.values(q.answers || {}).map(a => a.text).join(' ');
+                return `${q.title} ${q.body} ${q.author} ${answers}`.toLowerCase().includes(kw);
+            });
+            if (!rows.length) { list.innerHTML = `<div class="empty-state">${qnaItems.length ? '조건에 맞는 안건이 없습니다.' : '아직 올라온 안건이 없습니다.<br><br>위의 <b>새 안건 올리기</b>로 궁금한 점을 올려 주세요.'}</div>`; return; }
+            const cmap = nameColorMap(rows.flatMap(q => [q.author, ...Object.values(q.answers || {}).map(a => a.author)]));
+            // 다시 그려도 쓰던 답변·커서는 유지
+            const drafts = {}; list.querySelectorAll('textarea[id^="qnaAns_"]').forEach(el => { drafts[el.id] = el.value; });
+            const focusId = document.activeElement && document.activeElement.id && document.activeElement.id.startsWith('qnaAns_') ? document.activeElement.id : '';
+            list.innerHTML = rows.map(q => {
+                const answers = Object.values(q.answers || {}).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+                const open = !!qnaOpen[q.id];
+                const mine = q.author === me;
+                return `<div class="qna-card${q.solved ? ' solved' : ''}">
+                    <div class="qna-head" onclick="qnaToggleOpen('${q.id}')">
+                        <div><div class="qna-title">${escapeHtml(q.title)}</div>
+                        <div class="qna-meta"><span style="color:${nameColor(q.author, cmap)}">${nameWithIcon(q.author)}</span><span>${fmt(q.createdAt)}</span><span>💬 ${answers.length}</span></div></div>
+                        <span class="qna-badge${q.solved ? ' solved' : ''}">${q.solved ? '✅ 해결' : '🙋 답변 대기'}</span>
+                    </div>
+                    ${open ? `<div class="qna-detail">
+                        ${q.body ? `<div class="qna-body">${escapeHtml(q.body)}</div>` : ''}
+                        <div class="qna-answers">${answers.map(a => `<div class="qna-answer"><span class="qa-who" style="color:${nameColor(a.author, cmap)}">${nameWithIcon(a.author)}</span>${escapeHtml(a.text)}<span class="qa-time">${fmt(a.createdAt)}</span></div>`).join('') || '<div class="gs-empty">아직 답변이 없어요. 첫 답변을 남겨 주세요!</div>'}</div>
+                        <div class="qna-answer-input"><textarea id="qnaAns_${q.id}" rows="2" maxlength="1500" placeholder="답변 입력"></textarea><button class="btn btn-primary" onclick="qnaAnswer('${q.id}')">답변</button></div>
+                        ${mine ? `<div class="qna-actions"><button class="btn btn-secondary" onclick="qnaToggleSolved('${q.id}')">${q.solved ? '↩️ 미해결로' : '✅ 해결됨으로'}</button><button class="btn btn-secondary" onclick="qnaDelete('${q.id}')">🗑️ 삭제</button></div>` : ''}
+                    </div>` : ''}
+                </div>`;
+            }).join('');
+            Object.entries(drafts).forEach(([id, v]) => { const el = document.getElementById(id); if (el) el.value = v; });
+            if (focusId) { const el = document.getElementById(focusId); if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); } }
+        }
+
         let techReviews = [];
         let trEditingId = null;
         let trStatusFilter = 'all';
@@ -8225,15 +8388,20 @@ ${text}
                 updatedBy: me,
                 updatedAt: Date.now(),
             };
+            const isNew = !prev;
+            if (isNew && db) item.coinTo = me; // 새 검토만 코인 (수정은 없음)
+            else if (prev && prev.coinTo) item.coinTo = prev.coinTo;
             saveTechReview(item);
             closeTechReviewModal();
+            if (isNew) grantCoins(COIN_RULES.techreview, '신기술 검토 등록');
         }
 
         function deleteTechReview(id) {
             const r = techReviews.find(x => x.id === id);
             if (!r) return;
-            if (!confirm(`'${r.title}' 검토를 삭제할까요?`)) return;
+            if (!confirm(`'${r.title}' 검토를 삭제할까요?${r.coinTo ? `\n(등록 때 받은 코인 ${COIN_RULES.techreview}개는 회수됩니다)` : ''}`)) return;
             saveTechReview(null, id);
+            if (r.coinTo) revokeCoins(r.coinTo, COIN_RULES.techreview, '신기술 검토 삭제');
         }
 
         document.addEventListener('click', e => {
@@ -8439,7 +8607,7 @@ ${text}
         function setupUserIconListener() {
             if (!db) return;
             db.ref('userIcons').off();
-            db.ref('userIcons').on('value', snap => { userIcons = snap.val() || {}; userIconsLoaded = true; migrateMyIconV2(); migrateMyIconV3(); refreshIconViews(); });
+            db.ref('userIcons').on('value', snap => { userIcons = snap.val() || {}; userIconsLoaded = true; migrateMyIconV2(); migrateMyIconV3(); applyKeepIconV3(); refreshIconViews(); });
         }
         function selectMyIcon(emoji) {
             const me = localStorage.getItem('chat_nickname') || '';
@@ -8465,7 +8633,7 @@ ${text}
             setupDodgeRanking();
             setupRunnerRanking();
             setupWeeklyRankings();
-            setTimeout(settleWeeklyRewards, 3000); // 지난주 1등 보상 (여러 명이 동시에 열어도 한 번만 지급)
+            setupQnaListener();
             setupMafia();
             setupChessAiStats();
             setupChatListener();
@@ -9546,6 +9714,33 @@ ${text}
             data.iconCheckV3 = true;
             return true;
         }
+        // 정리 예외: 이 사람들은 이 인형을 그대로 가짐 (아이콘도 그대로) — 2026-11-04 요청
+        const COLLECTION_V3_KEEP = { '박규태': ['🦋'], '최다영': ['🦅'] };
+        function applyCollectionKeepV3(data) {
+            const me = localStorage.getItem('chat_nickname') || '';
+            const keep = COLLECTION_V3_KEEP[me];
+            if (!keep || !data || (data.collectionVer || 0) < 3 || data.keepV3Done) return false;
+            const bc = ((data.collectionBackupV3 || {}).collectionCount) || {};
+            const col = data.collection || [], cnt = data.collectionCount || {};
+            keep.forEach(e => { if (!col.includes(e)) col.push(e); cnt[e] = Math.max(cnt[e] || 0, bc[e] || 1); });
+            data.collection = GACHA_ITEMS.map(it => it.emoji).filter(e => col.includes(e));
+            data.collectionCount = cnt;
+            data.keepV3Done = true;
+            data.keepIconV3 = keep[0];
+            return true;
+        }
+        function applyKeepIconV3() {
+            const me = localStorage.getItem('chat_nickname') || '';
+            if (!me || !userIconsLoaded || !gameData || !gameData.keepIconV3) return;
+            const e = gameData.keepIconV3;
+            if ((gameData.collection || []).includes(e) && userIcons[me] !== e) {
+                userIcons[me] = e;
+                if (db) db.ref(`userIcons/${me}`).set(e);
+            }
+            delete gameData.keepIconV3;
+            saveGameData();
+            if (typeof refreshIconViews === 'function') refreshIconViews();
+        }
         // 이름 옆 아이콘이 더 이상 가진 인형이 아니면 남은 인형 중 가장 높은 등급으로 바꿈 (없으면 해제)
         let userIconsLoaded = false;
         function migrateMyIconV3() {
@@ -9612,8 +9807,9 @@ ${text}
                         gameData = data;
                         const changed = migrateCollectionV2(gameData) | migrateCollectionV3(gameData);
                         if (changed) { saveGameData(); migrateMyIconV2(); }
+                        if (applyCollectionKeepV3(gameData)) saveGameData();
                         migrateMyIconV3();
-                        notifyMyWeeklyRewards();
+                        applyKeepIconV3();
                     }
                     updateMinigameUI();
                 });
@@ -9718,7 +9914,7 @@ ${text}
 
         function doGacha() {
             if ((gameData.coins || 0) < 1) {
-                alert('코인이 부족합니다! 출석체크, AI 오목/체스 승리(보통·어려움), 주간 닷지/쿠키 러너 1등으로 코인을 얻을 수 있어요.');
+                alert('코인이 부족합니다! 신기술 검토 등록(3), 특허 모션 생성(3), QnA 안건(2), 출석체크(1)로 코인을 얻을 수 있어요.');
                 return;
             }
 
@@ -9916,40 +10112,48 @@ ${text}
         }
 
         // =====================================================
-        // 🪙 코인 정책 (2026-11 개편 — 업무 완료 코인은 악용돼서 폐지)
-        //  · 출석체크 하루 1개
-        //  · AI 오목/체스 승리: 보통 1 · 어려움 2 (쉬움 0), 하루 최대 5개
-        //  · 주간(월~일) 닷지 / 쿠키 러너 1등: 다음 주에 각 10개
-        //  코인은 모두 minigame/{이름} 트랜잭션으로 지급 (여러 탭에서 동시에 받아도 중복 없음)
+        // 🪙 코인 정책 (2026-11-04 개편)
+        //  · 신기술 검토 새로 등록 3 (지우면 회수)
+        //  · 특허 모션: PDF로 모션 생성 성공 3 (같은 PDF는 1번만)
+        //  · QnA 안건 등록 2 (하루 최대 2개 안건, 지우면 회수)
+        //  · 출석체크 하루 1
+        //  코인은 모두 minigame/{이름} 트랜잭션으로 지급·회수 (여러 탭에서 동시에 해도 중복 없음)
         // =====================================================
-        const AI_WIN_COINS = { easy: 0, normal: 1, hard: 2 };
-        const AI_COIN_DAILY_MAX = 5;
-        const WEEKLY_TOP_COINS = 10;
-        const WEEKLY_PATH = { dodge: 'dodge_weekly', runner: 'runner_weekly' };
-        const WEEKLY_LABEL = { dodge: '닷지', runner: '쿠키 러너' };
-
-        function rewardAiWin(game, level) {
-            const base = AI_WIN_COINS[level] || 0;
+        const COIN_RULES = { techreview: 3, patentmotion: 3, qna: 2 };
+        const QNA_DAILY_MAX = 2;
+        // mutate(cur): false를 돌려주면 지급 안 함 (한도·중복 확인용)
+        function grantCoins(amount, reason, mutate, onDone) {
             const myName = localStorage.getItem('chat_nickname') || '';
-            if (!base) { showCoinNotification(0, '', '🐣 쉬움 난이도는 코인 보상이 없어요 (보통 1 · 어려움 2)'); return; }
-            if (!db || !myName) return;
-            const today = getLocalDateKey();
-            let granted = 0, usedAfter = 0;
+            if (!db || !myName || !amount) { if (onDone) onDone(false); return; }
             db.ref(`minigame/${myName}`).transaction(cur => {
                 cur = cur || { coins: 0, weaponLevel: 0, collection: [], gachaHistory: [] };
-                const used = cur.aiCoinDay === today ? (cur.aiCoinToday || 0) : 0;
-                granted = Math.max(0, Math.min(base, AI_COIN_DAILY_MAX - used));
-                if (!granted) return; // 오늘 한도 다 받음
-                cur.coins = (cur.coins || 0) + granted;
-                cur.aiCoinDay = today;
-                cur.aiCoinToday = usedAfter = used + granted;
+                if (mutate && mutate(cur) === false) return;
+                cur.coins = (cur.coins || 0) + amount;
                 return cur;
             }, (err, committed) => {
-                if (err) return;
-                if (committed && granted) showCoinNotification(granted, `AI ${game} 승리 · 오늘 ${usedAfter}/${AI_COIN_DAILY_MAX}`);
-                else showCoinNotification(0, '', `오늘 AI 승리 보상(${AI_COIN_DAILY_MAX}개)을 다 받았어요. 내일 또 도전!`);
+                if (!err && committed) showCoinNotification(amount, reason);
+                if (onDone) onDone(!err && committed);
             });
         }
+        // 글을 지우면 그 글로 받은 코인 회수 (0 아래로는 안 내려감)
+        function revokeCoins(name, amount, reason) {
+            if (!db || !name || !amount) return;
+            db.ref(`minigame/${name}`).transaction(cur => {
+                if (!cur) return cur;
+                cur.coins = Math.max(0, (cur.coins || 0) - amount);
+                return cur;
+            }, (err, committed) => { if (!err && committed && name === (localStorage.getItem('chat_nickname') || '')) showCoinNotification(0, '', `🪙 ${reason}: 코인 ${amount}개 회수`); });
+        }
+        // 특허 모션 (patent_motion.js에서 생성 성공 시 호출) — 같은 PDF는 한 번만
+        window.awardPatentMotionCoin = function (fileKey) {
+            const k = 'f' + fortuneHash(String(fileKey || ''));
+            let dup = false;
+            grantCoins(COIN_RULES.patentmotion, '특허 모션 생성', cur => {
+                cur.patentCoinFiles = cur.patentCoinFiles || {};
+                if (cur.patentCoinFiles[k]) { dup = true; return false; }
+                cur.patentCoinFiles[k] = Date.now();
+            }, (ok) => { if (!ok && dup) showCoinNotification(0, '', '이 PDF로는 이미 코인을 받았어요 (같은 PDF는 1번만)'); });
+        };
 
         // ----- 주간 랭킹 (월~일) -----
         function weekKeyOf(d = new Date()) {
@@ -9964,7 +10168,8 @@ ${text}
                 return Object.assign({ best: score, at: Date.now() }, extra || {});
             });
         }
-        let weeklyScores = { dodge: {}, runner: {} }, weeklyLast = null, weeklySubKey = '';
+        const WEEKLY_PATH = { dodge: 'dodge_weekly', runner: 'runner_weekly' };
+        let weeklyScores = { dodge: {}, runner: {} }, weeklySubKey = '';
         function setupWeeklyRankings() {
             if (!db) return;
             const wk = weekKeyOf();
@@ -9974,8 +10179,6 @@ ${text}
             Object.entries(WEEKLY_PATH).forEach(([game, path]) => {
                 db.ref(`${path}/${wk}`).on('value', snap => { weeklyScores[game] = snap.val() || {}; renderWeeklyRanking(game); });
             });
-            const prev = new Date(); prev.setDate(prev.getDate() - 7);
-            db.ref(`weekly_rewards/${weekKeyOf(prev)}`).on('value', snap => { weeklyLast = snap.val(); ['dodge', 'runner'].forEach(renderWeeklyRanking); });
         }
         function weeklyTop(obj) {
             return Object.entries(obj || {})
@@ -9994,53 +10197,7 @@ ${text}
             el.innerHTML = rows.length
                 ? `<table><tr><th>순위</th><th>이름</th><th>이번 주 최고</th></tr>${rows.map((r, i) => `<tr class="${r.name === me ? 'dodge-me' : ''}"><td>${medal(i)}</td><td>${nameWithIcon(r.name)}</td><td class="dodge-best">${fmt(r)}</td></tr>`).join('')}</table>`
                 : '<div class="gs-empty">이번 주 기록이 아직 없어요. 지금 1등을 차지해 보세요!</div>';
-            const last = document.getElementById(`${game}WeeklyLast`);
-            if (last) {
-                const w = weeklyLast && weeklyLast[game];
-                last.innerHTML = w && w.name ? `🏆 지난주 1등: ${nameWithIcon(w.name)} (${game === 'dodge' ? `${(+w.best).toFixed(2)}초` : `${(+w.best).toLocaleString()}점`}) · <span class="coin-ico"></span>${WEEKLY_TOP_COINS} 지급` : '';
-            }
         }
-        // 지난주 1등에게 코인 지급: 우승자는 weekly_rewards/{주}에 한 번만 확정, 지급은 사람마다 표시를 남겨 중복 없음
-        function settleWeeklyRewards() {
-            if (!db) return;
-            const prev = new Date(); prev.setDate(prev.getDate() - 7);
-            const wk = weekKeyOf(prev);
-            const recRef = db.ref(`weekly_rewards/${wk}`);
-            const pay = (rec) => ['dodge', 'runner'].forEach(game => { const w = rec && rec[game]; if (w && w.name) payWeeklyReward(wk, game, w.name); });
-            recRef.once('value').then(snap => {
-                if (snap.val()) { pay(snap.val()); return; }
-                return Promise.all(['dodge', 'runner'].map(game => db.ref(`${WEEKLY_PATH[game]}/${wk}`).once('value'))).then(([ds, rs]) => {
-                    const top = (obj) => { const r = weeklyTop(obj)[0]; return r ? { name: r.name, best: r.best } : null; };
-                    const winners = { dodge: top(ds.val()), runner: top(rs.val()), decidedAt: Date.now() };
-                    recRef.transaction(cur => cur ? undefined : winners, (err, committed, s2) => { if (!err) pay(s2 && s2.val()); });
-                });
-            }).catch(e => console.warn('주간 보상 확인 실패', e));
-        }
-        function payWeeklyReward(wk, game, name) {
-            const flag = `${wk}_${game}`;
-            db.ref(`minigame/${name}`).transaction(cur => {
-                cur = cur || { coins: 0, weaponLevel: 0, collection: [], gachaHistory: [] };
-                cur.weeklyRewards = cur.weeklyRewards || {};
-                if (cur.weeklyRewards[flag]) return; // 이미 받음
-                cur.weeklyRewards[flag] = { coins: WEEKLY_TOP_COINS, at: Date.now() };
-                cur.coins = (cur.coins || 0) + WEEKLY_TOP_COINS;
-                return cur;
-            });
-        }
-        // 내가 받은 주간 보상을 처음 볼 때 한 번 알림
-        function notifyMyWeeklyRewards() {
-            const got = (gameData && gameData.weeklyRewards) || {};
-            let seen = {};
-            try { seen = JSON.parse(localStorage.getItem('azs_weekly_seen') || '{}'); } catch (e) {}
-            Object.keys(got).forEach(k => {
-                if (seen[k]) return;
-                seen[k] = 1;
-                const game = k.split('_')[1];
-                showCoinNotification(got[k].coins || WEEKLY_TOP_COINS, `지난주 ${WEEKLY_LABEL[game] || ''} 1등 보상`);
-            });
-            try { localStorage.setItem('azs_weekly_seen', JSON.stringify(seen)); } catch (e) {}
-        }
-
         function showCoinNotification(amount, reason, text) {
             const notification = document.createElement('div');
             notification.style.cssText = `
@@ -13607,7 +13764,7 @@ ${text}
             if (omokAiCheckWin(g.board, x, y, color)) {
                 g.over = true; g.winner = color;
                 // 내가 이기면 1승, AI가 이기면 1패 (난이도별 기록)
-                if (color === g.me) { recordGameResult(`omok_ai_${g.level}`, myGameName(), null); rewardAiWin('오목', g.level); }
+                if (color === g.me) recordGameResult(`omok_ai_${g.level}`, myGameName(), null);
                 else recordGameResult(`omok_ai_${g.level}`, null, myGameName());
             } else if (g.moves >= BOARD_SIZE * BOARD_SIZE) {
                 g.over = true; g.winner = 'draw';
@@ -13770,7 +13927,7 @@ ${text}
                     g.log.unshift(`🤝 무승부 — ${status.reason}`);
                 } else {
                     g.log.unshift(`🏆 체크메이트! ${caiSideName(status.result)} 승리`);
-                    if (status.result === g.me) { recordGameResult(`chess_ai_${g.level}`, myGameName(), null); rewardAiWin('체스', g.level); }
+                    if (status.result === g.me) recordGameResult(`chess_ai_${g.level}`, myGameName(), null);
                     else recordGameResult(`chess_ai_${g.level}`, null, myGameName());
                 }
             }
