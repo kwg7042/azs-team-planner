@@ -9826,6 +9826,27 @@ ${text}
             if (typeof refreshIconViews === 'function') refreshIconViews();
         }
 
+        // 컬렉션 지급 (한 번만): 이름별로 등급마다 무작위 n종을 넣어 줌 — 2026-11-04 요청
+        //  (권병진: 닉네임 덮어쓰기 버그로 컬렉션이 사라져서 브론즈·실버·골드 5종씩)
+        //  아직 없는 인형부터 고르고, 이미 가진 인형의 개수는 그대로 둠
+        const COLLECTION_GRANT_V5 = { '권병진': { bronze: 5, silver: 5, gold: 5 } };
+        function applyCollectionGrantV5(data, me) {
+            const g = COLLECTION_GRANT_V5[me];
+            if (!g || !data || data.grantV5Done) return false;
+            const col = (data.collection || []).slice(), cnt = Object.assign({}, data.collectionCount || {});
+            const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+            const given = [];
+            Object.keys(g).forEach(r => {
+                const pool = GACHA_ITEMS.filter(it => it.rarity === r).map(it => it.emoji);
+                const pick = shuffle(pool.filter(e => !col.includes(e))).concat(shuffle(pool.filter(e => col.includes(e)))).slice(0, g[r]);
+                pick.forEach(e => { if (!col.includes(e)) col.push(e); cnt[e] = Math.max(cnt[e] || 0, 1); given.push(e); });
+            });
+            data.collection = GACHA_ITEMS.map(it => it.emoji).filter(e => col.includes(e));
+            data.collectionCount = cnt;
+            data.grantV5Done = given;
+            return true;
+        }
+
         // 정리 예외: 이 사람들은 이 인형을 그대로 가짐 (아이콘도 그대로) — 2026-11-04 요청
         const COLLECTION_V3_KEEP = { '박규태': ['🦋'], '최다영': ['🦅'] };
         function applyCollectionKeepV3(data, me) {
@@ -9926,6 +9947,7 @@ ${text}
         function runCollectionMigrations(d, me) {
             let changed = migrateCollectionV2(d) | migrateCollectionV3(d) | migrateCollectionV4(d);
             if (applyCollectionKeepV3(d, me)) changed = 1;
+            if (applyCollectionGrantV5(d, me)) changed = 1;
             return !!changed;
         }
 
