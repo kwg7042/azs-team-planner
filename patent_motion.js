@@ -80,6 +80,9 @@
   function normalizeSpec(raw) {
     const warnings = [];
     const r = raw && typeof raw === 'object' ? raw : {};
+    // 4가지 전극 공정(web 모드)에 안 맞는 장치는 범용 기구 모드로 그림
+    const mech = r.mode === 'mechanism' || (r.mechanism && typeof r.mechanism === 'object' && !(Array.isArray(r.stations) && r.stations.length));
+    const warn0 = warnings.length;
     const webR = r.web && typeof r.web === 'object' ? r.web : {};
     const width = clamp(num(webR.width_mm, 110), 5, 3000);
     const pitch = clamp(num(webR.pitch_mm, 80), 2, 5000);
@@ -125,7 +128,9 @@
       }
       return o;
     });
-    if (!stations.length && !pre) warnings.push('표시할 공정(stations)이 없습니다. 시트만 이송됩니다.');
+    if (!stations.length && !pre && !mech) warnings.push('표시할 공정(stations)이 없습니다. 시트만 이송됩니다.');
+    if (mech) warnings.splice(warn0); // 범용 모드에서는 시트/공정 기본값 경고가 의미 없음
+    const mechanism = mech ? normMechanism(r.mechanism, warnings) : null;
     const colors = Object.assign({}, DEF_COLORS);
     if (r.colors && typeof r.colors === 'object') Object.keys(DEF_COLORS).forEach((k) => { if (isHex(r.colors[k])) colors[k] = r.colors[k]; });
     const parts = Array.isArray(r.parts) ? r.parts.filter((x) => x && typeof x === 'object').map((x) => ({
@@ -138,7 +143,9 @@
       title: String(r.title || '제목 없음'), source: String(r.source || ''), summary: String(r.summary || ''),
       web: { width_mm: width, pitch_mm: pitch, bands, preformed_tabs: pre },
       stations, colors, parts, evidence, assumptions: toStrList(r.assumptions), unsupported,
+      mode: mech ? 'mechanism' : 'web',
     };
+    if (mech) { spec.mechanism = mechanism; spec.stations = []; }
     return { spec, warnings };
   }
 
@@ -146,6 +153,7 @@
    * 2. 화면 배치 계산
    * ------------------------------------------------------------------ */
   function buildLayout(spec) {
+    if (spec.mode === 'mechanism') return { mode: 'mechanism', M: spec.mechanism, stations: [] };
     const w = spec.web;
     const k = V.W / w.width_mm;
     let hs = w.bands.map((b) => Math.max(8, b.width_mm * k));
@@ -824,6 +832,163 @@
   /* ------------------------------------------------------------------
    * 6. 샘플 사양
    * ------------------------------------------------------------------ */
+  /* ------------------------------------------------------------------
+   * 6. 범용 기구 모드 — 4가지 전극 공정에 안 맞는 장치용
+   *  측면도에 부품(도형)을 놓고 회전·왕복 회전·직선 왕복 + 재료 이송으로 움직임을 보여 줌
+   *  좌표: 가로 0~1000, 세로 0~560 (위쪽이 0)
+   * ------------------------------------------------------------------ */
+  const MECH = { W: 1000, H: 560 };
+  const MECH_SHAPES = ['rect', 'roller', 'circle', 'arm', 'blade', 'plate'];
+  const MECH_MOTIONS = ['none', 'rotate', 'swing', 'slide'];
+  const MECH_PALETTE = ['#4A6FA5', '#C9772B', '#5B8C5A', '#8E5BA8', '#B8474A', '#2E8B9A', '#7A7A7A', '#A88B2E'];
+  const SHAPE_LABEL = { rect: '블록', roller: '롤러', circle: '원판', arm: '링크/레버', blade: '칼날', plate: '판' };
+
+  function normMechanism(m, warnings) {
+    const mm = m && typeof m === 'object' ? m : {};
+    const ids = new Set();
+    const parts = (Array.isArray(mm.parts) ? mm.parts : []).filter((q) => q && typeof q === 'object').slice(0, 40).map((q, i) => {
+      let id = String(q.id || 'p' + (i + 1));
+      while (ids.has(id)) id += '_';
+      ids.add(id);
+      const shape = MECH_SHAPES.includes(q.shape) ? q.shape : 'rect';
+      const mo = q.motion && typeof q.motion === 'object' ? q.motion : {};
+      const type = MECH_MOTIONS.includes(mo.type) ? mo.type : 'none';
+      const motion = { type };
+      if (type === 'rotate') { motion.rpm = clamp(num(mo.rpm, 20), -120, 120) || 20; motion.phase = frac(num(mo.phase, 0)); }
+      if (type === 'swing') motion.angle_deg = clamp(num(mo.angle_deg, 30), 1, 180);
+      if (type === 'slide') {
+        motion.dx = clamp(num(mo.dx, 0), -700, 700); motion.dy = clamp(num(mo.dy, 0), -500, 500);
+        if (!motion.dx && !motion.dy) motion.dy = 40;
+      }
+      if (type === 'swing' || type === 'slide') { motion.period_s = clamp(num(mo.period_s, 2), 0.4, 30); motion.phase = frac(num(mo.phase, 0)); }
+      const o = {
+        id, no: String(q.no || ''), name: String(q.name || ''), shape,
+        x: clamp(num(q.x, 500), -200, 1200), y: clamp(num(q.y, 280), -200, 800),
+        w: clamp(num(q.w, shape === 'roller' || shape === 'circle' ? 80 : 120), 4, 1100),
+        h: clamp(num(q.h, shape === 'arm' ? 18 : 40), 2, 700),
+        angle: clamp(num(q.angle_deg, 0), -360, 360),
+        color: isHex(q.color) ? q.color : MECH_PALETTE[i % MECH_PALETTE.length],
+        parent: q.parent ? String(q.parent) : null, motion,
+      };
+      if (shape === 'roller' || shape === 'circle') o.h = o.w;
+      if (Array.isArray(q.pivot) && q.pivot.length >= 2) o.pivot = [clamp(num(q.pivot[0], o.x), -200, 1200), clamp(num(q.pivot[1], o.y), -200, 800)];
+      return o;
+    });
+    const byId = {};
+    parts.forEach((q) => { byId[q.id] = q; });
+    parts.forEach((q) => { if (q.parent && (!byId[q.parent] || q.parent === q.id)) q.parent = null; });
+    parts.forEach((q) => { // 순환 연결 끊기
+      let c = q, n = 0;
+      while (c && c.parent && n < 50) { c = byId[c.parent]; n++; if (c === q) { q.parent = null; break; } }
+      if (n >= 50) q.parent = null;
+    });
+    const flows = (Array.isArray(mm.flows) ? mm.flows : []).filter((f) => f && typeof f === 'object').slice(0, 6).map((f) => ({
+      name: String(f.name || ''), material: normMaterial(f.material, f.name),
+      width: clamp(num(f.width, 8), 2, 40), speed: clamp(num(f.speed, 60), -400, 400),
+      path: (Array.isArray(f.path) ? f.path : []).filter((pt) => Array.isArray(pt) && pt.length >= 2).slice(0, 40)
+        .map((pt) => [clamp(num(pt[0], 0), -200, 1200), clamp(num(pt[1], 0), -200, 800)]),
+    })).filter((f) => f.path.length >= 2);
+    if (!parts.length) warnings.push('범용 기구 모드인데 부품(mechanism.parts) 정보가 없습니다. 수정 요청으로 부품 배치를 알려 주세요.');
+    else if (!parts.some((q) => q.motion.type !== 'none') && !flows.length) warnings.push('움직이는 부품이 없습니다. 수정 요청에서 어떤 부품이 어떻게 움직이는지 알려 주세요.');
+    return { note: String(mm.note || ''), parts, flows };
+  }
+
+  // 2D 변환 행렬 [a b c d e f] (SVG matrix와 같은 순서)
+  const MI = [1, 0, 0, 1, 0, 0];
+  const mmul = (m, n) => [m[0] * n[0] + m[2] * n[1], m[1] * n[0] + m[3] * n[1], m[0] * n[2] + m[2] * n[3], m[1] * n[2] + m[3] * n[3], m[0] * n[4] + m[2] * n[5] + m[4], m[1] * n[4] + m[3] * n[5] + m[5]];
+  const mrot = (deg, cx, cy) => { const a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a); return [c, s, -s, c, cx - c * cx + s * cy, cy - s * cx - c * cy]; };
+  const mtr = (dx, dy) => [1, 0, 0, 1, dx, dy];
+  const mapp = (m, x, y) => [m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]];
+  const mstr = (m) => `matrix(${m.map((v) => +v.toFixed(4)).join(' ')})`;
+
+  function pivotOf(q) { return q.pivot || [q.x, q.y]; }
+  function motionMatrix(q, t) {
+    const mo = q.motion, [px, py] = pivotOf(q);
+    if (mo.type === 'rotate') return mrot((mo.rpm / 60) * 360 * t + mo.phase * 360, px, py);
+    if (mo.type === 'swing') return mrot((mo.angle_deg / 2) * Math.sin(2 * Math.PI * (t / mo.period_s + mo.phase)), px, py);
+    if (mo.type === 'slide') { const k = (1 - Math.cos(2 * Math.PI * (t / mo.period_s + mo.phase))) / 2; return mtr(mo.dx * k, mo.dy * k); }
+    return MI;
+  }
+  function worldMatrices(M, t) {
+    const byId = {}, out = {};
+    M.parts.forEach((q) => { byId[q.id] = q; });
+    const get = (q, depth) => {
+      if (out[q.id]) return out[q.id];
+      const parent = q.parent && byId[q.parent] && depth < 40 ? get(byId[q.parent], depth + 1) : MI;
+      out[q.id] = mmul(parent, motionMatrix(q, t));
+      return out[q.id];
+    };
+    M.parts.forEach((q) => get(q, 0));
+    return out;
+  }
+  function shapeSvg(q) {
+    const st = `fill="${q.color}" stroke="${shade(q.color, -0.35)}" stroke-width="1.5"`;
+    const rotA = q.angle ? ` transform="rotate(${f1(q.angle)} ${f1(q.x)} ${f1(q.y)})"` : '';
+    const { x, y, w, h } = q;
+    if (q.shape === 'roller') {
+      const r = w / 2, hub = Math.max(4, r * 0.22);
+      let sp = '';
+      for (let k = 0; k < 4; k++) { const a = (k * Math.PI) / 2; sp += `<line x1="${f1(x)}" y1="${f1(y)}" x2="${f1(x + r * 0.82 * Math.cos(a))}" y2="${f1(y + r * 0.82 * Math.sin(a))}" stroke="${shade(q.color, -0.45)}" stroke-width="2"/>`; }
+      return `<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(r)}" ${st}/>${sp}<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(hub)}" fill="${shade(q.color, -0.5)}"/><circle cx="${f1(x + r * 0.62)}" cy="${f1(y)}" r="${f1(Math.max(2.5, r * 0.09))}" fill="#fff"/>`;
+    }
+    if (q.shape === 'circle') {
+      const r = w / 2;
+      return `<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(r)}" ${st}/><line x1="${f1(x)}" y1="${f1(y)}" x2="${f1(x + r)}" y2="${f1(y)}" stroke="#fff" stroke-width="2"/>`;
+    }
+    if (q.shape === 'arm') {
+      return `<g transform="rotate(${f1(q.angle)} ${f1(x)} ${f1(y)})"><rect x="${f1(x - h / 2)}" y="${f1(y - h / 2)}" width="${f1(w + h)}" height="${f1(h)}" rx="${f1(h / 2)}" ${st}/><circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(h * 0.32)}" fill="#fff" stroke="${shade(q.color, -0.45)}"/><circle cx="${f1(x + w)}" cy="${f1(y)}" r="${f1(h * 0.24)}" fill="${shade(q.color, -0.4)}"/></g>`;
+    }
+    if (q.shape === 'blade') {
+      return `<polygon points="${f1(x - w / 2)},${f1(y - h / 2)} ${f1(x + w / 2)},${f1(y - h / 2)} ${f1(x)},${f1(y + h / 2)}"${rotA} ${st}/>`;
+    }
+    if (q.shape === 'plate') {
+      return `<rect x="${f1(x - w / 2)}" y="${f1(y - h / 2)}" width="${f1(w)}" height="${f1(h)}" rx="2"${rotA} fill="${shade(q.color, 0.35)}" stroke="${shade(q.color, -0.35)}" stroke-width="1.5"/>`;
+    }
+    return `<rect x="${f1(x - w / 2)}" y="${f1(y - h / 2)}" width="${f1(w)}" height="${f1(h)}" rx="4"${rotA} ${st}/>`;
+  }
+  function renderMech(E, t) {
+    const M = E.L.M, C = E.C;
+    if (!M) return '';
+    const W = worldMatrices(M, t);
+    let svg = `<defs><pattern id="pmGrid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0V50" fill="none" stroke="#E0E3EA" stroke-width="1"/></pattern>
+      <marker id="pmArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5F5E5A"/></marker></defs>
+      <rect width="${MECH.W}" height="${MECH.H}" fill="url(#pmGrid)"/>`;
+    // 부품 (움직임이 적용된 위치)
+    M.parts.forEach((q) => { svg += `<g transform="${mstr(W[q.id])}">${shapeSvg(q)}</g>`; });
+    // 재료 흐름: 점선이 이동 방향으로 흘러감
+    M.flows.forEach((f) => {
+      const pts = f.path.map((pt) => pt.join(',')).join(' ');
+      const col = matColor(C, f.material);
+      svg += `<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="${f.width}" stroke-linejoin="round" stroke-linecap="round" opacity="0.9"/>`;
+      svg += `<polyline points="${pts}" fill="none" stroke="#fff" stroke-width="${Math.max(1.5, f.width * 0.25)}" stroke-dasharray="14 18" stroke-dashoffset="${f1(-f.speed * t)}" opacity="0.85" marker-end="url(#pmArr)"/>`;
+      if (f.name) { const [lx, ly] = f.path[0]; svg += `<text x="${f1(lx + 6)}" y="${f1(ly - f.width / 2 - 6)}" font-size="15" fill="#3B3B3B">${esc(f.name)}</text>`; }
+    });
+    // 부호·이름 (돌아가도 글자는 똑바로)
+    M.parts.forEach((q) => {
+      const lab = q.no || q.name; if (!lab) return;
+      const [cx, cy] = mapp(W[q.id], q.shape === 'arm' ? q.x + (q.w / 2) * Math.cos(q.angle * Math.PI / 180) : q.x, q.shape === 'arm' ? q.y + (q.w / 2) * Math.sin(q.angle * Math.PI / 180) : q.y);
+      const dy = q.shape === 'arm' ? -q.h - 4 : q.shape === 'blade' ? q.h / 2 + 17 : -(q.h / 2) - 8; // 칼날은 아래쪽에 (위는 붙은 부품과 겹침)
+      svg += `<text x="${f1(cx)}" y="${f1(cy + dy)}" font-size="15" text-anchor="middle" fill="#1F2430" stroke="#F3F4F7" stroke-width="3" paint-order="stroke">${esc(lab)}</text>`;
+    });
+    if (!M.parts.length && !M.flows.length) svg += `<text x="500" y="280" font-size="18" text-anchor="middle" fill="#888">표시할 부품이 없습니다</text>`;
+    return svg;
+  }
+  function mechStatus(E, t) {
+    const M = E.L.M, lines = [];
+    (M ? M.parts : []).forEach((q) => {
+      const n = `${q.no ? q.no + ' ' : ''}${q.name || SHAPE_LABEL[q.shape]}`;
+      const mo = q.motion;
+      if (mo.type === 'rotate') lines.push(`${n}: ${mo.rpm > 0 ? '시계' : '반시계'} 방향 연속 회전 (${Math.abs(mo.rpm)}rpm)`);
+      else if (mo.type === 'swing') lines.push(`${n}: ±${f1(mo.angle_deg / 2)}° 왕복 회전 (${mo.period_s}초 주기)`);
+      else if (mo.type === 'slide') {
+        const ph = frac(t / mo.period_s + mo.phase), dir = Math.abs(mo.dy) >= Math.abs(mo.dx) ? (mo.dy > 0 ? ['하강', '상승'] : ['상승', '하강']) : (mo.dx > 0 ? ['오른쪽 이동', '왼쪽 복귀'] : ['왼쪽 이동', '오른쪽 복귀']);
+        lines.push(`${n}: ${ph < 0.5 ? dir[0] : dir[1]} 중 (${mo.period_s}초 주기 왕복)`);
+      }
+    });
+    (M ? M.flows : []).forEach((f) => lines.push(`${f.name || '재료'}: 이송 중`));
+    return { head: '범용 기구 모드', text: lines.join('\n') || '움직이는 부품이 없습니다.' };
+  }
+
   const SAMPLES = {
     toptec_mod: {
       title: '롤러 노칭 · 상부 직사각형 노칭 + 하부 일자 절단', source: 'KR102300705B1 (변형 컨셉)',
@@ -891,10 +1056,20 @@
     '- rotary_cut은 "blade":"straight"|"helical", "skew":true|false(롤러 축이 이송 방향에 비스듬히 기울어 있으면 true), "scrap_width_mm"(이중 칼날로 띠를 잘라내면 그 폭, 아니면 0).',
     '- "colors"는 사용자가 색을 요청할 때만 넣는다: {"coated":"#RRGGBB","foil":"#RRGGBB","roller":"#RRGGBB","blade":"#RRGGBB"}.',
     '',
+    '[범용 기구 모드] 문서의 장치가 위 4가지 유형(전극 시트 노칭·절단)이 아니면(적층·권취·그리퍼·이송·검사·프레스 외 기구 등) 억지로 끼워 맞추지 말고 "mode":"mechanism"으로 출력한다.',
+    '- mechanism.parts: 측면에서 본 주요 부품(최대 25개). 좌표는 가로 0~1000, 세로 0~560(위쪽이 0) 화면 기준이며 도면 배치와 비슷하게 잡는다.',
+    '  shape: rect(블록·프레임·헤드) | roller(롤러·풀리, w=지름) | circle(원판·캠) | arm(링크·레버: x,y=회전축, w=길이, h=두께, angle_deg=처음 각도) | blade(칼날·펀치 끝) | plate(판·스테이지·트레이)',
+    '  필드: id, no(도면 부호), name, shape, x, y(중심, arm은 회전축), w, h, angle_deg(기울기), parent(붙어서 같이 움직이는 부품 id, 없으면 null), pivot([x,y], 회전 중심을 따로 둘 때만)',
+    '  motion: {"type":"none"} | {"type":"rotate","rpm":숫자(음수=반시계)} | {"type":"swing","angle_deg":흔들림 각도,"period_s":주기초} | {"type":"slide","dx":가로 이동량,"dy":세로 이동량(+는 아래),"period_s":주기초,"phase":0~1}',
+    '- mechanism.flows: 이송되는 재료(전극·분리막·셀 등) [{"name":"","material":"coated|foil|other","path":[[x,y],[x,y]],"speed":초당 이동량,"width":두께}]',
+    '- 여러 부품이 순서대로 움직이면(내려와서 집고 옮김 등) period_s를 같게 하고 phase로 순서를 맞춘다.',
+    '- 범용 모드에서는 web과 stations를 생략한다.',
+    '',
     '[출력 형식]',
-    '{"title":"","source":"특허/논문 번호","summary":"장치가 무엇을 어떻게 하는지 2~3문장",',
+    '{"mode":"web|mechanism","title":"","source":"특허/논문 번호","summary":"장치가 무엇을 어떻게 하는지 2~3문장",',
     ' "web":{"width_mm":0,"pitch_mm":0,"bands":[{"name":"","width_mm":0,"material":"coated|foil|other"}],"preformed_tabs":null},',
     ' "stations":[{"id":"s1","type":"4가지 유형 중 문서에 맞는 것","label":"도면 부호를 포함한 이름", ...유형별 필드}],',
+    ' "mechanism":{"parts":[...],"flows":[...]} (mode가 mechanism일 때만),',
     ' "parts":[{"no":"부호","name":"부품명","role":"역할"}],',
     ' "evidence":[{"text":"사양에 반영한 사실","source":"근거 위치(도 3, 청구항 4 등)"}],',
     ' "assumptions":["특허에 없어 추정한 내용"],',
@@ -903,10 +1078,10 @@
     '[규칙]',
     '- 치수(mm)는 특허에 있으면 그 값, 없으면 도면 비율로 추정하고 assumptions에 적는다.',
     '- 특허에 근거가 있는 것만 evidence에, 추정은 assumptions에 넣는다. 근거 없이 단정하지 않는다.',
-    '- 4가지 유형에 맞지 않는 기구는 가장 가까운 유형으로 근사하고, 차이를 unsupported에 적는다.',
+    '- 장치가 4가지 유형 중 하나와 실제로 같을 때만 web/stations로 쓴다. 비슷해 보인다는 이유로 노칭·롤 커팅으로 근사하지 말고, 다르면 mechanism 모드로 그 문서의 실제 부품과 움직임을 그린다.',
     '- 모든 문장은 한국어로 쓴다.',
     '- 매번 백지상태에서 시작한다. 위 출력 형식은 구조 안내일 뿐이며 그 값이나 이전 결과·샘플을 재사용하지 않는다. 이번에 받은 문서에 나온 장치만 사양으로 만든다.',
-    '- 문서에 4가지 유형에 해당하는 공정이 없으면 stations를 빈 배열로 두고, 문서의 실제 동작을 unsupported에 설명한다.',
+    '- 범용 모드로도 표현하기 어려운 동작(유체, 열, 화학 반응 등)은 unsupported에 설명한다.',
   ].join('\n');
 
   function exaoneTarget() {
@@ -930,37 +1105,45 @@
   }
 
   async function exaoneChat(messages, opt) {
-    const { proxy, key } = exaoneTarget();
-    if (!proxy && !key) {
-      const err = new Error('EXAONE 연결 정보가 없습니다. AI 설정에서 EXAONE 보안 프록시 URL 또는 API 키를 입력하세요.');
-      err.code = 'no_config'; throw err;
-    }
-    const url = proxy || EXAONE_URL;
-    const headers = { 'Content-Type': 'application/json' };
-    if (!proxy && key) headers.Authorization = `Bearer ${key}`;
+    const payload = {
+      model: EXAONE_MODEL, messages, temperature: 0.4, top_p: 0.95, top_k: 20,
+      max_tokens: (opt && opt.maxTokens) || 6000,
+      chat_template_kwargs: { enable_thinking: !!(opt && opt.thinking) },
+    };
     const ctrl = new AbortController();
     // 도면이 많거나 '깊게 생각하기'면 수 분 걸리므로 최대 15분까지 기다림 (로컬 프록시도 15분)
     const tm = setTimeout(() => ctrl.abort(), (opt && opt.timeoutMs) || EXAONE_TIMEOUT_MS);
     try {
-      const res = await fetch(url, {
-        method: 'POST', headers, signal: ctrl.signal,
-        body: JSON.stringify({
-          model: EXAONE_MODEL, messages, temperature: 0.4, top_p: 0.95, top_k: 20,
-          max_tokens: (opt && opt.maxTokens) || 6000,
-          chat_template_kwargs: { enable_thinking: !!(opt && opt.thinking) },
-        }),
-      });
+      let res;
+      if (typeof window.exaoneFetch === 'function') {
+        // 앱 공통 연결: 직접 지정 프록시 → API 키 직접 호출 → 이 PC의 로컬 프록시 순서로 시도
+        res = (await window.exaoneFetch(payload, { signal: ctrl.signal })).res;
+      } else {
+        const { proxy, key } = exaoneTarget();
+        if (!proxy && !key) {
+          const err = new Error('EXAONE 연결 정보가 없습니다. AI 설정에서 EXAONE 프록시 URL 또는 API 키를 입력하세요.');
+          err.code = 'no_config'; throw err;
+        }
+        const headers = { 'Content-Type': 'application/json' };
+        if (!proxy && key) headers.Authorization = `Bearer ${key}`;
+        try {
+          res = await fetch(proxy || EXAONE_URL, { method: 'POST', headers, signal: ctrl.signal, body: JSON.stringify(payload) });
+        } catch (e) {
+          if (e instanceof TypeError) throw new Error(`EXAONE에 연결하지 못했습니다 (${proxy ? '프록시 ' + proxy : '직접 호출'}). 프록시가 켜져 있는지, 주소가 맞는지 확인하세요.`);
+          throw e;
+        }
+      }
       if (!res.ok) {
         const t = await res.text().catch(() => '');
         const slow = /timed?\s*out|timeout/i.test(t) || res.status === 504;
-        throw new Error(`EXAONE 오류 ${res.status}${t ? ': ' + t.slice(0, 240) : ''}${slow ? '\n→ 프록시가 응답을 기다리다 끊었습니다. 로컬 프록시를 최신 버전(대기 15분)으로 다시 실행했는지 확인하고, 그래도 끊기면 도면 수를 줄이거나 \'깊게 생각하기\'를 끄고 다시 시도하세요.' : ''}`);
+        const hint = typeof window.exaoneHttpHint === 'function' ? window.exaoneHttpHint(res.status, t) : '';
+        throw new Error(`EXAONE 오류 ${res.status}${t ? ': ' + t.slice(0, 240) : ''}${hint ? '\n→ ' + hint : ''}${slow ? '\n→ 프록시가 응답을 기다리다 끊었습니다. 로컬 프록시를 최신 버전(대기 15분)으로 다시 실행했는지 확인하고, 그래도 끊기면 도면 수를 줄이거나 \'깊게 생각하기\'를 끄고 다시 시도하세요.' : ''}`);
       }
       const data = await res.json();
       const msg = data && data.choices && data.choices[0] && data.choices[0].message;
       return String((msg && msg.content) || '');
     } catch (e) {
       if (e.name === 'AbortError') throw new Error(`EXAONE 응답 시간 초과 (${Math.round(((opt && opt.timeoutMs) || EXAONE_TIMEOUT_MS) / 60000)}분). 도면 수를 줄이거나 다시 시도하세요.`);
-      if (e instanceof TypeError) throw new Error(`EXAONE에 연결하지 못했습니다 (${proxy ? '프록시 ' + proxy : '직접 호출'}). 프록시가 켜져 있는지, 주소가 맞는지 확인하세요.`);
       throw e;
     } finally { clearTimeout(tm); }
   }
@@ -1083,6 +1266,9 @@
   #tab-patentmotion select.pm-sel{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 10px;font-size:13px}
   #tab-patentmotion select.pm-sel option{color:#000}
   #tab-patentmotion details summary{cursor:pointer;font-size:13px;color:rgba(255,255,255,.8)}
+  #tab-patentmotion.pm-mech .pm-webonly{display:none}
+  #tab-patentmotion .pm-origin{display:inline-block;font-size:11px;border-radius:10px;padding:1px 8px;margin-left:6px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);font-weight:400}
+  #tab-patentmotion .pm-origin.sample{background:rgba(255,193,7,.18);color:#ffd36b}
   @media (max-width:600px){#tab-patentmotion .pm-3d{height:300px}#tab-patentmotion .pm-card{padding:12px}}
   `;
 
@@ -1122,12 +1308,12 @@
     </div>
     <div class="pm-status" id="pmStatus">-</div>
     <div class="pm-status-sub" id="pmStatusSub"></div>
-    <div class="pm-label">3D 사선 뷰 · 탭 쪽이 앞</div>
-    <div class="pm-view pm-3d" id="pm3d"><span class="pm-hint" id="pm3dHint">드래그로 회전 · 휠로 확대/축소</span></div>
-    <div class="pm-label">측면도 · 시트는 오른쪽에서 왼쪽으로 이송</div>
+    <div class="pm-label pm-webonly">3D 사선 뷰 · 탭 쪽이 앞</div>
+    <div class="pm-view pm-3d pm-webonly" id="pm3d"><span class="pm-hint" id="pm3dHint">드래그로 회전 · 휠로 확대/축소</span></div>
+    <div class="pm-label" id="pmSideLabel">측면도 · 시트는 오른쪽에서 왼쪽으로 이송</div>
     <div class="pm-view"><svg id="pmSide" viewBox="0 0 680 300" role="img" aria-label="측면도"></svg></div>
-    <div class="pm-label">평면도 · 측면도와 같은 가로 위치 기준</div>
-    <div class="pm-view"><svg id="pmTop" viewBox="0 0 680 205" role="img" aria-label="평면도"></svg></div>
+    <div class="pm-label pm-webonly">평면도 · 측면도와 같은 가로 위치 기준</div>
+    <div class="pm-view pm-webonly"><svg id="pmTop" viewBox="0 0 680 205" role="img" aria-label="평면도"></svg></div>
   </div>
 
   <div class="pm-card">
@@ -1136,8 +1322,8 @@
   </div>
 
   <div class="pm-card">
-    <h3><i class="fas fa-edit"></i> 4. 수정 요청</h3>
-    <textarea class="pm-ta" id="pmFix" placeholder="예: 바디부는 검정, 탭은 구리색으로 / 하부는 일자로 자르게 바꿔줘 / 롤러 1회전에 탭 6개"></textarea>
+    <h3><i class="fas fa-edit"></i> 4. 수정 요청 <span class="pm-muted" style="font-weight:400">· 지금 화면(2번)의 동작을 고칩니다. 새 PDF는 1번에서 'AI 분석 시작'</span></h3>
+    <textarea class="pm-ta" id="pmFix" placeholder="예: 바디부는 검정, 탭은 구리색으로 / 하부는 일자로 자르게 바꿔줘 / 롤러 1회전에 탭 6개 / 그리퍼가 내려와서 셀을 집고 오른쪽으로 옮기게"></textarea>
     <div class="pm-row"><button class="btn btn-primary" id="pmFixBtn"><i class="fas fa-paper-plane"></i> AI로 수정</button><span class="pm-log" id="pmFixLog" style="margin:0"></span></div>
     <details style="margin-top:8px"><summary>사양 JSON 직접 편집</summary>
       <textarea class="pm-ta pm-json" id="pmJson" spellcheck="false"></textarea>
@@ -1166,11 +1352,18 @@
       return `<li>${i + 1}. <b>${esc(TYPE_LABEL[o.type])}</b> · ${esc(o.label)}${d ? ' — ' + esc(d) : ''}</li>`;
     }).join('');
     const bands = s.web.bands.map((b) => `${esc(b.name || b.material)} ${f1(b.width_mm)}mm`).join(' / ');
+    const M = s.mode === 'mechanism' ? s.mechanism : null;
+    const mv = M ? M.parts.filter((q) => q.motion.type !== 'none') : [];
+    const moTxt = (q) => q.motion.type === 'rotate' ? `회전 ${q.motion.rpm}rpm` : q.motion.type === 'swing' ? `왕복 회전 ±${f1(q.motion.angle_deg / 2)}°` : `직선 왕복 (${f1(q.motion.dx)}, ${f1(q.motion.dy)})`;
+    const head = M
+      ? `<div class="pm-muted">범용 기구 모드 · 부품 ${M.parts.length}개 · 움직이는 부품 ${mv.length}개 · 재료 흐름 ${M.flows.length}개</div>
+      <ul class="pm-list">${mv.map((q) => `<li>• <b>${esc((q.no ? q.no + ' ' : '') + (q.name || SHAPE_LABEL[q.shape]))}</b> — ${esc(moTxt(q))}${q.parent ? ` <span class="pm-muted">(${esc(q.parent)}에 붙어 같이 움직임)</span>` : ''}</li>`).join('') || '<li class="pm-muted">움직이는 부품 없음</li>'}</ul>`
+      : `<div class="pm-muted">시트: 폭 ${f1(s.web.width_mm)}mm · 피치 ${f1(s.web.pitch_mm)}mm · 띠(위→아래) ${bands}${s.web.preformed_tabs ? ' · 탭 사전 성형' : ''}</div>
+      <ul class="pm-list">${st || '<li class="pm-muted">공정 없음</li>'}</ul>`;
     el.innerHTML = `
       <div style="font-size:14px;font-weight:600;color:#fff">${esc(s.title)} <span class="pm-muted">${esc(s.source)}</span></div>
       <p style="font-size:13px;color:rgba(255,255,255,.85);margin:6px 0 8px;line-height:1.6">${esc(s.summary)}</p>
-      <div class="pm-muted">시트: 폭 ${f1(s.web.width_mm)}mm · 피치 ${f1(s.web.pitch_mm)}mm · 띠(위→아래) ${bands}${s.web.preformed_tabs ? ' · 탭 사전 성형' : ''}</div>
-      <ul class="pm-list">${st || '<li class="pm-muted">공정 없음</li>'}</ul>
+      ${head}
       ${s.parts.length ? `<table class="pm-tbl"><tr><th>부호</th><th>부품</th><th>역할</th></tr>${s.parts.map((p) => `<tr><td>${esc(p.no)}</td><td>${esc(p.name)}</td><td>${esc(p.role)}</td></tr>`).join('')}</table>` : ''}
       <ul class="pm-list">${li(s.evidence, 'pm-b-ev', '근거')}${li(s.assumptions, 'pm-b-as', '추정')}${li(s.unsupported, 'pm-b-un', '미표현')}${li(state.warnings, 'pm-b-un', '자동 보정')}</ul>`;
   }
@@ -1196,6 +1389,8 @@
       state.scene.rd.render(state.scene.sc, state.scene.cam); // 빈 장면으로 다시 그림
     }
     $('pmTitle').textContent = '';
+    setOrigin(null);
+    const tab = $('tab-patentmotion'); if (tab) tab.classList.remove('pm-mech');
     $('pmTop').innerHTML = ''; $('pmSide').innerHTML = '';
     $('pmStatus').textContent = '-'; $('pmStatusSub').textContent = msg || '';
     $('pmJson').value = ''; $('pmFix').value = '';
@@ -1205,13 +1400,33 @@
     renderColors();
   }
 
+  // 지금 화면의 사양이 어디서 왔는지 (샘플을 PDF 결과로 착각하지 않게)
+  function setOrigin(o) {
+    state.origin = o || null;
+    try { if (o) localStorage.setItem('pm_last_origin', JSON.stringify(o)); else localStorage.removeItem('pm_last_origin'); } catch (e) { /* noop */ }
+  }
+  function originBadge() {
+    const o = state.origin;
+    if (!o) return '';
+    const txt = o.kind === 'sample' ? `샘플: ${o.name}` : o.kind === 'pdf' ? `PDF: ${o.name}` : o.kind === 'json' ? '불러온 사양' : '';
+    return txt ? `<span class="pm-origin ${o.kind === 'sample' ? 'sample' : ''}">${esc(txt)}</span>` : '';
+  }
   function applySpec(raw, opt) {
     const { spec, warnings } = normalizeSpec(raw);
     state.spec = spec; state.warnings = warnings;
     state.layout = buildLayout(spec);
+    if (opt && opt.origin) setOrigin(opt.origin);
     if (!(opt && opt.keepTime)) state.t = 0;
-    if (state.scene) state.scene.build(state.layout, spec.colors);
-    $('pmTitle').textContent = '· ' + spec.title;
+    const isMech = spec.mode === 'mechanism';
+    const tab = $('tab-patentmotion');
+    if (tab) tab.classList.toggle('pm-mech', isMech);
+    $('pmSide').setAttribute('viewBox', isMech ? `0 0 ${MECH.W} ${MECH.H}` : '0 0 680 300');
+    $('pmSideLabel').textContent = isMech ? '측면도 · 범용 기구 모드 (부품 회전·왕복·재료 이송)' : '측면도 · 시트는 오른쪽에서 왼쪽으로 이송';
+    if (state.scene) {
+      if (isMech) { state.scene.disposeRoot(); state.scene.L = null; }
+      else { state.scene.build(state.layout, spec.colors); setTimeout(() => state.scene && state.scene.resize(), 30); }
+    }
+    $('pmTitle').innerHTML = '· ' + esc(spec.title) + originBadge();
     $('pmJson').value = JSON.stringify(spec, null, 2);
     try { localStorage.setItem('pm_last_spec', JSON.stringify(spec)); } catch (e) { /* noop */ }
     renderResult();
@@ -1227,6 +1442,14 @@
     state.last = ts;
     if (state.run) state.t += dt * state.speed;
     if (!state.layout) return;
+    if (state.layout.mode === 'mechanism') {
+      const E = { L: state.layout, C: state.spec.colors };
+      $('pmSide').innerHTML = renderMech(E, state.t);
+      const st = mechStatus(E, state.t);
+      $('pmStatus').textContent = st.head;
+      $('pmStatusSub').textContent = st.text;
+      return;
+    }
     const E = { L: state.layout, W: webState(state.layout, state.t), C: state.spec.colors };
     $('pmTop').innerHTML = renderTop(E);
     $('pmSide').innerHTML = renderSide(E);
@@ -1241,7 +1464,7 @@
       if (!window.THREE) await loadScript(CDN.three);
       if (!window.THREE.OrbitControls) await loadScript(CDN.orbit).catch(() => null);
       state.scene = new Scene3D($('pm3d'));
-      if (state.layout) state.scene.build(state.layout, state.spec.colors);
+      if (state.layout && state.layout.mode !== 'mechanism') state.scene.build(state.layout, state.spec.colors);
     } catch (e) {
       $('pm3dHint').textContent = '3D 뷰를 불러오지 못했습니다. 측면도와 평면도는 정상 동작합니다.';
     }
@@ -1303,13 +1526,13 @@
       try {
         raw = await chatJson([{ role: 'system', content: SYSTEM_PROMPT }, { role: 'user', content }], { thinking: $('pmThink').checked, maxTokens: $('pmThink').checked ? 8000 : 4000 }, (m) => ticker.set(m));
       } finally { ticker.stop(); }
-      applySpec(raw);
+      applySpec(raw, { origin: { kind: 'pdf', name: state.pdf.name } });
       setLog('pmLog', `해석 완료 (${Math.round((Date.now() - t0) / 1000)}초). 아래 동작과 '근거/추정'을 확인하고, 다르면 4번에서 수정 요청하세요.`);
       // 모션 생성 성공 → 코인 (같은 PDF는 한 번만, index.html의 코인 정책)
       if (typeof window.awardPatentMotionCoin === 'function') window.awardPatentMotionCoin(`${state.pdf.name}|${state.pdf.size}|${state.pdf.total}`);
     } catch (e) {
       setLog('pmLog', e.message, true);
-      if (e.code === 'no_config' && typeof window.openAiSettingsModal === 'function') {
+      if ((e.code === 'no_config' || e.code === 'connect') && typeof window.openAiSettingsModal === 'function') {
         $('pmLog').insertAdjacentHTML('beforeend', ' <button class="btn btn-secondary" id="pmOpenSet" style="padding:4px 10px;font-size:12px">AI 설정 열기</button>');
         $('pmOpenSet').onclick = () => window.openAiSettingsModal();
       }
@@ -1321,6 +1544,11 @@
     if (!req) { setLog('pmFixLog', '수정할 내용을 입력하세요.', true); return; }
     if (!state.spec) { setLog('pmFixLog', '먼저 PDF를 분석하거나 샘플을 불러오세요.', true); return; }
     if (state.busy) return;
+    const o = state.origin;
+    if (state.pdf && !(o && o.kind === 'pdf' && o.name === state.pdf.name)) {
+      setLog('pmFixLog', `지금 2번 화면은 ${o && o.kind === 'sample' ? `샘플(${o.name})` : '이전 사양'}입니다. 새 PDF(${state.pdf.name})의 동작은 1번에서 'AI 분석 시작'을 눌러야 새로 만들어집니다. 수정 요청은 지금 화면의 동작을 고치는 기능이에요.`, true);
+      return;
+    }
     state.busy = true; $('pmFixBtn').disabled = true;
     const ticker = startTicker('pmFixLog', 'EXAONE이 사양을 수정하는 중…');
     try {
@@ -1340,7 +1568,7 @@
   function bind() {
     const sampleSel = $('pmSample');
     Object.keys(SAMPLES).forEach((k) => { const o = document.createElement('option'); o.value = k; o.textContent = SAMPLE_NAMES[k]; sampleSel.appendChild(o); });
-    sampleSel.addEventListener('change', () => { if (sampleSel.value) applySpec(JSON.parse(JSON.stringify(SAMPLES[sampleSel.value]))); sampleSel.value = ''; });
+    sampleSel.addEventListener('change', () => { if (sampleSel.value) applySpec(JSON.parse(JSON.stringify(SAMPLES[sampleSel.value])), { origin: { kind: 'sample', name: SAMPLE_NAMES[sampleSel.value] } }); sampleSel.value = ''; });
     $('pmSaveJson').addEventListener('click', () => {
       if (!state.spec) return;
       const blob = new Blob([JSON.stringify(state.spec, null, 2)], { type: 'application/json' });
@@ -1352,7 +1580,7 @@
     $('pmLoadJson').addEventListener('change', async (e) => {
       const f = e.target.files[0]; e.target.value = '';
       if (!f) return;
-      try { applySpec(JSON.parse(await f.text())); } catch (err) { setLog('pmJsonLog', 'JSON을 읽지 못했습니다: ' + err.message, true); }
+      try { applySpec(JSON.parse(await f.text()), { origin: { kind: 'json', name: f.name } }); } catch (err) { setLog('pmJsonLog', 'JSON을 읽지 못했습니다: ' + err.message, true); }
     });
     const drop = $('pmDrop');
     drop.addEventListener('click', () => $('pmFile').click());
@@ -1379,9 +1607,11 @@
     const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
     tab.innerHTML = HTML;
     bind();
-    let start = null;
-    try { start = JSON.parse(localStorage.getItem('pm_last_spec') || 'null'); } catch (e) { start = null; }
-    applySpec(start || JSON.parse(JSON.stringify(SAMPLES.toptec_mod)));
+    let start = null, origin = null;
+    try { start = JSON.parse(localStorage.getItem('pm_last_spec') || 'null'); origin = JSON.parse(localStorage.getItem('pm_last_origin') || 'null'); } catch (e) { start = null; }
+    // 예전엔 처음 열면 로터리 노칭 샘플이 떠 있어서, 새 PDF 분석이 실패해도 샘플이 결과처럼 보였음 → 빈 화면에서 시작
+    if (start) applySpec(start, { origin: origin || { kind: 'json', name: '이전 사양' } });
+    else clearMotion('PDF를 첨부하고 \'AI 분석 시작\'을 누르면 그 문서의 동작이 새로 만들어집니다. (예시는 위 \'샘플 불러오기\')');
     state.raf = requestAnimationFrame(frame);
     init3D();
   }
