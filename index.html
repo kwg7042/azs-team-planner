@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-04b">
+    <meta name="app-version" content="2026-11-04c">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -6310,6 +6310,13 @@
         function exaoneHttpHint(status, text) {
             const t = String(text || '');
             if (/Forbidden origin|허용되지 않은 주소/i.test(t)) return '프록시가 이 주소를 허용하지 않습니다. 최신 로컬 프록시(AI 설정 > 로컬 프록시 내려받기)로 다시 실행하세요.';
+            // 응답 대기 시간 초과: 서버 연결은 됐는데 답이 늦어서 프록시가 끊은 경우 (연결 실패와 구분)
+            const rt = t.match(/read timed?\s*out[^(]*\(read timeout=(\d+)/i);
+            if (rt || status === 504 || /timed?\s*out/i.test(t)) {
+                const sec = rt ? +rt[1] : 0;
+                if (sec && sec < 300) return `EXAONE 서버에는 연결됐지만 답이 ${sec}초 안에 오지 않아 프록시가 끊었습니다. 지금 켜 둔 프록시는 예전 버전(대기 ${sec}초)입니다 → 그 프록시 창을 닫고, AI 설정 > EXAONE에서 새 로컬 프록시(exaone_proxy.py + EXAONE_proxy_start.bat, 대기 15분)를 내려받아 실행하세요.`;
+                return `EXAONE의 답이 ${sec ? sec + '초' : '프록시 대기 시간'} 안에 오지 않았습니다. 도면 수를 줄이거나 '깊게 생각하기'를 끄고 다시 시도하세요.`;
+            }
             if (status === 401) return 'API 키가 틀렸거나 만료되었습니다. (로컬 프록시면 창을 닫고 EXAONE_proxy_start.bat --reset 으로 키를 다시 입력)';
             if (status === 403) return '이 키로 EXAONE 접근이 허용되지 않았습니다.';
             if (status === 404) return '엔드포인트 주소나 모델명이 맞지 않습니다.';
@@ -14852,6 +14859,6 @@ ${text}
     })();
     </script>
     <!-- 특허 모션 탭: PDF → EXAONE 해석 → 동작 애니메이션 -->
-    <script src="patent_motion.js?v=2026-11-04b"></script>
+    <script src="patent_motion.js?v=2026-11-04c"></script>
 </body>
 </html>

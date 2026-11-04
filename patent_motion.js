@@ -1137,7 +1137,7 @@
         const t = await res.text().catch(() => '');
         const slow = /timed?\s*out|timeout/i.test(t) || res.status === 504;
         const hint = typeof window.exaoneHttpHint === 'function' ? window.exaoneHttpHint(res.status, t) : '';
-        throw new Error(`EXAONE 오류 ${res.status}${t ? ': ' + t.slice(0, 240) : ''}${hint ? '\n→ ' + hint : ''}${slow ? '\n→ 프록시가 응답을 기다리다 끊었습니다. 로컬 프록시를 최신 버전(대기 15분)으로 다시 실행했는지 확인하고, 그래도 끊기면 도면 수를 줄이거나 \'깊게 생각하기\'를 끄고 다시 시도하세요.' : ''}`);
+        throw new Error(`EXAONE 오류 ${res.status}${t ? ': ' + t.slice(0, 240) : ''}${hint ? '\n→ ' + hint : ''}${slow && !hint ? '\n→ 프록시가 응답을 기다리다 끊었습니다. 로컬 프록시를 최신 버전(대기 15분)으로 다시 실행했는지 확인하고, 그래도 끊기면 도면 수를 줄이거나 \'깊게 생각하기\'를 끄고 다시 시도하세요.' : ''}`);
       }
       const data = await res.json();
       const msg = data && data.choices && data.choices[0] && data.choices[0].message;
