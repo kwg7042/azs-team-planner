@@ -1182,7 +1182,7 @@
     const lib = await ensurePdfJs();
     const data = new Uint8Array(await file.arrayBuffer());
     const doc = await lib.getDocument({ data }).promise;
-    const n = Math.min(doc.numPages, 40), pages = [];
+    const n = Math.min(doc.numPages, PDF_MAX_PAGES), pages = [];
     for (let i = 1; i <= n; i++) {
       const page = await doc.getPage(i);
       const tc = await page.getTextContent();
@@ -1195,18 +1195,34 @@
       onProgress && onProgress(i, n);
     }
     const drawingKw = /도면\s*\d|附图|FIG\.?\s*\d|图\s*\d/;
-    pages.forEach((p, idx) => { p.sel = idx > 0 && p.chars < 400 && (drawingKw.test(p.text) || p.chars < 120); });
-    let cnt = 0;
-    pages.forEach((p) => { if (p.sel) { cnt++; if (cnt > 4) p.sel = false; } });
+    // 도면으로 보이는 페이지는 전부 자동 선택 (예전엔 4장까지만) — 필요 없는 건 클릭해서 빼면 됨
+    pages.forEach((p, idx) => { p.drawing = idx > 0 && p.chars < 400 && (drawingKw.test(p.text) || p.chars < 120); p.sel = p.drawing; });
     return { doc, pages, total: doc.numPages };
   }
-  async function pageImage(doc, no) {
+  const PDF_MAX_PAGES = 200;            // PDF에서 읽는 최대 쪽수
+  const IMG_TOTAL_BUDGET = 8.5e6;       // 도면 이미지 전체 크기 목표 (base64 글자 수, 약 8.5MB)
+  // 장수에 따라 한 장의 가로 해상도·화질을 정함 (6장 이하는 예전과 같은 1100px)
+  function imageSpec(count) {
+    const w = count <= 6 ? 1100 : Math.max(640, Math.round(1100 * Math.sqrt(6 / count)));
+    return { width: w, quality: count <= 12 ? 0.82 : 0.72, budget: IMG_TOTAL_BUDGET / Math.max(1, count) };
+  }
+  async function pageImage(doc, no, spec) {
+    const sp = spec || imageSpec(1);
+    let url = await renderPageJpeg(doc, no, sp.width, sp.quality);
+    // 한 장 몫보다 크면 해상도를 줄여 다시 (글자가 빽빽한 도면 대비)
+    for (let w = sp.width; url.length > sp.budget && w > 520; ) {
+      w = Math.round(w * 0.8);
+      url = await renderPageJpeg(doc, no, w, Math.max(0.6, sp.quality - 0.08));
+    }
+    return url;
+  }
+  async function renderPageJpeg(doc, no, width, quality) {
     const page = await doc.getPage(no);
-    const vp0 = page.getViewport({ scale: 1 }), sc = Math.min(2.2, 1100 / vp0.width), vp = page.getViewport({ scale: sc });
+    const vp0 = page.getViewport({ scale: 1 }), sc = Math.min(2.2, width / vp0.width), vp = page.getViewport({ scale: sc });
     const cv = document.createElement('canvas'); cv.width = Math.ceil(vp.width); cv.height = Math.ceil(vp.height);
     const ctx = cv.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
     await page.render({ canvasContext: ctx, viewport: vp }).promise;
-    return cv.toDataURL('image/jpeg', 0.82);
+    return cv.toDataURL('image/jpeg', quality);
   }
   function pickText(pages, limit) {
     const full = pages.map((p) => `[${p.no}쪽] ${p.text}`).join('\n');
@@ -1292,7 +1308,13 @@
     <div class="pm-row" id="pmAnalyzeRow" style="display:none">
       <button class="btn btn-primary" id="pmAnalyze"><i class="fas fa-magic"></i> AI 분석 시작</button>
       <label class="pm-muted"><input type="checkbox" id="pmThink"> 깊게 생각하기 (느리지만 정확도↑)</label>
-      <span class="pm-muted">파란 테두리 = AI에 보낼 도면 페이지 (클릭해 선택/해제, 최대 6장)</span>
+      <span class="pm-muted">파란 테두리 = AI에 보낼 페이지 (클릭해 선택/해제, 장수 제한 없음)</span>
+    </div>
+    <div class="pm-row" id="pmSelRow" style="display:none">
+      <button class="btn btn-secondary" id="pmSelDraw" style="padding:6px 12px;font-size:12px">도면만 선택</button>
+      <button class="btn btn-secondary" id="pmSelAll" style="padding:6px 12px;font-size:12px">전체 선택</button>
+      <button class="btn btn-secondary" id="pmSelNone" style="padding:6px 12px;font-size:12px">모두 해제</button>
+      <span class="pm-muted" id="pmSelInfo"></span>
     </div>
     <div class="pm-log" id="pmLog"></div>
   </div>
@@ -1473,12 +1495,12 @@
   function renderThumbs() {
     const box = $('pmThumbs');
     if (!state.pdf) { box.innerHTML = ''; return; }
-    box.innerHTML = state.pdf.pages.map((p) => `<div class="pm-thumb ${p.sel ? 'sel' : ''}" data-no="${p.no}" title="${p.chars}자"><img src="${p.thumb}" alt="${p.no}쪽"><span>${p.no}쪽${p.sel ? ' · 도면' : ''}</span></div>`).join('');
+    box.innerHTML = state.pdf.pages.map((p) => `<div class="pm-thumb ${p.sel ? 'sel' : ''}" data-no="${p.no}" title="${p.chars}자"><img src="${p.thumb}" alt="${p.no}쪽"><span>${p.no}쪽${p.sel ? ' · 보냄' : ''}</span></div>`).join('');
+    const n = state.pdf.pages.filter((x) => x.sel).length, sp = imageSpec(n);
+    $('pmSelInfo').innerHTML = `선택 <b>${n}</b>장 / ${state.pdf.pages.length}쪽${n > 6 ? ` · 장수가 많아 한 장을 ${sp.width}px로 줄여 보냄` : ''}${n > 12 ? ' · <span class="pm-err">많이 보낼수록 해석이 오래 걸리고, 모델 한도를 넘으면 오류가 날 수 있어요 (오류 나면 줄이기)</span>' : ''}`;
     box.querySelectorAll('.pm-thumb').forEach((d) => {
       d.addEventListener('click', () => {
         const p = state.pdf.pages.find((x) => x.no === +d.dataset.no);
-        const cnt = state.pdf.pages.filter((x) => x.sel).length;
-        if (!p.sel && cnt >= 6) { setLog('pmLog', '도면 이미지는 최대 6장까지 보낼 수 있습니다.', true); return; }
         p.sel = !p.sel; renderThumbs();
       });
     });
@@ -1490,15 +1512,16 @@
     if (file.size > 40 * 1024 * 1024) { setLog('pmLog', '40MB 이하 PDF만 처리합니다.', true); return; }
     setLog('pmLog', 'PDF를 읽는 중…');
     state.pdf = null; renderThumbs();
-    $('pmPdfInfo').textContent = ''; $('pmAnalyzeRow').style.display = 'none';
+    $('pmPdfInfo').textContent = ''; $('pmAnalyzeRow').style.display = 'none'; $('pmSelRow').style.display = 'none';
     try {
       const pdf = await readPdf(file, (i, n) => setLog('pmLog', `PDF를 읽는 중… ${i}/${n}쪽`));
       pdf.name = file.name;
       pdf.size = file.size;
       state.pdf = pdf;
       const sel = pdf.pages.filter((p) => p.sel).length;
-      $('pmPdfInfo').textContent = `${file.name} · ${pdf.total}쪽${pdf.total > 40 ? ' (앞 40쪽만 사용)' : ''} · 도면으로 보이는 페이지 ${sel}장 자동 선택`;
+      $('pmPdfInfo').textContent = `${file.name} · ${pdf.total}쪽${pdf.total > PDF_MAX_PAGES ? ` (앞 ${PDF_MAX_PAGES}쪽만 사용)` : ''} · 도면으로 보이는 페이지 ${sel}장 자동 선택 (원하는 페이지를 눌러 더하거나 빼세요)`;
       $('pmAnalyzeRow').style.display = '';
+      $('pmSelRow').style.display = '';
       renderThumbs();
       clearMotion('새 PDF를 불러왔습니다. 도면 페이지를 확인하고 분석을 누르세요.');
       setLog('pmLog', sel ? '' : '도면 페이지를 자동으로 찾지 못했습니다. 미리보기에서 도면 페이지를 직접 골라 주세요.');
@@ -1515,9 +1538,12 @@
     try {
       setLog('pmLog', `도면 ${sel.length}장을 이미지로 변환하는 중…`);
       const content = [{ type: 'text', text: '[특허 본문 발췌]\n' + pickText(state.pdf.pages, 14000) }];
+      const spec = imageSpec(sel.length);
+      let made = 0;
       for (const p of sel) {
         content.push({ type: 'text', text: `[도면 이미지: PDF ${p.no}쪽]` });
-        content.push({ type: 'image_url', image_url: { url: await pageImage(state.pdf.doc, p.no) } });
+        content.push({ type: 'image_url', image_url: { url: await pageImage(state.pdf.doc, p.no, spec) } });
+        setLog('pmLog', `도면 ${sel.length}장을 이미지로 변환하는 중… ${++made}/${sel.length}`);
       }
       content.push({ type: 'text', text: '위 자료만 근거로, 이전 결과나 예시와 무관하게 처음부터 동작 사양 JSON 하나만 출력하라.' });
       const t0 = Date.now();
@@ -1589,6 +1615,10 @@
     drop.addEventListener('dragleave', () => drop.classList.remove('over'));
     drop.addEventListener('drop', (e) => { e.preventDefault(); drop.classList.remove('over'); onFile(e.dataTransfer.files[0]); });
     $('pmAnalyze').addEventListener('click', analyze);
+    const selAll = (f) => { if (!state.pdf) return; state.pdf.pages.forEach((p) => { p.sel = f(p); }); renderThumbs(); };
+    $('pmSelDraw').addEventListener('click', () => selAll((p) => !!p.drawing));
+    $('pmSelAll').addEventListener('click', () => selAll(() => true));
+    $('pmSelNone').addEventListener('click', () => selAll(() => false));
     $('pmFixBtn').addEventListener('click', fixWithAi);
     $('pmJsonApply').addEventListener('click', () => {
       try { applySpec(JSON.parse($('pmJson').value), { keepTime: true }); setLog('pmJsonLog', '적용했습니다.'); } catch (e) { setLog('pmJsonLog', 'JSON 문법 오류: ' + e.message, true); }
