@@ -38,7 +38,7 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-VERSION = 3
+VERSION = 4
 HOST = "127.0.0.1"
 DEFAULT_PORT = 8787
 DEFAULT_BASE_URL = "https://api.lgresearch.ai/v1"
@@ -116,6 +116,54 @@ def _read_old_config(folder: Path) -> dict:
     return out
 
 
+# 예전 ExaOne 폴더(exaone_client.py / *exaone_local_proxy*.py 가 있는 곳)를 내 문서 폴더 아래에서 자동으로 찾기
+_SKIP_DIRS = {"appdata", "node_modules", "__pycache__", "site-packages", "venv", ".venv", "env", "library",
+              "program files", "program files (x86)", "windows", "$recycle.bin", "anaconda3", "miniconda3"}
+
+
+def find_old_configs(limit_sec: float = 10.0, max_depth: int = 7) -> list:
+    roots = [CONFIG_PATH.parent, CONFIG_PATH.parent.parent, Path.home()]
+    found, seen, t0 = [], set(), time.time()
+    for root in roots:
+        try:
+            root = root.resolve()
+        except OSError:
+            continue
+        base_depth = len(root.parts)
+        for dirpath, dirnames, filenames in os.walk(root):
+            if time.time() - t0 > limit_sec:
+                return found
+            d = Path(dirpath)
+            if len(d.parts) - base_depth >= max_depth:
+                dirnames[:] = []
+            dirnames[:] = [x for x in dirnames if not x.startswith(".") and x.lower() not in _SKIP_DIRS]
+            names = set(filenames)
+            if ("exaone_client.py" in names or any("exaone_local_proxy" in f for f in names)) and d not in seen:
+                seen.add(d)
+                cfg = _read_old_config(d)
+                if cfg.get("api_key"):
+                    found.append((d, cfg))
+            if root == CONFIG_PATH.parent or root == CONFIG_PATH.parent.parent:
+                dirnames[:] = dirnames if len(d.parts) - base_depth < 2 else []
+    return found
+
+
+def offer_old_config(cfg: dict, exclude_key: str = "") -> dict:
+    print(" 예전에 쓰던 EXAONE 설정(ExaOne 폴더)을 찾는 중… (최대 10초)")
+    for folder, old in find_old_configs():
+        if old.get("api_key") == exclude_key and (old.get("base_url") or DEFAULT_BASE_URL) == (cfg.get("base_url") or DEFAULT_BASE_URL):
+            continue
+        print(f" 찾았습니다: {folder}")
+        print(f"   주소 {normalize_url(old.get('base_url') or DEFAULT_BASE_URL)} · 키 {mask(old['api_key'])}")
+        ans = input(" 이 설정을 쓸까요? (Enter = 예 / n = 아니오): ").strip().lower()
+        if ans in ("", "y", "yes", "예", "ㅇ"):
+            new = dict(cfg, api_key=_clean_key(old["api_key"]), base_url=old.get("base_url") or DEFAULT_BASE_URL)
+            save_config(new)
+            return new
+    print(" 예전 설정을 찾지 못했습니다.")
+    return {}
+
+
 def _clean_key(key: str) -> str:
     key = (key or "").strip().strip('"').strip("'")
     if key.lower().startswith("bearer "):
@@ -164,6 +212,8 @@ def load_config(reset: bool = False) -> dict:
         cfg["api_key"] = os.environ["EXAONE_API_KEY"]
     if os.environ.get("EXAONE_BASE_URL"):
         cfg["base_url"] = os.environ["EXAONE_BASE_URL"]
+    if not cfg.get("api_key") and not reset:
+        cfg = offer_old_config(cfg) or cfg
     if not cfg.get("api_key"):
         cfg = ask_key(cfg)
     cfg["api_key"] = _clean_key(cfg["api_key"])
@@ -191,6 +241,11 @@ def check_key(cfg: dict) -> dict:
                    403: "이 키로 접근이 허용되지 않았습니다", 404: "엔드포인트 주소나 모델명이 맞지 않습니다"}[code]
             print(f" ❌ {code}: {why}")
             print(f"    서버 응답: {data[:200].decode('utf-8', 'replace')}")
+            if attempt == 0:
+                found = offer_old_config(cfg, exclude_key=cfg["api_key"])
+                if found:
+                    cfg = found
+                    continue
             print(" 키와 주소를 다시 입력해 주세요. (그만하려면 창을 닫으세요)")
             cfg = ask_key(cfg)
             continue
