@@ -3,7 +3,23 @@
 팀플래너의 EXAONE 기능(이슈 분석·특허 모션)은 브라우저에서 EXAONE을 직접 부르면 막히거나(CORS) API 키가 노출됩니다.
 이 프록시를 **각자 PC에서** 켜 두면 팀플래너가 `http://localhost:8787`로 요청하고, 프록시가 내 API 키를 붙여 EXAONE에 전달합니다.
 
-## 사용법 (Windows)
+## 팀 공유 (다른 사람 PC에서도 쓰기) ← 추천
+API 키가 있는 사람 **한 명만** 아래처럼 켜 두면, 팀원은 아무것도 설치하지 않고 팀플래너에서 바로 EXAONE을 씁니다.
+1. `exaone_proxy.py`와 `EXAONE_proxy_share_start.bat`을 같은 폴더에 내려받습니다.
+2. `EXAONE_proxy_share_start.bat`을 실행합니다. 처음 한 번만 API 키와 공유 이름(예: 김원근)을 입력합니다.
+3. 창을 켜 둔 채로 둡니다. 팀플래너 AI 설정 > EXAONE에 🟢 **팀 공유 EXAONE 켜짐**이 표시되는지 확인합니다.
+
+동작 방식:
+- 팀원 브라우저가 Firebase(`exaone_jobs`)에 요청을 올립니다.
+- 이 PC가 15초마다 '켜짐' 표시를 남기고, 올라온 요청을 가져가 EXAONE을 호출한 뒤 결과를 Firebase로 돌려줍니다.
+- 이 PC 주인은 자기 PC의 로컬 프록시로 바로 처리합니다.
+
+주의:
+- 키는 이 PC 밖으로 나가지 않지만, 사용량은 이 키로 계산됩니다.
+- 요청 내용(특허 본문·도면 이미지)이 Firebase를 거칩니다. 미공개 사내 자료는 보안 규정을 확인하세요.
+- 이 PC가 꺼지거나 창이 닫히면 팀원은 사용할 수 없습니다. 꺼진 지 약 45초 뒤 '꺼짐'으로 표시됩니다.
+
+## 사용법: 내 PC에서만 (Windows)
 1. `exaone_proxy.py`와 `EXAONE_proxy_start.bat`을 같은 폴더에 내려받습니다. Python 3이 필요하며, 추가로 설치할 패키지는 없습니다.
 2. `EXAONE_proxy_start.bat`을 더블클릭합니다.
 3. 처음 한 번만 API 키를 입력합니다. 키는 같은 폴더의 `exaone_proxy_config.json`에만 저장됩니다.

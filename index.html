@@ -4351,13 +4351,17 @@
                         <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 15px;">
                             <strong style="color: #00d4ff;">EXAONE 4.5</strong>를 이슈 분석·특허 모션에 사용합니다.
                         </p>
+                        <div id="exaoneRelayStatus" style="font-size: 12px; line-height: 1.7; background: rgba(0,255,136,0.07); border: 1px solid rgba(0,255,136,0.3); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px;">팀 공유 EXAONE 상태 확인 중…</div>
                         <div style="font-size: 12px; line-height: 1.7; background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.3); border-radius: 8px; padding: 10px 12px; margin-bottom: 15px;">
-                            <strong>내 PC에서 쓰려면 (처음 한 번)</strong><br>
+                            <strong>팀 공유 켜기 (API 키가 있는 사람 PC에서 한 번)</strong><br>
+                            <a href="tools/exaone-proxy/exaone_proxy.py" download style="color:#00d4ff;">exaone_proxy.py</a> 와 <a href="tools/exaone-proxy/EXAONE_proxy_share_start.bat" download style="color:#00d4ff;">EXAONE_proxy_share_start.bat</a> 을 같은 폴더에 받아 <b>EXAONE_proxy_share_start.bat</b> 실행 (처음 한 번 API 키·공유 이름 입력) → 창을 켜 두면 팀 모두 설치 없이 사용<br>
+                            <span style="color: rgba(255,255,255,0.55);">팀원 요청은 Firebase를 거쳐 그 PC의 키로 처리돼요 (키는 그 PC 밖으로 안 나감 · 사용량은 그 키로 계산 · 도면 이미지가 Firebase를 거치니 미공개 자료는 보안 규정 확인)</span><br><br>
+                            <strong>내 PC에서만 쓰려면 (처음 한 번)</strong><br>
                             ① <a href="tools/exaone-proxy/exaone_proxy.py" download style="color:#00d4ff;">exaone_proxy.py</a> 와
                                <a href="tools/exaone-proxy/EXAONE_proxy_start.bat" download style="color:#00d4ff;">EXAONE_proxy_start.bat</a> 을 같은 폴더에 내려받기 (Python 3 필요)<br>
                             ② <b>EXAONE_proxy_start.bat</b> 더블클릭 → 처음 한 번 API 키 입력 → 창은 켜 둔 채로 사용<br>
                             ③ 아래 '연결 테스트'로 확인. 브라우저가 '이 기기의 다른 앱·서비스 접근' 권한을 물으면 <b>허용</b><br>
-                            <span style="color: rgba(255,255,255,0.55);">프록시 URL 칸을 비워 두면: 설정한 API 키로 직접 호출 → 안 되면 이 PC의 로컬 프록시(localhost:8787) 순서로 자동 연결</span>
+                            <span style="color: rgba(255,255,255,0.55);">프록시 URL 칸을 비워 두면: API 키 직접 호출 → 이 PC의 로컬 프록시 / 팀 공유 EXAONE 순서로 자동 연결</span>
                         </div>
                         <div class="form-group" style="margin-bottom: 15px;">
                             <label style="display: block; margin-bottom: 8px; font-size: 13px;">EXAONE API Key (선택 · 로컬 프록시를 쓰면 비워 둬도 됨)</label>
@@ -6296,15 +6300,87 @@
             const routes = [];
             if (explicit) routes.push({ kind: 'proxy', url: explicit, label: `프록시 ${explicit}` });
             if (key) routes.push({ kind: 'direct', url: EXAONE_API_URL, key, label: 'API 키로 직접 호출' });
-            if (DEFAULT_EXAONE_PROXY_URL && explicit.replace(/\/+$/, '') !== DEFAULT_EXAONE_PROXY_URL) routes.push({ kind: 'proxy', url: DEFAULT_EXAONE_PROXY_URL, label: `이 PC의 로컬 프록시 ${DEFAULT_EXAONE_PROXY_URL}` });
+            const local = DEFAULT_EXAONE_PROXY_URL && explicit.replace(/\/+$/, '') !== DEFAULT_EXAONE_PROXY_URL
+                ? { kind: 'proxy', url: DEFAULT_EXAONE_PROXY_URL, local: true, label: `이 PC의 로컬 프록시 ${DEFAULT_EXAONE_PROXY_URL}` } : null;
+            const w = exaoneRelayWorker;
+            const relay = !o.noRelay && exaoneRelayOnline() ? { kind: 'relay', label: `팀 공유 EXAONE (${w && w.name ? w.name + ' PC' : '공유 PC'})` } : null;
+            // 이 PC에서 로컬 프록시가 된 적이 있으면 로컬 먼저, 아니면 팀 공유 먼저 (다른 사람 PC는 설치 없이 바로)
+            let localOk = false;
+            try { localOk = localStorage.getItem('exaoneLocalOk') === '1'; } catch (e) { /* noop */ }
+            // 공유 PC 주인 본인이면(공유 이름 = 내 닉네임) 자기 PC의 로컬 프록시를 먼저 (도면을 Firebase로 안 올림)
+            if (w && w.name && w.name === (localStorage.getItem('chat_nickname') || '').trim()) localOk = true;
+            (localOk ? [local, relay] : [relay, local]).forEach(x => { if (x) routes.push(x); });
             return routes;
         }
+
+        // ===== 팀 공유 EXAONE (2026-11-05) =====
+        //  API 키가 있는 사람 PC의 프록시를 --share 로 켜 두면(EXAONE_proxy_share_start.bat),
+        //  다른 사람 브라우저는 Firebase(exaone_jobs)에 요청을 올리고 그 PC가 대신 EXAONE을 불러 결과를 돌려줌
+        //  → 다른 사람은 아무것도 설치하지 않아도 됨. 공유 PC는 exaone_relay/worker 에 15초마다 '켜짐' 표시
+        const EXAONE_RELAY_PICKUP_MS = 25000; // 이 시간 안에 공유 PC가 요청을 안 가져가면 꺼진 것으로 봄
+        let exaoneRelayWorker = null, exaoneRelayOffset = 0;
+        function exaoneRelayOnline() {
+            const w = exaoneRelayWorker;
+            return !!(db && w && typeof w.at === 'number' && Date.now() + exaoneRelayOffset - w.at < 45000);
+        }
+        function setupExaoneRelay() {
+            if (!db) return;
+            db.ref('.info/serverTimeOffset').on('value', s => { exaoneRelayOffset = s.val() || 0; });
+            db.ref('exaone_relay/worker').on('value', s => { exaoneRelayWorker = s.val(); renderExaoneRelayStatus(); });
+            setInterval(renderExaoneRelayStatus, 15000);
+        }
+        function renderExaoneRelayStatus() {
+            const el = document.getElementById('exaoneRelayStatus');
+            if (!el) return;
+            const w = exaoneRelayWorker;
+            if (exaoneRelayOnline()) {
+                const ago = Math.max(0, Math.round((Date.now() + exaoneRelayOffset - w.at) / 1000));
+                el.innerHTML = `🟢 <b>팀 공유 EXAONE 켜짐</b> — ${escapeHtml(w.name || '공유 PC')} PC가 처리 (${ago}초 전 확인)${w.busy ? ` · 처리 중 ${w.busy}건` : ''}<br><span style="color: rgba(255,255,255,0.6);">이 PC에 아무것도 설치하지 않아도 EXAONE을 쓸 수 있어요.</span>`;
+            } else {
+                el.innerHTML = `⚪ <b>팀 공유 EXAONE 꺼짐</b>${w && w.name ? ` (마지막: ${escapeHtml(w.name)} PC)` : ''}<br><span style="color: rgba(255,255,255,0.6);">API 키가 있는 사람이 자기 PC에서 <b>EXAONE_proxy_share_start.bat</b>을 켜 두면 팀 모두 쓸 수 있어요.</span>`;
+            }
+        }
+        // 팀 공유로 요청 → 공유 PC가 처리한 결과를 fetch의 Response처럼 돌려줌
+        function exaoneRelayFetch(payload, signal) {
+            return new Promise((resolve, reject) => {
+                const fail = (msg) => Object.assign(new Error(msg), { code: 'relay_offline' });
+                if (!db) { reject(fail('no db')); return; }
+                const ref = db.ref('exaone_jobs').push();
+                let done = false, picked = false, tm = null, onVal = null;
+                const finish = (fn, arg, keep) => {
+                    if (done) return; done = true;
+                    clearTimeout(tm);
+                    if (onVal) ref.off('value', onVal);
+                    if (signal) signal.removeEventListener('abort', onAbort);
+                    if (!keep) ref.remove().catch(() => {});
+                    fn(arg);
+                };
+                const onAbort = () => finish(reject, new DOMException('요청 취소', 'AbortError'));
+                if (signal) { if (signal.aborted) { onAbort(); return; } signal.addEventListener('abort', onAbort); }
+                tm = setTimeout(() => { if (!picked) finish(reject, fail('공유 PC가 요청을 가져가지 않음')); }, EXAONE_RELAY_PICKUP_MS);
+                onVal = (snap) => {
+                    const j = snap.val();
+                    if (!j) return;
+                    if (j.status === 'working') picked = true;
+                    if (j.status === 'done' && j.body !== undefined) { // 결과 본문까지 다 들어온 뒤에
+                        const body = typeof j.body === 'string' ? j.body : JSON.stringify(j.body || {});
+                        const code = Math.min(599, Math.max(200, +j.code || 200));
+                        finish(resolve, new Response(body, { status: code === 204 ? 200 : code, headers: { 'Content-Type': 'application/json' } }));
+                    }
+                };
+                ref.set({ status: 'pending', from: (localStorage.getItem('chat_nickname') || '').trim() || '익명', at: firebase.database.ServerValue.TIMESTAMP, payload: JSON.stringify(payload) })
+                    .then(() => { if (!done) ref.on('value', onVal); })
+                    .catch(e => finish(reject, fail('요청을 올리지 못함: ' + (e && e.message)), true));
+            });
+        }
+        window.exaoneRelayOnline = exaoneRelayOnline;
         function exaoneConnectHelp(tried) {
             const lines = ['EXAONE에 연결하지 못했습니다.'];
-            tried.forEach(r => lines.push(`· ${r.label}: ${r.kind === 'direct' ? '브라우저에서 막힘(CORS·회사망)' : '응답 없음 (프록시가 꺼져 있음)'}`));
-            lines.push('', '해결 방법');
-            lines.push(`1) 이 PC에서 EXAONE 로컬 프록시 켜기: AI 설정 > EXAONE > '로컬 프록시 내려받기'로 받은 EXAONE_proxy_start.bat 실행 (처음 한 번 API 키 입력, 창은 켜 둔 채로)`);
-            lines.push(`2) 프록시를 켰는데도 안 되면: 브라우저가 '이 기기의 다른 앱·서비스 접근(로컬 네트워크)' 권한을 물을 때 '허용' (주소창 왼쪽 아이콘 > 사이트 설정에서 바꿀 수 있음)`);
+            tried.forEach(r => lines.push(`· ${r.label}: ${r.kind === 'direct' ? '브라우저에서 막힘(CORS·회사망)' : r.kind === 'relay' ? '공유 PC가 응답하지 않음' : '응답 없음 (프록시가 꺼져 있음)'}`));
+            if (!tried.some(r => r.kind === 'relay')) lines.push('· 팀 공유 EXAONE: 꺼져 있음 (공유 PC가 켜져 있지 않음)');
+            lines.push('', '해결 방법 (둘 중 하나)');
+            lines.push(`1) 팀 공유: API 키가 있는 사람이 자기 PC에서 EXAONE_proxy_share_start.bat 을 켜 두면, 다른 사람은 설치 없이 바로 쓸 수 있어요. (AI 설정 > EXAONE에서 켜짐/꺼짐 확인)`);
+            lines.push(`2) 내 PC에서 직접: AI 설정 > EXAONE에서 exaone_proxy.py · EXAONE_proxy_start.bat 내려받아 실행 (처음 한 번 API 키 입력). 브라우저가 '이 기기의 다른 앱·서비스 접근' 권한을 물으면 '허용'`);
             return lines.join('\n');
         }
         function exaoneHttpHint(status, text) {
@@ -6332,13 +6408,19 @@
             const routes = exaoneRoutes(o.override);
             const tried = [];
             for (const r of routes) {
+                if (r.kind === 'relay') {
+                    try { return { res: await exaoneRelayFetch(payload, o.signal), route: r }; }
+                    catch (e) { if (e && e.name === 'AbortError') throw e; tried.push(r); continue; }
+                }
                 const headers = { 'Content-Type': 'application/json' };
                 if (r.kind === 'direct') headers.Authorization = `Bearer ${r.key}`;
                 try {
                     const res = await fetch(r.url, { method: 'POST', headers, body: JSON.stringify(payload), signal: o.signal });
+                    if (r.local) { try { localStorage.setItem('exaoneLocalOk', '1'); } catch (e) { /* noop */ } }
                     return { res, route: r };
                 } catch (e) {
                     if (e && e.name === 'AbortError') throw e;
+                    if (r.local) { try { localStorage.removeItem('exaoneLocalOk'); } catch (e2) { /* noop */ } }
                     tried.push(r);
                 }
             }
@@ -6371,6 +6453,7 @@
             // 설정창이 ESHG 이슈 탭 안에 있어서 다른 탭(특허 모션 등)에서 열면 안 보였음 → body로 옮겨서 어디서나 보이게
             if (modal.parentElement !== document.body) document.body.appendChild(modal);
             modal.style.display = 'flex';
+            renderExaoneRelayStatus();
             document.getElementById('groqApiKey').value = localStorage.getItem('groqApiKey') || '';
             document.getElementById('groqProxyUrl').value = localStorage.getItem('groqProxyUrl') || '';
             document.getElementById('exaoneApiKey').value = localStorage.getItem('exaoneApiKey') || '';
@@ -8758,6 +8841,7 @@ ${text}
             setupWeeklyRankings();
             setupQnaListener();
             setupMafia();
+            setupExaoneRelay();
             setupChessAiStats();
             setupChatListener();
             setupYieldListener();
