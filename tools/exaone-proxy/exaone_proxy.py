@@ -38,7 +38,7 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-VERSION = 2
+VERSION = 3
 HOST = "127.0.0.1"
 DEFAULT_PORT = 8787
 DEFAULT_BASE_URL = "https://api.lgresearch.ai/v1"
@@ -66,18 +66,21 @@ def normalize_url(base_url: str) -> str:
     return url if url.endswith("/chat/completions") else url + "/chat/completions"
 
 
-def call_exaone(target_url: str, api_key: str, body: bytes) -> tuple[int, bytes]:
+CHECK_MODEL = os.environ.get("EXAONE_CHECK_MODEL", "exaone-v4.5_33b")
+
+
+def call_exaone(target_url: str, api_key: str, body: bytes, timeout: int = 0) -> tuple[int, bytes]:
     """EXAONE에 그대로 전달하고 (상태 코드, 응답 본문)을 돌려줌. 연결 실패는 502."""
     req = urllib.request.Request(
         target_url, data=body, method="POST",
         headers={"Content-Type": "application/json", "Accept": "application/json", "Authorization": f"Bearer {api_key}"},
     )
     try:
-        with urllib.request.urlopen(req, timeout=READ_TIMEOUT) as res:
+        with urllib.request.urlopen(req, timeout=timeout or READ_TIMEOUT) as res:
             return res.status, res.read()
     except urllib.error.HTTPError as exc:
         data = exc.read() or json.dumps({"error": str(exc)}).encode("utf-8")
-        hint = {401: "API 키가 틀렸거나 만료되었습니다 (--reset 으로 다시 입력)",
+        hint = {401: "API 키가 틀렸거나 이 주소용 키가 아닙니다 → 프록시 창을 닫고 다시 실행하면 키를 다시 확인해요",
                 403: "이 키로 접근이 허용되지 않았습니다",
                 404: "엔드포인트 주소나 모델명이 맞지 않습니다",
                 429: "요청이 너무 많습니다. 잠시 후 다시 시도하세요"}.get(exc.code)
@@ -89,6 +92,62 @@ def call_exaone(target_url: str, api_key: str, body: bytes) -> tuple[int, bytes]
         return 502, json.dumps({"error": f"프록시가 EXAONE 서버에 연결하지 못했습니다: {exc}"}, ensure_ascii=False).encode("utf-8")
 
 
+def _read_old_config(folder: Path) -> dict:
+    """예전 ExaOne 폴더 설정(exaone_config.json / .env)이 같은 폴더에 있으면 그 값을 씀 (이미 되던 키·주소)"""
+    out: dict = {}
+    js = folder / "exaone_config.json"
+    if js.exists():
+        try:
+            d = json.loads(js.read_text(encoding="utf-8"))
+            for k in ("api_key", "base_url"):
+                if d.get(k) and "여기에" not in str(d.get(k)):
+                    out[k] = str(d[k]).strip()
+        except (OSError, ValueError):
+            pass
+    env = folder / ".env"
+    if env.exists():
+        try:
+            for line in env.read_text(encoding="utf-8").splitlines():
+                m = re.match(r"\s*(EXAONE_API_KEY|EXAONE_BASE_URL)\s*=\s*(.+?)\s*$", line)
+                if m and "여기에" not in m.group(2):
+                    out["api_key" if m.group(1) == "EXAONE_API_KEY" else "base_url"] = m.group(2).strip().strip('"').strip("'")
+        except OSError:
+            pass
+    return out
+
+
+def _clean_key(key: str) -> str:
+    key = (key or "").strip().strip('"').strip("'")
+    if key.lower().startswith("bearer "):
+        key = key[7:].strip()
+    return re.sub(r"[\s\x00-\x1f]", "", key)  # 붙여넣기로 섞인 공백·제어문자 제거
+
+
+def save_config(cfg: dict) -> None:
+    try:
+        CONFIG_PATH.write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f" 저장했습니다: {CONFIG_PATH}")
+    except OSError as exc:
+        print(f" (설정 파일 저장 실패: {exc}) 이번 실행에만 사용합니다.")
+
+
+def ask_key(cfg: dict) -> dict:
+    print("=" * 60)
+    print(" EXAONE API 키를 입력하세요 (입력해도 화면에 보이지 않습니다 · 붙여넣기는 마우스 우클릭)")
+    print(" 키는 이 PC의 exaone_proxy_config.json 에만 저장됩니다.")
+    print("=" * 60)
+    key = _clean_key(getpass.getpass(" API 키: "))
+    if not key:
+        print("API 키가 없어서 종료합니다.")
+        sys.exit(1)
+    cur = cfg.get("base_url") or DEFAULT_BASE_URL
+    print(" 엔드포인트 주소: 회사에서 받은 안내(또는 예전 ExaOne 폴더 .env 의 EXAONE_BASE_URL)에 적힌 주소")
+    base = input(f" 엔드포인트 주소 (그냥 Enter = {cur}): ").strip()
+    cfg = dict(cfg, api_key=key, base_url=base or cur)
+    save_config(cfg)
+    return cfg
+
+
 def load_config(reset: bool = False) -> dict:
     cfg: dict = {}
     if CONFIG_PATH.exists() and not reset:
@@ -96,27 +155,50 @@ def load_config(reset: bool = False) -> dict:
             cfg = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             cfg = {}
+    if not cfg.get("api_key") and not reset:
+        old = _read_old_config(CONFIG_PATH.parent)
+        if old.get("api_key"):
+            print(" 예전 EXAONE 설정(exaone_config.json/.env)을 찾아서 그 키·주소를 사용합니다.")
+            cfg.update(old)
     if os.environ.get("EXAONE_API_KEY"):
         cfg["api_key"] = os.environ["EXAONE_API_KEY"]
     if os.environ.get("EXAONE_BASE_URL"):
         cfg["base_url"] = os.environ["EXAONE_BASE_URL"]
     if not cfg.get("api_key"):
-        print("=" * 60)
-        print(" EXAONE API 키를 입력하세요 (입력해도 화면에 보이지 않습니다)")
-        print(" 키는 이 PC의 exaone_proxy_config.json 에만 저장됩니다.")
-        print("=" * 60)
-        key = getpass.getpass(" API 키: ").strip()
-        if not key:
-            print("API 키가 없어서 종료합니다.")
-            sys.exit(1)
-        base = input(f" 엔드포인트 주소 (그냥 Enter = {DEFAULT_BASE_URL}): ").strip()
-        cfg = {"api_key": key, "base_url": base or DEFAULT_BASE_URL}
-        try:
-            CONFIG_PATH.write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
-            print(f" 저장했습니다: {CONFIG_PATH}")
-        except OSError as exc:
-            print(f" (설정 파일 저장 실패: {exc}) 이번 실행에만 사용합니다.")
+        cfg = ask_key(cfg)
+    cfg["api_key"] = _clean_key(cfg["api_key"])
     cfg.setdefault("base_url", DEFAULT_BASE_URL)
+    return cfg
+
+
+def mask(key: str) -> str:
+    return key[:4] + "…" + key[-4:] if len(key) > 10 else "…"
+
+
+def check_key(cfg: dict) -> dict:
+    """시작할 때 아주 짧은 요청으로 키·주소 확인. 401/403/404면 그 자리에서 다시 입력 (최대 3번)"""
+    for attempt in range(4):
+        url = normalize_url(cfg.get("base_url"))
+        print(f" EXAONE 연결 확인 중… (주소 {url}, 키 {mask(cfg['api_key'])})")
+        body = json.dumps({"model": CHECK_MODEL, "messages": [{"role": "user", "content": "ping"}], "max_tokens": 1,
+                           "chat_template_kwargs": {"enable_thinking": False}}).encode("utf-8")
+        code, data = call_exaone(url, cfg["api_key"], body, timeout=60)
+        if 200 <= code < 300:
+            print(" ✅ EXAONE 연결 확인 완료")
+            return cfg
+        if code in (401, 403, 404) and attempt < 3:
+            why = {401: "API 키가 맞지 않습니다 (키가 틀렸거나 만료, 또는 이 키에 맞는 주소가 아님)",
+                   403: "이 키로 접근이 허용되지 않았습니다", 404: "엔드포인트 주소나 모델명이 맞지 않습니다"}[code]
+            print(f" ❌ {code}: {why}")
+            print(f"    서버 응답: {data[:200].decode('utf-8', 'replace')}")
+            print(" 키와 주소를 다시 입력해 주세요. (그만하려면 창을 닫으세요)")
+            cfg = ask_key(cfg)
+            continue
+        if code in (401, 403, 404):
+            print(f" ❌ {code}: 키·주소 확인에 계속 실패했습니다. 회사에서 받은 키·주소를 확인한 뒤 다시 실행하세요.")
+            return cfg
+        print(f" ⚠️ 연결 확인을 못 했습니다 ({code}). 일단 켜 두고, 요청이 오면 다시 시도합니다.")
+        return cfg
     return cfg
 
 
@@ -313,9 +395,12 @@ def main() -> None:
     ap.add_argument("--port", type=int, default=DEFAULT_PORT)
     ap.add_argument("--reset", action="store_true", help="API 키/주소 다시 입력")
     ap.add_argument("--share", action="store_true", help="팀 공유: 다른 사람 PC의 EXAONE 요청도 이 PC가 대신 처리")
+    ap.add_argument("--no-check", action="store_true", help="시작할 때 키 확인 생략")
     args = ap.parse_args()
 
     cfg = load_config(reset=args.reset)
+    if not args.no_check:
+        cfg = check_key(cfg)
     if args.share and not cfg.get("share_name"):
         name = input(" 팀원에게 보일 공유 PC 이름 (예: 김원근): ").strip() or socket.gethostname()
         cfg["share_name"] = name
@@ -323,6 +408,7 @@ def main() -> None:
             CONFIG_PATH.write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
         except OSError:
             pass
+    print(f" 사용 중인 주소: {normalize_url(cfg.get('base_url'))} · 키 {mask(cfg['api_key'])}")
     Handler.api_key = cfg["api_key"]
     Handler.target_url = normalize_url(cfg.get("base_url"))
     try:
