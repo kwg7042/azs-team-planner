@@ -9893,11 +9893,15 @@ ${text}
             { emoji: '🐅', name: '백호', rarity: 'emerald', rate: 6.5 / 4 },
             { emoji: '🦅', name: '주작', rarity: 'emerald', rate: 6.5 / 4 },
             { emoji: '🐢', name: '현무', rarity: 'emerald', rate: 6.5 / 4 },
-            // 히든 (4개 합계 3.5%) — 뽑기 전까지 컬렉션에 ❓로 표시
-            { emoji: '🃏', name: '조커', rarity: 'hidden', rate: 3.5 / 4 },
-            { emoji: '🤡', name: '공포의 삐에로', rarity: 'hidden', rate: 3.5 / 4 },
-            { emoji: '⚔️', name: '성웅 이순신', rarity: 'hidden', rate: 3.5 / 4 },
-            { emoji: '💀', name: '저승사자', rarity: 'hidden', rate: 3.5 / 4 },
+            // 히든 (8개 합계 3.5%, 각 0.4375%) — 뽑기 전까지 컬렉션에 ❓로 표시
+            { emoji: '🃏', name: '조커', rarity: 'hidden', rate: 3.5 / 8 },
+            { emoji: '🤡', name: '공포의 삐에로', rarity: 'hidden', rate: 3.5 / 8 },
+            { emoji: '⚔️', name: '성웅 이순신', rarity: 'hidden', rate: 3.5 / 8 },
+            { emoji: '💀', name: '저승사자', rarity: 'hidden', rate: 3.5 / 8 },
+            { emoji: '🦾', name: '아이언맨', rarity: 'hidden', rate: 3.5 / 8 },
+            { emoji: '🕷️', name: '스파이더맨', rarity: 'hidden', rate: 3.5 / 8 },
+            { emoji: '🦸', name: '슈퍼맨', rarity: 'hidden', rate: 3.5 / 8 },
+            { emoji: '🦇', name: '배트맨', rarity: 'hidden', rate: 3.5 / 8 },
             // 블랙: 4흉수 (4개 합계 0.5%, 각 0.125%) — 가장 귀한 등급, 히든처럼 뽑기 전까지 컬렉션에 ❓로 표시
             { emoji: '👹', name: '도철', rarity: 'black', rate: 0.125 },
             { emoji: '🐆', name: '궁기', rarity: 'black', rate: 0.125 },
@@ -9918,7 +9922,7 @@ ${text}
         //  글꼴 이모지는 기기마다 작고 납작하게 보여서 그림으로 통일. 못 불러오면 글자 이모지로 대체
         const emojiCode = (e) => [...String(e)].map(c => c.codePointAt(0)).filter(c => c !== 0xfe0f).map(c => c.toString(16)).join('-');
         let EMOJI_3D = null;
-        const EMOJI_3D_VER = 8; // 그림을 바꾸면 올려서 브라우저에 남은 예전 그림 대신 새 그림을 받게 함 (8: 블랙 4흉수를 사용자 제공 그림으로 교체)
+        const EMOJI_3D_VER = 9; // 그림을 바꾸면 올려서 브라우저에 남은 예전 그림 대신 새 그림을 받게 함 (9: 히든 히어로 4종 추가·삐에로 그림 교체)
         function emojiArt(e, cls = '') {
             if (!e) return '';
             if (!EMOJI_3D) EMOJI_3D = new Set(GACHA_ITEMS.map(it => emojiCode(it.emoji)));
