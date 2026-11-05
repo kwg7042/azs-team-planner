@@ -28,3 +28,5 @@
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE
+예외: 히든 히어로 4종(1f9be 아이언맨, 1f577 스파이더맨, 1f9b8 슈퍼맨, 1f987 배트맨)과 히든 삐에로(1f921)는 사용자가 제공한 웹 이미지 캡처를 정사각으로 자른 것.
+      캐릭터·이미지의 저작권과 상표권은 각 권리자(Marvel, DC 등)에게 있음. 예전 삐에로 그림 원본은 emoji3d/src/ 에 보관.
