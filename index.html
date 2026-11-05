@@ -3627,6 +3627,8 @@
         .collection-grid .ci-section small { font-weight: normal; opacity: 0.75; margin-left: 4px; }
         .grade-text-bronze { color: #e0a060; } .grade-text-silver { color: #dfe6ee; } .grade-text-gold { color: #ffd700; }
         .grade-text-emerald { color: #2ee59d; } .grade-text-hidden { color: #ff4fd8; }
+        .grade-text-black { color: #fff; text-shadow: 0 0 6px #ff1f1f, 0 0 2px #000; font-weight: bold; }
+        .collection-summary .black-count { color: #fff; text-shadow: 0 0 6px #ff1f1f; }
         .collection-item { position: relative; border-width: 3px; border-style: solid; }
         .app-update-bar { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 100000; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; padding: 10px 16px; border-radius: 14px; box-shadow: 0 6px 24px rgba(0,0,0,0.45); font-size: 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; max-width: calc(100vw - 32px); }
         .app-update-bar button { border: none; border-radius: 10px; padding: 6px 12px; font-weight: bold; background: #ffd400; color: #1a1a2e; cursor: pointer; }
@@ -3694,6 +3696,28 @@
         @keyframes hiddenFloat { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-4px) scale(1.08); } }
         @keyframes hiddenTwinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1.2); } }
         @keyframes hiddenLockPulse { 0%, 100% { box-shadow: 0 0 0 rgba(255,79,216,0); } 50% { box-shadow: 0 0 14px rgba(255,79,216,0.5); } }
+
+        /* ===== 블랙 (4흉수): 칠흑 바탕 + 핏빛 기운이 도는 테두리 ===== */
+        .collection-item.grade-black { border-color: #000; }
+        .collection-item.black-locked { border: 3px dashed rgba(255,40,40,0.6); background: radial-gradient(circle at 50% 40%, #1a0000, #000 75%); opacity: 1; animation: blackLockPulse 2.6s ease-in-out infinite; }
+        .collection-item.black-locked .ci-emoji { filter: grayscale(1) brightness(1.4); color: #ff4d4d; }
+        .collection-item.black-owned { border-color: transparent; overflow: hidden; z-index: 0; background: #000; box-shadow: 0 0 20px rgba(255,20,20,0.75), 0 0 40px rgba(0,0,0,0.9); }
+        .collection-item.black-owned::before { content: ''; position: absolute; inset: -60%; z-index: -2; background: conic-gradient(#000, #7a0000, #ff2a2a, #000, #3a0000, #000); animation: hiddenSpin 3s linear infinite; }
+        .collection-item.black-owned::after { content: ''; position: absolute; inset: 3px; z-index: -1; border-radius: 11px; background: radial-gradient(circle at 50% 35%, #220404, #000 75%); }
+        .collection-item.black-owned .ci-emoji .emo3d { filter: drop-shadow(0 0 10px rgba(255,30,30,0.85)) drop-shadow(0 0 2px #000); animation: hiddenFloat 2.4s ease-in-out infinite; }
+        .collection-item.black-owned .ci-spark { color: #ff4d4d; }
+        @keyframes blackLockPulse { 0%, 100% { box-shadow: 0 0 0 rgba(255,30,30,0); } 50% { box-shadow: 0 0 14px rgba(255,30,30,0.55); } }
+        .gacha-display.grade-black { border-color: #000; background: radial-gradient(circle, #2a0000, #000 70%); box-shadow: 0 0 60px #ff1f1f, 0 0 100px #000; animation: blackGlowRing 1.4s linear infinite; }
+        @keyframes blackGlowRing { 0%, 100% { border-color: #000; } 50% { border-color: #ff2a2a; } }
+        .gacha-display.grade-black .emo-result { filter: drop-shadow(0 0 18px #ff1f1f) drop-shadow(0 10px 10px rgba(0,0,0,0.8)); }
+        .gacha-chip.grade-black { border-color: #000; background: #120000; box-shadow: 0 0 8px #ff1f1f; }
+        .name-icon.black-icon { display: inline-block; animation: blackNameGlow 2.2s ease-in-out infinite; }
+        @keyframes blackNameGlow { 0%, 100% { filter: drop-shadow(0 0 2px #ff1f1f); } 50% { filter: drop-shadow(0 0 6px #ff1f1f) drop-shadow(0 0 2px #000); } }
+        .hidden-reveal.black-reveal { background: radial-gradient(circle, rgba(70,0,0,0.9), rgba(0,0,0,0.98)); }
+        .hidden-reveal.black-reveal .hr-rays { background: repeating-conic-gradient(rgba(255,30,30,0.3) 0deg 6deg, transparent 6deg 18deg, rgba(0,0,0,0.6) 18deg 26deg, transparent 26deg 40deg); animation-duration: 10s; }
+        .hidden-reveal.black-reveal .hr-title { background: linear-gradient(90deg, #ff1f1f, #ffffff, #7a0000, #ff1f1f); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: 14px; }
+        .hidden-reveal.black-reveal .hr-emoji { filter: drop-shadow(0 0 30px #ff1f1f) drop-shadow(0 0 60px #000); }
+        .hidden-reveal.black-reveal .hr-name { text-shadow: 0 0 12px #ff1f1f; }
 
         /* 뽑기 결과 원판 테두리 */
         .gacha-display.grade-bronze { border-color: #cd7f32; box-shadow: 0 0 25px rgba(205,127,50,0.5); }
@@ -4746,11 +4770,12 @@
                             <span>뽑기! (1<span class="coin-ico"></span>)</span>
                         </button>
                         <div class="gacha-rates">
-                            <span class="grade-text-bronze">🥉 브론즈 60%</span> ·
+                            <span class="grade-text-bronze">🥉 브론즈 59.2%</span> ·
                             <span class="grade-text-silver">🥈 실버 20%</span> ·
                             <span class="grade-text-gold">🥇 골드 10%</span> ·
                             <span class="grade-text-emerald">💚 에메랄드 6.5%</span> ·
-                            <span class="grade-text-hidden">❓ 히든 3.5%</span>
+                            <span class="grade-text-hidden">❓ 히든 3.5%</span> ·
+                            <span class="grade-text-black">⚫ 블랙 0.8%</span>
                         </div>
                     </div>
                     <div class="gacha-history">
@@ -8784,8 +8809,8 @@ ${text}
         }
         function nameWithIcon(name) {
             const ic = iconOf(name);
-            const hidden = ic && GACHA_ITEMS.some(it => it.emoji === ic && it.rarity === 'hidden');
-            return (ic ? `<span class="name-icon${hidden ? ' hidden-icon' : ''}">${emojiArt(ic)}</span>` : '') + escapeHtml(name);
+            const rr = ic && (GACHA_ITEMS.find(it => it.emoji === ic) || {}).rarity;
+            return (ic ? `<span class="name-icon${rr === 'hidden' ? ' hidden-icon' : rr === 'black' ? ' black-icon' : ''}">${emojiArt(ic)}</span>` : '') + escapeHtml(name);
         }
         function refreshIconViews() {
             const me = localStorage.getItem('chat_nickname') || '';
@@ -9811,30 +9836,30 @@ ${text}
 
         // 뽑기 아이템 목록 (2026-11 개편)
         // 등급(테두리): 브론즈 20 · 실버 10 · 골드 6 · 에메랄드 4 · 히든 4
-        // 확률(등급 합계): 브론즈 60% · 실버 20% · 골드 10% · 에메랄드 6.5% · 히든 3.5%
+        // 확률(등급 합계): 브론즈 59.2% · 실버 20% · 골드 10% · 에메랄드 6.5% · 히든 3.5% · 블랙 0.8%
         // 화면에는 emoji3d/ 그림으로 보여주고, 그림을 못 불러올 때만 글자 이모지가 보임
         const GACHA_ITEMS = [
-            // 브론즈: 엄청 흔한 동물 (각 3%)
-            { emoji: '🐿️', name: '다람쥐', rarity: 'bronze', rate: 3 },
-            { emoji: '🐶', name: '강아지', rarity: 'bronze', rate: 3 },
-            { emoji: '🐱', name: '고양이', rarity: 'bronze', rate: 3 },
-            { emoji: '🐭', name: '생쥐', rarity: 'bronze', rate: 3 },
-            { emoji: '🐹', name: '햄스터', rarity: 'bronze', rate: 3 },
-            { emoji: '🐰', name: '토끼', rarity: 'bronze', rate: 3 },
-            { emoji: '🐷', name: '돼지', rarity: 'bronze', rate: 3 },
-            { emoji: '🐔', name: '닭', rarity: 'bronze', rate: 3 },
-            { emoji: '🐤', name: '병아리', rarity: 'bronze', rate: 3 },
-            { emoji: '🐸', name: '개구리', rarity: 'bronze', rate: 3 },
-            { emoji: '🦆', name: '오리', rarity: 'bronze', rate: 3 },
-            { emoji: '🐦', name: '참새', rarity: 'bronze', rate: 3 },
-            { emoji: '🐟', name: '붕어', rarity: 'bronze', rate: 3 },
-            { emoji: '🐌', name: '달팽이', rarity: 'bronze', rate: 3 },
-            { emoji: '🐞', name: '무당벌레', rarity: 'bronze', rate: 3 },
-            { emoji: '🐝', name: '꿀벌', rarity: 'bronze', rate: 3 },
-            { emoji: '🐮', name: '젖소', rarity: 'bronze', rate: 3 },
-            { emoji: '🐑', name: '양', rarity: 'bronze', rate: 3 },
-            { emoji: '🐜', name: '개미', rarity: 'bronze', rate: 3 },
-            { emoji: '🦋', name: '나비', rarity: 'bronze', rate: 3 },
+            // 브론즈: 엄청 흔한 동물 (각 2.96%)
+            { emoji: '🐿️', name: '다람쥐', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐶', name: '강아지', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐱', name: '고양이', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐭', name: '생쥐', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐹', name: '햄스터', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐰', name: '토끼', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐷', name: '돼지', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐔', name: '닭', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐤', name: '병아리', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐸', name: '개구리', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🦆', name: '오리', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐦', name: '참새', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐟', name: '붕어', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐌', name: '달팽이', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐞', name: '무당벌레', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐝', name: '꿀벌', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐮', name: '젖소', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐑', name: '양', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🐜', name: '개미', rarity: 'bronze', rate: 2.96 },
+            { emoji: '🦋', name: '나비', rarity: 'bronze', rate: 2.96 },
             // 실버: 동물원의 큰 동물 (각 2%)
             { emoji: '🦁', name: '사자', rarity: 'silver', rate: 2 },
             { emoji: '🐯', name: '호랑이', rarity: 'silver', rate: 2 },
@@ -9862,7 +9887,12 @@ ${text}
             { emoji: '🃏', name: '조커', rarity: 'hidden', rate: 3.5 / 4 },
             { emoji: '🤡', name: '공포의 삐에로', rarity: 'hidden', rate: 3.5 / 4 },
             { emoji: '⚔️', name: '성웅 이순신', rarity: 'hidden', rate: 3.5 / 4 },
-            { emoji: '💀', name: '저승사자', rarity: 'hidden', rate: 3.5 / 4 }
+            { emoji: '💀', name: '저승사자', rarity: 'hidden', rate: 3.5 / 4 },
+            // 블랙: 4흉수 (4개 합계 0.8%, 각 0.2%) — 가장 귀한 등급, 히든처럼 뽑기 전까지 컬렉션에 ❓로 표시
+            { emoji: '👹', name: '도철', rarity: 'black', rate: 0.2 },
+            { emoji: '🐆', name: '궁기', rarity: 'black', rate: 0.2 },
+            { emoji: '👺', name: '도올', rarity: 'black', rate: 0.2 },
+            { emoji: '🌀', name: '혼돈', rarity: 'black', rate: 0.2 }
         ];
         // 2026-11-04 개편: 브라키오사우루스 → 맘모스, 히든 4종 교체 (같은 등급끼리 1:1)
         const COLLECTION_V4_MAP = { '🦕': '🦣', '🐙': '🃏', '🤖': '🤡', '🧛': '⚔️', '🧙': '💀' };
@@ -9878,7 +9908,7 @@ ${text}
         //  글꼴 이모지는 기기마다 작고 납작하게 보여서 그림으로 통일. 못 불러오면 글자 이모지로 대체
         const emojiCode = (e) => [...String(e)].map(c => c.codePointAt(0)).filter(c => c !== 0xfe0f).map(c => c.toString(16)).join('-');
         let EMOJI_3D = null;
-        const EMOJI_3D_VER = 6; // 그림을 바꾸면 올려서 브라우저에 남은 예전 그림 대신 새 그림을 받게 함 (6: 메가로돈·맘모스·히든 교체)
+        const EMOJI_3D_VER = 7; // 그림을 바꾸면 올려서 브라우저에 남은 예전 그림 대신 새 그림을 받게 함 (7: 블랙 4흉수 추가)
         function emojiArt(e, cls = '') {
             if (!e) return '';
             if (!EMOJI_3D) EMOJI_3D = new Set(GACHA_ITEMS.map(it => emojiCode(it.emoji)));
@@ -10003,7 +10033,7 @@ ${text}
             if (!gameMine(me) || !userIconsLoaded || !gameData.iconCheckV3) return;
             const cur = userIcons[me], owned = gameData.collection || [];
             if (cur && !owned.includes(cur)) {
-                const order = ['hidden', 'emerald', 'gold', 'silver', 'bronze'];
+                const order = ['black', 'hidden', 'emerald', 'gold', 'silver', 'bronze'];
                 const rank = (e) => order.indexOf((GACHA_ITEMS.find(it => it.emoji === e) || {}).rarity);
                 const best = owned.slice().sort((a, b) => rank(a) - rank(b))[0] || null;
                 if (best) userIcons[me] = best; else delete userIcons[me];
@@ -10028,15 +10058,17 @@ ${text}
             if (typeof refreshIconViews === 'function') refreshIconViews();
         }
 
-        const RARITY_ORDER = ['bronze', 'silver', 'gold', 'emerald', 'hidden'];
-        const RARITY_LABEL = { bronze: '브론즈', silver: '실버', gold: '골드', emerald: '에메랄드', hidden: '히든' };
-        const RARITY_BADGE = { bronze: '🥉', silver: '🥈', gold: '🥇', emerald: '💚', hidden: '❓' };
+        const RARITY_ORDER = ['bronze', 'silver', 'gold', 'emerald', 'hidden', 'black'];
+        const RARITY_LABEL = { bronze: '브론즈', silver: '실버', gold: '골드', emerald: '에메랄드', hidden: '히든', black: '블랙' };
+        const RARITY_BADGE = { bronze: '🥉', silver: '🥈', gold: '🥇', emerald: '💚', hidden: '❓', black: '⚫' };
+        const SECRET_RARITIES = ['hidden', 'black']; // 뽑기 전까지 정체를 숨기는 등급
         const RARITY_COLORS = {
             bronze: '#cd7f32',
             silver: '#c9d1d9',
             gold: '#ffd700',
             emerald: '#2ee59d',
             hidden: '#ff4fd8',
+            black: '#ff4d4d',
             // 이전 등급 이름으로 저장된 뽑기 내역 호환
             normal: '#cd7f32', rare: '#c9d1d9', epic: '#ffd700', legendary: '#2ee59d'
         };
@@ -10303,6 +10335,7 @@ ${text}
 
             // 히든은 화면 전체 연출
             if (result.rarity === 'hidden') showHiddenReveal(result);
+            else if (result.rarity === 'black') showHiddenReveal(result, { cls: 'black-reveal', title: 'BLACK', sub: '전설의 4흉수 획득! (블랙 0.8%)' });
 
             renderGachaHistory();
             updateMinigameUI();
@@ -10372,18 +10405,20 @@ ${text}
             const countOf = (emoji) => (gameData.collectionCount || {})[emoji] || 1;
             const card = (item) => {
                 const has = owned.includes(item.emoji);
-                const hidden = item.rarity === 'hidden';
-                if (hidden && !has) {
-                    // 히든은 뽑기 전까지 정체를 숨김
-                    return `<div class="collection-item grade-hidden hidden-locked" title="??? (히든)"><span class="ci-emoji">❓</span></div>`;
+                const hidden = item.rarity === 'hidden', black = item.rarity === 'black';
+                if ((hidden || black) && !has) {
+                    // 히든·블랙은 뽑기 전까지 정체를 숨김 (이름·그림 모두)
+                    return black
+                        ? `<div class="collection-item grade-black black-locked" title="??? (블랙)"><span class="ci-emoji">❓</span></div>`
+                        : `<div class="collection-item grade-hidden hidden-locked" title="??? (히든)"><span class="ci-emoji">❓</span></div>`;
                 }
                 return `
-                <div class="collection-item grade-${item.rarity} ${has ? 'owned' : 'locked'} ${hidden ? 'hidden-owned' : ''} ${selected === item.emoji ? 'selected' : ''}"
+                <div class="collection-item grade-${item.rarity} ${has ? 'owned' : 'locked'} ${hidden ? 'hidden-owned' : ''} ${black ? 'black-owned' : ''} ${selected === item.emoji ? 'selected' : ''}"
                      ${has ? `onclick="selectMyIcon('${item.emoji}')"` : ''}
                      title="${item.name} (${RARITY_LABEL[item.rarity]})${has ? ' - 눌러서 내 아이콘으로' : ''}">
                     <span class="ci-emoji">${emojiArt(item.emoji)}</span>
                     ${has && countOf(item.emoji) >= 2 ? `<span class="ci-count" title="${countOf(item.emoji)}개 보유">${countOf(item.emoji)}</span>` : ''}
-                    ${hidden ? '<span class="ci-spark s1">✦</span><span class="ci-spark s2">✦</span><span class="ci-spark s3">✦</span>' : ''}
+                    ${hidden || black ? `<span class="ci-spark s1">${black ? '✸' : '✦'}</span><span class="ci-spark s2">${black ? '✸' : '✦'}</span><span class="ci-spark s3">${black ? '✸' : '✦'}</span>` : ''}
                 </div>`;
             };
             // 등급별로 묶어서 표시
@@ -10399,21 +10434,24 @@ ${text}
                 const total = GACHA_ITEMS.filter(it => owned.includes(it.emoji)).length;
                 const hiddenItems = GACHA_ITEMS.filter(it => it.rarity === 'hidden');
                 const ownHidden = hiddenItems.filter(it => owned.includes(it.emoji)).length;
-                summary.innerHTML = `전체 수집 <b>${total}/${GACHA_ITEMS.length}</b> · <span class="hidden-count">히든 ${ownHidden}/${hiddenItems.length}</span>${typeof APP_FP !== 'undefined' && APP_FP ? `<span class="app-ver" title="사람마다 이 코드가 같으면 같은 버전이에요">버전 ${APP_FP}</span>` : ''}`;
+                const blackItems = GACHA_ITEMS.filter(it => it.rarity === 'black');
+                const ownBlack = blackItems.filter(it => owned.includes(it.emoji)).length;
+                summary.innerHTML = `전체 수집 <b>${total}/${GACHA_ITEMS.length}</b> · <span class="hidden-count">히든 ${ownHidden}/${hiddenItems.length}</span> · <span class="black-count">블랙 ${ownBlack}/${blackItems.length}</span>${typeof APP_FP !== 'undefined' && APP_FP ? `<span class="app-ver" title="사람마다 이 코드가 같으면 같은 버전이에요">버전 ${APP_FP}</span>` : ''}`;
             }
         }
 
         // 히든 획득 연출: 화면 전체에 빛줄기 + 캐릭터 등장
-        function showHiddenReveal(item) {
+        function showHiddenReveal(item, opt) {
+            const o = opt || {};
             const ov = document.createElement('div');
-            ov.className = 'hidden-reveal';
+            ov.className = 'hidden-reveal' + (o.cls ? ' ' + o.cls : '');
             ov.innerHTML = `
                 <div class="hr-rays"></div>
                 <div class="hr-card">
-                    <div class="hr-title">HIDDEN</div>
+                    <div class="hr-title">${o.title || 'HIDDEN'}</div>
                     <div class="hr-emoji">${emojiArt(item.emoji, 'emo-reveal')}</div>
                     <div class="hr-name">${escapeHtml(item.name)}</div>
-                    <div class="hr-sub">히든 캐릭터 획득! (히든 3.5%)</div>
+                    <div class="hr-sub">${o.sub || '히든 캐릭터 획득! (히든 3.5%)'}</div>
                 </div>`;
             ov.onclick = () => ov.remove();
             document.body.appendChild(ov);
