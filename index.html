@@ -3491,13 +3491,23 @@
         .checkin-calendar .cal-day.empty { background: none; }
         .checkin-calendar .cal-day.checked { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #1a1a2e; font-weight: bold; }
         .checkin-calendar .cal-day.today { outline: 2px solid #667eea; }
-        .checkin-today-list { display: flex; flex-wrap: wrap; gap: 6px; }
-        .checkin-today-list span {
-            padding: 4px 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            font-size: 13px;
-        }
+        /* 오늘 출석한 팀원: 이름별 아이콘을 크게 보여 주는 카드 */
+        .checkin-today-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 10px; }
+        .checkin-today-list .ct-empty { grid-column: 1 / -1; color: rgba(255,255,255,0.5); font-size: 13px; }
+        .ct-item { background: rgba(255,255,255,0.07); border: 2px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 8px 4px 6px; text-align: center; min-width: 0; }
+        .ct-item .ct-icon { height: 60px; display: flex; align-items: center; justify-content: center; }
+        .ct-item .ct-icon .emo3d { width: 60px; height: 60px; vertical-align: middle; filter: drop-shadow(0 4px 5px rgba(0,0,0,0.5)); }
+        .ct-item .ct-noicon { font-size: 34px; opacity: 0.35; }
+        .ct-item .ct-name { font-size: 13px; font-weight: bold; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ct-item .ct-time { font-size: 11px; color: rgba(255,255,255,0.5); }
+        .ct-item.r-bronze { border-color: rgba(205,127,50,0.7); } .ct-item.r-silver { border-color: rgba(201,209,217,0.8); }
+        .ct-item.r-gold { border-color: #ffd700; box-shadow: 0 0 10px rgba(255,215,0,0.45); }
+        .ct-item.r-emerald { border-color: #2ee59d; box-shadow: 0 0 12px rgba(46,229,157,0.5); }
+        .ct-item.r-hidden { border-color: #ff4fd8; box-shadow: 0 0 14px rgba(255,79,216,0.55); background: radial-gradient(circle at 50% 30%, rgba(74,26,122,0.6), rgba(11,4,32,0.6)); }
+        .ct-item.r-black { border-color: #000; box-shadow: 0 0 14px rgba(255,30,30,0.6); background: radial-gradient(circle at 50% 30%, #2a0303, #000 80%); }
+        .ct-item.r-hidden .ct-icon .emo3d { filter: drop-shadow(0 0 8px #ff4fd8); }
+        .ct-item.r-black .ct-icon .emo3d { filter: drop-shadow(0 0 8px rgba(255,30,30,0.9)); }
+        .ct-item.me { outline: 2px solid #00ff88; outline-offset: 1px; }
         @media (max-width: 768px) {
             .checkin-grid { grid-template-columns: 1fr; }
         }
@@ -4770,12 +4780,12 @@
                             <span>뽑기! (1<span class="coin-ico"></span>)</span>
                         </button>
                         <div class="gacha-rates">
-                            <span class="grade-text-bronze">🥉 브론즈 59.2%</span> ·
+                            <span class="grade-text-bronze">🥉 브론즈 59.5%</span> ·
                             <span class="grade-text-silver">🥈 실버 20%</span> ·
                             <span class="grade-text-gold">🥇 골드 10%</span> ·
                             <span class="grade-text-emerald">💚 에메랄드 6.5%</span> ·
                             <span class="grade-text-hidden">❓ 히든 3.5%</span> ·
-                            <span class="grade-text-black">⚫ 블랙 0.8%</span>
+                            <span class="grade-text-black">⚫ 블랙 0.5%</span>
                         </div>
                     </div>
                     <div class="gacha-history">
@@ -9836,30 +9846,30 @@ ${text}
 
         // 뽑기 아이템 목록 (2026-11 개편)
         // 등급(테두리): 브론즈 20 · 실버 10 · 골드 6 · 에메랄드 4 · 히든 4
-        // 확률(등급 합계): 브론즈 59.2% · 실버 20% · 골드 10% · 에메랄드 6.5% · 히든 3.5% · 블랙 0.8%
+        // 확률(등급 합계): 브론즈 59.5% · 실버 20% · 골드 10% · 에메랄드 6.5% · 히든 3.5% · 블랙 0.5%
         // 화면에는 emoji3d/ 그림으로 보여주고, 그림을 못 불러올 때만 글자 이모지가 보임
         const GACHA_ITEMS = [
-            // 브론즈: 엄청 흔한 동물 (각 2.96%)
-            { emoji: '🐿️', name: '다람쥐', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐶', name: '강아지', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐱', name: '고양이', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐭', name: '생쥐', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐹', name: '햄스터', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐰', name: '토끼', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐷', name: '돼지', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐔', name: '닭', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐤', name: '병아리', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐸', name: '개구리', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🦆', name: '오리', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐦', name: '참새', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐟', name: '붕어', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐌', name: '달팽이', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐞', name: '무당벌레', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐝', name: '꿀벌', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐮', name: '젖소', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐑', name: '양', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🐜', name: '개미', rarity: 'bronze', rate: 2.96 },
-            { emoji: '🦋', name: '나비', rarity: 'bronze', rate: 2.96 },
+            // 브론즈: 엄청 흔한 동물 (각 2.975%)
+            { emoji: '🐿️', name: '다람쥐', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐶', name: '강아지', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐱', name: '고양이', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐭', name: '생쥐', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐹', name: '햄스터', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐰', name: '토끼', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐷', name: '돼지', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐔', name: '닭', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐤', name: '병아리', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐸', name: '개구리', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🦆', name: '오리', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐦', name: '참새', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐟', name: '붕어', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐌', name: '달팽이', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐞', name: '무당벌레', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐝', name: '꿀벌', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐮', name: '젖소', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐑', name: '양', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🐜', name: '개미', rarity: 'bronze', rate: 2.975 },
+            { emoji: '🦋', name: '나비', rarity: 'bronze', rate: 2.975 },
             // 실버: 동물원의 큰 동물 (각 2%)
             { emoji: '🦁', name: '사자', rarity: 'silver', rate: 2 },
             { emoji: '🐯', name: '호랑이', rarity: 'silver', rate: 2 },
@@ -9888,11 +9898,11 @@ ${text}
             { emoji: '🤡', name: '공포의 삐에로', rarity: 'hidden', rate: 3.5 / 4 },
             { emoji: '⚔️', name: '성웅 이순신', rarity: 'hidden', rate: 3.5 / 4 },
             { emoji: '💀', name: '저승사자', rarity: 'hidden', rate: 3.5 / 4 },
-            // 블랙: 4흉수 (4개 합계 0.8%, 각 0.2%) — 가장 귀한 등급, 히든처럼 뽑기 전까지 컬렉션에 ❓로 표시
-            { emoji: '👹', name: '도철', rarity: 'black', rate: 0.2 },
-            { emoji: '🐆', name: '궁기', rarity: 'black', rate: 0.2 },
-            { emoji: '👺', name: '도올', rarity: 'black', rate: 0.2 },
-            { emoji: '🌀', name: '혼돈', rarity: 'black', rate: 0.2 }
+            // 블랙: 4흉수 (4개 합계 0.5%, 각 0.125%) — 가장 귀한 등급, 히든처럼 뽑기 전까지 컬렉션에 ❓로 표시
+            { emoji: '👹', name: '도철', rarity: 'black', rate: 0.125 },
+            { emoji: '🐆', name: '궁기', rarity: 'black', rate: 0.125 },
+            { emoji: '👺', name: '도올', rarity: 'black', rate: 0.125 },
+            { emoji: '🌀', name: '혼돈', rarity: 'black', rate: 0.125 }
         ];
         // 2026-11-04 개편: 브라키오사우루스 → 맘모스, 히든 4종 교체 (같은 등급끼리 1:1)
         const COLLECTION_V4_MAP = { '🦕': '🦣', '🐙': '🃏', '🤖': '🤡', '🧛': '⚔️', '🧙': '💀' };
@@ -10335,7 +10345,7 @@ ${text}
 
             // 히든은 화면 전체 연출
             if (result.rarity === 'hidden') showHiddenReveal(result);
-            else if (result.rarity === 'black') showHiddenReveal(result, { cls: 'black-reveal', title: 'BLACK', sub: '전설의 4흉수 획득! (블랙 0.8%)' });
+            else if (result.rarity === 'black') showHiddenReveal(result, { cls: 'black-reveal', title: 'BLACK', sub: '전설의 4흉수 획득! (블랙 0.5%)' });
 
             renderGachaHistory();
             updateMinigameUI();
@@ -10629,16 +10639,21 @@ ${text}
         function renderCheckinToday() {
             const listEl = document.getElementById('checkinTodayList');
             if (!listEl) return;
+            const me = (localStorage.getItem('chat_nickname') || '').trim();
             const names = Object.entries(checkinTodayData)
                 .sort((a, b) => a[1] - b[1])
                 .map(([name, time]) => {
                     const t = new Date(time);
-                    return `${nameWithIcon(name)} <small style="color:rgba(255,255,255,0.5)">${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}</small>`;
+                    const ic = iconOf(name);
+                    const rr = ic && (GACHA_ITEMS.find(it => it.emoji === ic) || {}).rarity;
+                    return `<div class="ct-item${rr ? ' r-' + rr : ''}${name === me ? ' me' : ''}" title="${escapeHtml(name)}">
+                        <div class="ct-icon">${ic ? emojiArt(ic) : '<span class="ct-noicon">🙂</span>'}</div>
+                        <div class="ct-name">${escapeHtml(name)}</div>
+                        <div class="ct-time">${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}</div>
+                    </div>`;
                 });
             document.getElementById('checkinTodayCount').textContent = names.length;
-            listEl.innerHTML = names.length
-                ? names.map(n => `<span>${n}</span>`).join('')
-                : '<span style="background:none;color:rgba(255,255,255,0.5)">아직 아무도 출석하지 않았어요</span>';
+            listEl.innerHTML = names.length ? names.join('') : '<div class="ct-empty">아직 아무도 출석하지 않았어요</div>';
         }
 
         function doCheckIn() {
