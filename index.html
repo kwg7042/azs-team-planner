@@ -9893,15 +9893,14 @@ ${text}
             { emoji: '🐅', name: '백호', rarity: 'emerald', rate: 6.5 / 4 },
             { emoji: '🦅', name: '주작', rarity: 'emerald', rate: 6.5 / 4 },
             { emoji: '🐢', name: '현무', rarity: 'emerald', rate: 6.5 / 4 },
-            // 히든 (8개 합계 3.5%, 각 0.4375%) — 뽑기 전까지 컬렉션에 ❓로 표시
-            { emoji: '🃏', name: '조커', rarity: 'hidden', rate: 3.5 / 8 },
-            { emoji: '🤡', name: '공포의 삐에로', rarity: 'hidden', rate: 3.5 / 8 },
-            { emoji: '⚔️', name: '성웅 이순신', rarity: 'hidden', rate: 3.5 / 8 },
-            { emoji: '💀', name: '저승사자', rarity: 'hidden', rate: 3.5 / 8 },
-            { emoji: '🦾', name: '아이언맨', rarity: 'hidden', rate: 3.5 / 8 },
-            { emoji: '🕷️', name: '스파이더맨', rarity: 'hidden', rate: 3.5 / 8 },
-            { emoji: '🦸', name: '슈퍼맨', rarity: 'hidden', rate: 3.5 / 8 },
-            { emoji: '🦇', name: '배트맨', rarity: 'hidden', rate: 3.5 / 8 },
+            // 히든 (7개 합계 3.5%, 각 0.5%) — 뽑기 전까지 컬렉션에 ❓로 표시 (2026-11-05 삐에로 삭제)
+            { emoji: '🃏', name: '조커', rarity: 'hidden', rate: 3.5 / 7 },
+            { emoji: '⚔️', name: '성웅 이순신', rarity: 'hidden', rate: 3.5 / 7 },
+            { emoji: '💀', name: '저승사자', rarity: 'hidden', rate: 3.5 / 7 },
+            { emoji: '🦾', name: '아이언맨', rarity: 'hidden', rate: 3.5 / 7 },
+            { emoji: '🕷️', name: '스파이더맨', rarity: 'hidden', rate: 3.5 / 7 },
+            { emoji: '🦸', name: '슈퍼맨', rarity: 'hidden', rate: 3.5 / 7 },
+            { emoji: '🦇', name: '배트맨', rarity: 'hidden', rate: 3.5 / 7 },
             // 블랙: 4흉수 (4개 합계 0.5%, 각 0.125%) — 가장 귀한 등급, 히든처럼 뽑기 전까지 컬렉션에 ❓로 표시
             { emoji: '👹', name: '도철', rarity: 'black', rate: 0.125 },
             { emoji: '🐆', name: '궁기', rarity: 'black', rate: 0.125 },
@@ -9922,7 +9921,7 @@ ${text}
         //  글꼴 이모지는 기기마다 작고 납작하게 보여서 그림으로 통일. 못 불러오면 글자 이모지로 대체
         const emojiCode = (e) => [...String(e)].map(c => c.codePointAt(0)).filter(c => c !== 0xfe0f).map(c => c.toString(16)).join('-');
         let EMOJI_3D = null;
-        const EMOJI_3D_VER = 10; // 그림을 바꾸면 올려서 브라우저에 남은 예전 그림 대신 새 그림을 받게 함 (10: 이순신 그림 교체)
+        const EMOJI_3D_VER = 11; // 그림을 바꾸면 올려서 브라우저에 남은 예전 그림 대신 새 그림을 받게 함 (11: 조커·저승사자 교체, 삐에로 삭제)
         function emojiArt(e, cls = '') {
             if (!e) return '';
             if (!EMOJI_3D) EMOJI_3D = new Set(GACHA_ITEMS.map(it => emojiCode(it.emoji)));
@@ -10114,10 +10113,22 @@ ${text}
             if (db && gameMine(me)) db.ref(`minigame/${me}/${k}`).remove();
         }
         // 컬렉션 변환(2→3→4차)과 정리 예외를 한 번에 (바뀌었으면 true)
+        // 없앤 인형: 가진 사람 컬렉션에서 빼고, 이름 옆 아이콘이었으면 남은 인형 중 가장 높은 등급으로 바꿈 (2026-11-05 삐에로 삭제)
+        const RETIRED_ITEMS = ['🤡'];
+        function removeRetiredItems(d) {
+            if (!d || !(d.collection || []).some(e => RETIRED_ITEMS.includes(e))) return false;
+            d.collection = d.collection.filter(e => !RETIRED_ITEMS.includes(e));
+            const cnt = Object.assign({}, d.collectionCount || {});
+            RETIRED_ITEMS.forEach(e => { delete cnt[e]; });
+            d.collectionCount = cnt;
+            d.iconCheckV3 = true; // migrateMyIconV3 가 아이콘을 남은 인형으로 바꿔 줌
+            return true;
+        }
         function runCollectionMigrations(d, me) {
             let changed = migrateCollectionV2(d) | migrateCollectionV3(d) | migrateCollectionV4(d);
             if (applyCollectionKeepV3(d, me)) changed = 1;
             if (applyCollectionGrantV5(d, me)) changed = 1;
+            if (removeRetiredItems(d)) changed = 1;
             return !!changed;
         }
 
