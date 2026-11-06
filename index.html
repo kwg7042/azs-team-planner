@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-06c">
+    <meta name="app-version" content="2026-11-06d">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -2618,7 +2618,9 @@
         .sword-sell-btn { padding: 15px 30px; font-size: 17px; background: linear-gradient(135deg, #ffd700, #ff9f1a); border: none; border-radius: 30px; color: #1a1a2e; cursor: pointer; font-weight: bold; transition: all 0.3s; font-family: inherit; }
         .sword-sell-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 5px 20px rgba(255,215,0,0.35); }
         .sword-sell-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .sword-aid-btn { margin-top: 12px; padding: 10px 22px; border-radius: 20px; border: 1px dashed rgba(255,255,255,0.4); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; font-size: 14px; font-family: inherit; }
+        .sword-charge-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(255,215,0,0.55); background: linear-gradient(135deg, rgba(255,215,0,0.22), rgba(255,140,0,0.22)); color: #ffd700; font-size: 13px; font-weight: bold; cursor: pointer; font-family: inherit; }
+        .sword-charge-btn:hover:not(:disabled) { background: linear-gradient(135deg, rgba(255,215,0,0.35), rgba(255,140,0,0.35)); }
+        .sword-charge-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .sword-rule { margin-top: 12px; font-size: 11px; color: rgba(255,255,255,0.5); }
         .sword-table { margin-top: 12px; text-align: left; font-size: 12px; }
         .sword-table summary { cursor: pointer; text-align: center; color: rgba(255,255,255,0.7); }
@@ -4985,6 +4987,7 @@
                         <div class="sword-wallet">
                             <div class="sw-money">💰 보유 금액 <b id="swordMoney">10,000원</b></div>
                             <div class="sw-best">🏅 최고 기록 <b id="swordBest">+0</b></div>
+                            <button class="sword-charge-btn" id="swordChargeBtn" onclick="chargeSwordMoney()" title="코인 1개를 강화 머니 1만원으로 바꿔요">🪙 코인 1개 → 1만원 충전</button>
                         </div>
                         <div class="enhance-info">
                             <div class="sword-odds" id="swordOdds"></div>
@@ -4997,8 +5000,7 @@
                             </button>
                             <button class="sword-sell-btn" id="swordSellBtn" onclick="sellSword()">💰 판매하기</button>
                         </div>
-                        <button class="sword-aid-btn" id="swordAidBtn" onclick="takeSwordAid()" style="display: none;">🆘 지원금 받기</button>
-                        <div class="sword-rule">강화 비용은 <b>원</b>으로 내요 (코인과 별개) · 검을 팔면 판매가만큼 받고 새 +0 검으로 다시 시작</div>
+                        <div class="sword-rule">강화 비용은 <b>원</b>으로 내요 (코인 1개 = 1만원 충전) · <b>+0 강화는 무료</b> · 실패하면 <b>+0</b>으로 · 검을 팔면 판매가만큼 받고 새 +0 검으로 다시 시작</div>
                         <div class="enhance-history" id="enhanceHistory"></div>
                         <details class="sword-table">
                             <summary>📋 강화표 (단계별 확률·비용·판매가)</summary>
@@ -10400,22 +10402,20 @@ ${text}
         const rarityOf = (r) => LEGACY_RARITY[r] || r;
 
         // ===== 검 강화 (2026-11-06 개편) =====
-        //  돈(원)으로 강화 → 검을 팔면 판매가를 받고 새 +0 검으로 다시 시작. 코인과는 완전히 별개.
-        //  +0~+4: 실패해도 그대로 · +5~+9: 실패하면 절반은 파괴 · +10 이상: 실패하면 파괴
-        //  판매가는 '파괴 없는 구간에서 강화→판매하면 살짝 손해, 위험을 감수할수록 이득'이 되도록 맞춤
+        //  돈(원)으로 강화 → 검을 팔면 판매가를 받고 새 +0 검으로 다시 시작. 강화 머니는 코인과 별개 (코인 1개 → 1만원 충전만 가능)
+        //  +0 강화는 무료 · 실패하면 무조건 +0
+        //  판매가는 단계마다 2~3배씩 급등: 한 번 도전의 기대값이 지금 판매가의 1.3배(+10부터 1.15배)가 되게 맞춤
         const SWORD_MAX = 20;
         const SWORD_START = 10000;       // 처음 받는 돈
-        const SWORD_AID = 1000;          // 돈이 바닥나면 받는 지원금
+        const SWORD_COIN_WON = 10000;    // 코인 1개로 충전되는 돈
         const ENHANCE_RATES = [95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 7, 5]; // +L → +L+1 성공 %
-        const SWORD_COST = [100, 160, 260, 410, 660, 1000, 1700, 2700, 4300, 6900, 11000, 18000, 28000, 84000, 290000,
-            1300000, 6600000, 44000000, 450000000, 6600000000];                                                 // +L에서 강화 1번 비용
-        const SWORD_SELL = [0, 100, 260, 550, 1000, 1800, 3800, 7800, 16000, 32000, 66000, 170000, 470000, 1400000, 4900000,
-            21000000, 110000000, 740000000, 7500000000, 110000000000, 2200000000000];                           // +L 검 판매가
-        const swordBreakShare = (L) => L < 5 ? 0 : (L < 10 ? 0.5 : 1);  // 실패했을 때 파괴되는 비율
+        const SWORD_COST = [0, 120, 220, 400, 780, 1600, 3500, 8200, 21000, 60000, 180000, 580000, 2000000, 8000000, 38000000,
+            210000000, 1500000000, 14000000000, 190000000000, 3800000000000];                                   // +L에서 강화 1번 비용 (+0은 무료)
+        const SWORD_SELL = [0, 500, 860, 1600, 3100, 6400, 14000, 33000, 85000, 240000, 740000, 2300000, 8100000, 32000000,
+            150000000, 840000000, 5900000000, 55000000000, 770000000000, 15000000000000, 420000000000000];      // +L 검 판매가
         function swordOdds(L) {
             const up = ENHANCE_RATES[Math.min(L, SWORD_MAX - 1)];
-            const brk = Math.round((100 - up) * swordBreakShare(L) * 10) / 10;
-            return { up, keep: Math.round((100 - up - brk) * 10) / 10, brk };
+            return { up, brk: 100 - up };   // 실패 = +0
         }
         const swordMoneyOf = (d) => (d && typeof d.swordMoney === 'number') ? d.swordMoney : SWORD_START;
         const swordSellOf = (L) => SWORD_SELL[Math.max(0, Math.min(L || 0, SWORD_MAX))];
@@ -10423,6 +10423,7 @@ ${text}
         function fmtWon(n) {
             n = Math.floor(n || 0);
             const unit = (v, u) => `${(Math.floor(v * 10) / 10).toLocaleString('ko-KR', { maximumFractionDigits: 1 })}${u}원`;
+            if (n >= 1e16) return unit(n / 1e16, '경');
             if (n >= 1e12) return unit(n / 1e12, '조');
             if (n >= 1e8) return unit(n / 1e8, '억');
             if (n >= 1e5) return unit(n / 1e4, '만');
@@ -10758,24 +10759,20 @@ ${text}
             const o = swordOdds(L);
             document.getElementById('swordOdds').innerHTML = maxed
                 ? '<span class="o-up">🏆 최고 단계 달성! 이제 팔아서 부자가 되세요</span>'
-                : `<span class="o-up">성공 ${o.up}%</span><span class="o-keep">유지 ${o.keep}%</span><span class="o-break">파괴 ${o.brk}%</span>`;
+                : `<span class="o-up">성공 ${o.up}%</span><span class="o-break">실패 ${o.brk}% → +0</span>`;
             document.getElementById('swordPrices').innerHTML = maxed
                 ? `<span class="sp-sell">지금 판매가 <b>${fmtWon(swordSellOf(L))}</b></span>`
-                : `강화 비용 <b>${fmtWon(SWORD_COST[L])}</b> · <span class="sp-sell">지금 판매가 <b>${fmtWon(swordSellOf(L))}</b></span> · 성공하면 <b>${fmtWon(swordSellOf(L + 1))}</b>`;
+                : `강화 비용 <b>${SWORD_COST[L] ? fmtWon(SWORD_COST[L]) : '무료'}</b> · <span class="sp-sell">지금 판매가 <b>${fmtWon(swordSellOf(L))}</b></span> · 성공하면 <b>${fmtWon(swordSellOf(L + 1))}</b>`;
             const warn = document.getElementById('enhanceWarning');
-            warn.textContent = maxed ? '' : (o.brk >= 50 ? '⚠️ 실패하면 대부분 파괴! 팔지 말지 잘 생각하세요' : o.brk > 0 ? '⚠️ 이제부터 실패하면 검이 파괴될 수 있어요' : '');
+            warn.textContent = maxed || L === 0 ? '' : (o.brk >= 50 ? `⚠️ 실패할 확률이 더 높아요! 실패하면 ${fmtWon(swordSellOf(L))}짜리 검이 +0으로` : '⚠️ 실패하면 +0으로 돌아가요');
             warn.style.display = warn.textContent ? 'block' : 'none';
             const btn = document.getElementById('enhanceBtn');
             btn.disabled = maxed || money < SWORD_COST[L];
-            document.getElementById('enhanceBtnLabel').textContent = maxed ? '⚔️ 최고 단계' : `⚔️ 강화하기 (${fmtWon(SWORD_COST[L])})`;
+            document.getElementById('enhanceBtnLabel').textContent = maxed ? '⚔️ 최고 단계' : `⚔️ 강화하기 (${SWORD_COST[L] ? fmtWon(SWORD_COST[L]) : '무료'})`;
             const sellBtn = document.getElementById('swordSellBtn');
             sellBtn.disabled = L === 0;
             sellBtn.textContent = L === 0 ? '💰 +0 검은 못 팔아요' : `💰 판매하기 (${fmtWon(swordSellOf(L))})`;
-            // 돈이 강화 비용보다 적고 팔 검도 없으면 지원금
-            const aid = document.getElementById('swordAidBtn');
-            const broke = L === 0 && money < SWORD_COST[0];
-            aid.style.display = broke ? 'inline-block' : 'none';
-            aid.textContent = `🆘 돈이 바닥났어요 · 지원금 ${fmtWon(SWORD_AID)} 받기`;
+            document.getElementById('swordChargeBtn').disabled = (gameData.coins || 0) < 1;
             renderSwordTable(L);
         }
 
@@ -10787,10 +10784,10 @@ ${text}
             for (let i = 0; i <= SWORD_MAX; i++) {
                 const o = swordOdds(i);
                 rows += `<tr class="${i === L ? 'cur' : ''}"><td>+${i}</td>`
-                    + (i < SWORD_MAX ? `<td>${o.up}%</td><td class="${o.brk ? 't-break' : ''}">${o.brk}%</td><td>${fmtWon(SWORD_COST[i])}</td>` : '<td>-</td><td>-</td><td>-</td>')
+                    + (i < SWORD_MAX ? `<td>${o.up}%</td><td>${SWORD_COST[i] ? fmtWon(SWORD_COST[i]) : '무료'}</td>` : '<td>-</td><td>-</td>')
                     + `<td>${i ? fmtWon(SWORD_SELL[i]) : '-'}</td></tr>`;
             }
-            box.innerHTML = `<table><tr><th>단계</th><th>성공</th><th>파괴</th><th>강화 비용</th><th>판매가</th></tr>${rows}</table>`;
+            box.innerHTML = `<table><tr><th>단계</th><th>성공 (실패하면 +0)</th><th>강화 비용</th><th>판매가</th></tr>${rows}</table>`;
         }
 
         function swordLog(cls, html) {
@@ -10818,14 +10815,12 @@ ${text}
             if (r < o.up) {
                 gameData.weaponLevel = level + 1;
                 gameData.swordBest = Math.max(gameData.swordBest || 0, level + 1);
-                swordLog('enhance-success', `✅ +${level} → +${level + 1} 강화 성공! <small>(-${fmtWon(cost)})</small>`);
+                swordLog('enhance-success', `✅ +${level} → +${level + 1} 강화 성공! <small>(${cost ? '-' + fmtWon(cost) : '무료'})</small>`);
                 weaponBig.classList.remove('level-up');
                 setTimeout(() => weaponBig.classList.add('level-up'), 10);
-            } else if (r < o.up + o.keep) {
-                swordLog('enhance-keep', `😮‍💨 +${level} 강화 실패… 그대로 유지 <small>(-${fmtWon(cost)})</small>`);
             } else {
                 gameData.weaponLevel = 0;
-                swordLog('enhance-fail', `💥 +${level} 강화 실패… 검이 파괴됐어요! <small>(-${fmtWon(cost)}, 판매가 ${fmtWon(swordSellOf(level))} 날아감)</small>`);
+                swordLog('enhance-fail', `💥 +${level} 강화 실패… +0으로 돌아갔어요 <small>(${cost ? '-' + fmtWon(cost) : '무료'}${level ? `, 판매가 ${fmtWon(swordSellOf(level))} 날아감` : ''})</small>`);
                 weaponBig.style.transform = 'scale(0)';
                 setTimeout(() => { weaponBig.style.transform = 'scale(1)'; }, 500);
             }
@@ -10851,14 +10846,29 @@ ${text}
             loadLeaderboard();
         }
 
-        function takeSwordAid() {
-            if (!gameMine(myMinigameName())) { bindMinigame(); return; }
-            if ((gameData.weaponLevel || 0) > 0 || swordMoneyOf(gameData) >= SWORD_COST[0]) return;
-            gameData.swordMoney = swordMoneyOf(gameData) + SWORD_AID;
-            gameData.swordAidCount = (gameData.swordAidCount || 0) + 1;
-            swordLog('enhance-keep', `🆘 지원금 ${fmtWon(SWORD_AID)}을 받았어요. 다시 도전!`);
-            saveGameData();
-            updateMinigameUI();
+        // 코인 1개 → 강화 머니 1만원 (한 방향만, 서버 값 기준 트랜잭션)
+        let swordCharging = false;
+        function chargeSwordMoney() {
+            const me = myMinigameName();
+            if (!gameMine(me) || !db) { bindMinigame(); alert('내 미니게임 데이터를 불러오는 중이에요. 잠시 후 다시 시도해주세요.'); return; }
+            if (swordCharging) return;
+            if ((gameData.coins || 0) < 1) { alert('코인이 없어요. 출첵·신기술 검토·QnA 등으로 코인을 모아 주세요.'); return; }
+            if (!confirm(`코인 1개를 강화 머니 ${fmtWon(SWORD_COIN_WON)}으로 바꿀까요?\n(지금 코인 ${gameData.coins}개 · 원을 코인으로 되돌릴 수는 없어요)`)) return;
+            swordCharging = true;
+            db.ref(`minigame/${me}`).transaction(cur => {
+                if (!cur || (cur.coins || 0) < 1) return;
+                cur.coins -= 1;
+                cur.swordMoney = swordMoneyOf(cur) + SWORD_COIN_WON;
+                cur.swordCharged = (cur.swordCharged || 0) + 1;
+                return cur;
+            }, (err, committed, snap) => {
+                swordCharging = false;
+                if (snap && snap.val() && gameDataOwner === me) gameData = snap.val();
+                updateMinigameUI();
+                if (err || !committed) { alert('충전하지 못했어요. 코인이 부족하거나 다른 탭에서 먼저 바뀌었어요.'); return; }
+                swordLog('enhance-sell', `🪙 코인 1개로 <b>+${fmtWon(SWORD_COIN_WON)}</b> 충전했어요`);
+                loadLeaderboard();
+            });
         }
 
         function renderCollection() {
