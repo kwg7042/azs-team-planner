@@ -10162,6 +10162,7 @@ ${text}
                     migrateMyIconV3();
                     applyKeepIconV3();
                     migrateMyIconV4();
+                    showMyGiftNotices();
                 } else {
                     gameData = { coins: 0, weaponLevel: 0, collection: [], gachaHistory: [] };
                     gameDataLoaded = true;
@@ -10176,9 +10177,53 @@ ${text}
             try { bindMinigame(); } catch (e) { console.warn('minigame rebind', e); }
         }
 
+        // ===== 코인 선물 (한 번만) =====
+        //  앱을 연 팀원 누구의 브라우저에서든 트랜잭션으로 지급 (받는 사람이 접속하지 않아도 들어감, 중복 없음)
+        const COIN_GIFTS = [
+            { id: 'g20261105_escape', names: ['고귀한', '장찬호', '최다영'], coins: 10, reason: '방탈출(샵보이스 테마) 우승 보상' }
+        ];
+        function applyCoinGifts() {
+            if (!db) return;
+            COIN_GIFTS.forEach(g => {
+                let doneKey = `coinGiftDone_${g.id}`;
+                try { if (localStorage.getItem(doneKey)) return; } catch (e) { doneKey = null; }
+                let left = g.names.length;
+                g.names.forEach(name => {
+                    db.ref(`minigame/${name}`).transaction(cur => {
+                        if (!cur) return null; // 캐시가 비었을 때: 서버 값으로 다시 시도하게 둠 (없는 사람은 다음 줄에서 새로 만듦)
+                        cur.giftsReceived = cur.giftsReceived || {};
+                        if (cur.giftsReceived[g.id]) return; // 이미 받음
+                        cur.coins = (cur.coins || 0) + g.coins;
+                        cur.giftsReceived[g.id] = { coins: g.coins, reason: g.reason, at: Date.now() };
+                        return cur;
+                    }, (err, committed, snap) => {
+                        if (!err && snap && !snap.val()) {
+                            // 기록이 아예 없는 사람: 새로 만들어 지급
+                            db.ref(`minigame/${name}`).transaction(cur2 => {
+                                if (cur2) return; // 그새 생겼으면 위 경로가 처리
+                                return { coins: g.coins, weaponLevel: 0, collection: [], gachaHistory: [], giftsReceived: { [g.id]: { coins: g.coins, reason: g.reason, at: Date.now() } } };
+                            });
+                        }
+                        if (!err && --left === 0 && doneKey) { try { localStorage.setItem(doneKey, '1'); } catch (e) { /* noop */ } }
+                    });
+                });
+            });
+        }
+        // 내가 받은 선물은 접속했을 때 한 번 알림
+        function showMyGiftNotices() {
+            const me = myMinigameName();
+            if (!gameMine(me)) return;
+            Object.entries(gameData.giftsReceived || {}).forEach(([id, gft]) => {
+                const k = `giftShown_${id}_${me}`;
+                try { if (localStorage.getItem(k)) return; localStorage.setItem(k, '1'); } catch (e) { return; }
+                setTimeout(() => showCoinNotification(0, '', `🎁 ${gft.reason}: 코인 ${gft.coins}개를 받았어요!`), 1200);
+            });
+        }
+
         function initMinigame() {
             if (db) {
                 bindMinigame();
+                setTimeout(applyCoinGifts, 4000); // 내 데이터를 먼저 불러온 뒤에
 
                 // 리더보드 로드
                 loadLeaderboard();
