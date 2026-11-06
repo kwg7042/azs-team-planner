@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-06a">
+    <meta name="app-version" content="2026-11-06b">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -3743,6 +3743,26 @@
         .app-update-bar button { border: none; border-radius: 10px; padding: 6px 12px; font-weight: bold; background: #ffd400; color: #1a1a2e; cursor: pointer; }
         .app-update-bar small { opacity: 0.8; font-size: 11px; width: 100%; text-align: center; }
         .collection-summary .app-ver { margin-left: 8px; font-size: 11px; opacity: 0.5; }
+        /* 중복 인형 판매 */
+        .sell-box { margin: 0 auto 12px; max-width: 640px; background: rgba(255,215,0,0.05); border: 1px solid rgba(255,215,0,0.25); border-radius: 10px; padding: 8px 12px; }
+        .sell-box > summary { cursor: pointer; font-size: 13px; font-weight: bold; color: #ffd700; list-style: none; text-align: center; }
+        .sell-box > summary::-webkit-details-marker { display: none; }
+        .sell-box > summary::after { content: ' ▾'; opacity: 0.7; }
+        .sell-box[open] > summary::after { content: ' ▴'; }
+        .sell-box .sell-total { font-weight: normal; color: rgba(255,255,255,0.7); font-size: 12px; margin-left: 4px; }
+        .sell-note { font-size: 11px; color: rgba(255,255,255,0.6); text-align: center; margin: 8px 0; line-height: 1.6; }
+        .sell-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid rgba(255,255,255,0.07); font-size: 12px; }
+        .sell-row .sell-grade { width: 78px; font-weight: bold; flex-shrink: 0; }
+        .sell-row .sell-info { flex: 1; min-width: 0; color: rgba(255,255,255,0.75); }
+        .sell-row .sell-info small { color: rgba(255,255,255,0.45); }
+        .sell-row button { padding: 5px 10px; border-radius: 14px; border: 1px solid rgba(255,215,0,0.45); background: rgba(255,215,0,0.12); color: #ffd700; font-size: 12px; cursor: pointer; white-space: nowrap; font-family: inherit; }
+        .sell-row button:hover:not(:disabled) { background: rgba(255,215,0,0.25); }
+        .sell-row button:disabled { opacity: 0.35; cursor: default; border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); background: transparent; }
+        @media (max-width: 520px) {
+            .sell-row { flex-wrap: wrap; }
+            .sell-row .sell-info { flex-basis: calc(100% - 90px); }
+            .sell-row .sell-btns { width: 100%; display: flex; gap: 6px; justify-content: flex-end; }
+        }
         .collection-item .ci-count { position: absolute; top: 2px; right: 3px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: #ff4757; color: #fff; font-size: 12px; font-weight: bold; line-height: 20px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.5); z-index: 2; }
         .collection-item.locked { filter: none; opacity: 0.7; }
         .collection-item.locked .ci-emoji { filter: grayscale(100%) brightness(0.35); }
@@ -4946,6 +4966,11 @@
                 <div class="minigame-panel" id="panel-collection">
                     <div class="collection-hint">💡 모은 인형을 누르면 내 이름 옆에 아이콘으로 표시돼요. 한 번 더 누르면 해제돼요.</div>
                     <div class="collection-summary" id="collectionSummary"></div>
+                    <details class="sell-box" id="sellBox">
+                        <summary>💰 중복 인형 판매 <span class="sell-total" id="sellTotal"></span></summary>
+                        <div class="sell-note">각 인형 <b>1개는 남기고</b> 겹치는 인형만 팔아요 · 많이 겹친 인형부터 팔려요<br>브론즈 5개 · 실버 4개 · 골드 3개 · 에메랄드·히든·블랙 1개 = <span class="coin-ico"></span> 1코인</div>
+                        <div class="sell-rows" id="sellRows"></div>
+                    </details>
                     <div class="collection-grid" id="collectionGrid">
                         <!-- 컬렉션 아이템들 -->
                     </div>
@@ -10740,6 +10765,8 @@ ${text}
                     + items.map(card).join('');
             }).join('');
 
+            renderSellBox();
+
             const summary = document.getElementById('collectionSummary');
             if (summary) {
                 const total = GACHA_ITEMS.filter(it => owned.includes(it.emoji)).length;
@@ -10749,6 +10776,99 @@ ${text}
                 const ownBlack = blackItems.filter(it => owned.includes(it.emoji)).length;
                 summary.innerHTML = `전체 수집 <b>${total}/${GACHA_ITEMS.length}</b> · <span class="hidden-count">히든 ${ownHidden}/${hiddenItems.length}</span> · <span class="black-count">블랙 ${ownBlack}/${blackItems.length}</span>${typeof APP_FP !== 'undefined' && APP_FP ? `<span class="app-ver" title="사람마다 이 코드가 같으면 같은 버전이에요">버전 ${APP_FP}</span>` : ''}`;
             }
+        }
+
+        // ===== 중복 인형 판매: 각 인형 1개는 남기고 겹치는 것만 → 등급별 N개 = 1코인 =====
+        const SELL_RATE = { bronze: 5, silver: 4, gold: 3, emerald: 1, hidden: 1, black: 1 };
+        let sellBusy = false;
+
+        // 등급별 팔 수 있는 중복 (인형마다 보유 개수 - 1)
+        function sellableOf(d, rarity) {
+            const col = (d && d.collection) || [], cnt = (d && d.collectionCount) || {};
+            return GACHA_ITEMS.filter(it => it.rarity === rarity && col.includes(it.emoji))
+                .map(it => ({ emoji: it.emoji, name: it.name, extra: Math.max(0, (cnt[it.emoji] || 1) - 1) }))
+                .filter(x => x.extra > 0);
+        }
+
+        // 팔 개수만큼 고르기: 가장 많이 겹친 인형부터 하나씩 (개수가 고르게 줄도록)
+        function planSale(d, rarity, units) {
+            const pool = sellableOf(d, rarity);
+            const need = units * SELL_RATE[rarity];
+            if (pool.reduce((a, x) => a + x.extra, 0) < need) return null;
+            const take = {};
+            for (let i = 0; i < need; i++) {
+                const pick = pool.reduce((best, x) => (x.extra > (best ? best.extra : 0) ? x : best), null);
+                pick.extra--;
+                take[pick.emoji] = (take[pick.emoji] || 0) + 1;
+            }
+            return { take, units, count: need };
+        }
+
+        function renderSellBox() {
+            const rows = document.getElementById('sellRows');
+            if (!rows) return;
+            let totalCoins = 0;
+            rows.innerHTML = RARITY_ORDER.map(r => {
+                const per = SELL_RATE[r];
+                const extra = sellableOf(gameData, r).reduce((a, x) => a + x.extra, 0);
+                const units = Math.floor(extra / per);
+                totalCoins += units;
+                const lack = per - (extra % per);
+                const info = extra === 0
+                    ? `<small>겹치는 인형 없음</small>`
+                    : `중복 <b>${extra}</b>개${units ? '' : ` <small>· ${lack}개 더 모이면 1코인</small>`}`;
+                return `<div class="sell-row">
+                    <span class="sell-grade grade-text-${r}">${RARITY_BADGE[r]} ${RARITY_LABEL[r]}</span>
+                    <span class="sell-info">${info}</span>
+                    <span class="sell-btns">
+                        <button onclick="sellDuplicates('${r}', 1)" ${units ? '' : 'disabled'} title="${per}개 팔고 1코인">${per}개 → 1코인</button>
+                        <button onclick="sellDuplicates('${r}', 'all')" ${units > 1 ? '' : 'disabled'} title="팔 수 있는 만큼 모두">${units > 1 ? `모두 → ${units}코인` : '모두'}</button>
+                    </span>
+                </div>`;
+            }).join('');
+            const t = document.getElementById('sellTotal');
+            if (t) t.textContent = totalCoins ? `· 지금 최대 ${totalCoins}코인` : '· 겹치는 인형을 모으면 코인으로 바꿀 수 있어요';
+        }
+
+        function sellDuplicates(rarity, mode) {
+            const me = myMinigameName();
+            if (!gameMine(me) || !db) { bindMinigame(); alert('내 미니게임 데이터를 불러오는 중이에요. 잠시 후 다시 시도해주세요.'); return; }
+            if (sellBusy) return;
+            const per = SELL_RATE[rarity];
+            const extra = sellableOf(gameData, rarity).reduce((a, x) => a + x.extra, 0);
+            const maxUnits = Math.floor(extra / per);
+            if (!maxUnits) { alert(`${RARITY_LABEL[rarity]} 중복 인형이 ${per}개 있어야 1코인으로 바꿀 수 있어요.`); return; }
+            const units = mode === 'all' ? maxUnits : 1;
+            const plan = planSale(gameData, rarity, units);
+            if (!plan) return;
+            const list = Object.entries(plan.take)
+                .map(([e, n]) => `${e} ${(GACHA_ITEMS.find(it => it.emoji === e) || {}).name || ''} ×${n}`).join('\n');
+            if (!confirm(`${RARITY_LABEL[rarity]} 중복 ${plan.count}개를 팔고 ${units}코인을 받을까요?\n\n${list}\n\n(각 인형 1개씩은 그대로 남아요)`)) return;
+
+            sellBusy = true;
+            db.ref(`minigame/${me}`).transaction(cur => {
+                if (!cur) return;
+                // 서버 값 기준으로 다시 확인: 그 사이 다른 탭에서 팔았으면 취소 (1개 밑으로는 절대 안 내려감)
+                const col = cur.collection || [], cnt = Object.assign({}, cur.collectionCount || {});
+                for (const [e, n] of Object.entries(plan.take)) {
+                    if (!col.includes(e) || (cnt[e] || 1) - n < 1) return;
+                }
+                for (const [e, n] of Object.entries(plan.take)) cnt[e] = (cnt[e] || 1) - n;
+                cur.collectionCount = cnt;
+                cur.coins = (cur.coins || 0) + units;
+                return cur;
+            }, (err, committed, snap) => {
+                sellBusy = false;
+                if (err || !committed) {
+                    // 서버 값으로 화면을 다시 맞춤
+                    if (!err && snap && snap.val() && gameDataOwner === me) { gameData = snap.val(); updateMinigameUI(); }
+                    alert('판매하지 못했어요. 다른 탭/기기에서 먼저 바뀌었을 수 있어요. 다시 시도해주세요.');
+                    return;
+                }
+                if (snap && snap.val() && gameDataOwner === me) gameData = snap.val();
+                updateMinigameUI();
+                showCoinNotification(units, `${RARITY_LABEL[rarity]} 중복 ${plan.count}개 판매`);
+            });
         }
 
         // 히든 획득 연출: 화면 전체에 빛줄기 + 캐릭터 등장
