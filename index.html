@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-06e">
+    <meta name="app-version" content="2026-11-06f">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -10463,9 +10463,9 @@ ${text}
         // 🧩 조각: +L 검이 부서지면 받는 개수 (단계가 높을수록 많이)
         const SWORD_SHARD = [0, 1, 2, 3, 4, 7, 10, 17, 27, 43, 69, 110, 176, 281, 450, 720, 1150, 1840, 2950, 4720, 0];
         // 🛡️ 방지권: '+L 방지권' 1장 = +L 이하에서 실패해도 단계 유지 (1번 쓰면 사라짐)
-        //   원으로 사면 그 단계 판매가의 60%, 조각으로 만들면 그 단계 조각의 2배
+        //   원으로 사면 그 단계 판매가의 80%, 조각으로 만들면 그 단계 조각의 2배
         const niceWon = (x) => { if (x < 1000) return Math.max(10, Math.round(x / 10) * 10); const e = 10 ** (Math.floor(Math.log10(x)) - 1); return Math.round(x / e) * e; };
-        const shieldPrice = (L) => niceWon(SWORD_SELL[L] * 0.6);
+        const shieldPrice = (L) => niceWon(SWORD_SELL[L] * 0.8);
         const shieldShardCost = (L) => SWORD_SHARD[L] * 2;
         // 📖 도감: 처음 달성한 단계마다 판매가의 30% 보상, 5·10·15단계는 그 단계 방지권 1장 더
         const dexReward = (L) => niceWon(SWORD_SELL[L] * 0.3);
