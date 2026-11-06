@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-05a">
+    <meta name="app-version" content="2026-11-06a">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -491,103 +491,172 @@
         }
 
         /* ===== ESHG 이슈 탭 ===== */
+        /* 색은 상태 점(●) 하나에만 쓰고 나머지는 무채색으로 — 카드가 많아도 내용이 먼저 읽히게 */
+        .issue-toolbar {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .issue-filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+        .issue-filter-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+            min-width: 34px;
+            margin-right: 2px;
+        }
+        .issue-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.14);
+            background: transparent;
+            color: rgba(255,255,255,0.78);
+            font-size: 12px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .issue-chip:hover { border-color: rgba(255,255,255,0.32); color: #fff; }
+        .issue-chip.active { background: #e8eaf2; border-color: #e8eaf2; color: #15172b; font-weight: 600; }
+        .issue-chip .chip-count { font-size: 11px; opacity: 0.6; font-variant-numeric: tabular-nums; }
+        .issue-chip.active .chip-count { opacity: 0.75; }
+
+        .issue-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: #9ca3af;
+        }
+        .issue-dot.st-waiting { background: #9ca3af; }
+        .issue-dot.st-doing { background: #f5b942; }
+        .issue-dot.st-done { background: #34d399; }
+        .issue-dot.st-unresolved { background: #f87171; }
+
         .issue-list {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
+            gap: 12px;
+            align-items: start;
         }
 
         .issue-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 15px;
-            border-left: 4px solid #667eea;
+            background: rgba(255,255,255,0.035);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 10px;
+            padding: 14px 16px 12px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: border-color 0.15s, background 0.15s;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 0;
         }
-
         .issue-card:hover {
-            background: rgba(255,255,255,0.08);
-            transform: translateY(-2px);
+            background: rgba(255,255,255,0.055);
+            border-color: rgba(255,255,255,0.2);
         }
-
-        .issue-card.status-waiting { border-left-color: #888; }
-        .issue-card.status-doing { border-left-color: #ffd93d; }
-        .issue-card.status-done { border-left-color: #00ff88; }
-        .issue-card.status-unresolved { border-left-color: #ff6b6b; }
+        .issue-card.is-done .issue-text { color: rgba(255,255,255,0.55); }
 
         .issue-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-        }
-
-        .issue-category {
-            display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
-
         .issue-badge {
-            padding: 4px 12px;
-            border-radius: 15px;
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 600;
+            color: rgba(255,255,255,0.88);
+            background: rgba(255,255,255,0.07);
+            padding: 2px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .issue-date {
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
         }
 
-        .issue-badge { background: rgba(102,126,234,0.3); color: #a5b4fc; }
-
-        .issue-status {
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 12px;
+        .issue-text {
+            font-size: 13px;
+            line-height: 1.55;
+            color: rgba(255,255,255,0.92);
+            white-space: pre-line;
+            word-break: break-word;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
-
-        .status-waiting { background: rgba(136,136,136,0.3); color: #aaa; }
-        .status-doing { background: rgba(255,217,61,0.3); color: #ffd93d; }
-        .status-done { background: rgba(0,255,136,0.3); color: #00ff88; }
-        .status-unresolved { background: rgba(255,107,107,0.3); color: #ff6b6b; }
-
-        .issue-content {
-            margin-bottom: 10px;
+        .issue-discussion {
+            border-top: 1px dashed rgba(255,255,255,0.1);
+            padding-top: 8px;
         }
-
-        .issue-content h4 {
-            font-size: 15px;
-            margin-bottom: 10px;
-        }
-
-        .issue-field {
-            margin-bottom: 8px;
-        }
-
         .issue-field-label {
             font-size: 11px;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255,255,255,0.45);
             margin-bottom: 3px;
         }
-
-        .issue-field-value {
+        .issue-discussion .issue-text {
             font-size: 12px;
-            line-height: 1.4;
-            padding: 6px 8px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 4px;
-            max-height: 60px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: pre-line;
+            color: rgba(255,255,255,0.7);
+            -webkit-line-clamp: 3;
         }
 
         .issue-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 10px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            gap: 8px;
+            margin-top: 2px;
+        }
+        .issue-status-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 4px 3px 9px;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 999px;
+        }
+        .issue-status {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.85);
             font-size: 12px;
-            color: rgba(255,255,255,0.5);
+            font-family: inherit;
+            cursor: pointer;
+            padding: 0 2px;
+            outline: none;
+        }
+        .issue-status option { background: #1a1a2e; color: #fff; }
+        .issue-del-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.35);
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+        .issue-del-btn:hover { color: #f87171; background: rgba(248,113,113,0.1); }
+        .issue-hint {
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+        }
+        @media (max-width: 1100px) {
+            .issue-list { grid-template-columns: repeat(2, 1fr); }
         }
 
         /* 이슈 추가 폼 */
@@ -901,6 +970,8 @@
         .attendance-badge.business { background: rgba(118,75,162,0.3); color: #a855f7; }
         .attendance-badge.training { background: rgba(102,126,234,0.3); color: #667eea; }
         .attendance-badge.official { background: rgba(156,163,175,0.3); color: #9ca3af; }
+        .attendance-badge.dinner { background: rgba(244,114,182,0.3); color: #f472b6; }
+        .attendance-badge.etc { background: rgba(45,212,191,0.3); color: #2dd4bf; }
 
         /* 공통 모달 (AI 설정·텍스트 파싱·이슈 수정) — 예전엔 스타일이 없어서 페이지 아래에 그냥 붙어 보였음 */
         .modal-overlay {
@@ -978,13 +1049,14 @@
 
         .attendance-type-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
         }
 
         .attendance-type-btn {
-            padding: 15px;
+            padding: 11px 4px;
+            min-width: 0;
             border: 2px solid rgba(255,255,255,0.1);
             border-radius: 10px;
             background: rgba(255,255,255,0.05);
@@ -1012,6 +1084,37 @@
 
         .attendance-type-btn span {
             font-size: 12px;
+        }
+
+        .attendance-modal-content { width: 480px; box-sizing: border-box; max-height: 92vh; overflow-y: auto; }
+        .attendance-range {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 12px;
+        }
+        .attendance-range-label { font-size: 12px; color: rgba(255,255,255,0.75); margin-bottom: 8px; }
+        .attendance-range-label span { color: rgba(255,255,255,0.4); font-size: 11px; }
+        .attendance-range-inputs { display: flex; align-items: center; gap: 8px; }
+        .attendance-range-inputs input {
+            flex: 1;
+            min-width: 0;
+            padding: 8px 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.08);
+            color: white;
+            font-size: 13px;
+            color-scheme: dark;
+        }
+        .attendance-range-inputs .range-sep { color: rgba(255,255,255,0.5); }
+        .attendance-range-skip { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 12px; color: rgba(255,255,255,0.7); cursor: pointer; }
+        .attendance-range-summary { margin-top: 6px; font-size: 12px; color: #00d4ff; min-height: 16px; }
+        .attendance-range-summary.warn { color: #ff6b6b; }
+        @media (max-width: 520px) {
+            .attendance-modal-content { padding: 20px 16px; min-width: 0; }
+            .attendance-type-btn i { font-size: 16px; }
+            .attendance-type-btn span { font-size: 11px; }
         }
 
         .attendance-legend {
@@ -2843,16 +2946,12 @@
 
             /* 이슈 카드 */
             .issue-card {
-                padding: 15px;
+                padding: 13px 14px 11px;
             }
 
-            .issue-header {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .issue-content h4 {
-                font-size: 13px;
+            .issue-filter-label {
+                width: 100%;
+                margin-bottom: -2px;
             }
 
             /* 게임 컨테이너 */
@@ -4178,6 +4277,8 @@
                 <div class="legend-item"><span class="attendance-badge business">출장</span></div>
                 <div class="legend-item"><span class="attendance-badge training">교육</span></div>
                 <div class="legend-item"><span class="attendance-badge official">공가</span></div>
+                <div class="legend-item"><span class="attendance-badge dinner">회식</span></div>
+                <div class="legend-item"><span class="attendance-badge etc">기타</span></div>
             </div>
 
             <div class="attendance-container">
@@ -4251,9 +4352,29 @@
                         <i class="fas fa-building" style="color: #9ca3af;"></i>
                         <span>공가</span>
                     </button>
+                    <button class="attendance-type-btn" data-type="dinner" onclick="selectAttendanceType('dinner')">
+                        <i class="fas fa-utensils" style="color: #f472b6;"></i>
+                        <span>회식</span>
+                    </button>
+                    <button class="attendance-type-btn" data-type="etc" onclick="selectAttendanceType('etc')">
+                        <i class="fas fa-ellipsis-h" style="color: #2dd4bf;"></i>
+                        <span>기타</span>
+                    </button>
+                </div>
+                <div class="attendance-range">
+                    <div class="attendance-range-label"><i class="fas fa-calendar-week"></i> 기간 <span>(여러 날이면 종료일만 바꾸세요)</span></div>
+                    <div class="attendance-range-inputs">
+                        <input type="date" id="attendanceStart" onchange="onAttendanceRangeChange('start')">
+                        <span class="range-sep">~</span>
+                        <input type="date" id="attendanceEnd" onchange="onAttendanceRangeChange('end')">
+                    </div>
+                    <label class="attendance-range-skip">
+                        <input type="checkbox" id="attendanceSkipOff" checked onchange="onAttendanceRangeChange()"> 주말·공휴일 제외
+                    </label>
+                    <div class="attendance-range-summary" id="attendanceRangeSummary"></div>
                 </div>
                 <div class="form-group" style="margin: 15px 0;">
-                    <label style="font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 8px; display: block;">비고 (예: 예비군, 건강검진 등)</label>
+                    <label style="font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 8px; display: block;">비고 (예: 예비군, 건강검진, 기타 내용 등)</label>
                     <input type="text" id="attendanceNote" placeholder="비고 입력 (선택사항)" style="width: 100%; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; background: rgba(255,255,255,0.1); color: white; font-size: 13px;">
                 </div>
                 <div style="display: flex; gap: 10px;">
@@ -4509,9 +4630,10 @@
                 </div>
             </div>
 
-            <!-- 카테고리 필터 버튼 -->
-            <div class="issue-category-filters" id="issueCategoryFilters" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
-                <!-- JavaScript로 생성 -->
+            <!-- 상태·구분 필터 (JavaScript로 생성) -->
+            <div class="issue-toolbar">
+                <div class="issue-filter-row" id="issueStatusFilters"></div>
+                <div class="issue-filter-row" id="issueCategoryFilters"></div>
             </div>
 
             <div class="issue-list" id="issueList">
@@ -5844,109 +5966,117 @@
             return issue.writtenDate || (issue.createdAt ? issue.createdAt.slice(0, 10) : '-');
         }
         
+        const ISSUE_CATEGORIES = ['TS', '저전압(이물)', '저전압', '어깨선', '표면', '탈리', '얼라인', '비전', '금형', '탭이슈', '타발유', '기타'];
+        const ISSUE_STATUSES = [
+            { key: 'unresolved', label: '미해결' },
+            { key: 'doing', label: '진행중' },
+            { key: 'waiting', label: '대기' },
+            { key: 'done', label: '완료' }
+        ];
+        const ISSUE_STATUS_ORDER = { unresolved: 0, doing: 1, waiting: 2, done: 3 };
+        // 상태 변경 드롭다운은 작업 흐름 순서(대기→진행중→완료, 미해결)
+        const ISSUE_STATUS_OPTIONS = ['waiting', 'doing', 'done', 'unresolved'].map(k => ISSUE_STATUSES.find(s => s.key === k));
+        let selectedIssueStatus = null;  // 현재 선택된 상태 필터
+
+        function issueStatusOf(issue) {
+            return ISSUE_STATUS_ORDER[issue.status] !== undefined ? issue.status : 'waiting';
+        }
+
         function renderCategoryFilters() {
             const container = document.getElementById('issueCategoryFilters');
-            const categories = ['TS', '저전압(이물)', '저전압', '어깨선', '표면', '탈리', '얼라인', '비전', '금형', '탭이슈', '타발유', '기타'];
-            
-            const categoryStats = {};
-            categories.forEach(cat => {
-                const catIssues = issues.filter(i => i.category === cat);
-                const completed = catIssues.filter(i => i.status === 'done').length;
-                const total = catIssues.length;
-                if (total > 0) {
-                    categoryStats[cat] = { completed, total };
-                }
-            });
-            
-            // 전체 보기 버튼 + 이슈 있는 카테고리만 표시
-            let html = `
-                <button class="category-filter-btn ${selectedIssueCategory === null ? 'active' : ''}"
-                        onclick="filterByCategory(null)"
-                        style="padding: 8px 16px; border-radius: 20px; border: none; cursor: pointer;
-                               background: ${selectedIssueCategory === null ? 'linear-gradient(135deg, #667eea, #764ba2)' : 'rgba(255,255,255,0.1)'};
-                               color: white; font-weight: 500;">
-                    전체 <span style="opacity: 0.8;">(${issues.length})</span>
-                </button>
-            `;
-            
-            for (const [cat, stats] of Object.entries(categoryStats)) {
-                const isSelected = selectedIssueCategory === cat;
-                const allCompleted = stats.completed === stats.total;
-                html += `
-                    <button class="category-filter-btn ${isSelected ? 'active' : ''}"
-                            onclick="filterByCategory('${cat}')"
-                            style="padding: 8px 16px; border-radius: 20px; border: none; cursor: pointer;
-                                   background: ${isSelected ? 'linear-gradient(135deg, #667eea, #764ba2)' : 'rgba(255,255,255,0.1)'};
-                                   color: ${allCompleted ? '#00b894' : 'white'}; font-weight: 500;">
-                        ${cat}: <span style="opacity: 0.8;">${stats.completed}/${stats.total}</span>
-                    </button>
-                `;
+            const statusBox = document.getElementById('issueStatusFilters');
+            const chip = (attr, active, label, count, title, dot) => `
+                <button class="issue-chip${active ? ' active' : ''}" ${attr} ${title ? `title="${title}"` : ''}>
+                    ${dot ? `<span class="issue-dot st-${dot}"></span>` : ''}${label}<span class="chip-count">${count}</span>
+                </button>`;
+
+            // 상태 필터: 선택된 구분 안에서의 상태별 개수
+            if (statusBox) {
+                const inCat = selectedIssueCategory ? issues.filter(i => i.category === selectedIssueCategory) : issues;
+                let sh = `<span class="issue-filter-label">상태</span>`;
+                sh += chip(`onclick="filterByStatus(null)"`, selectedIssueStatus === null, '전체', inCat.length);
+                ISSUE_STATUSES.forEach(st => {
+                    const n = inCat.filter(i => issueStatusOf(i) === st.key).length;
+                    sh += chip(`onclick="filterByStatus('${st.key}')"`, selectedIssueStatus === st.key, st.label, n, '', st.key);
+                });
+                statusBox.innerHTML = sh;
             }
-            
+
+            // 구분 필터: 이슈가 있는 구분만 (목록에 없는 구분도 포함), 숫자는 완료/전체
+            const cats = [...ISSUE_CATEGORIES, ...[...new Set(issues.map(i => i.category))].filter(c => c && !ISSUE_CATEGORIES.includes(c))];
+            let html = `<span class="issue-filter-label">구분</span>`;
+            html += chip(`data-cat="" onclick="filterByCategory(null)"`, selectedIssueCategory === null, '전체', issues.length);
+            cats.forEach(cat => {
+                const catIssues = issues.filter(i => i.category === cat);
+                if (!catIssues.length) return;
+                const completed = catIssues.filter(i => i.status === 'done').length;
+                html += chip(`data-cat="${escapeHtml(cat)}" onclick="filterByCategory(this.dataset.cat)"`,
+                    selectedIssueCategory === cat, escapeHtml(cat), `${completed}/${catIssues.length}`, '완료 / 전체');
+            });
             container.innerHTML = html;
         }
-        
+
         function filterByCategory(category) {
-            selectedIssueCategory = category;
-            renderCategoryFilters();
+            selectedIssueCategory = category || null;
+            renderIssues();
+        }
+
+        function filterByStatus(status) {
+            selectedIssueStatus = status || null;
             renderIssues();
         }
 
         function renderIssues() {
             const container = document.getElementById('issueList');
             renderCategoryFilters();  // 필터 버튼 갱신
-            
-            // 선택된 카테고리로 필터링
-            const filteredIssues = selectedIssueCategory 
-                ? issues.filter(i => i.category === selectedIssueCategory)
-                : issues;
-            
+
+            // 선택된 구분·상태로 필터링 → 미해결·진행중·대기·완료 순, 같은 상태면 최근 작성일 먼저
+            const filteredIssues = issues
+                .filter(i => !selectedIssueCategory || i.category === selectedIssueCategory)
+                .filter(i => !selectedIssueStatus || issueStatusOf(i) === selectedIssueStatus)
+                .sort((a, b) => (ISSUE_STATUS_ORDER[issueStatusOf(a)] - ISSUE_STATUS_ORDER[issueStatusOf(b)])
+                    || String(getIssueWrittenDate(b)).localeCompare(String(getIssueWrittenDate(a)))
+                    || String(b.id).localeCompare(String(a.id)));
+
             if (filteredIssues.length === 0) {
+                const what = [selectedIssueCategory ? `'${escapeHtml(selectedIssueCategory)}'` : '',
+                              selectedIssueStatus ? `'${ISSUE_STATUSES.find(s => s.key === selectedIssueStatus).label}'` : ''].filter(Boolean).join(' · ');
                 container.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-clipboard-check"></i>
-                        <p>${selectedIssueCategory ? `'${selectedIssueCategory}' 카테고리에 등록된 이슈가 없습니다.` : '등록된 이슈가 없습니다.'}</p>
+                        <p>${what ? `${what} 조건에 맞는 이슈가 없습니다.` : '등록된 이슈가 없습니다.'}</p>
                     </div>
                 `;
                 return;
             }
 
-            container.innerHTML = filteredIssues.map(issue => `
-                <div class="issue-card status-${issue.status}" ondblclick="editIssueCard('${issue.id}')" title="더블클릭으로 수정">
+            container.innerHTML = filteredIssues.map(issue => {
+                const st = issueStatusOf(issue);
+                return `
+                <div class="issue-card${st === 'done' ? ' is-done' : ''}" ondblclick="editIssueCard('${issue.id}')" title="더블클릭으로 수정">
                     <div class="issue-header">
-                        <div class="issue-category">
-                            <span class="issue-badge" style="font-size: 11px; padding: 3px 8px;">${escapeHtml(issue.category)}</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 5px;">
-                            <select class="issue-status status-${issue.status}" 
-                                    onchange="updateIssueStatus('${issue.id}', this.value)" onclick="event.stopPropagation()"
-                                    style="background: transparent; border: none; color: inherit; cursor: pointer; font-size: 11px; padding: 2px;">
-                                <option value="waiting" ${issue.status === 'waiting' ? 'selected' : ''}>대기</option>
-                                <option value="doing" ${issue.status === 'doing' ? 'selected' : ''}>진행중</option>
-                                <option value="done" ${issue.status === 'done' ? 'selected' : ''}>완료</option>
-                                <option value="unresolved" ${issue.status === 'unresolved' ? 'selected' : ''}>미해결</option>
+                        <span class="issue-badge">${escapeHtml(issue.category || '기타')}</span>
+                        <span class="issue-date">${escapeHtml(getIssueWrittenDate(issue))}</span>
+                    </div>
+                    <div class="issue-text">${escapeHtml(issue.content || '-')}</div>
+                    ${issue.discussion ? `
+                    <div class="issue-discussion">
+                        <div class="issue-field-label">논의 항목</div>
+                        <div class="issue-text">${escapeHtml(issue.discussion)}</div>
+                    </div>` : ''}
+                    <div class="issue-footer">
+                        <span class="issue-status-wrap" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()">
+                            <span class="issue-dot st-${st}"></span>
+                            <select class="issue-status" onchange="updateIssueStatus('${issue.id}', this.value)" title="진행상태 변경">
+                                ${ISSUE_STATUS_OPTIONS.map(s => `<option value="${s.key}" ${st === s.key ? 'selected' : ''}>${s.label}</option>`).join('')}
                             </select>
-                            <button class="btn btn-danger" onclick="event.stopPropagation(); deleteIssue('${issue.id}')" style="padding: 3px 6px; font-size: 10px;">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
+                        </span>
+                        <button class="issue-del-btn" onclick="event.stopPropagation(); deleteIssue('${issue.id}')" ondblclick="event.stopPropagation()" title="삭제">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
-                    <div class="issue-content">
-                        <div class="issue-field">
-                            <div class="issue-field-label">작성일</div>
-                            <div class="issue-field-value">${getIssueWrittenDate(issue)}</div>
-                        </div>
-                        <div class="issue-field">
-                            <div class="issue-field-label">이슈 사항</div>
-                            <div class="issue-field-value">${escapeHtml(issue.content || '-')}</div>
-                        </div>
-                        <div class="issue-field">
-                            <div class="issue-field-label">논의 항목</div>
-                            <div class="issue-field-value">${escapeHtml(issue.discussion || '-')}</div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
         function addIssue() {
@@ -7451,8 +7581,11 @@ ${text}
             'half-pm': { label: '오후반차', icon: 'moon', color: '#ffaa3d' },
             'business': { label: '출장', icon: 'plane', color: '#a855f7' },
             'training': { label: '교육', icon: 'graduation-cap', color: '#667eea' },
-            'official': { label: '공가', icon: 'building', color: '#9ca3af' }
+            'official': { label: '공가', icon: 'building', color: '#9ca3af' },
+            'dinner': { label: '회식', icon: 'utensils', color: '#f472b6' },
+            'etc': { label: '기타', icon: 'ellipsis-h', color: '#2dd4bf' }
         };
+        const ATTENDANCE_RANGE_MAX = 62; // 한 번에 등록할 수 있는 최대 일수 (오입력으로 수백 일이 써지는 것 방지)
 
         function renderAttendance() {
             const year = attendanceMonth.getFullYear();
@@ -7556,6 +7689,87 @@ ${text}
             saveAttendanceData(member, dateKey);
         }
 
+        // 여러 날짜를 한 번에 저장/삭제 (type이 없으면 삭제) — Firebase에는 한 번의 update로 기록
+        function setAttendanceMany(member, dateKeys, type, note) {
+            if (!attendanceData[member]) attendanceData[member] = {};
+            const patch = {};
+            dateKeys.forEach(k => {
+                const val = type ? { type, note: note || '' } : null;
+                if (val) attendanceData[member][k] = val; else delete attendanceData[member][k];
+                patch[k] = val;
+            });
+            if (isConnected && db) {
+                db.ref(`attendance/${member}`).update(patch);
+            } else {
+                localStorage.setItem('planner_attendance', JSON.stringify(attendanceData));
+            }
+        }
+
+        function parseDateKey(key) {
+            const [y, m, d] = key.split('-').map(Number);
+            return new Date(y, m - 1, d);
+        }
+
+        function attendanceDayLabel(key) {
+            const d = parseDateKey(key);
+            return `${d.getMonth() + 1}/${d.getDate()}(${'일월화수목금토'[d.getDay()]})`;
+        }
+
+        // 모달의 기간 입력 → 적용할 날짜 목록
+        function attendanceRangeKeys() {
+            const start = document.getElementById('attendanceStart').value;
+            const end = document.getElementById('attendanceEnd').value || start;
+            if (!start) return { keys: [], error: '시작일을 선택해주세요.' };
+            if (end < start) return { keys: [], error: '종료일이 시작일보다 빠릅니다.' };
+            const single = start === end;
+            const skipOff = document.getElementById('attendanceSkipOff').checked;
+            const keys = [];
+            let skipped = 0, total = 0;
+            for (const d = parseDateKey(start); formatDateKey(d) <= end; d.setDate(d.getDate() + 1)) {
+                if (++total > ATTENDANCE_RANGE_MAX) {
+                    return { keys: [], error: `한 번에 최대 ${ATTENDANCE_RANGE_MAX}일까지 등록할 수 있어요.` };
+                }
+                const k = formatDateKey(d);
+                const off = d.getDay() === 0 || d.getDay() === 6 || isHoliday(k);
+                // 하루만 고른 경우엔 주말이라도 그대로 적용 (주말 근무·당직 등)
+                if (!single && skipOff && off) { skipped++; continue; }
+                keys.push(k);
+            }
+            return { keys, skipped, single, start, end };
+        }
+
+        function onAttendanceRangeChange(which) {
+            const startEl = document.getElementById('attendanceStart');
+            const endEl = document.getElementById('attendanceEnd');
+            // 시작일을 종료일 뒤로 옮기면 종료일도 따라감
+            if (which === 'start' && startEl.value && (!endEl.value || endEl.value < startEl.value)) {
+                endEl.value = startEl.value;
+            }
+            updateAttendanceRangeSummary();
+        }
+
+        function updateAttendanceRangeSummary() {
+            const box = document.getElementById('attendanceRangeSummary');
+            const title = document.getElementById('modalDateTitle');
+            const r = attendanceRangeKeys();
+            box.classList.toggle('warn', !!r.error || !r.keys.length);
+            if (r.error) { box.textContent = r.error; return; }
+            const fmt = k => { const [y, m, d] = k.split('-').map(Number); return `${y}년 ${m}월 ${d}일`; };
+            if (r.single) {
+                title.textContent = fmt(r.start);
+                box.textContent = '';
+                return;
+            }
+            const [ey, em, ed] = r.end.split('-').map(Number);
+            title.textContent = `${fmt(r.start)} ~ ${ey === Number(r.start.slice(0, 4)) ? '' : ey + '년 '}${em}월 ${ed}일`;
+            if (!r.keys.length) { box.textContent = '선택한 기간이 모두 주말·공휴일이에요.'; return; }
+            const member = selectedAttendanceCell ? selectedAttendanceCell.member : '';
+            const existing = r.keys.filter(k => getAttendance(member, k)).length;
+            box.textContent = `${attendanceDayLabel(r.keys[0])} ~ ${attendanceDayLabel(r.keys[r.keys.length - 1])} · ${r.keys.length}일 적용`
+                + (r.skipped ? ` (주말·공휴일 ${r.skipped}일 제외)` : '')
+                + (existing ? ` · 이미 입력된 ${existing}일은 바뀝니다` : '');
+        }
+
         function openAttendanceModal(dateKey) {
             // 내 닉네임 자동 가져오기
             const myName = localStorage.getItem('chat_nickname') || '';
@@ -7578,6 +7792,10 @@ ${text}
                 btn.classList.remove('selected');
             });
             document.getElementById('attendanceNote').value = '';
+            document.getElementById('attendanceStart').value = dateKey;
+            document.getElementById('attendanceEnd').value = dateKey;
+            document.getElementById('attendanceSkipOff').checked = true;
+            updateAttendanceRangeSummary();
             
             // 기존 값이 있으면 선택 표시
             const currentData = getAttendance(myName, dateKey);
@@ -7613,7 +7831,17 @@ ${text}
             
             const type = selectedBtn.dataset.type;
             const note = document.getElementById('attendanceNote').value.trim();
-            setAttendance(selectedAttendanceCell.member, selectedAttendanceCell.dateKey, type, note);
+            const r = attendanceRangeKeys();
+            if (r.error) { alert(r.error); return; }
+            if (!r.keys.length) {
+                alert('선택한 기간이 모두 주말·공휴일이에요.\n"주말·공휴일 제외"를 끄거나 기간을 바꿔주세요.');
+                return;
+            }
+            if (r.keys.length === 1) {
+                setAttendance(selectedAttendanceCell.member, r.keys[0], type, note);
+            } else {
+                setAttendanceMany(selectedAttendanceCell.member, r.keys, type, note);
+            }
             
             closeAttendanceModal();
             renderAttendance();
@@ -7621,8 +7849,16 @@ ${text}
 
         function clearAttendance() {
             if (!selectedAttendanceCell) return;
-            
-            setAttendance(selectedAttendanceCell.member, selectedAttendanceCell.dateKey, null);
+            const member = selectedAttendanceCell.member;
+            const r = attendanceRangeKeys();
+            if (r.error) { alert(r.error); return; }
+            const targets = r.keys.filter(k => getAttendance(member, k));
+            if (targets.length > 1) {
+                if (!confirm(`${attendanceDayLabel(targets[0])} ~ ${attendanceDayLabel(targets[targets.length - 1])} 중 입력된 ${targets.length}일의 근태를 삭제할까요?`)) return;
+                setAttendanceMany(member, targets, null);
+            } else if (targets.length === 1) {
+                setAttendance(member, targets[0], null);
+            }
             
             closeAttendanceModal();
             renderAttendance();
@@ -7661,14 +7897,14 @@ ${text}
             for (let d = 1; d <= lastDay; d++) {
                 csv += `${d}일,`;
             }
-            csv += '출근,재택,휴가,반차,출장,교육,공가\n';
+            csv += '출근,재택,휴가,반차,출장,교육,공가,회식,기타\n';
             
             const csvCell = v => /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
             // 팀원 목록에 없는 닉네임으로 입력된 근태도 누락되지 않게 포함
             const members = [...TEAM_MEMBERS, ...Object.keys(attendanceData).filter(m => !TEAM_MEMBERS.includes(m))];
             members.forEach(member => {
                 csv += `${csvCell(member)},`;
-                let counts = { work: 0, remote: 0, vacation: 0, half: 0, business: 0, training: 0, official: 0 };
+                let counts = { work: 0, remote: 0, vacation: 0, half: 0, business: 0, training: 0, official: 0, dinner: 0, etc: 0 };
                 
                 for (let d = 1; d <= lastDay; d++) {
                     const dateKey = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
@@ -7685,9 +7921,11 @@ ${text}
                     else if (type === 'business') counts.business++;
                     else if (type === 'training') counts.training++;
                     else if (type === 'official') counts.official++;
+                    else if (type === 'dinner') counts.dinner++;
+                    else if (type === 'etc') counts.etc++;
                 }
                 
-                csv += `${counts.work},${counts.remote},${counts.vacation},${counts.half},${counts.business},${counts.training},${counts.official}\n`;
+                csv += `${counts.work},${counts.remote},${counts.vacation},${counts.half},${counts.business},${counts.training},${counts.official},${counts.dinner},${counts.etc}\n`;
             });
             
             const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
