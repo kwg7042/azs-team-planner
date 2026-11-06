@@ -17,8 +17,14 @@
   3) 처음 한 번만 API 키를 물어봅니다 → 같은 폴더의 exaone_proxy_config.json 에 저장
   4) 창을 켜 둔 채로 팀플래너에서 EXAONE 기능을 사용합니다. 끝낼 때는 Ctrl+C
 
+자동 실행 (Windows 로그인할 때마다 창 없이 켜기)
+  EXAONE_autostart_install.bat 더블클릭 (먼저 share bat로 키를 한 번 저장해 둬야 함)
+  끄기/해제: EXAONE_autostart_uninstall.bat · 기록: 같은 폴더의 exaone_proxy.log
+
 옵션
   python exaone_proxy.py --reset     API 키/주소 다시 입력
+  python exaone_proxy.py --background 창 없이 실행 (묻지 않음, 기록은 exaone_proxy.log)
+  python exaone_proxy.py --stop      켜져 있는 프록시 끄기
   python exaone_proxy.py --port 8787 포트 변경 (팀플래너 AI 설정의 프록시 URL도 같이 바꿔야 함)
   환경변수 EXAONE_API_KEY / EXAONE_BASE_URL / EXAONE_PROXY_TIMEOUT 이 있으면 설정 파일보다 우선
 """
@@ -29,6 +35,7 @@ import getpass
 import json
 import os
 import re
+import secrets
 import socket
 import sys
 import threading
@@ -38,7 +45,9 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-VERSION = 4
+VERSION = 5
+BACKGROUND = False  # --background: 창 없이 실행, 사용자에게 묻지 않음
+LOG_PATH = Path(__file__).with_name("exaone_proxy.log")
 HOST = "127.0.0.1"
 DEFAULT_PORT = 8787
 DEFAULT_BASE_URL = "https://api.lgresearch.ai/v1"
@@ -155,7 +164,7 @@ def offer_old_config(cfg: dict, exclude_key: str = "") -> dict:
             continue
         print(f" 찾았습니다: {folder}")
         print(f"   주소 {normalize_url(old.get('base_url') or DEFAULT_BASE_URL)} · 키 {mask(old['api_key'])}")
-        ans = input(" 이 설정을 쓸까요? (Enter = 예 / n = 아니오): ").strip().lower()
+        ans = "" if BACKGROUND else input(" 이 설정을 쓸까요? (Enter = 예 / n = 아니오): ").strip().lower()
         if ans in ("", "y", "yes", "예", "ㅇ"):
             new = dict(cfg, api_key=_clean_key(old["api_key"]), base_url=old.get("base_url") or DEFAULT_BASE_URL)
             save_config(new)
@@ -180,6 +189,12 @@ def save_config(cfg: dict) -> None:
 
 
 def ask_key(cfg: dict) -> dict:
+    if BACKGROUND:
+        print(" ❌ API 키가 없거나 맞지 않습니다. 창 없이 실행 중이라 물어볼 수 없어요.")
+        print("    EXAONE_proxy_share_start.bat 를 한 번 실행해 키를 저장한 뒤 다시 켜 주세요.")
+        if not cfg.get("api_key"):
+            sys.exit(2)
+        return cfg
     print("=" * 60)
     print(" EXAONE API 키를 입력하세요 (입력해도 화면에 보이지 않습니다 · 붙여넣기는 마우스 우클릭)")
     print(" 키는 이 PC의 exaone_proxy_config.json 에만 저장됩니다.")
@@ -246,6 +261,9 @@ def check_key(cfg: dict) -> dict:
                 if found:
                     cfg = found
                     continue
+            if BACKGROUND:
+                ask_key(cfg)  # 안내만 남기고 그대로 켜 둠
+                return cfg
             print(" 키와 주소를 다시 입력해 주세요. (그만하려면 창을 닫으세요)")
             cfg = ask_key(cfg)
             continue
@@ -293,7 +311,19 @@ class Handler(BaseHTTPRequestHandler):
         self._cors()
         self.end_headers()
 
+    stop_token = ""
+    server_ref = None
+
     def do_GET(self) -> None:  # noqa: N802
+        # --stop: 같은 PC에서 설정 파일의 토큰을 아는 경우에만 끔 (브라우저 요청은 Origin이 붙어 거절)
+        if self.path.startswith("/__stop"):
+            tok = self.path.split("token=", 1)[1] if "token=" in self.path else ""
+            if self.stop_token and tok == self.stop_token and not self.headers.get("Origin"):
+                self._json(200, {"ok": True, "stopping": True})
+                threading.Thread(target=self.server_ref.shutdown, daemon=True).start()
+            else:
+                self._json(403, {"error": "forbidden"})
+            return
         # 팀플래너가 '프록시가 켜져 있는지' 확인할 때 사용
         self._json(200, {"ok": True, "service": "azs-exaone-proxy", "version": VERSION})
 
@@ -320,7 +350,7 @@ class Handler(BaseHTTPRequestHandler):
         self._send(status, data)
 
     def log_message(self, fmt: str, *args) -> None:
-        print(f"[프록시] {self.address_string()} - {fmt % args}")
+        print(f"[프록시] {self.address_string()} - " + re.sub(r"token=\w+", "token=***", fmt % args))
 
 
 # ---------------------------------------------------------------------
@@ -451,32 +481,66 @@ def main() -> None:
     ap.add_argument("--reset", action="store_true", help="API 키/주소 다시 입력")
     ap.add_argument("--share", action="store_true", help="팀 공유: 다른 사람 PC의 EXAONE 요청도 이 PC가 대신 처리")
     ap.add_argument("--no-check", action="store_true", help="시작할 때 키 확인 생략")
+    ap.add_argument("--background", action="store_true", help="창 없이 실행 (묻지 않음, 기록은 exaone_proxy.log)")
+    ap.add_argument("--stop", action="store_true", help="켜져 있는 프록시 끄기")
     args = ap.parse_args()
+
+    if args.stop:
+        try:
+            tok = json.loads(CONFIG_PATH.read_text(encoding="utf-8")).get("stop_token", "")
+            with urllib.request.build_opener(urllib.request.ProxyHandler({})).open(
+                    f"http://127.0.0.1:{args.port}/__stop?token={tok}", timeout=5) as r:
+                print(" 켜져 있던 프록시를 껐습니다." if r.status == 200 else f" 끄지 못했습니다 ({r.status})")
+        except Exception as exc:  # noqa: BLE001
+            print(f" 켜져 있는 프록시가 없거나 끌 수 없습니다 ({exc})")
+        return
+
+    global BACKGROUND
+    BACKGROUND = args.background
+    if BACKGROUND:
+        # 창이 없으니 화면 출력은 기록 파일로 (1MB 넘으면 새로 시작)
+        try:
+            if LOG_PATH.exists() and LOG_PATH.stat().st_size > 1_000_000:
+                LOG_PATH.unlink()
+            log = open(LOG_PATH, "a", encoding="utf-8", buffering=1)
+            sys.stdout = sys.stderr = log
+        except OSError:
+            pass
+        print("\n" + "=" * 60 + f"\n {time.strftime('%Y-%m-%d %H:%M:%S')} 창 없이 시작 (자동 실행)")
 
     cfg = load_config(reset=args.reset)
     if not args.no_check:
         cfg = check_key(cfg)
     if args.share and not cfg.get("share_name"):
-        name = input(" 팀원에게 보일 공유 PC 이름 (예: 김원근): ").strip() or socket.gethostname()
+        name = socket.gethostname() if BACKGROUND else (input(" 팀원에게 보일 공유 PC 이름 (예: 김원근): ").strip() or socket.gethostname())
         cfg["share_name"] = name
+        try:
+            CONFIG_PATH.write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
+        except OSError:
+            pass
+    if not cfg.get("stop_token"):
+        cfg["stop_token"] = secrets.token_hex(16)
         try:
             CONFIG_PATH.write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
         except OSError:
             pass
     print(f" 사용 중인 주소: {normalize_url(cfg.get('base_url'))} · 키 {mask(cfg['api_key'])}")
     Handler.api_key = cfg["api_key"]
+    Handler.stop_token = cfg["stop_token"]
     Handler.target_url = normalize_url(cfg.get("base_url"))
     try:
         server = ThreadingHTTPServer((HOST, args.port), Handler)
     except OSError as exc:
         print(f"포트 {args.port}을(를) 열 수 없습니다 ({exc}).")
         print("이미 프록시가 켜져 있거나 다른 프로그램이 쓰고 있습니다. 켜져 있는 창이 있으면 그대로 쓰면 됩니다.")
-        sys.exit(1)
+        sys.exit(0 if BACKGROUND else 1)
+    Handler.server_ref = server
     print("=" * 60)
     print(f" EXAONE 로컬 프록시 실행 중: http://localhost:{args.port}")
     print(f" 전달 주소: {Handler.target_url}")
     print(f" 최대 대기: {READ_TIMEOUT}초")
-    print(" 이 창을 켜 둔 채로 팀플래너를 사용하세요. 종료: Ctrl+C")
+    print(" 창 없이 켜져 있습니다. 끄기: EXAONE_autostart_uninstall.bat 또는 python exaone_proxy.py --stop" if BACKGROUND
+          else " 이 창을 켜 둔 채로 팀플래너를 사용하세요. 종료: Ctrl+C")
     print(" (브라우저가 '이 기기의 다른 앱/서비스 접근' 권한을 물으면 '허용')")
     if args.share:
         print(f" 팀 공유 켜짐: 다른 사람도 팀플래너에서 EXAONE을 쓸 수 있습니다 (Firebase: {FIREBASE_URL})")
@@ -489,6 +553,7 @@ def main() -> None:
         print("\n프록시를 종료합니다.")
     finally:
         server.server_close()
+        print(f" {time.strftime('%Y-%m-%d %H:%M:%S')} 프록시 종료")
 
 
 if __name__ == "__main__":

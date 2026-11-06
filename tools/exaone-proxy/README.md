@@ -19,6 +19,18 @@ API 키가 있는 사람 **한 명만** 아래처럼 켜 두면, 팀원은 아�
 - 요청 내용(특허 본문·도면 이미지)이 Firebase를 거칩니다. 미공개 사내 자료는 보안 규정을 확인하세요.
 - 이 PC가 꺼지거나 창이 닫히면 팀원은 사용할 수 없습니다. 꺼진 지 약 45초 뒤 '꺼짐'으로 표시됩니다.
 
+### 자동으로 켜기 (Windows 로그인할 때마다, 창 없이)
+1. 위 방법으로 `EXAONE_proxy_share_start.bat`을 한 번 실행합니다. "✅ EXAONE 연결 확인 완료"가 뜨면 창을 닫습니다. 이때 키가 저장됩니다.
+2. 같은 폴더에 `EXAONE_autostart_install.bat`을 받아 더블클릭합니다.
+   - 지금 바로 창 없이 켜지고, 앞으로 로그인할 때마다 자동으로 켜집니다.
+   - 시작프로그램 폴더에 `AZS_EXAONE_proxy.bat`가 등록되며, 관리자 권한은 필요 없습니다.
+3. 동작 기록은 같은 폴더의 `exaone_proxy.log`에 남습니다. 팀플래너 AI 설정 > EXAONE의 🟢 표시로도 켜져 있는지 확인할 수 있습니다.
+4. 자동 실행을 끄고 지금 켜진 프록시도 멈추려면 `EXAONE_autostart_uninstall.bat`을 실행합니다.
+
+주의:
+- PC가 절전 모드에 들어가면 팀 공유도 멈춥니다. 팀원이 계속 쓰려면 Windows 전원 설정에서 '절전 모드 안 함'으로 두세요.
+- 키를 바꾸려면 먼저 `EXAONE_autostart_uninstall.bat`을 실행합니다. 그다음 share bat에 `--reset`을 붙여 다시 입력하고, `EXAONE_autostart_install.bat`을 다시 실행합니다.
+
 ## 사용법: 내 PC에서만 (Windows)
 1. `exaone_proxy.py`와 `EXAONE_proxy_start.bat`을 같은 폴더에 내려받습니다. Python 3이 필요하며, 추가로 설치할 패키지는 없습니다.
 2. `EXAONE_proxy_start.bat`을 더블클릭합니다.
