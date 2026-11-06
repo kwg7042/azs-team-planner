@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-06i">
+    <meta name="app-version" content="2026-11-06j">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -4034,21 +4034,52 @@
         .raid-area { text-align: center; padding: 18px 15px; background: radial-gradient(ellipse at top, #3a1030, #150818 70%); border-radius: 20px; border: 3px solid rgba(255,90,120,0.4); margin-bottom: 20px; }
         .raid-week { font-size: 13px; color: rgba(255,255,255,0.75); margin-bottom: 10px; }
         .raid-week b { color: #ffd54f; }
-        .raid-boss { position: relative; max-width: 460px; margin: 0 auto 12px; }
-        .raid-art { position: relative; height: 170px; display: flex; align-items: center; justify-content: center; }
-        .raid-art .emo3d, .raid-art .raid-emo { width: 160px; height: 160px; filter: drop-shadow(0 0 18px rgba(255,60,90,0.6)); animation: raidIdle 2.6s ease-in-out infinite; }
-        .raid-art.hit .emo3d { animation: raidHit 0.35s ease; }
-        .raid-boss.defeated .raid-art .emo3d { filter: grayscale(1) brightness(0.55); animation: none; transform: rotate(-12deg); }
-        @keyframes raidIdle { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-6px) scale(1.03); } }
-        @keyframes raidHit { 0% { transform: translateX(0); } 25% { transform: translateX(-10px) rotate(-4deg); filter: brightness(2) drop-shadow(0 0 18px #fff); } 60% { transform: translateX(8px) rotate(3deg); } 100% { transform: translateX(0); } }
-        .raid-dmg { position: absolute; left: 50%; top: 40%; transform: translateX(-50%); font-size: 30px; font-weight: 900; color: #fff; text-shadow: 0 0 8px #ff1744, 0 2px 0 #000; pointer-events: none; animation: raidDmg 1.1s ease-out forwards; white-space: nowrap; }
-        .raid-dmg.crit { color: #ffd54f; font-size: 38px; }
-        @keyframes raidDmg { 0% { opacity: 0; transform: translate(-50%, 10px) scale(0.6); } 15% { opacity: 1; transform: translate(-50%, 0) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -70px) scale(1); } }
-        .raid-name { font-size: 20px; font-weight: bold; color: #ff8fa3; margin: 4px 0 8px; }
-        .raid-name small { color: rgba(255,255,255,0.55); font-size: 12px; font-weight: normal; }
-        .raid-hpbar { position: relative; height: 24px; border-radius: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); overflow: hidden; }
-        .raid-hpfill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #ff1744, #ff6d00); transition: width 0.5s ease; }
-        .raid-hpbar span { position: relative; font-size: 13px; font-weight: bold; line-height: 24px; text-shadow: 0 1px 2px #000; font-variant-numeric: tabular-nums; }
+        .raid-boss { position: relative; max-width: 640px; margin: 0 auto 10px; }
+        /* 무대: 용암 동굴 그림 + 불씨 + 맞을 때 번쩍임·흔들림 (보스 색은 주마다 바뀜) */
+        .raid-stage { position: relative; aspect-ratio: 1 / 1; border-radius: 16px; overflow: hidden; background: #120a10; box-shadow: 0 0 34px rgba(255,90,20,0.35), 0 0 0 2px rgba(255,120,60,0.35); }
+        .raid-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: filter 0.6s; animation: raidBreath 5s ease-in-out infinite; transform-origin: 50% 42%; user-select: none; -webkit-user-drag: none; }
+        @keyframes raidBreath { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.018); } }
+        .raid-stage.hit { animation: raidShake 0.38s ease; }
+        @keyframes raidShake { 0%, 100% { transform: translate(0, 0); } 20% { transform: translate(-7px, 3px); } 40% { transform: translate(6px, -4px); } 60% { transform: translate(-4px, 2px); } 80% { transform: translate(3px, -1px); } }
+        .raid-flash { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 40%, rgba(255,255,255,0.8), rgba(255,70,30,0.35) 28%, transparent 58%); }
+        .raid-stage.hit .raid-flash { animation: raidFlash 0.42s ease-out; }
+        @keyframes raidFlash { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+        .raid-embers { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+        .raid-embers i { position: absolute; bottom: -8px; width: 4px; height: 4px; border-radius: 50%; background: #ffb74d; box-shadow: 0 0 6px 2px rgba(255,120,30,0.8); animation: raidEmber linear infinite; }
+        @keyframes raidEmber { 0% { transform: translate(0, 0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translate(var(--dx, 0), -110%) translateY(-60vh); opacity: 0; } }
+        .raid-hud { position: absolute; top: 0; left: 0; right: 0; padding: 12px 14px 22px; background: linear-gradient(180deg, rgba(0,0,0,0.72), transparent); }
+        .raid-fx { position: absolute; inset: 0; pointer-events: none; }
+        .raid-slash { position: absolute; left: 50%; top: 40%; width: 64%; height: 6px; margin-left: -32%; border-radius: 3px; background: linear-gradient(90deg, transparent, #e0f7ff 30%, #fff 50%, #9fe6ff 70%, transparent); box-shadow: 0 0 14px #7fdcff; animation: raidSlash 0.36s ease-out forwards; }
+        @keyframes raidSlash { 0% { opacity: 0; clip-path: inset(0 100% 0 0); } 30% { opacity: 1; } 100% { opacity: 0; clip-path: inset(0 0 0 0); } }
+        .raid-stamp { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%) rotate(-12deg) scale(0.6); padding: 8px 22px; border: 5px solid #ff1744; border-radius: 12px; color: #ff1744; font-size: 40px; font-weight: 900; letter-spacing: 2px; background: rgba(0,0,0,0.35); text-shadow: 0 0 10px rgba(255,23,68,0.6); opacity: 0; pointer-events: none; transition: all 0.4s; }
+        .raid-boss.defeated .raid-bg { filter: grayscale(0.85) brightness(0.5) !important; animation: none; }
+        .raid-boss.defeated .raid-stamp { opacity: 1; transform: translate(-50%, -50%) rotate(-12deg) scale(1); }
+        .raid-boss.defeated .raid-embers { display: none; }
+        .raid-dmg { position: absolute; transform: translateX(-50%); font-size: 30px; font-weight: 900; color: #fff; text-shadow: 0 0 8px #ff1744, 0 2px 0 #000, 0 0 2px #000; pointer-events: none; animation: raidDmg 1.15s ease-out forwards; white-space: nowrap; }
+        .raid-dmg.crit { color: #ffd54f; font-size: 40px; }
+        .raid-dmg.other { font-size: 20px; color: #c9f1ff; text-shadow: 0 0 6px #2196f3, 0 2px 0 #000; }
+        .raid-dmg small { display: block; font-size: 12px; font-weight: bold; color: #fff; }
+        @keyframes raidDmg { 0% { opacity: 0; transform: translate(-50%, 10px) scale(0.6); } 15% { opacity: 1; transform: translate(-50%, 0) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -80px) scale(1); } }
+        .raid-name { font-size: 20px; font-weight: 900; color: #ffd0d6; margin: 0 0 6px; text-shadow: 0 2px 6px #000, 0 0 12px rgba(255,40,40,0.6); text-align: left; }
+        .raid-name small { color: rgba(255,255,255,0.7); font-size: 12px; font-weight: normal; }
+        .raid-hpbar { position: relative; height: 22px; border-radius: 11px; background: rgba(0,0,0,0.65); border: 1px solid rgba(255,180,160,0.4); overflow: hidden; }
+        .raid-hpfill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #b71c1c, #ff1744 60%, #ff6d00); box-shadow: 0 0 10px rgba(255,40,40,0.7); transition: width 0.5s ease; }
+        .raid-hpbar span { position: relative; font-size: 12px; font-weight: bold; line-height: 22px; text-shadow: 0 1px 2px #000; font-variant-numeric: tabular-nums; }
+        /* 파티: 팀원 카드 (머리 위 파란 막대 = 이번 주 기여도) */
+        .raid-party { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 640px; margin: 0 auto 14px; }
+        .party-card { width: 78px; padding: 6px 4px 7px; border-radius: 12px; background: rgba(0,0,0,0.38); border: 1px solid rgba(120,200,255,0.28); }
+        .party-card .pc-bar { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.12); overflow: hidden; margin: 0 6px 5px; }
+        .party-card .pc-bar i { display: block; height: 100%; background: linear-gradient(90deg, #4fc3f7, #7fdcff); box-shadow: 0 0 6px #4fc3f7; }
+        .party-card .pc-ava { height: 42px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .party-card .pc-ava .emo3d { width: 40px; height: 40px; }
+        .party-card .pc-ava .pc-init { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #5c6bc0, #7e57c2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: #fff; }
+        .party-card .pc-name { font-size: 11px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .party-card .pc-dmg { font-size: 10px; color: #9fdcff; font-variant-numeric: tabular-nums; }
+        .party-card.idle { opacity: 0.45; }
+        .party-card.idle .pc-dmg { color: rgba(255,255,255,0.6); }
+        .party-card.me { border-color: #ffd54f; box-shadow: 0 0 10px rgba(255,213,79,0.35); }
+        .party-card.act { animation: partyAct 0.5s ease; }
+        @keyframes partyAct { 0%, 100% { transform: translateY(0); } 35% { transform: translateY(-10px) scale(1.06); } }
         .raid-banner { margin-top: 10px; font-size: 15px; font-weight: bold; color: #ffd54f; min-height: 0; }
         .raid-me { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.7; margin-bottom: 12px; }
         .raid-me b { color: #ffd54f; }
@@ -5325,18 +5356,27 @@
                     <div class="raid-area">
                         <div class="raid-week" id="raidWeek">레이드 정보를 불러오는 중…</div>
                         <div class="raid-boss" id="raidBoss">
-                            <div class="raid-art" id="raidArt"></div>
-                            <div class="raid-name" id="raidName"></div>
-                            <div class="raid-hpbar"><div class="raid-hpfill" id="raidHpFill"></div><span id="raidHpText"></span></div>
+                            <div class="raid-stage" id="raidStage">
+                                <img class="raid-bg" id="raidBg" src="img/raid_stage.webp?v=1" alt="레이드 보스" draggable="false">
+                                <div class="raid-embers"><i style="left:44%;animation-delay:-5.7s;animation-duration:5.4s;--dx:-34px"></i><i style="left:12%;animation-delay:-4.9s;animation-duration:4.3s;--dx:34px"></i><i style="left:10%;animation-delay:-5.5s;animation-duration:4.8s;--dx:-29px"></i><i style="left:58%;animation-delay:-2.5s;animation-duration:4.8s;--dx:30px"></i><i style="left:57%;animation-delay:-0.4s;animation-duration:6.0s;--dx:-12px"></i><i style="left:83%;animation-delay:-3.8s;animation-duration:7.3s;--dx:33px"></i><i style="left:77%;animation-delay:-2.4s;animation-duration:7.4s;--dx:-35px"></i><i style="left:74%;animation-delay:-5.2s;animation-duration:5.0s;--dx:-22px"></i><i style="left:72%;animation-delay:-0.7s;animation-duration:5.1s;--dx:-17px"></i><i style="left:16%;animation-delay:-3.5s;animation-duration:6.2s;--dx:7px"></i><i style="left:15%;animation-delay:-3.3s;animation-duration:4.2s;--dx:-33px"></i><i style="left:82%;animation-delay:-1.2s;animation-duration:6.4s;--dx:14px"></i><i style="left:43%;animation-delay:-2.8s;animation-duration:7.2s;--dx:6px"></i><i style="left:41%;animation-delay:-1.5s;animation-duration:4.6s;--dx:-9px"></i><i style="left:13%;animation-delay:-3.4s;animation-duration:5.8s;--dx:3px"></i><i style="left:96%;animation-delay:-2.7s;animation-duration:6.1s;--dx:-31px"></i></div>
+                                <div class="raid-flash"></div>
+                                <div class="raid-hud">
+                                    <div class="raid-name" id="raidName"></div>
+                                    <div class="raid-hpbar"><div class="raid-hpfill" id="raidHpFill"></div><span id="raidHpText"></span></div>
+                                </div>
+                                <div class="raid-fx" id="raidArt"></div>
+                                <div class="raid-stamp">토벌 성공!</div>
+                            </div>
                             <div class="raid-banner" id="raidBanner"></div>
                         </div>
+                        <div class="raid-party" id="raidParty"></div>
                         <div class="raid-me" id="raidMe"></div>
                         <div class="raid-actions">
                             <button class="raid-attack" id="raidAttackBtn" onclick="raidAttack(false)">⚔️ 공격!</button>
                             <button class="raid-extra" id="raidExtraBtn" onclick="raidAttack(true)">🪙 코인 1개로 추가 공격</button>
                         </div>
                         <button class="raid-claim" id="raidClaimBtn" onclick="raidClaim()" style="display: none;"></button>
-                        <div class="pika-help">🤝 팀이 다 같이 한 주(월~일) 동안 보스 체력을 깎는 협동 게임이에요. 실시간으로 모일 필요 없이 각자 편할 때 공격!<br>⚔️ 하루 <b>무료 3번</b> + 🪙 코인 1개로 <b>추가 3번</b>까지 · 공격력은 ⚔️ 검 강화 <b>명성</b>이 높을수록 세져요 (12% 확률 치명타 2배)<br>🎉 쓰러뜨리면 이번 주에 공격한 사람 <b>모두</b> 보상: 코인 2개 + 강화 머니 (보스 레벨 × 3만원) · 👑 가장 많이 깎은 사람 +코인 2 · 🗡️ 마지막 일격 +코인 1<br>📈 쓰러뜨리면 다음 주 보스가 한 단계 강해져요 · 못 잡으면 같은 레벨로 다시 나와요</div>
+                        <div class="pika-help">🔥 매주 새로운 마왕이 용암 동굴에 나타나요 (용암 → 빙결 → 심연 → 독무 → 혈월 → 황금 마왕 순, 쓰러뜨릴수록 강해짐)<br>🤝 팀이 다 같이 한 주(월~일) 동안 보스 체력을 깎는 협동 게임이에요. 실시간으로 모일 필요 없이 각자 편할 때 공격!<br>⚔️ 하루 <b>무료 3번</b> + 🪙 코인 1개로 <b>추가 3번</b>까지 · 공격력은 ⚔️ 검 강화 <b>명성</b>이 높을수록 세져요 (12% 확률 치명타 2배)<br>🎉 쓰러뜨리면 이번 주에 공격한 사람 <b>모두</b> 보상: 코인 2개 + 강화 머니 (보스 레벨 × 3만원) · 👑 가장 많이 깎은 사람 +코인 2 · 🗡️ 마지막 일격 +코인 1<br>📈 쓰러뜨리면 다음 주 보스가 한 단계 강해져요 · 못 잡으면 같은 레벨로 다시 나와요</div>
                     </div>
                     <div class="leaderboard dodge-ranking">
                         <h4>🏅 이번 주 기여도</h4>
@@ -13072,14 +13112,21 @@ ${text}
         //  쓰러뜨리면 다음 주 보스가 한 단계 강해짐 · 데이터: raid/{주 키}/state·users·log, raid_meta/level
         // =====================================================
         const RAID_FREE = 3, RAID_EXTRA = 3, RAID_CRIT = 0.12;
-        // 보스 = 컬렉션 인형 (히든·블랙은 뽑기 전까지 비밀이라 쓰지 않음)
-        const RAID_BOSSES = [['🦑', '크라켄'], ['🦈', '메가로돈'], ['🦖', '티라노사우루스'], ['🐳', '대왕고래'], ['🐢', '현무'], ['🦅', '주작'], ['🐅', '백호'], ['🐉', '청룡']];
-        let raidWeek = '', raidState = null, raidUsers = {}, raidLogs = [], raidMetaLevel = 1, raidMetaLoaded = false, raidMetaSub = false, raidBusy = false, raidPrev = null, raidTimer = null;
+        // 보스 = 용암 동굴의 마왕 (그림 한 장의 색을 주마다 바꿔서 다른 마왕으로)
+        const RAID_BOSSES = [
+            { name: '용암 마왕', filter: 'none' },
+            { name: '빙결 마왕', filter: 'hue-rotate(185deg) saturate(1.1)' },
+            { name: '심연 마왕', filter: 'hue-rotate(245deg) saturate(1.15)' },
+            { name: '독무 마왕', filter: 'hue-rotate(95deg) saturate(1.05)' },
+            { name: '혈월 마왕', filter: 'hue-rotate(330deg) saturate(1.35)' },
+            { name: '황금 마왕', filter: 'hue-rotate(28deg) saturate(1.4) brightness(1.08)' }
+        ];
+        let raidWeek = '', raidState = null, raidUsers = {}, raidLogs = [], raidSeenAt = 0, raidMetaLevel = 1, raidMetaLoaded = false, raidMetaSub = false, raidBusy = false, raidPrev = null, raidTimer = null;
         var raidReady = true;   // var: 이 줄이 실행되기 전(페이지 로딩 중)에 renderRaid가 불려도 안전하게 건너뛰도록
         const raidTxn = (ref, fn) => new Promise(res => ref.transaction(fn, (err, committed, snap) => res(!err && committed ? (snap ? snap.val() : true) : null)));
         function raidBossOf(level) {
             const b = RAID_BOSSES[(level - 1) % RAID_BOSSES.length], star = Math.floor((level - 1) / RAID_BOSSES.length);
-            return { emoji: b[0], name: (star ? '★'.repeat(Math.min(star, 5)) + ' ' : '') + b[1] };
+            return { filter: b.filter, name: (star ? '★'.repeat(Math.min(star, 5)) + ' ' : '') + b.name };
         }
         const raidMaxHp = (level) => niceWon(TEAM_MEMBERS.length * 2200 * Math.pow(1.25, level - 1));
         const raidPower = (d) => Math.round(100 * (1 + Math.sqrt(fameOf(d || {})) / 3));   // 명성 0 → 100, 20 → 249, 100 → 433
@@ -13105,8 +13152,14 @@ ${text}
             if (!raidMetaSub) raidMetaSub = true, db.ref('raid_meta/level').on('value', snap => { raidMetaLevel = snap.val() || 1; raidMetaLoaded = true; ensureRaidState(); renderRaid(); });
             db.ref(`raid/${wk}/state`).on('value', snap => { raidState = snap.val(); if (!raidState) ensureRaidState(); renderRaid(); });
             db.ref(`raid/${wk}/users`).on('value', snap => { raidUsers = snap.val() || {}; renderRaid(); });
+            raidSeenAt = Date.now();
             db.ref(`raid/${wk}/log`).orderByChild('at').limitToLast(20).on('value', snap => {
                 raidLogs = Object.values(snap.val() || {}).filter(Boolean).sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 20);
+                // 다른 팀원이 방금 공격한 것도 화면에 보여줌 (내 공격은 이미 보여줬으니 빼고)
+                const me = myGameName();
+                raidLogs.filter(l => (l.at || 0) > raidSeenAt && l.name !== me).reverse()
+                    .forEach((l, i) => setTimeout(() => raidHitFx(l.dmg || 0, !!l.crit, !!l.kill, l.name), i * 250));
+                raidSeenAt = Math.max(raidSeenAt, ...raidLogs.map(l => l.at || 0));
                 renderRaid();
             });
             // 지난주 보상을 아직 안 받았으면 받을 수 있게
@@ -13180,15 +13233,28 @@ ${text}
             }
         }
 
-        function raidHitFx(dmg, crit, killed) {
-            const art = document.getElementById('raidArt');
-            if (!art) return;
-            art.classList.remove('hit'); void art.offsetWidth; art.classList.add('hit');
+        function raidHitFx(dmg, crit, killed, who) {
+            const stage = document.getElementById('raidStage'), fx = document.getElementById('raidArt');
+            if (!stage || !fx || !isMinigamePanelVisible('raid')) return;
+            stage.classList.remove('hit'); void stage.offsetWidth; stage.classList.add('hit');
+            const slash = document.createElement('div');
+            slash.className = 'raid-slash';
+            slash.style.transform = `rotate(${Math.round(-35 + Math.random() * 70)}deg)`;
+            fx.appendChild(slash);
             const t = document.createElement('div');
-            t.className = 'raid-dmg' + (crit ? ' crit' : '');
-            t.textContent = `${crit ? '치명타! ' : ''}-${dmg.toLocaleString('ko-KR')}${killed ? ' 💥' : ''}`;
-            art.appendChild(t);
-            setTimeout(() => t.remove(), 1200);
+            t.className = 'raid-dmg' + (crit ? ' crit' : '') + (who ? ' other' : '');
+            t.style.left = `${42 + Math.random() * 16}%`;
+            t.style.top = `${30 + Math.random() * 14}%`;
+            t.innerHTML = `${who ? `<small>${escapeHtml(who)}</small>` : ''}${crit ? '치명타! ' : ''}-${(dmg || 0).toLocaleString('ko-KR')}${killed ? ' 💥' : ''}`;
+            fx.appendChild(t);
+            setTimeout(() => { t.remove(); slash.remove(); }, 1200);
+            // 공격한 팀원 카드가 폴짝
+            const card = document.querySelector(`.party-card[data-key="${CSS.escape(statKey(who || myGameName()))}"]`);
+            if (card) { card.classList.remove('act'); void card.offsetWidth; card.classList.add('act'); }
+        }
+        function isMinigamePanelVisible(id) {
+            const panel = document.getElementById('panel-' + id), tab = document.getElementById('tab-minigame');
+            return !!(panel && tab && panel.classList.contains('active') && tab.classList.contains('active'));
         }
 
         // 보상 받기 (이번 주 또는 지난주) — 받았다는 표시를 먼저 트랜잭션으로 찍어서 두 번 못 받게
@@ -13231,14 +13297,14 @@ ${text}
             const box = document.getElementById('raidBoss');
             if (!st) {
                 document.getElementById('raidName').textContent = '보스가 나타나는 중…';
-                document.getElementById('raidArt').innerHTML = ''; document.getElementById('raidHpText').textContent = '';
+                document.getElementById('raidHpText').textContent = '';
                 document.getElementById('raidHpFill').style.width = '0%';
                 return;
             }
             const boss = raidBossOf(st.level || 1), dead = st.hp <= 0;
             box.classList.toggle('defeated', dead);
-            const art = document.getElementById('raidArt');
-            if (art.dataset.emoji !== boss.emoji) { art.innerHTML = emojiArt(boss.emoji, 'raid-emo'); art.dataset.emoji = boss.emoji; }
+            const bg = document.getElementById('raidBg');
+            if (bg.dataset.filter !== boss.filter) { bg.style.filter = boss.filter; bg.dataset.filter = boss.filter; }
             document.getElementById('raidName').innerHTML = `Lv.${st.level || 1} ${boss.name} <small>체력 ${fmtWonNum(st.maxHp)}</small>`;
             document.getElementById('raidHpFill').style.width = `${Math.max(0, Math.min(100, st.hp / st.maxHp * 100))}%`;
             document.getElementById('raidHpText').textContent = `${Math.max(0, st.hp).toLocaleString('ko-KR')} / ${st.maxHp.toLocaleString('ko-KR')}`;
@@ -13265,6 +13331,23 @@ ${text}
                 claimBtn.disabled = raidBusy;
                 claimBtn.textContent = `🎁 ${cand.label} 레이드 보상 받기 (코인 ${cand.r.coins}개 + ${fmtWon(cand.r.won)}${cand.r.mvp ? ' · 👑MVP' : ''}${cand.r.last ? ' · 🗡️마지막 일격' : ''})`;
             } else claimBtn.style.display = 'none';
+            // 파티: 팀원 카드 (머리 위 파란 막대 = 1등 대비 기여도)
+            const party = [...TEAM_MEMBERS.map(n => [statKey(n), n]), ...Object.entries(raidUsers).filter(([k, x]) => x && x.hits > 0 && !TEAM_MEMBERS.some(n => statKey(n) === k)).map(([k, x]) => [k, x.name || k])];
+            const topDmg = users.length ? users[0][1].dmg : 0;
+            const partyHtml = party
+                .map(([k, n]) => ({ k, n, x: raidUsers[k] || {} }))
+                .sort((a, b) => (b.x.dmg || 0) - (a.x.dmg || 0))
+                .map(({ k, n, x }) => {
+                    const ic = iconOf(n);
+                    return `<div class="party-card ${x.hits > 0 ? '' : 'idle'} ${k === key ? 'me' : ''}" data-key="${escapeHtml(k)}" title="${escapeHtml(n)} · 이번 주 ${(x.dmg || 0).toLocaleString('ko-KR')} 피해 · ${x.hits || 0}번 공격">
+                        <div class="pc-bar"><i style="width:${topDmg ? Math.round((x.dmg || 0) / topDmg * 100) : 0}%"></i></div>
+                        <div class="pc-ava">${ic ? emojiArt(ic) : `<span class="pc-init">${escapeHtml(String(n).length > 2 ? String(n).slice(-2) : String(n))}</span>`}</div>
+                        <div class="pc-name">${escapeHtml(n)}</div>
+                        <div class="pc-dmg">${x.hits > 0 ? (x.dmg || 0).toLocaleString('ko-KR') : '아직 공격 전'}</div>
+                    </div>`;
+                }).join('');
+            const partyEl = document.getElementById('raidParty');
+            if (partyEl.dataset.html !== partyHtml) { partyEl.innerHTML = partyHtml; partyEl.dataset.html = partyHtml; }   // 그대로면 다시 안 그림 (폴짝 효과 유지)
             // 기여도 표
             const total = users.reduce((a, [, x]) => a + x.dmg, 0) || 1;
             const medal = (i) => i === 0 ? '👑' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
