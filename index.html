@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-06h">
+    <meta name="app-version" content="2026-11-06i">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -4030,6 +4030,39 @@
         .cross-pad button:active { transform: scale(0.95); filter: brightness(0.9); }
         .cross-pad [data-dir="up"] { grid-area: up; } .cross-pad [data-dir="left"] { grid-area: left; }
         .cross-pad [data-dir="down"] { grid-area: down; } .cross-pad [data-dir="right"] { grid-area: right; }
+        /* ===== 🐲 주간 레이드 ===== */
+        .raid-area { text-align: center; padding: 18px 15px; background: radial-gradient(ellipse at top, #3a1030, #150818 70%); border-radius: 20px; border: 3px solid rgba(255,90,120,0.4); margin-bottom: 20px; }
+        .raid-week { font-size: 13px; color: rgba(255,255,255,0.75); margin-bottom: 10px; }
+        .raid-week b { color: #ffd54f; }
+        .raid-boss { position: relative; max-width: 460px; margin: 0 auto 12px; }
+        .raid-art { position: relative; height: 170px; display: flex; align-items: center; justify-content: center; }
+        .raid-art .emo3d, .raid-art .raid-emo { width: 160px; height: 160px; filter: drop-shadow(0 0 18px rgba(255,60,90,0.6)); animation: raidIdle 2.6s ease-in-out infinite; }
+        .raid-art.hit .emo3d { animation: raidHit 0.35s ease; }
+        .raid-boss.defeated .raid-art .emo3d { filter: grayscale(1) brightness(0.55); animation: none; transform: rotate(-12deg); }
+        @keyframes raidIdle { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-6px) scale(1.03); } }
+        @keyframes raidHit { 0% { transform: translateX(0); } 25% { transform: translateX(-10px) rotate(-4deg); filter: brightness(2) drop-shadow(0 0 18px #fff); } 60% { transform: translateX(8px) rotate(3deg); } 100% { transform: translateX(0); } }
+        .raid-dmg { position: absolute; left: 50%; top: 40%; transform: translateX(-50%); font-size: 30px; font-weight: 900; color: #fff; text-shadow: 0 0 8px #ff1744, 0 2px 0 #000; pointer-events: none; animation: raidDmg 1.1s ease-out forwards; white-space: nowrap; }
+        .raid-dmg.crit { color: #ffd54f; font-size: 38px; }
+        @keyframes raidDmg { 0% { opacity: 0; transform: translate(-50%, 10px) scale(0.6); } 15% { opacity: 1; transform: translate(-50%, 0) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -70px) scale(1); } }
+        .raid-name { font-size: 20px; font-weight: bold; color: #ff8fa3; margin: 4px 0 8px; }
+        .raid-name small { color: rgba(255,255,255,0.55); font-size: 12px; font-weight: normal; }
+        .raid-hpbar { position: relative; height: 24px; border-radius: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); overflow: hidden; }
+        .raid-hpfill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #ff1744, #ff6d00); transition: width 0.5s ease; }
+        .raid-hpbar span { position: relative; font-size: 13px; font-weight: bold; line-height: 24px; text-shadow: 0 1px 2px #000; font-variant-numeric: tabular-nums; }
+        .raid-banner { margin-top: 10px; font-size: 15px; font-weight: bold; color: #ffd54f; min-height: 0; }
+        .raid-me { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.7; margin-bottom: 12px; }
+        .raid-me b { color: #ffd54f; }
+        .raid-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .raid-attack { padding: 15px 38px; font-size: 18px; font-weight: bold; border: none; border-radius: 30px; color: #fff; cursor: pointer; background: linear-gradient(135deg, #ff1744, #d500f9); box-shadow: 0 4px 18px rgba(255,23,68,0.4); font-family: inherit; }
+        .raid-attack:hover:not(:disabled) { transform: scale(1.05); }
+        .raid-extra { padding: 15px 22px; font-size: 14px; font-weight: bold; border-radius: 30px; cursor: pointer; border: 1px solid rgba(255,215,0,0.55); background: rgba(255,215,0,0.12); color: #ffd700; font-family: inherit; }
+        .raid-attack:disabled, .raid-extra:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .raid-claim { margin-top: 14px; padding: 12px 26px; font-size: 15px; font-weight: bold; border: none; border-radius: 24px; cursor: pointer; color: #1a1a2e; background: linear-gradient(135deg, #ffd700, #ff9f1a); animation: dexClaimGlow 1.6s ease-in-out infinite; font-family: inherit; }
+        .raid-log { font-size: 12px; line-height: 1.8; max-height: 260px; overflow-y: auto; }
+        .raid-log .rl-time { color: rgba(255,255,255,0.4); margin-right: 6px; font-variant-numeric: tabular-nums; }
+        .raid-log .rl-crit { color: #ffd54f; font-weight: bold; }
+        .raid-log .rl-kill { color: #ff8fa3; font-weight: bold; }
+        .raid-rank-share { display: inline-block; height: 6px; border-radius: 3px; background: linear-gradient(90deg, #ff1744, #ff6d00); vertical-align: middle; margin-left: 6px; }
         /* ===== 운세 ===== */
         .fortune-area { max-width: 760px; margin: 0 auto 20px; padding: 18px; border-radius: 20px; background: linear-gradient(160deg, #2b1055, #1a1446 55%, #0f1c3f); border: 2px solid rgba(200,160,255,0.35); }
         .fortune-top { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; margin-bottom: 12px; }
@@ -4995,6 +5028,7 @@
                     <button class="minigame-tab active" onclick="switchMinigame('gacha')">🎰 인형뽑기</button>
                     <button class="minigame-tab" onclick="switchMinigame('enhance')">⚔️ 검 강화</button>
                     <button class="minigame-tab" onclick="switchMinigame('collection')">🏆 컬렉션</button>
+                    <button class="minigame-tab" onclick="switchMinigame('raid')">🐲 레이드</button>
                     <button class="minigame-tab" onclick="switchMinigame('omok')">⚫ 오목</button>
                     <button class="minigame-tab" onclick="switchMinigame('omokai')">🤖 AI 오목</button>
                     <button class="minigame-tab" onclick="switchMinigame('chessai')">🤖 AI 체스</button>
@@ -5283,6 +5317,34 @@
                     <div class="leaderboard dodge-ranking weekly-ranking">
                         <h4>📅 이번 주 길건너기 랭킹 <small>(월~일)</small></h4>
                         <div id="crossWeekly" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                    </div>
+                </div>
+
+                <!-- 🐲 주간 레이드 보스 (팀 협동) -->
+                <div class="minigame-panel" id="panel-raid">
+                    <div class="raid-area">
+                        <div class="raid-week" id="raidWeek">레이드 정보를 불러오는 중…</div>
+                        <div class="raid-boss" id="raidBoss">
+                            <div class="raid-art" id="raidArt"></div>
+                            <div class="raid-name" id="raidName"></div>
+                            <div class="raid-hpbar"><div class="raid-hpfill" id="raidHpFill"></div><span id="raidHpText"></span></div>
+                            <div class="raid-banner" id="raidBanner"></div>
+                        </div>
+                        <div class="raid-me" id="raidMe"></div>
+                        <div class="raid-actions">
+                            <button class="raid-attack" id="raidAttackBtn" onclick="raidAttack(false)">⚔️ 공격!</button>
+                            <button class="raid-extra" id="raidExtraBtn" onclick="raidAttack(true)">🪙 코인 1개로 추가 공격</button>
+                        </div>
+                        <button class="raid-claim" id="raidClaimBtn" onclick="raidClaim()" style="display: none;"></button>
+                        <div class="pika-help">🤝 팀이 다 같이 한 주(월~일) 동안 보스 체력을 깎는 협동 게임이에요. 실시간으로 모일 필요 없이 각자 편할 때 공격!<br>⚔️ 하루 <b>무료 3번</b> + 🪙 코인 1개로 <b>추가 3번</b>까지 · 공격력은 ⚔️ 검 강화 <b>명성</b>이 높을수록 세져요 (12% 확률 치명타 2배)<br>🎉 쓰러뜨리면 이번 주에 공격한 사람 <b>모두</b> 보상: 코인 2개 + 강화 머니 (보스 레벨 × 3만원) · 👑 가장 많이 깎은 사람 +코인 2 · 🗡️ 마지막 일격 +코인 1<br>📈 쓰러뜨리면 다음 주 보스가 한 단계 강해져요 · 못 잡으면 같은 레벨로 다시 나와요</div>
+                    </div>
+                    <div class="leaderboard dodge-ranking">
+                        <h4>🏅 이번 주 기여도</h4>
+                        <div id="raidRank" class="game-stats-table"><div class="gs-empty">아직 아무도 공격하지 않았어요</div></div>
+                    </div>
+                    <div class="leaderboard dodge-ranking">
+                        <h4>📜 최근 공격 기록</h4>
+                        <div id="raidLog" class="raid-log"><div class="gs-empty">아직 기록이 없어요</div></div>
                     </div>
                 </div>
 
@@ -9161,6 +9223,7 @@ ${text}
             if (typeof renderOmokAiStats === 'function') safe(renderOmokAiStats);
             if (typeof renderDodgeRanking === 'function') safe(renderDodgeRanking);
             if (typeof renderCrossRanking === 'function') safe(renderCrossRanking);
+            if (typeof renderRaid === 'function') safe(renderRaid);
             if (typeof renderWeeklyRanking === 'function') ['dodge', 'cross'].forEach(g => safe(() => renderWeeklyRanking(g)));
             if (typeof renderMafia === 'function') safe(renderMafia);
             if (typeof renderChessAiStats === 'function') safe(renderChessAiStats);
@@ -9191,6 +9254,7 @@ ${text}
             setupOmokAiStats();
             setupDodgeRanking();
             setupCrossRanking();
+            setupRaid();
             setupWeeklyRankings();
             setupQnaListener();
             setupMafia();
@@ -10727,6 +10791,9 @@ ${text}
 
             // 출석체크 화면 업데이트
             renderCheckin();
+
+            // 레이드 (코인·명성이 바뀌면 버튼·공격력도 바로 갱신)
+            if (typeof renderRaid === 'function') renderRaid();
         }
 
         function switchMinigame(panel) {
@@ -10750,6 +10817,8 @@ ${text}
             } else if (panel === 'dodge') {
                 drawDodge();
                 renderDodgeRanking();
+            } else if (panel === 'raid') {
+                renderRaid();
             } else if (panel === 'cross') {
                 if (crossG && crossG.state === 'playing' && crossG.paused) crossLastTs = 0;
                 drawCross();
@@ -12995,6 +13064,220 @@ ${text}
             drawCross();
         }
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initCross); else initCross();
+
+        // =====================================================
+        // 🐲 주간 레이드 보스 (팀 협동): 월~일 한 주 동안 다 같이 보스 체력을 깎음
+        //  각자 하루 무료 3번 + 코인 1개로 추가 3번 · 공격력 = 검 강화 명성에 비례 (12% 치명타 2배)
+        //  쓰러뜨리면 이번 주에 공격한 사람 모두 보상 (코인 2 + 강화 머니 레벨×3만원), MVP +코인 2, 마지막 일격 +코인 1
+        //  쓰러뜨리면 다음 주 보스가 한 단계 강해짐 · 데이터: raid/{주 키}/state·users·log, raid_meta/level
+        // =====================================================
+        const RAID_FREE = 3, RAID_EXTRA = 3, RAID_CRIT = 0.12;
+        // 보스 = 컬렉션 인형 (히든·블랙은 뽑기 전까지 비밀이라 쓰지 않음)
+        const RAID_BOSSES = [['🦑', '크라켄'], ['🦈', '메가로돈'], ['🦖', '티라노사우루스'], ['🐳', '대왕고래'], ['🐢', '현무'], ['🦅', '주작'], ['🐅', '백호'], ['🐉', '청룡']];
+        let raidWeek = '', raidState = null, raidUsers = {}, raidLogs = [], raidMetaLevel = 1, raidMetaLoaded = false, raidMetaSub = false, raidBusy = false, raidPrev = null, raidTimer = null;
+        var raidReady = true;   // var: 이 줄이 실행되기 전(페이지 로딩 중)에 renderRaid가 불려도 안전하게 건너뛰도록
+        const raidTxn = (ref, fn) => new Promise(res => ref.transaction(fn, (err, committed, snap) => res(!err && committed ? (snap ? snap.val() : true) : null)));
+        function raidBossOf(level) {
+            const b = RAID_BOSSES[(level - 1) % RAID_BOSSES.length], star = Math.floor((level - 1) / RAID_BOSSES.length);
+            return { emoji: b[0], name: (star ? '★'.repeat(Math.min(star, 5)) + ' ' : '') + b[1] };
+        }
+        const raidMaxHp = (level) => niceWon(TEAM_MEMBERS.length * 2200 * Math.pow(1.25, level - 1));
+        const raidPower = (d) => Math.round(100 * (1 + Math.sqrt(fameOf(d || {})) / 3));   // 명성 0 → 100, 20 → 249, 100 → 433
+        const raidToday = () => getLocalDateKey(new Date());
+        function raidMyUse(u) {
+            const today = raidToday();
+            return u && u.day === today ? { free: u.dayHits || 0, extra: u.dayExtra || 0 } : { free: 0, extra: 0 };
+        }
+        function raidRewardOf(state, users, key) {
+            const me = users && users[key];
+            if (!state || !state.defeatedAt || !me || !(me.hits > 0)) return null;
+            const top = Object.entries(users).filter(([, u]) => u && u.dmg > 0).sort((a, b) => b[1].dmg - a[1].dmg || (a[1].lastAt || 0) - (b[1].lastAt || 0))[0];
+            const mvp = top && top[0] === key, last = state.lastHitKey === key;
+            return { coins: 2 + (mvp ? 2 : 0) + (last ? 1 : 0), won: (state.level || 1) * 30000, mvp, last, claimed: !!me.claimed };
+        }
+
+        function setupRaid() {
+            if (!raidReady || !db) return;
+            const wk = weekKeyOf();
+            if (raidWeek === wk) return;
+            if (raidWeek) ['state', 'users', 'log'].forEach(k => db.ref(`raid/${raidWeek}/${k}`).off());
+            raidWeek = wk; raidState = null; raidUsers = {}; raidLogs = [];
+            if (!raidMetaSub) raidMetaSub = true, db.ref('raid_meta/level').on('value', snap => { raidMetaLevel = snap.val() || 1; raidMetaLoaded = true; ensureRaidState(); renderRaid(); });
+            db.ref(`raid/${wk}/state`).on('value', snap => { raidState = snap.val(); if (!raidState) ensureRaidState(); renderRaid(); });
+            db.ref(`raid/${wk}/users`).on('value', snap => { raidUsers = snap.val() || {}; renderRaid(); });
+            db.ref(`raid/${wk}/log`).orderByChild('at').limitToLast(20).on('value', snap => {
+                raidLogs = Object.values(snap.val() || {}).filter(Boolean).sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 20);
+                renderRaid();
+            });
+            // 지난주 보상을 아직 안 받았으면 받을 수 있게
+            const prev = weekKeyOf(new Date(new Date(wk + 'T12:00:00').getTime() - 7 * 864e5));
+            Promise.all([db.ref(`raid/${prev}/state`).once('value'), db.ref(`raid/${prev}/users`).once('value')])
+                .then(([a, b]) => { raidPrev = { wk: prev, state: a.val(), users: b.val() || {} }; renderRaid(); }).catch(() => {});
+            if (!raidTimer) raidTimer = setInterval(() => { if (raidWeek && raidWeek !== weekKeyOf()) setupRaid(); renderRaid(); }, 60000);
+        }
+        // 이번 주 보스가 아직 없으면 만들기 (여러 명이 동시에 열어도 하나만 생김)
+        function ensureRaidState() {
+            if (!db || !raidWeek || raidState || !raidMetaLoaded) return;
+            const L = raidMetaLevel || 1, hp = raidMaxHp(L);
+            db.ref(`raid/${raidWeek}/state`).transaction(cur => cur ? undefined : { level: L, maxHp: hp, hp, createdAt: Date.now() });
+        }
+
+        async function raidAttack(extra) {
+            const me = myGameName(), key = statKey(me);
+            if (!db) { alert('서버에 연결된 뒤에 할 수 있어요.'); return; }
+            if (!localStorage.getItem('chat_nickname')) { alert('먼저 상단에서 이름을 입력해 주세요.'); return; }
+            if (raidBusy || !raidState) return;
+            if (raidState.hp <= 0) { alert('이번 주 보스는 이미 쓰러졌어요! 보상을 받고 다음 주 보스를 기다려 주세요.'); return; }
+            const use = raidMyUse(raidUsers[key]);
+            if (!extra && use.free >= RAID_FREE) { alert('오늘 무료 공격 3번을 다 썼어요. 코인으로 추가 공격하거나 내일 다시 와 주세요!'); return; }
+            if (extra) {
+                if (use.extra >= RAID_EXTRA) { alert('추가 공격도 오늘 3번을 다 썼어요. 내일 다시 와 주세요!'); return; }
+                if (!gameMine(me)) { bindMinigame(); alert('내 코인 정보를 불러오는 중이에요. 잠시 후 다시 시도해 주세요.'); return; }
+                if ((gameData.coins || 0) < 1) { alert('코인이 없어요. 출첵·신기술 검토·QnA 등으로 코인을 모아 주세요.'); return; }
+                if (!confirm(`코인 1개로 추가 공격할까요? (지금 코인 ${gameData.coins}개)`)) return;
+            }
+            const wk = raidWeek, today = raidToday();
+            raidBusy = true; renderRaid();
+            try {
+                if (extra && !(await raidTxn(db.ref(`minigame/${me}`), cur => { if (!cur || (cur.coins || 0) < 1) return; cur.coins -= 1; return cur; })))
+                    throw new Error('코인이 부족해요.');
+                const refund = () => extra && db.ref(`minigame/${me}`).transaction(cur => { if (cur) cur.coins = (cur.coins || 0) + 1; return cur; });
+                // 1) 오늘 공격 횟수 예약 (여러 탭에서 눌러도 하루 횟수를 넘지 않게)
+                const reserved = await raidTxn(db.ref(`raid/${wk}/users/${key}`), cur => {
+                    cur = cur || { dmg: 0, hits: 0 };
+                    if (cur.day !== today) { cur.day = today; cur.dayHits = 0; cur.dayExtra = 0; }
+                    if (extra ? (cur.dayExtra || 0) >= RAID_EXTRA : (cur.dayHits || 0) >= RAID_FREE) return;
+                    if (extra) cur.dayExtra = (cur.dayExtra || 0) + 1; else cur.dayHits = (cur.dayHits || 0) + 1;
+                    cur.hits = (cur.hits || 0) + 1; cur.name = me;
+                    return cur;
+                });
+                if (!reserved) { refund(); throw new Error('오늘 공격 횟수를 다 썼어요.'); }
+                // 2) 보스 체력 깎기
+                const crit = Math.random() < RAID_CRIT;
+                const dmg = Math.max(1, Math.round(raidPower(gameData) * (0.8 + Math.random() * 0.45) * (crit ? 2 : 1)));
+                let dealt = 0, killed = false, level = raidState.level || 1;
+                const after = await raidTxn(db.ref(`raid/${wk}/state`), cur => {
+                    if (!cur || cur.hp <= 0) return;
+                    dealt = Math.min(dmg, cur.hp); level = cur.level || 1;
+                    cur.hp -= dealt; killed = cur.hp <= 0;
+                    if (killed) { cur.hp = 0; cur.defeatedAt = Date.now(); cur.lastHit = me; cur.lastHitKey = key; }
+                    return cur;
+                });
+                if (!after) {   // 그 사이 다른 사람이 쓰러뜨림 → 공격 횟수·코인 돌려줌
+                    db.ref(`raid/${wk}/users/${key}`).transaction(cur => { if (!cur) return cur; cur.hits = Math.max(0, (cur.hits || 0) - 1); if (extra) cur.dayExtra = Math.max(0, (cur.dayExtra || 0) - 1); else cur.dayHits = Math.max(0, (cur.dayHits || 0) - 1); return cur; });
+                    refund();
+                    throw new Error('방금 다른 팀원이 보스를 쓰러뜨렸어요! 🎉 보상을 받아 가세요.');
+                }
+                // 3) 기여도·기록
+                await raidTxn(db.ref(`raid/${wk}/users/${key}`), cur => { cur = cur || {}; cur.dmg = (cur.dmg || 0) + dealt; if (crit) cur.crits = (cur.crits || 0) + 1; cur.lastAt = Date.now(); cur.name = me; return cur; });
+                db.ref(`raid/${wk}/log`).push({ name: me, dmg: dealt, crit, extra: !!extra, kill: killed, at: Date.now() });
+                if (killed) db.ref('raid_meta/level').transaction(cur => Math.max(cur || 1, level + 1));
+                raidHitFx(dealt, crit, killed);
+            } catch (e) {
+                alert(e.message || '공격하지 못했어요. 다시 시도해 주세요.');
+            } finally {
+                raidBusy = false; renderRaid();
+            }
+        }
+
+        function raidHitFx(dmg, crit, killed) {
+            const art = document.getElementById('raidArt');
+            if (!art) return;
+            art.classList.remove('hit'); void art.offsetWidth; art.classList.add('hit');
+            const t = document.createElement('div');
+            t.className = 'raid-dmg' + (crit ? ' crit' : '');
+            t.textContent = `${crit ? '치명타! ' : ''}-${dmg.toLocaleString('ko-KR')}${killed ? ' 💥' : ''}`;
+            art.appendChild(t);
+            setTimeout(() => t.remove(), 1200);
+        }
+
+        // 보상 받기 (이번 주 또는 지난주) — 받았다는 표시를 먼저 트랜잭션으로 찍어서 두 번 못 받게
+        async function raidClaim() {
+            const me = myGameName(), key = statKey(me);
+            if (!db || raidBusy) return;
+            const pick = [[raidWeek, raidState, raidUsers], raidPrev ? [raidPrev.wk, raidPrev.state, raidPrev.users] : null]
+                .filter(Boolean).map(([wk, st, us]) => ({ wk, st, r: raidRewardOf(st, us, key) })).find(x => x.r && !x.r.claimed);
+            if (!pick) return;
+            raidBusy = true; renderRaid();
+            try {
+                const ok = await raidTxn(db.ref(`raid/${pick.wk}/users/${key}/claimed`), cur => cur ? undefined : Date.now());
+                if (!ok) throw new Error('이미 보상을 받았어요.');
+                const r = pick.r;
+                await raidTxn(db.ref(`minigame/${me}`), cur => {
+                    cur = cur || { coins: 0, weaponLevel: 0, collection: [], gachaHistory: [] };
+                    cur.coins = (cur.coins || 0) + r.coins;
+                    cur.swordMoney = swordMoneyOf(cur) + r.won;
+                    return cur;
+                });
+                if (pick.wk !== raidWeek && raidPrev) raidPrev.users[key] = Object.assign({}, raidPrev.users[key], { claimed: Date.now() });
+                showCoinNotification(r.coins, '', `🎉 레이드 보상: 코인 ${r.coins}개 + 강화 머니 ${fmtWon(r.won)}${r.mvp ? ' (👑 MVP)' : ''}${r.last ? ' (🗡️ 마지막 일격)' : ''}`);
+            } catch (e) {
+                alert(e.message || '보상을 받지 못했어요. 다시 시도해 주세요.');
+            } finally {
+                raidBusy = false; renderRaid();
+            }
+        }
+
+        function renderRaid() {
+            if (!raidReady) return;
+            const weekEl = document.getElementById('raidWeek');
+            if (!weekEl) return;
+            if (!db) { weekEl.textContent = '서버에 연결되면 레이드가 열려요.'; return; }
+            const key = statKey(myGameName()), st = raidState;
+            // 남은 시간 (다음 주 월요일 0시까지)
+            const end = new Date((raidWeek || weekKeyOf()) + 'T00:00:00'); end.setDate(end.getDate() + 7);
+            const left = Math.max(0, end - Date.now()), dd = Math.floor(left / 864e5), hh = Math.floor(left % 864e5 / 36e5), mm = Math.floor(left % 36e5 / 6e4);
+            weekEl.innerHTML = `📅 이번 주 레이드 (${(raidWeek || '').slice(5).replace('-', '/')}~) · 남은 시간 <b>${dd ? dd + '일 ' : ''}${hh}시간 ${mm}분</b>`;
+            const box = document.getElementById('raidBoss');
+            if (!st) {
+                document.getElementById('raidName').textContent = '보스가 나타나는 중…';
+                document.getElementById('raidArt').innerHTML = ''; document.getElementById('raidHpText').textContent = '';
+                document.getElementById('raidHpFill').style.width = '0%';
+                return;
+            }
+            const boss = raidBossOf(st.level || 1), dead = st.hp <= 0;
+            box.classList.toggle('defeated', dead);
+            const art = document.getElementById('raidArt');
+            if (art.dataset.emoji !== boss.emoji) { art.innerHTML = emojiArt(boss.emoji, 'raid-emo'); art.dataset.emoji = boss.emoji; }
+            document.getElementById('raidName').innerHTML = `Lv.${st.level || 1} ${boss.name} <small>체력 ${fmtWonNum(st.maxHp)}</small>`;
+            document.getElementById('raidHpFill').style.width = `${Math.max(0, Math.min(100, st.hp / st.maxHp * 100))}%`;
+            document.getElementById('raidHpText').textContent = `${Math.max(0, st.hp).toLocaleString('ko-KR')} / ${st.maxHp.toLocaleString('ko-KR')}`;
+            const when = st.defeatedAt ? new Date(st.defeatedAt) : null;
+            document.getElementById('raidBanner').innerHTML = dead
+                ? `🎉 토벌 성공! ${when ? `${'일월화수목금토'[when.getDay()]}요일 ${String(when.getHours()).padStart(2, '0')}:${String(when.getMinutes()).padStart(2, '0')}` : ''} · 🗡️ 마지막 일격 ${escapeHtml(st.lastHit || '')}<br><small style="color: rgba(255,255,255,0.7); font-weight: normal;">다음 주 월요일에 Lv.${(st.level || 1) + 1} ${raidBossOf((st.level || 1) + 1).name} 등장!</small>`
+                : '';
+            // 내 상태 · 버튼
+            const u = raidUsers[key], use = raidMyUse(u), power = raidPower(gameData);
+            const users = Object.entries(raidUsers).filter(([, x]) => x && x.dmg > 0).sort((a, b) => b[1].dmg - a[1].dmg);
+            const myRank = users.findIndex(([k]) => k === key);
+            document.getElementById('raidMe').innerHTML = `내 공격력 약 <b>${power.toLocaleString('ko-KR')}</b> <small>(검 강화 명성 ${fameOf(gameData || {})}점 기준)</small> · 오늘 무료 공격 <b>${RAID_FREE - use.free}</b>번 남음 · 추가 공격 ${use.extra}/${RAID_EXTRA}<br>이번 주 내 피해량 <b>${((u && u.dmg) || 0).toLocaleString('ko-KR')}</b>${myRank >= 0 ? ` · ${myRank + 1}위` : ''}`;
+            const atk = document.getElementById('raidAttackBtn'), ext = document.getElementById('raidExtraBtn');
+            atk.disabled = raidBusy || dead || use.free >= RAID_FREE;
+            atk.textContent = dead ? '🎉 토벌 완료' : use.free >= RAID_FREE ? '⏳ 오늘 무료 공격 끝' : `⚔️ 공격! (${RAID_FREE - use.free}번 남음)`;
+            ext.disabled = raidBusy || dead || use.extra >= RAID_EXTRA || ((gameData && gameData.coins) || 0) < 1;
+            ext.textContent = `🪙 코인 1개로 추가 공격 (${use.extra}/${RAID_EXTRA})`;
+            // 보상 버튼 (이번 주 → 지난주 순)
+            const claimBtn = document.getElementById('raidClaimBtn');
+            const cand = [[raidWeek, st, raidUsers, '이번 주'], raidPrev ? [raidPrev.wk, raidPrev.state, raidPrev.users, '지난주'] : null]
+                .filter(Boolean).map(([wk, s2, us, label]) => ({ label, r: raidRewardOf(s2, us, key) })).find(x => x.r && !x.r.claimed);
+            if (cand) {
+                claimBtn.style.display = 'inline-block';
+                claimBtn.disabled = raidBusy;
+                claimBtn.textContent = `🎁 ${cand.label} 레이드 보상 받기 (코인 ${cand.r.coins}개 + ${fmtWon(cand.r.won)}${cand.r.mvp ? ' · 👑MVP' : ''}${cand.r.last ? ' · 🗡️마지막 일격' : ''})`;
+            } else claimBtn.style.display = 'none';
+            // 기여도 표
+            const total = users.reduce((a, [, x]) => a + x.dmg, 0) || 1;
+            const medal = (i) => i === 0 ? '👑' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+            document.getElementById('raidRank').innerHTML = users.length
+                ? `<table><tr><th>순위</th><th>이름</th><th>피해량</th><th>공격</th></tr>${users.map(([k, x], i) => `
+                    <tr class="${k === key ? 'dodge-me' : ''}"><td>${medal(i)}</td><td>${nameWithIcon(x.name || k)}${st.lastHitKey === k ? ' 🗡️' : ''}</td>
+                    <td class="dodge-best">${x.dmg.toLocaleString('ko-KR')} <small style="color: rgba(255,255,255,0.5); font-weight: normal;">${Math.round(x.dmg / total * 100)}%</small></td><td>${x.hits || 0}번${x.crits ? ` · 치명 ${x.crits}` : ''}</td></tr>`).join('')}</table>`
+                : '<div class="gs-empty">아직 아무도 공격하지 않았어요. 첫 공격의 주인공이 되어 보세요!</div>';
+            document.getElementById('raidLog').innerHTML = raidLogs.length
+                ? raidLogs.map(l => { const d = new Date(l.at || 0); return `<div><span class="rl-time">${'일월화수목금토'[d.getDay()]} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}</span>${nameWithIcon(l.name || '')} ⚔️ <b>${(l.dmg || 0).toLocaleString('ko-KR')}</b>${l.crit ? ' <span class="rl-crit">치명타!</span>' : ''}${l.extra ? ' 🪙' : ''}${l.kill ? ' <span class="rl-kill">💥 토벌!</span>' : ''}</div>`; }).join('')
+                : '<div class="gs-empty">아직 기록이 없어요</div>';
+        }
+        const fmtWonNum = (n) => (n || 0).toLocaleString('ko-KR');
 
         // =====================================================
         // 🔮 운세 (재미로 보는 오늘·내일·이번 주 운세)
