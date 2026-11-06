@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-06g">
+    <meta name="app-version" content="2026-11-06h">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -4021,14 +4021,15 @@
         .weekly-ranking h4 small { font-weight: normal; opacity: 0.75; font-size: 12px; }
         .weekly-last { margin-top: 8px; font-size: 13px; color: #ffe27a; }
         .ai-reward-note { text-align: center; font-size: 12px; color: #ffe27a; margin: -6px 0 10px; }
-        /* ===== 쿠키 러너 ===== */
-        .runner-area { text-align: center; padding: 15px; background: linear-gradient(180deg, #3b2412, #1e1209); border-radius: 20px; border: 3px solid rgba(255,180,90,0.45); margin-bottom: 20px; }
-        #runnerCanvas { width: 100%; max-width: 720px; height: auto; display: block; margin: 0 auto; border-radius: 12px; touch-action: none; user-select: none; -webkit-user-select: none; }
-        .runner-pause { padding: 8px 14px; border-radius: 20px; border: none; background: rgba(255,255,255,0.15); color: #fff; font-size: 14px; cursor: pointer; }
-        .runner-pad { display: flex; gap: 12px; justify-content: center; max-width: 720px; margin: 10px auto 0; }
-        .runner-pad-btn { flex: 1; padding: 14px 0; border-radius: 14px; border: none; font-size: 17px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #ffd400, #ff9800); color: #3b2412; touch-action: none; user-select: none; -webkit-user-select: none; }
-        .runner-pad-btn.slide { background: linear-gradient(135deg, #4fc3f7, #1e88e5); color: #fff; }
-        .runner-pad-btn:active { transform: scale(0.97); filter: brightness(0.9); }
+        /* ===== 길건너기 ===== */
+        .cross-area { text-align: center; padding: 15px; background: linear-gradient(180deg, #17361f, #0c1d12); border-radius: 20px; border: 3px solid rgba(126,217,87,0.4); margin-bottom: 20px; }
+        #crossCanvas { width: 100%; max-width: 432px; height: auto; display: block; margin: 0 auto; border-radius: 12px; touch-action: none; user-select: none; -webkit-user-select: none; }
+        .cross-pause { padding: 8px 14px; border-radius: 20px; border: none; background: rgba(255,255,255,0.15); color: #fff; font-size: 14px; cursor: pointer; }
+        .cross-pad { display: grid; grid-template-columns: repeat(3, 66px); grid-template-areas: ". up ." "left down right"; gap: 8px; justify-content: center; margin: 12px auto 0; }
+        .cross-pad button { height: 50px; border-radius: 14px; border: none; font-size: 20px; font-weight: bold; cursor: pointer; background: linear-gradient(135deg, #8be36a, #3fa34d); color: #0c1d12; touch-action: none; user-select: none; -webkit-user-select: none; }
+        .cross-pad button:active { transform: scale(0.95); filter: brightness(0.9); }
+        .cross-pad [data-dir="up"] { grid-area: up; } .cross-pad [data-dir="left"] { grid-area: left; }
+        .cross-pad [data-dir="down"] { grid-area: down; } .cross-pad [data-dir="right"] { grid-area: right; }
         /* ===== 운세 ===== */
         .fortune-area { max-width: 760px; margin: 0 auto 20px; padding: 18px; border-radius: 20px; background: linear-gradient(160deg, #2b1055, #1a1446 55%, #0f1c3f); border: 2px solid rgba(200,160,255,0.35); }
         .fortune-top { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; margin-bottom: 12px; }
@@ -4995,12 +4996,11 @@
                     <button class="minigame-tab" onclick="switchMinigame('enhance')">⚔️ 검 강화</button>
                     <button class="minigame-tab" onclick="switchMinigame('collection')">🏆 컬렉션</button>
                     <button class="minigame-tab" onclick="switchMinigame('omok')">⚫ 오목</button>
-                    <button class="minigame-tab" onclick="switchMinigame('chess')">♟️ 체스</button>
                     <button class="minigame-tab" onclick="switchMinigame('omokai')">🤖 AI 오목</button>
                     <button class="minigame-tab" onclick="switchMinigame('chessai')">🤖 AI 체스</button>
                     <button class="minigame-tab" onclick="switchMinigame('pikachu')">⚡ 피카츄배구</button>
                     <button class="minigame-tab" onclick="switchMinigame('dodge')">✈️ 닷지</button>
-                    <button class="minigame-tab" onclick="switchMinigame('runner')">🍪 쿠키 러너</button>
+                    <button class="minigame-tab" onclick="switchMinigame('cross')">🐥 길건너기</button>
                     <button class="minigame-tab" id="mafiaTabBtn" onclick="switchMinigame('mafia')">🕵️ 마피아</button>
                     <button class="minigame-tab" onclick="switchMinigame('fortune')">🔮 운세</button>
                 </div>
@@ -5259,28 +5259,30 @@
                     </div>
                 </div>
 
-                <!-- 쿠키 러너 패널 -->
-                <div class="minigame-panel" id="panel-runner">
-                    <div class="runner-area">
+                <!-- 길건너기 패널 -->
+                <div class="minigame-panel" id="panel-cross">
+                    <div class="cross-area">
                         <div class="dodge-top">
-                            <button class="pika-start" id="runnerStartBtn" onclick="startRunner()">▶ 시작</button>
-                            <button class="runner-pause" onclick="toggleRunnerPause()" title="일시정지 (P)">⏸</button>
-                            <span class="dodge-mybest" id="runnerMyBest">아직 내 기록이 없어요</span>
+                            <button class="pika-start" id="crossStartBtn" onclick="startCross()">▶ 시작</button>
+                            <button class="cross-pause" onclick="toggleCrossPause()" title="일시정지 (P)">⏸</button>
+                            <span class="dodge-mybest" id="crossMyBest">아직 내 기록이 없어요</span>
                         </div>
-                        <canvas id="runnerCanvas" width="720" height="360"></canvas>
-                        <div class="runner-pad">
-                            <button id="runnerJumpBtn" class="runner-pad-btn">⤒ 점프</button>
-                            <button id="runnerSlideBtn" class="runner-pad-btn slide">⤓ 슬라이드</button>
+                        <canvas id="crossCanvas" width="432" height="576"></canvas>
+                        <div class="cross-pad">
+                            <button data-dir="up" aria-label="앞으로">▲</button>
+                            <button data-dir="left" aria-label="왼쪽">◀</button>
+                            <button data-dir="down" aria-label="뒤로">▼</button>
+                            <button data-dir="right" aria-label="오른쪽">▶</button>
                         </div>
-                        <div class="pika-help">🎮 Space/↑ 점프 (공중에서 한 번 더 누르면 2단 점프) · ↓ 누르고 있으면 슬라이드 · P 일시정지<br>📱 화면 왼쪽 터치 = 점프, 오른쪽 누르고 있기 = 슬라이드 · 가시는 점프, 빨간 막대는 슬라이드, 낭떠러지는 2단 점프!<br>체력은 계속 줄어요. 🧪 물약으로 회복하고, 🍬 젤리(10점)·왕젤리(100점)를 모으세요. 점수 = 젤리×10 + 달린 거리(m)<br>🔥 20·45·70·95초에 6초간 <b>피버</b>: 젤리 2배 + 체력 안 깎임! 바닥 젤리 끝에서 점프하면 윗줄 젤리도 쭉 · ⚡ 갈수록 점점 빨라져서 2분은 못 버텨요 <br>※ 게임 속 젤리는 점수용이에요 (진짜 코인은 주지 않아요)</div>
+                        <div class="pika-help">🎮 ↑ 앞으로 · ← → 옆으로 · ↓ 뒤로 (WASD도 돼요) · Space 시작/다시 · P 일시정지<br>📱 화면을 톡 치면 앞으로, 밀면(스와이프) 그 방향으로 · 아래 버튼도 OK<br>🚗 도로는 차를 피하고, 🌊 강은 통나무를 밟고 건너요 (물에 빠지거나 화면 밖으로 떠내려가면 끝) · 🚆 철길은 빨간불이 깜빡이면 기차가 와요<br>🌳 나무는 못 지나가요 · ⏳ 화면이 천천히 따라오니 머뭇거리면 잡혀요 · 주인공은 내 컬렉션 아이콘! 점수 = 앞으로 건넌 칸 수</div>
                     </div>
                     <div class="leaderboard dodge-ranking">
-                        <h4>🏆 쿠키 러너 랭킹 (최고 점수)</h4>
-                        <div id="runnerRanking" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                        <h4>🏆 길건너기 랭킹 (최고 기록)</h4>
+                        <div id="crossRanking" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
                     </div>
                     <div class="leaderboard dodge-ranking weekly-ranking">
-                        <h4>📅 이번 주 쿠키 러너 랭킹 <small>(월~일)</small></h4>
-                        <div id="runnerWeekly" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                        <h4>📅 이번 주 길건너기 랭킹 <small>(월~일)</small></h4>
+                        <div id="crossWeekly" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
                     </div>
                 </div>
 
@@ -5370,77 +5372,6 @@
                     </div>
                 </div>
 
-                <!-- 체스 패널 -->
-                <div class="minigame-panel" id="panel-chess">
-                    <div class="game-mode-notice" id="chessModeNotice">
-                        <div class="mode-status">
-                            <span class="mode-badge spectator">👀 관람 모드</span>
-                            <p>현재 게임 진행 중입니다. 관람만 가능합니다.</p>
-                        </div>
-                    </div>
-                    <div class="game-players-info" id="chessPlayersInfo">
-                        <div class="player-slot" id="chessWhitePlayerInfo">
-                            <span class="stone-icon">🔴</span>
-                            <span class="player-name">대기 중...</span>
-                        </div>
-                        <span class="vs-text">VS</span>
-                        <div class="player-slot" id="chessBlackPlayerInfo">
-                            <span class="stone-icon">🔵</span>
-                            <span class="player-name">대기 중...</span>
-                        </div>
-                    </div>
-                    <div class="game-actions" style="margin-bottom: 15px;">
-                        <button class="btn btn-primary" onclick="resetChessGame()">
-                            <i class="fas fa-redo"></i> 새 게임
-                        </button>
-                    </div>
-                    <div class="game-container-mini">
-                        <div class="game-board-wrapper-mini">
-                            <div id="chessBoardMini"></div>
-                        </div>
-                        <div class="game-info-mini">
-                            <div class="game-status">
-                                <h4><i class="fas fa-chess-king"></i> 게임 상태</h4>
-                                <div id="chessWinnerBannerMini"></div>
-                                <div id="chessCheckWarningMini"></div>
-                                <p style="font-size: 12px; margin-bottom: 8px;">내 진영 선택:</p>
-                                <div class="player-select-mini">
-                                    <button class="player-btn-mini" onclick="selectChessSideIntegrated('white')" id="chessBtnWhiteMini">🔴 빨강</button>
-                                    <button class="player-btn-mini" onclick="selectChessSideIntegrated('black')" id="chessBtnBlackMini">🔵 파랑</button>
-                                </div>
-                                <div class="current-turn-mini" id="chessCurrentTurnMini">
-                                    🔴 빨강 차례
-                                </div>
-                                <div class="castle-hint" id="chessCastleHintMini" style="display:none"></div>
-                            </div>
-                            <div class="captured-pieces-mini">
-                                <span>잡힌 말:</span>
-                                <div class="captured-row">
-                                    <span>🔴</span><span id="capturedWhiteMini"></span>
-                                </div>
-                                <div class="captured-row">
-                                    <span>🔵</span><span id="capturedBlackMini"></span>
-                                </div>
-                            </div>
-                            <div class="game-log-mini">
-                                <h4><i class="fas fa-list"></i> 기보</h4>
-                                <div id="chessGameLogMini"></div>
-                            </div>
-                            <div class="game-stats-mini">
-                                <h4><i class="fas fa-trophy"></i> 전적 (승/패/승률)</h4>
-                                <div id="chessStatsMini" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
-                            </div>
-                            <div class="game-chat-mini">
-                                <h4><i class="fas fa-comments"></i> 채팅</h4>
-                                <div id="chessChatMini" class="game-chat-list"></div>
-                                <div class="game-chat-input">
-                                    <input type="text" id="chessChatInput" maxlength="200" placeholder="메시지 입력 후 Enter" onkeydown="if(event.key==='Enter' && !event.isComposing) sendGameChat('chess')">
-                                    <button onclick="sendGameChat('chess')"><i class="fas fa-paper-plane"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -9226,11 +9157,11 @@ ${text}
             if (typeof renderStudyMaterials === 'function') safe(renderStudyMaterials);
             if (typeof loadLeaderboard === 'function') safe(loadLeaderboard);
             if (typeof renderCheckinToday === 'function') safe(renderCheckinToday);
-            if (typeof renderGameStats === 'function') ['omok', 'chess'].forEach(g => { safe(() => renderGameStats(g)); safe(() => renderGameChat(g)); });
+            if (typeof renderGameStats === 'function') ['omok'].forEach(g => { safe(() => renderGameStats(g)); safe(() => renderGameChat(g)); });
             if (typeof renderOmokAiStats === 'function') safe(renderOmokAiStats);
             if (typeof renderDodgeRanking === 'function') safe(renderDodgeRanking);
-            if (typeof renderRunnerRanking === 'function') safe(renderRunnerRanking);
-            if (typeof renderWeeklyRanking === 'function') ['dodge', 'runner'].forEach(g => safe(() => renderWeeklyRanking(g)));
+            if (typeof renderCrossRanking === 'function') safe(renderCrossRanking);
+            if (typeof renderWeeklyRanking === 'function') ['dodge', 'cross'].forEach(g => safe(() => renderWeeklyRanking(g)));
             if (typeof renderMafia === 'function') safe(renderMafia);
             if (typeof renderChessAiStats === 'function') safe(renderChessAiStats);
         }
@@ -9256,12 +9187,10 @@ ${text}
             originalSetupDataListeners();
             // 게임 탭은 omok_game 경로만 사용 (구버전 'omok' 경로 리스너는 상태를 덮어써서 제외)
             setupOmokIntegratedListener();
-            setupChessListener();
-            setupChessIntegratedListener();
             setupGameStatsAndChat();
             setupOmokAiStats();
             setupDodgeRanking();
-            setupRunnerRanking();
+            setupCrossRanking();
             setupWeeklyRankings();
             setupQnaListener();
             setupMafia();
@@ -10810,8 +10739,6 @@ ${text}
             // 오목/체스 패널 전환 시 보드 렌더링
             if (panel === 'omok') {
                 renderOmokBoardMini();
-            } else if (panel === 'chess') {
-                renderChessBoardMini();
             } else if (panel === 'pikachu') {
                 drawPika();
             } else if (panel === 'omokai') {
@@ -10823,10 +10750,10 @@ ${text}
             } else if (panel === 'dodge') {
                 drawDodge();
                 renderDodgeRanking();
-            } else if (panel === 'runner') {
-                if (runner && runner.state === 'playing' && runner.paused) runnerLastTs = 0;
-                drawRunner();
-                renderRunnerRanking();
+            } else if (panel === 'cross') {
+                if (crossG && crossG.state === 'playing' && crossG.paused) crossLastTs = 0;
+                drawCross();
+                renderCrossRanking();
             } else if (panel === 'mafia') {
                 renderMafia();
             } else if (panel === 'fortune') {
@@ -11472,8 +11399,8 @@ ${text}
                 return Object.assign({ best: score, at: Date.now() }, extra || {});
             });
         }
-        const WEEKLY_PATH = { dodge: 'dodge_weekly', runner: 'runner_weekly' };
-        let weeklyScores = { dodge: {}, runner: {} }, weeklySubKey = '';
+        const WEEKLY_PATH = { dodge: 'dodge_weekly', cross: 'cross_weekly' }; // 쿠키 러너 기록(runner_weekly)은 서버에 그대로 둠
+        let weeklyScores = { dodge: {}, cross: {} }, weeklySubKey = '';
         function setupWeeklyRankings() {
             if (!db) return;
             const wk = weekKeyOf();
@@ -11494,7 +11421,7 @@ ${text}
             const el = document.getElementById(`${game}Weekly`);
             if (!el) return;
             if (weeklySubKey && weeklySubKey !== weekKeyOf()) setupWeeklyRankings(); // 주가 바뀌면 다시 구독
-            const fmt = (r) => game === 'dodge' ? `${r.best.toFixed(2)}초` : `${r.best.toLocaleString()}점`;
+            const fmt = (r) => game === 'dodge' ? `${r.best.toFixed(2)}초` : game === 'cross' ? `${r.best.toLocaleString()}칸` : `${r.best.toLocaleString()}점`;
             const me = statKey(myGameName());
             const rows = weeklyTop(weeklyScores[game]).filter(r => hasRankIcon(r.name)).slice(0, 5);
             const medal = (i) => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
@@ -12707,481 +12634,367 @@ ${text}
 
 
         // =====================================================
-        // 🍪 쿠키 러너 (쿠키런 스타일): 자동으로 달리며 점프·슬라이드로 피하고 젤리 모으기
-        //  (게임 속 젤리는 점수용 — 진짜 코인은 주지 않음. 변수 이름 coins는 점수 계산용 젤리 개수)
+        // 🐥 길건너기: 도로(자동차)·강(통나무)·철길(기차)·풀밭(나무)을 한 칸씩 건너 최대한 멀리
+        //  주인공 = 내 컬렉션 아이콘 (없으면 병아리) · 화면이 천천히 따라와서 머뭇거리면 잡힘 · 점수 = 앞으로 간 칸 수
         // =====================================================
-        const RUN = {
-            W: 720, H: 360, GROUND: 300,
-            PX: 140, PW: 34, PH: 48, SLIDE_H: 24,
-            GRAV: 0.9, JUMP1: -14.5, JUMP2: -12.5,
-            SPEED0: 8, SPEED_MAX: 26,  // 속도는 시간에 따라 계속 빨라짐 (runnerSpeedAt)
-            DRAIN: 2.2,       // 초당 체력 감소 (시간이 지날수록 빨라지고 60초부터 더 가파르게)
-            HIT: 25,          // 장애물 피해
-            POTION: 30,
-            POTION_GAP: 7,    // 물약은 7초마다 1개 (빨리 달려도 물약이 몰려 나오지 않게)
-            POTION_UNTIL: 100, // 100초부터는 물약 없음 → 2분은 못 버팀
-            FEVER_START: 20, FEVER_EVERY: 25, FEVER_LEN: 6, // 20초부터 25초마다 6초간 피버 (젤리 2배, 체력 안 깎임)
-            FEVER_LAST: 95,   // 마지막 피버 (그 뒤엔 피버 없이 마지막 질주 → 2분 못 버팀)
-            BAR_BOTTOM: 266   // 머리 높이 막대의 아래 끝 (서 있으면 부딪히고, 슬라이드하면 통과)
-        };
-        const RUNNER_PATH = 'runner_scores';
-        let runner = null;
-        let runnerRaf = null, runnerLastTs = 0, runnerAcc = 0;
-        let runnerScores = {};
-        const runnerKeys = { jump: false, slide: false };
+        const CROSS = { COLS: 9, VIEW: 12, CELL: 48, HOP: 0.11, START_CAM: -3 };
+        const CROSS_PATH = 'cross_scores';
+        let crossG = null, crossRaf = null, crossLastTs = 0, crossScores = {};
+        const crossImgs = {};
+        const CAR_COLORS = ['#ef5350', '#42a5f5', '#ffca28', '#ab47bc', '#26a69a', '#ff7043', '#ec407a', '#e0e0e0'];
 
-        // 시간(초)별 속도: 시작 8 → 30초 11.6 → 60초 16.5 → 90초 22.7 → 최대 26
-        function runnerSpeedAt(t) { return Math.min(RUN.SPEED_MAX, RUN.SPEED0 + 0.1 * t + 0.0007 * t * t); }
-        function runnerDrainAt(t) { return RUN.DRAIN * (1 + t / 150) + Math.max(0, t - 60) * 0.08; }
-        // 피버 시간표: { on, left(남은 초) } 또는 { on:false, next(다음 피버까지 초) }
-        function runnerFeverAt(t) {
-            if (t < RUN.FEVER_START) return { on: false, next: RUN.FEVER_START - t };
-            if (t >= RUN.FEVER_LAST + RUN.FEVER_LEN) return { on: false, next: Infinity, over: true };
-            const since = (t - RUN.FEVER_START) % RUN.FEVER_EVERY;
-            return since < RUN.FEVER_LEN ? { on: true, left: RUN.FEVER_LEN - since } : { on: false, next: RUN.FEVER_EVERY - since };
-        }
-
-        function isRunnerVisible() {
-            const panel = document.getElementById('panel-runner');
+        function isCrossVisible() {
+            const panel = document.getElementById('panel-cross');
             const tab = document.getElementById('tab-minigame');
             return panel && tab && panel.classList.contains('active') && tab.classList.contains('active');
         }
+        const crossRand = (a, b) => a + Math.random() * (b - a);
+        const crossDiff = (r) => Math.min(1, r / 160);   // 0 → 1 (160칸에 걸쳐 어려워짐)
 
-        function startRunner() {
-            runner = {
-                state: 'playing', t: 0, dist: 0, speed: RUN.SPEED0, coins: 0, energy: 100,
-                y: RUN.GROUND - RUN.PH, vy: 0, jumps: 0, sliding: false, inv: 0, anim: 0,
-                ground: [{ x: -50, w: 1100 }], items: [], obstacles: [], nextX: 1050, paused: false, popups: [], fever: false, lastPotionT: 0,
-                hills: [0, 0]
-            };
-            const btn = document.getElementById('runnerStartBtn');
-            btn.textContent = '↻ 다시 시작'; btn.blur(); // Space가 버튼을 다시 누르지 않도록
-            runnerLastTs = 0; runnerAcc = 0;
-            if (!runnerRaf) runnerRaf = requestAnimationFrame(runnerLoop);
+        function crossTrees(d, avoid) {
+            const n = Math.floor(crossRand(0, 2.2 + 2 * d));
+            const set = new Set();
+            while (set.size < n) { const c = Math.floor(Math.random() * CROSS.COLS); if (c !== avoid) set.add(c); }
+            return [...set];
         }
-
-        // 앞쪽 지형·장애물·젤리를 덩어리(패턴) 단위로 생성
-        function runnerGenerate(g) {
-            const lv = Math.min(1, g.t / 60); // 0 → 1 (1분에 걸쳐 구멍이 넓어짐)
-            const pats = ['coins', 'spike', 'bar', 'coins', 'spike', 'bar'];
-            if (g.t > 12) pats.push('gap', 'double', 'gap');
-            if (g.t > 25) pats.push('gapSpike', 'barSpike', 'bigcoin');
-            let pick = pats[Math.floor(Math.random() * pats.length)];
-            const x0 = g.nextX, G = RUN.GROUND;
-            // 이 구간에 도착하는 시각 기준으로 피버/물약 판단
-            const arriveT = g.t + Math.max(0, x0 - RUN.PX) / (g.speed * 60);
-            if (runnerFeverAt(arriveT).on) pick = 'fever';
-            else if (arriveT < RUN.POTION_UNTIL && arriveT - g.lastPotionT >= RUN.POTION_GAP) { pick = 'potion'; g.lastPotionT = arriveT; }
-            // 빨라지면 점프 거리도 길어지므로 장애물 간격도 같이 넓힘 (피할 수 없는 배치 방지)
-            const f = Math.max(1, g.speed / 9);
-            const X = (off) => x0 + off * f;
-            const coinLine = (x, n, y, gap = 34) => { for (let i = 0; i < n; i++) g.items.push({ type: 'coin', x: x + i * gap, y }); };
-            const coinArc = (x, w, h, n) => { for (let i = 0; i < n; i++) { const t = i / (n - 1); g.items.push({ type: 'coin', x: x + t * w, y: G - 30 - Math.sin(t * Math.PI) * h }); } };
-            let w = 0;
-            if (pick === 'coins') { w = 380 * f; coinLine(X(30), 9, G - 30); }
-            else if (pick === 'fever') {
-                // 피버: 장애물 없이 바닥 젤리 줄 → 점프 궤적을 따라가는 윗줄 젤리가 번갈아 나옴
-                //  (윗줄은 달리기만 해선 안 닿음. 바닥 줄 끝에서 점프하면 궤적대로 쭉 먹힘)
-                const v = runnerSpeedAt(arriveT), arc0 = x0 + 230;
-                coinLine(x0 + 10, 6, G - 30, 34);
-                for (let k = 3; k <= 27; k += 3) { // 착지 직전 젤리는 빼서 바닥에서 못 줍게
-                    const h = -RUN.JUMP1 * k - RUN.GRAV / 2 * k * (k + 1); // 점프 k프레임 뒤 높이
-                    g.items.push({ type: 'coin', x: arc0 + k * v, y: (G - 22) - h });
+        // r번째 줄 만들기 (같은 종류가 몇 줄씩 묶여서 나옴)
+        function crossMakeLane(g, r) {
+            const d = crossDiff(r), C = CROSS.COLS, span = C + 6;
+            if (r < 4) return { type: 'grass', trees: r === 0 ? [] : crossTrees(0, 4) };
+            if (!g.chunk || g.chunk.left <= 0) {
+                const prev = g.chunk ? g.chunk.type : 'grass';
+                const opts = [['grass', 0.28], ['road', 0.34 + 0.08 * d], ['river', 0.22 + 0.06 * d], ['rail', 0.12]].filter(([t]) => t !== prev);
+                let x = Math.random() * opts.reduce((a, o) => a + o[1], 0), type = opts[0][0];
+                for (const [t, w] of opts) { if ((x -= w) <= 0) { type = t; break; } }
+                const len = { grass: 1 + Math.floor(Math.random() * 2), road: 1 + Math.floor(Math.random() * (2 + Math.round(3 * d))),
+                    river: 1 + Math.floor(Math.random() * (2 + Math.round(2 * d))), rail: 1 + (d > 0.5 && Math.random() < 0.4 ? 1 : 0) }[type];
+                g.chunk = { type, left: len, dir: Math.random() < 0.5 ? 1 : -1 };
+            }
+            g.chunk.left--;
+            const t = g.chunk.type;
+            if (t === 'grass') return { type: 'grass', trees: crossTrees(d) };
+            if (t === 'road') {
+                const dir = Math.random() < 0.5 ? 1 : -1;
+                const speed = crossRand(1.3, 2.1) + d * crossRand(0.6, 2.6);
+                const cars = []; let x = crossRand(-3, 0);
+                while (x < span - 3.5) {
+                    const w = Math.random() < 0.2 + 0.15 * d ? 2 : 1;
+                    cars.push({ x: x - 3, w, color: CAR_COLORS[Math.floor(Math.random() * CAR_COLORS.length)] });
+                    x += w + crossRand(2.3 - 0.7 * d, 4.6 - 1.4 * d);
                 }
-                w = 230 + 33 * v + 40;
-            } else if (pick === 'spike') {
-                w = 360 * f; g.obstacles.push({ type: 'spike', x: X(170), w: 34 });
-                coinLine(X(20), 3, G - 30); coinArc(X(120), 130 * f, 95, 6);
-            } else if (pick === 'double') {
-                w = 420 * f; g.obstacles.push({ type: 'spike', x: X(160), w: 34 }, { type: 'spike', x: X(160) + 34, w: 34 });
-                coinArc(X(110), 170 * f, 130, 7);
-            } else if (pick === 'bar') {
-                w = 380 * f; g.obstacles.push({ type: 'bar', x: X(160), w: 80 });
-                coinLine(X(160) - 30, 5, G - 12, 30);
-            } else if (pick === 'gap') {
-                const gw = 110 + Math.round(lv * 60);
-                w = 300 * f + gw; g.gapAt = { x: X(150), w: gw };
-                coinArc(X(150) - 40 * f, gw + 80 * f, 110, 7);
-            } else if (pick === 'gapSpike') {
-                const gw = 100 + Math.round(lv * 40);
-                w = 420 * f + gw; g.gapAt = { x: X(120), w: gw };
-                g.obstacles.push({ type: 'spike', x: X(120) + gw + 120 * f, w: 34 });
-                coinArc(X(120) - 40 * f, gw + 80 * f, 110, 6);
-            } else if (pick === 'barSpike') {
-                w = 520 * f; g.obstacles.push({ type: 'bar', x: X(140), w: 70 }, { type: 'spike', x: X(350), w: 34 });
-                coinLine(X(140) - 20, 4, G - 12, 30); coinArc(X(300), 130 * f, 95, 5);
-            } else if (pick === 'potion') {
-                w = 340 * f; g.items.push({ type: 'potion', x: X(180), y: G - 34 }); coinLine(X(40), 4, G - 30);
-            } else if (pick === 'bigcoin') {
-                w = 340 * f; g.items.push({ type: 'big', x: X(180), y: G - 150 }); coinLine(X(40), 4, G - 30);
+                return { type: 'road', dir, speed, cars };
             }
-            // 지형: 구멍이 있으면 땅을 두 조각으로
-            if (g.gapAt) {
-                g.ground.push({ x: x0, w: g.gapAt.x - x0 }, { x: g.gapAt.x + g.gapAt.w, w: x0 + w - (g.gapAt.x + g.gapAt.w) });
-                g.gapAt = null;
-            } else {
-                g.ground.push({ x: x0, w });
+            if (t === 'river') {
+                const dir = (g.chunk.dir = -g.chunk.dir);   // 강은 줄마다 방향이 번갈아
+                const speed = crossRand(0.8, 1.3) + d * crossRand(0.3, 1.3);
+                const logs = []; let x = crossRand(-2, 0);
+                while (x < span - 3) {
+                    const w = 2 + Math.floor(Math.random() * (d > 0.6 ? 2 : 3));
+                    logs.push({ x: x - 3, w });
+                    x += w + crossRand(1, 2 + 1.2 * d);
+                }
+                return { type: 'river', dir, speed, logs };
             }
-            g.nextX = x0 + w;
+            return { type: 'rail', dir: Math.random() < 0.5 ? 1 : -1, timer: crossRand(1.5, 5), warn: false, train: null };
+        }
+        function crossLane(g, r) {
+            if (r < 0) return { type: 'grass', trees: [] };
+            while (g.lanes.length <= r) g.lanes.push(crossMakeLane(g, g.lanes.length));
+            return g.lanes[r];
         }
 
-        function runnerOnGround(g) {
-            const l = RUN.PX + 6, r = RUN.PX + RUN.PW - 6;
-            return g.ground.some(s => r > s.x && l < s.x + s.w);
+        function startCross() {
+            crossG = { state: 'playing', t: 0, lanes: [], chunk: null, cam: CROSS.START_CAM, maxRow: 0, paused: false, buffer: null,
+                p: { x: 4, row: 0, fromX: 4, fromRow: 0, hopT: 1, face: 0 } };
+            crossLane(crossG, CROSS.VIEW + 4);
+            const btn = document.getElementById('crossStartBtn');
+            btn.textContent = '↻ 다시 시작'; btn.blur();
+            crossLastTs = 0;
+            if (!crossRaf) crossRaf = requestAnimationFrame(crossLoop);
         }
 
-        function runnerHitbox(g) {
-            const h = g.sliding ? RUN.SLIDE_H : RUN.PH;
-            return { x: RUN.PX + 5, y: g.sliding ? g.y + RUN.PH - h : g.y + 4, w: RUN.PW - 10, h: h - 4 };
+        function crossMove(dx, dy) {
+            const g = crossG;
+            if (!g || g.state === 'dead') { if (!g || performance.now() - (g.deadAtMs || 0) > 600) startCross(); return; }   // 죽자마자 실수로 다시 시작 방지
+            if (g.paused) { toggleCrossPause(); return; }
+            const p = g.p;
+            if (p.hopT < 1) { g.buffer = [dx, dy]; return; }   // 뛰는 중이면 다음 칸 예약
+            const tr = p.row + dy;
+            if (tr < 0) return;
+            const lane = crossLane(g, tr);
+            crossLane(g, tr + CROSS.VIEW + 2);
+            let tx = p.x + dx;
+            if (lane.type !== 'river') tx = Math.round(tx);   // 강이 아니면 칸에 딱 맞춰 섬
+            if (tx < -0.01 || tx > CROSS.COLS - 0.99) return;   // 화면 끝
+            if (lane.type === 'grass' && lane.trees.includes(Math.round(tx))) return;   // 나무는 못 지나감
+            p.fromX = p.x; p.fromRow = p.row; p.x = tx; p.row = tr; p.hopT = 0;
+            if (dx) p.face = dx;
+            if (tr > g.maxRow) g.maxRow = tr;
         }
 
-        function runnerStep() {
-            const g = runner;
+        function crossDie(reason) {
+            const g = crossG;
             if (g.state !== 'playing') return;
-            g.t += 1 / 60; g.anim += g.speed / 60;
-            g.speed = runnerSpeedAt(g.t);
-            const fv = runnerFeverAt(g.t);
-            if (fv.on && !g.fever) g.popups.push({ x: RUN.W / 2 - 17, y: 120, text: '🔥 FEVER! 젤리 2배', color: '#ff6d00', life: 70, big: true });
-            g.fever = fv.on;
-            const v = g.speed;
-            g.dist += v;
-            g.hills[0] = (g.hills[0] + v * 0.2) % 720; g.hills[1] = (g.hills[1] + v * 0.45) % 720;
-            // 체력 감소
-            if (!g.fever) g.energy -= runnerDrainAt(g.t) / 60; // 피버 중엔 체력 안 깎임
-            // 월드 이동
-            const move = (o) => { o.x -= v; };
-            g.ground.forEach(move); g.items.forEach(move); g.obstacles.forEach(move);
-            g.nextX -= v;
-            g.ground = g.ground.filter(s => s.x + s.w > -50);
-            g.items = g.items.filter(o => o.x > -40 && !o.got);
-            g.obstacles = g.obstacles.filter(o => o.x + o.w > -40);
-            while (g.nextX < RUN.W + 400) runnerGenerate(g);
-
-            // 입력
-            if (runnerKeys.jumpPressed) {
-                runnerKeys.jumpPressed = false;
-                if (g.jumps < 2) { g.vy = g.jumps === 0 ? RUN.JUMP1 : RUN.JUMP2; g.jumps++; g.sliding = false; }
-            }
-            const grounded = g.y + RUN.PH >= RUN.GROUND - 0.5 && g.vy >= 0 && runnerOnGround(g);
-            g.sliding = runnerKeys.slide && grounded;
-
-            // 중력·착지
-            g.vy += RUN.GRAV;
-            g.y += g.vy;
-            if (g.y + RUN.PH >= RUN.GROUND && g.y + RUN.PH - g.vy <= RUN.GROUND + 2 && runnerOnGround(g)) {
-                g.y = RUN.GROUND - RUN.PH; g.vy = 0; g.jumps = 0;
-            }
-            if (g.y > RUN.H + 40) { g.energy = 0; g.fell = true; }
-
-            // 충돌
-            const hb = runnerHitbox(g);
-            const overlap = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
-            if (g.inv > 0) g.inv--;
-            for (const o of g.obstacles) {
-                const box = o.type === 'spike'
-                    ? { x: o.x + 7, y: RUN.GROUND - 26, w: o.w - 14, h: 26 }
-                    : { x: o.x, y: 0, w: o.w, h: RUN.BAR_BOTTOM };
-                if (g.inv === 0 && !g.fever && overlap(hb, box)) { // 피버 중엔 부딪혀도 체력 안 깎임
-                    g.energy -= RUN.HIT; g.inv = 70; g.lastHit = o.type;
-                    g.popups.push({ x: RUN.PX, y: g.y - 10, text: `-${RUN.HIT}`, color: '#ff5252', life: 40 });
-                }
-            }
-            for (const it of g.items) {
-                const r = it.type === 'coin' ? 9 : 14;
-                if (overlap(hb, { x: it.x - r, y: it.y - r, w: r * 2, h: r * 2 })) {
-                    it.got = true;
-                    const mul = g.fever ? 2 : 1; // 피버 중 젤리 2배
-                    if (it.type === 'coin') g.coins += mul;
-                    else if (it.type === 'big') { g.coins += 10 * mul; g.popups.push({ x: it.x, y: it.y, text: `+${10 * mul}`, color: '#ffd400', life: 40 }); }
-                    else if (it.type === 'potion') { g.energy = Math.min(100, g.energy + RUN.POTION); g.popups.push({ x: it.x, y: it.y, text: `+${RUN.POTION} 체력`, color: '#69f0ae', life: 45 }); }
-                }
-            }
-            g.popups.forEach(p => { p.y -= 0.8; p.life--; }); g.popups = g.popups.filter(p => p.life > 0);
-            if (g.energy <= 0) runnerDie();
-        }
-
-        function runnerScore(g) { return g.coins * 10 + Math.floor(g.dist / 10); }
-
-        function runnerDie() {
-            const g = runner;
-            g.energy = 0; g.state = 'dead';
-            g.final = { score: runnerScore(g), coins: g.coins, meters: Math.floor(g.dist / 10) };
+            g.state = 'dead'; g.reason = reason; g.deadAt = g.t; g.deadAtMs = performance.now();
             const name = myGameName(), key = statKey(name);
-            const prev = (runnerScores[key] && runnerScores[key].best) || 0;
+            const prev = (crossScores[key] && crossScores[key].best) || 0;
             g.noIcon = !hasRankIcon(name);
-            g.newBest = !g.noIcon && g.final.score > prev;
-            if (g.noIcon || !db) return; // 컬렉션 아이콘 없으면 랭킹에 저장 안 함
-            const f = g.final;
-            db.ref(`${RUNNER_PATH}/${key}`).transaction(cur => {
+            g.newBest = !g.noIcon && g.maxRow > prev;
+            if (g.noIcon || !db || g.maxRow <= 0) return;   // 컬렉션 아이콘 없으면 랭킹에 저장 안 함
+            const score = g.maxRow;
+            db.ref(`${CROSS_PATH}/${key}`).transaction(cur => {
                 cur = cur || { best: 0, plays: 0 };
                 cur.plays = (cur.plays || 0) + 1;
-                if (f.score > (cur.best || 0)) { cur.best = f.score; cur.bestCoins = f.coins; cur.bestMeters = f.meters; cur.bestAt = Date.now(); }
+                if (score > (cur.best || 0)) { cur.best = score; cur.bestAt = Date.now(); }
                 cur.updatedAt = Date.now();
                 return cur;
             });
-            recordWeeklyScore('runner', name, f.score, { coins: f.coins, meters: f.meters });
+            recordWeeklyScore('cross', name, score);
+        }
+
+        function crossStep(dt) {
+            const g = crossG, p = g.p, C = CROSS.COLS, span = C + 6;
+            g.t += dt;
+            // 화면 근처 줄만 움직임
+            const lo = Math.max(0, Math.floor(g.cam) - 1), hi = Math.ceil(g.cam + CROSS.VIEW) + 1;
+            for (let r = lo; r <= hi; r++) {
+                const L = crossLane(g, r);
+                if (L.type === 'road' || L.type === 'river') {
+                    (L.cars || L.logs).forEach(o => {
+                        o.x += L.dir * L.speed * dt;
+                        if (o.x > C + 3) o.x -= span; else if (o.x + o.w < -3) o.x += span;
+                    });
+                } else if (L.type === 'rail') {
+                    if (!L.train) {
+                        L.timer -= dt; L.warn = L.timer < 1.3;
+                        if (L.timer <= 0) L.train = { x: L.dir > 0 ? -15 : C + 1, w: 14 };
+                    } else {
+                        L.train.x += L.dir * 22 * dt;
+                        if ((L.dir > 0 && L.train.x > C + 2) || (L.dir < 0 && L.train.x + L.train.w < -2)) { L.train = null; L.warn = false; L.timer = crossRand(2.5, 6.5); }
+                    }
+                }
+            }
+            // 뛰기
+            if (p.hopT < 1) {
+                p.hopT = Math.min(1, p.hopT + dt / CROSS.HOP);
+                if (p.hopT >= 1 && g.buffer) { const [bx, by] = g.buffer; g.buffer = null; crossMove(bx, by); }
+            }
+            // 부딪힘 판정 (착지 무렵부터)
+            if (p.hopT >= 0.55) {
+                const L = crossLane(g, p.row), cx = p.x + 0.5;
+                if (L.type === 'road') {
+                    if (L.cars.some(c => Math.abs(c.x + c.w / 2 - cx) < c.w / 2 + 0.32)) return crossDie('car');
+                } else if (L.type === 'rail') {
+                    if (L.train && cx > L.train.x - 0.2 && cx < L.train.x + L.train.w + 0.2) return crossDie('train');
+                } else if (L.type === 'river' && p.hopT >= 1) {
+                    const log = L.logs.find(o => cx >= o.x - 0.12 && cx <= o.x + o.w + 0.12);
+                    if (!log) return crossDie('drown');
+                    p.x += L.dir * L.speed * dt; p.fromX = p.x;   // 통나무 타고 떠내려감
+                    if (p.x < -0.45 || p.x > C - 0.55) return crossDie('carried');
+                }
+            }
+            // 카메라: 주인공을 따라가고, 4초 뒤부터는 저절로 조금씩 앞으로 (머뭇거리면 잡힘)
+            const target = p.row - 3;
+            if (target > g.cam) g.cam += (target - g.cam) * Math.min(1, dt * 5);
+            if (g.t > 4) g.cam += dt * Math.min(0.6, 0.14 + g.maxRow * 0.0025);
+            if (p.hopT >= 1 && p.row < g.cam - 0.35) return crossDie('slow');
+        }
+
+        function crossLoop(ts) {
+            crossRaf = null;
+            if (!crossG) return;
+            if (!isCrossVisible()) { if (crossG.state === 'playing') crossG.paused = true; return; }
+            if (crossG.paused) { drawCross(); return; }
+            if (!crossLastTs) crossLastTs = ts;
+            let dt = Math.min(0.1, (ts - crossLastTs) / 1000);
+            crossLastTs = ts;
+            while (dt > 0 && crossG.state === 'playing') { const h = Math.min(dt, 1 / 120); crossStep(h); dt -= h; }
+            if (crossG.state === 'dead') crossG.t += dt;
+            drawCross();
+            if (crossG.state === 'playing' || crossG.t - crossG.deadAt < 1) crossRaf = requestAnimationFrame(crossLoop);
+        }
+
+        function toggleCrossPause() {
+            if (!crossG || crossG.state !== 'playing') return;
+            crossG.paused = !crossG.paused;
+            if (!crossG.paused) { crossLastTs = 0; if (!crossRaf) crossRaf = requestAnimationFrame(crossLoop); }
+            drawCross();
         }
 
         // ---------- 그리기 ----------
-        function drawCookie(ctx, x, y, g) {
-            const sliding = g && g.sliding, inAir = g && g.vy !== 0 && !sliding;
-            if (g && g.inv > 0 && Math.floor(g.inv / 5) % 2 === 0) return; // 맞으면 깜빡임
-            ctx.save();
-            const body = '#c97a3a', dark = '#8d4e1d', icing = '#fff8ee';
-            const grad = (cx, cy, r) => { const gr = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.4, 1, cx, cy, r * 1.2); gr.addColorStop(0, '#e9a566'); gr.addColorStop(0.6, body); gr.addColorStop(1, dark); return gr; };
-            const t = g ? g.anim : 0;
-            if (sliding) {
-                // 미끄러지기: 몸을 눕힘
-                ctx.translate(x + 17, y + RUN.PH - 12);
-                ctx.rotate(-1.35);
-                ctx.translate(-17, -24);
-            } else {
-                ctx.translate(x, y);
-            }
-            const leg = sliding ? 0 : inAir ? 0.5 : Math.sin(t * 0.9) * 0.7;
-            // 다리
-            const limb = (lx, ly, ang, len) => { ctx.save(); ctx.translate(lx, ly); ctx.rotate(ang); ctx.beginPath(); ctx.ellipse(0, len / 2, 5.5, len / 2 + 2, 0, 0, Math.PI * 2); ctx.fillStyle = grad(0, len / 2, 8); ctx.fill(); ctx.strokeStyle = dark; ctx.lineWidth = 1; ctx.stroke(); ctx.restore(); };
-            limb(12, 34, leg, 12); limb(22, 34, -leg, 12);
-            // 팔
-            const arm = inAir ? -2.4 : -leg * 0.8 - 0.4;
-            limb(6, 22, arm + 0.6, 11); limb(28, 22, -arm - 0.6, 11);
-            // 몸통
-            ctx.beginPath(); ctx.ellipse(17, 28, 12, 11, 0, 0, Math.PI * 2); ctx.fillStyle = grad(17, 28, 12); ctx.fill(); ctx.strokeStyle = dark; ctx.stroke();
-            // 단추
-            ctx.fillStyle = '#ff5c8a'; [24, 31].forEach(by => { ctx.beginPath(); ctx.arc(17, by, 2, 0, Math.PI * 2); ctx.fill(); });
-            // 머리
-            ctx.beginPath(); ctx.arc(18, 11, 12, 0, Math.PI * 2); ctx.fillStyle = grad(18, 11, 12); ctx.fill(); ctx.strokeStyle = dark; ctx.stroke();
-            // 아이싱 테두리 (물결)
-            ctx.strokeStyle = icing; ctx.lineWidth = 1.6; ctx.beginPath();
-            for (let a = 0; a <= Math.PI * 2 + 0.01; a += 0.25) { const rr = 9.5 + Math.sin(a * 6) * 0.8; const px = 18 + Math.cos(a) * rr, py = 11 + Math.sin(a) * rr; a === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py); }
-            ctx.stroke();
-            // 눈·입·볼
-            ctx.fillStyle = '#3a1d08';
-            ctx.beginPath(); ctx.arc(15, 9, 1.8, 0, Math.PI * 2); ctx.arc(23, 9, 1.8, 0, Math.PI * 2); ctx.fill();
-            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(15.6, 8.3, 0.6, 0, Math.PI * 2); ctx.arc(23.6, 8.3, 0.6, 0, Math.PI * 2); ctx.fill();
-            ctx.fillStyle = 'rgba(255,120,150,0.75)'; ctx.beginPath(); ctx.arc(12, 13, 2.3, 0, Math.PI * 2); ctx.arc(26, 13, 2.3, 0, Math.PI * 2); ctx.fill();
-            ctx.strokeStyle = icing; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(19, 13, 3.2, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke();
-            ctx.restore();
+        function crossPlayerImg() {
+            const e = iconOf(myGameName());
+            if (!e || typeof emojiCode !== 'function') return null;
+            const src = `emoji3d/${emojiCode(e)}.webp?v=${EMOJI_3D_VER}`;
+            if (!crossImgs[src]) { const im = new Image(); im.onload = () => drawCross(); im.src = src; crossImgs[src] = im; }
+            const im = crossImgs[src];
+            return im.complete && im.naturalWidth ? im : null;
         }
-
-        function drawRunner() {
-            const canvas = document.getElementById('runnerCanvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const { W, H, GROUND } = RUN;
-            const g = runner;
-            // 하늘
-            const sky = ctx.createLinearGradient(0, 0, 0, H);
-            if (g && g.fever) { sky.addColorStop(0, '#ff9a3c'); sky.addColorStop(0.5, '#ffd56b'); sky.addColorStop(1, '#fff3c4'); }
-            else { sky.addColorStop(0, '#7fd3ff'); sky.addColorStop(1, '#e8f8ff'); }
-            ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
-            if (g && g.fever) {
-                // 피버 배경: 반짝이는 빛줄기
-                ctx.save(); ctx.globalAlpha = 0.18; ctx.fillStyle = '#fff';
-                for (let i = 0; i < 6; i++) { const x = ((i * 140 - g.dist * 0.6) % 840 + 840) % 840 - 60; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 50, 0); ctx.lineTo(x - 30, H); ctx.lineTo(x - 80, H); ctx.closePath(); ctx.fill(); }
-                ctx.restore();
-            }
-            // 먼 언덕 / 가까운 언덕 (패럴랙스)
-            const hills = (off, color, base, amp, period) => {
-                ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(0, H);
-                for (let x = 0; x <= W; x += 10) ctx.lineTo(x, base - Math.sin((x + off) / period) * amp - Math.sin((x + off) / (period * 0.37)) * amp * 0.3);
-                ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
-            };
-            hills(g ? g.hills[0] : 0, '#b6e3a8', 230, 28, 110);
-            hills(g ? g.hills[1] : 0, '#8fd18a', 262, 18, 70);
-            // 땅
-            const ground = g ? g.ground : [{ x: 0, w: W }];
-            for (const s of ground) {
-                ctx.fillStyle = '#9c6b3c'; ctx.fillRect(s.x, GROUND, s.w, H - GROUND);
-                ctx.fillStyle = '#7a5230'; for (let i = 0; i < s.w; i += 28) ctx.fillRect(s.x + i + 6, GROUND + 22, 10, 4);
-                ctx.fillStyle = '#5cbf4a'; ctx.fillRect(s.x, GROUND - 4, s.w, 10);
-                ctx.fillStyle = '#7ad66a'; ctx.fillRect(s.x, GROUND - 4, s.w, 3);
-            }
-            if (g) {
-                // 장애물
-                for (const o of g.obstacles) {
-                    if (o.type === 'spike') {
-                        for (let i = 0; i < 2; i++) {
-                            const sx = o.x + i * (o.w / 2);
-                            const gr = ctx.createLinearGradient(sx, GROUND - 30, sx + o.w / 2, GROUND);
-                            gr.addColorStop(0, '#eceff1'); gr.addColorStop(1, '#78909c');
-                            ctx.fillStyle = gr; ctx.beginPath(); ctx.moveTo(sx, GROUND); ctx.lineTo(sx + o.w / 4, GROUND - 30); ctx.lineTo(sx + o.w / 2, GROUND); ctx.closePath(); ctx.fill();
-                            ctx.strokeStyle = '#455a64'; ctx.lineWidth = 1; ctx.stroke();
-                        }
-                    } else {
-                        // 위에서 내려온 막대 (슬라이드로 통과)
-                        const bh = RUN.BAR_BOTTOM;
-                        ctx.fillStyle = '#6d4c41'; ctx.fillRect(o.x + o.w / 2 - 3, 0, 6, bh - 26);
-                        for (let i = 0; i < o.w; i += 16) { ctx.fillStyle = (i / 16) % 2 ? '#fff' : '#e53935'; ctx.fillRect(o.x + i, bh - 26, Math.min(16, o.w - i), 26); }
-                        ctx.strokeStyle = '#7f0000'; ctx.lineWidth = 2; ctx.strokeRect(o.x, bh - 26, o.w, 26);
+        function crossRound(ctx, x, y, w, h, r) {
+            ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+        }
+        function drawCross() {
+            const cv = document.getElementById('crossCanvas');
+            if (!cv) return;
+            const ctx = cv.getContext('2d'), S = CROSS.CELL, W = cv.width, H = cv.height, C = CROSS.COLS;
+            const g = crossG || { cam: CROSS.START_CAM, lanes: [], t: 0, p: { x: 4, row: 0, fromX: 4, fromRow: 0, hopT: 1 }, maxRow: 0 };
+            const rowY = (r) => H - (r - g.cam + 1) * S;
+            const lo = Math.floor(g.cam) - 1, hi = Math.ceil(g.cam + CROSS.VIEW);
+            const laneAt = (r) => crossG ? crossLane(crossG, r) : (r < 4 ? { type: 'grass', trees: r === 0 || r < 0 ? [] : [r % C] } : { type: 'grass', trees: [] });
+            ctx.clearRect(0, 0, W, H);
+            // 바닥
+            for (let r = lo; r <= hi; r++) {
+                const L = laneAt(r), y = rowY(r);
+                if (L.type === 'grass') {
+                    ctx.fillStyle = (r & 1) ? '#5bb450' : '#52a847'; ctx.fillRect(0, y, W, S);
+                    ctx.fillStyle = 'rgba(0,0,0,0.06)';
+                    for (let i = 0; i < 5; i++) { const tx = ((r * 37 + i * 91) % W + W) % W; ctx.fillRect(tx, y + ((r * 13 + i * 17) % (S - 8) + S) % S, 6, 3); }
+                } else if (L.type === 'road') {
+                    ctx.fillStyle = '#3a3d46'; ctx.fillRect(0, y, W, S);
+                    if (laneAt(r + 1).type === 'road') { ctx.fillStyle = 'rgba(255,255,255,0.55)'; for (let x = 6; x < W; x += 36) ctx.fillRect(x, y - 1.5, 18, 3); }
+                    else { ctx.fillStyle = '#9e9e9e'; ctx.fillRect(0, y, W, 3); }
+                    if (laneAt(r - 1).type !== 'road') { ctx.fillStyle = '#9e9e9e'; ctx.fillRect(0, y + S - 3, W, 3); }
+                } else if (L.type === 'river') {
+                    ctx.fillStyle = '#2f8fd8'; ctx.fillRect(0, y, W, S);
+                    ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 2;
+                    for (let i = 0; i < 4; i++) {
+                        const wx = (((g.t * 30 * (L.dir || 1) + i * 120 + r * 50) % (W + 60)) + W + 60) % (W + 60) - 30;
+                        ctx.beginPath(); ctx.moveTo(wx, y + 14 + (i % 2) * 18); ctx.quadraticCurveTo(wx + 10, y + 9 + (i % 2) * 18, wx + 20, y + 14 + (i % 2) * 18); ctx.stroke();
                     }
-                }
-                // 아이템
-                const spin = Math.abs(Math.cos(g.t * 4));
-                for (const it of g.items) {
-                    if (it.type === 'coin') {
-                        // 젤리 (말랑한 콩 모양)
-                        ctx.save(); ctx.translate(it.x, it.y); ctx.rotate(Math.sin(g.t * 4 + it.x * 0.05) * 0.25); ctx.scale(0.85 + 0.15 * spin, 1);
-                        const gr = ctx.createRadialGradient(-3, -4, 1, 0, 0, 11); gr.addColorStop(0, '#ffe0ef'); gr.addColorStop(0.5, '#ff5fa2'); gr.addColorStop(1, '#c2185b');
-                        ctx.fillStyle = gr; ctx.beginPath(); ctx.ellipse(0, 0, 6.5, 9.5, 0, 0, Math.PI * 2); ctx.fill();
-                        ctx.strokeStyle = '#8e0f45'; ctx.lineWidth = 1; ctx.stroke();
-                        ctx.fillStyle = 'rgba(255,255,255,0.75)'; ctx.beginPath(); ctx.ellipse(-2, -4, 1.8, 3, -0.3, 0, Math.PI * 2); ctx.fill();
-                        ctx.restore();
-                    } else if (it.type === 'big') {
-                        // 왕젤리
-                        ctx.save(); ctx.translate(it.x, it.y);
-                        ctx.shadowColor = '#b388ff'; ctx.shadowBlur = 14;
-                        const bg = ctx.createRadialGradient(-4, -5, 2, 0, 0, 16); bg.addColorStop(0, '#f3e5ff'); bg.addColorStop(0.5, '#b388ff'); bg.addColorStop(1, '#6a1bd1');
-                        ctx.fillStyle = bg; ctx.beginPath(); ctx.ellipse(0, 0, 13, 16, 0, 0, Math.PI * 2); ctx.fill();
-                        ctx.shadowBlur = 0; ctx.fillStyle = '#fff'; ctx.font = 'bold 16px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('★', 0, 1);
-                        ctx.restore();
-                    } else if (it.type === 'potion') {
-                        ctx.save(); ctx.translate(it.x, it.y + Math.sin(g.t * 5) * 3);
-                        ctx.fillStyle = '#e53935'; ctx.beginPath(); ctx.arc(0, 4, 10, 0, Math.PI * 2); ctx.fill();
-                        ctx.fillStyle = '#ffcdd2'; ctx.fillRect(-4, -12, 8, 8);
-                        ctx.fillStyle = '#8d6e63'; ctx.fillRect(-5, -15, 10, 4);
-                        ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.beginPath(); ctx.arc(-4, 0, 3, 0, Math.PI * 2); ctx.fill();
-                        ctx.restore();
-                    }
-                }
-            }
-            if (g && g.fever) { ctx.save(); ctx.shadowColor = '#ffb300'; ctx.shadowBlur = 22; drawCookie(ctx, RUN.PX, g.y, g); ctx.restore(); }
-            else drawCookie(ctx, RUN.PX, g ? g.y : GROUND - RUN.PH, g);
-            if (g) {
-                for (const p of g.popups) {
-                    ctx.globalAlpha = Math.min(1, p.life / 20); ctx.fillStyle = p.color; ctx.textAlign = 'center';
-                    ctx.font = p.big ? 'bold 30px "Segoe UI", sans-serif' : 'bold 15px "Segoe UI", sans-serif';
-                    if (p.big) { ctx.lineWidth = 5; ctx.strokeStyle = '#fff'; ctx.strokeText(p.text, p.x + 17, p.y); }
-                    ctx.fillText(p.text, p.x + 17, p.y);
-                }
-                ctx.globalAlpha = 1;
-                // HUD: 체력 바 + 점수
-                ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(14, 12, 204, 18);
-                const e = Math.max(0, g.energy) / 100;
-                ctx.fillStyle = e > 0.5 ? '#43d17a' : e > 0.25 ? '#ffb300' : '#ff5252'; ctx.fillRect(16, 14, 200 * e, 14);
-                ctx.fillStyle = '#fff'; ctx.font = 'bold 12px "Segoe UI", sans-serif'; ctx.textAlign = 'left'; ctx.fillText(`❤ 체력 ${Math.ceil(Math.max(0, g.energy))}`, 20, 25);
-                ctx.textAlign = 'right'; ctx.font = 'bold 18px "Segoe UI", sans-serif'; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(0,0,0,0.45)';
-                const hud = `${g.coins}  ·  ${Math.floor(g.dist / 10)}m  ·  ${runnerScore(g)}점`;
-                ctx.strokeText(hud, W - 14, 27); ctx.fillStyle = '#fff'; ctx.fillText(hud, W - 14, 27);
-                // 젤리 아이콘 (진짜 코인과 헷갈리지 않게 분홍 젤리)
-                const cx = W - 14 - ctx.measureText(hud).width - 12;
-                ctx.fillStyle = '#ff5fa2'; ctx.beginPath(); ctx.ellipse(cx, 21, 6, 9, 0, 0, Math.PI * 2); ctx.fill();
-                ctx.strokeStyle = '#8e0f45'; ctx.lineWidth = 1.2; ctx.stroke();
-                ctx.fillStyle = 'rgba(255,255,255,0.75)'; ctx.beginPath(); ctx.ellipse(cx - 2, 17, 1.6, 2.6, -0.3, 0, Math.PI * 2); ctx.fill();
-                // 피버 표시 / 다음 피버 안내 + 속도
-                const fv = runnerFeverAt(g.t);
-                ctx.textAlign = 'left'; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(0,0,0,0.45)';
-                if (fv.on) {
-                    ctx.font = 'bold 17px "Segoe UI", sans-serif';
-                    const ft = `🔥 FEVER ×2  ${fv.left.toFixed(1)}초`;
-                    ctx.strokeText(ft, 14, 52); ctx.fillStyle = '#ffeb3b'; ctx.fillText(ft, 14, 52);
                 } else {
-                    ctx.font = 'bold 12px "Segoe UI", sans-serif';
-                    const ft = fv.over ? '🏁 피버 끝 — 마지막 질주!' : fv.next <= 3 ? `🔥 곧 피버! ${Math.ceil(fv.next)}` : `🔥 다음 피버 ${Math.ceil(fv.next)}초`;
-                    ctx.strokeText(ft, 14, 48); ctx.fillStyle = fv.next <= 3 ? '#ffeb3b' : '#fff'; ctx.fillText(ft, 14, 48);
+                    ctx.fillStyle = '#7b6a58'; ctx.fillRect(0, y, W, S);
+                    ctx.fillStyle = '#5d4037'; for (let x = 4; x < W; x += 18) ctx.fillRect(x, y + 6, 8, S - 12);
+                    ctx.fillStyle = '#cfd8dc'; ctx.fillRect(0, y + S * 0.3, W, 3); ctx.fillRect(0, y + S * 0.67, W, 3);
+                    // 신호등 (기차 오기 전에 빨간불 깜빡)
+                    ctx.fillStyle = '#263238'; ctx.fillRect(W - 14, y + 4, 10, S - 8);
+                    ctx.fillStyle = L.warn && Math.floor(g.t * 6) % 2 === 0 ? '#ff1744' : '#4e342e';
+                    ctx.beginPath(); ctx.arc(W - 9, y + 13, 4, 0, Math.PI * 2); ctx.fill();
                 }
-                ctx.font = 'bold 12px "Segoe UI", sans-serif'; ctx.textAlign = 'right';
-                const sp = `⚡ 속도 ×${(g.speed / RUN.SPEED0).toFixed(1)}`;
-                ctx.strokeText(sp, W - 14, 48); ctx.fillStyle = g.speed > 18 ? '#ff8a80' : '#fff'; ctx.fillText(sp, W - 14, 48);
             }
-            ctx.textAlign = 'center';
+            // 통나무·나무
+            for (let r = lo; r <= hi; r++) {
+                const L = laneAt(r), y = rowY(r);
+                if (L.type === 'river') L.logs.forEach(o => {
+                    ctx.fillStyle = '#8d5a2b'; crossRound(ctx, o.x * S + 2, y + 7, o.w * S - 4, S - 14, 10); ctx.fill();
+                    ctx.fillStyle = '#a8743f'; ctx.fillRect(o.x * S + 10, y + 12, o.w * S - 20, 3);
+                    ctx.fillStyle = '#c49158'; ctx.beginPath(); ctx.arc(o.x * S + o.w * S - 10, y + S / 2, 7, 0, Math.PI * 2); ctx.fill();
+                });
+                if (L.type === 'grass') L.trees.forEach(c => {
+                    const x = c * S;
+                    ctx.fillStyle = '#6d4c41'; ctx.fillRect(x + S / 2 - 4, y + S - 16, 8, 12);
+                    ctx.fillStyle = '#2e7d32'; ctx.beginPath(); ctx.arc(x + S / 2, y + S / 2 - 2, S * 0.36, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#43a047'; ctx.beginPath(); ctx.arc(x + S / 2 - 5, y + S / 2 - 7, S * 0.2, 0, Math.PI * 2); ctx.fill();
+                });
+            }
+            // 주인공
+            const p = g.p, k = p.hopT;
+            const px = (p.fromX + (p.x - p.fromX) * k) * S, prow = p.fromRow + (p.row - p.fromRow) * k;
+            const py = rowY(prow) - Math.sin(Math.min(1, k) * Math.PI) * S * 0.28;
+            const dead = crossG && crossG.state === 'dead';
+            ctx.save();
+            if (dead && (crossG.reason === 'drown')) ctx.globalAlpha = 0.45;
+            if (dead && (crossG.reason === 'car' || crossG.reason === 'train')) { ctx.translate(px + S / 2, py + S * 0.8); ctx.scale(1.25, 0.35); ctx.translate(-(px + S / 2), -(py + S * 0.8)); }
+            ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.beginPath(); ctx.ellipse(px + S / 2, rowY(prow) + S * 0.82, S * 0.3, S * 0.1, 0, 0, Math.PI * 2); ctx.fill();
+            const img = crossPlayerImg();
+            if (img) ctx.drawImage(img, px + S * 0.06, py + S * 0.02, S * 0.88, S * 0.88);
+            else {
+                ctx.fillStyle = '#ffd54f'; ctx.beginPath(); ctx.arc(px + S / 2, py + S * 0.55, S * 0.32, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#ffca28'; ctx.beginPath(); ctx.arc(px + S / 2 - S * 0.16 * (p.face || 1), py + S * 0.6, S * 0.13, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#ff8f00'; ctx.beginPath(); ctx.moveTo(px + S / 2 + 2, py + S * 0.48); ctx.lineTo(px + S / 2 + 11, py + S * 0.53); ctx.lineTo(px + S / 2 + 2, py + S * 0.58); ctx.fill();
+                ctx.fillStyle = '#212121'; ctx.beginPath(); ctx.arc(px + S / 2 - 2, py + S * 0.44, 2.6, 0, Math.PI * 2); ctx.fill();
+            }
+            ctx.restore();
+            // 자동차·기차 (주인공 위로 지나감)
+            for (let r = lo; r <= hi; r++) {
+                const L = laneAt(r), y = rowY(r);
+                if (L.type === 'road') L.cars.forEach(c => {
+                    const x = c.x * S, w = c.w * S;
+                    ctx.fillStyle = c.color; crossRound(ctx, x + 3, y + 8, w - 6, S - 16, 8); ctx.fill();
+                    ctx.fillStyle = 'rgba(20,30,50,0.75)'; crossRound(ctx, x + (L.dir > 0 ? w * 0.55 : w * 0.15), y + 12, w * 0.3, S - 24, 4); ctx.fill();
+                    ctx.fillStyle = '#fff59d'; const hx = L.dir > 0 ? x + w - 6 : x + 3; ctx.fillRect(hx, y + 11, 3, 5); ctx.fillRect(hx, y + S - 16, 3, 5);
+                    ctx.fillStyle = '#212121'; ctx.fillRect(x + 8, y + 5, 10, 4); ctx.fillRect(x + w - 18, y + 5, 10, 4); ctx.fillRect(x + 8, y + S - 9, 10, 4); ctx.fillRect(x + w - 18, y + S - 9, 10, 4);
+                });
+                if (L.type === 'rail' && L.train) {
+                    const x = L.train.x * S, w = L.train.w * S;
+                    ctx.fillStyle = '#c62828'; crossRound(ctx, x, y + 5, w, S - 10, 10); ctx.fill();
+                    ctx.fillStyle = '#ffe082'; for (let wx = x + 14; wx < x + w - 20; wx += 30) ctx.fillRect(wx, y + 13, 16, S - 26);
+                    ctx.fillStyle = '#8e0000'; for (let cx = x + S * 3.5; cx < x + w - 10; cx += S * 3.5) ctx.fillRect(cx, y + 5, 4, S - 10);
+                }
+            }
+            // 점수
+            ctx.textAlign = 'left'; ctx.font = 'bold 26px "Segoe UI", sans-serif'; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.fillStyle = '#fff';
+            ctx.strokeText(`${g.maxRow}`, 12, 34); ctx.fillText(`${g.maxRow}`, 12, 34);
+            const mine = crossScores[statKey(myGameName())];
+            if (mine && mine.best) { ctx.font = 'bold 13px "Segoe UI", sans-serif'; ctx.textAlign = 'right'; ctx.strokeText(`최고 ${mine.best}`, W - 10, 24); ctx.fillText(`최고 ${mine.best}`, W - 10, 24); }
+            // 안내 화면
             const overlay = (lines) => {
-                ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(0, H / 2 - 70, W, 140);
-                lines.forEach(([txt, font, color], i) => { ctx.font = font; ctx.fillStyle = color; ctx.fillText(txt, W / 2, H / 2 - 30 + i * 34); });
+                ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(0, H / 2 - 90, W, 170); ctx.textAlign = 'center';
+                lines.forEach(([txt, font, color], i) => { ctx.font = font; ctx.fillStyle = color; ctx.fillText(txt, W / 2, H / 2 - 45 + i * 38); });
             };
-            if (!g) overlay([['🍪 쿠키 러너', 'bold 30px "Segoe UI", sans-serif', '#ffd400'], ['Space/↑ 점프(2단 점프) · ↓ 슬라이드', '15px "Segoe UI", sans-serif', '#fff'], ['▶ 시작 버튼 또는 Space', '14px "Segoe UI", sans-serif', 'rgba(255,255,255,0.8)']]);
-            else if (g.state === 'dead') overlay([
-                [g.fell ? '낭떠러지로 떨어졌어요!' : '체력이 다 떨어졌어요!', 'bold 24px "Segoe UI", sans-serif', '#ff8a80'],
-                [`${g.final.score}점 (젤리 ${g.final.coins}개 · ${g.final.meters}m)${g.newBest ? '  🎉 최고 기록!' : ''}`, 'bold 22px "Segoe UI", sans-serif', '#fff'],
-                [g.noIcon ? '🔒 컬렉션 아이콘을 지정해야 랭킹에 올라가요' : 'Space 또는 ↻ 다시 시작', '14px "Segoe UI", sans-serif', g.noIcon ? '#ffb74d' : 'rgba(255,255,255,0.8)']
-            ]);
-            else if (g.paused) overlay([['⏸ 일시정지', 'bold 26px "Segoe UI", sans-serif', '#fff'], ['P 또는 ⏸ 버튼으로 계속', '14px "Segoe UI", sans-serif', 'rgba(255,255,255,0.8)']]);
+            if (!crossG) overlay([['🐥 길건너기', 'bold 30px "Segoe UI", sans-serif', '#b9f6ca'], ['↑ 앞으로 · ← → 옆 · ↓ 뒤로', '15px "Segoe UI", sans-serif', '#fff'], ['차·물·기차를 피해 최대한 멀리!', '14px "Segoe UI", sans-serif', '#fff'], ['▶ 시작 · Space · 화면 터치', '14px "Segoe UI", sans-serif', 'rgba(255,255,255,0.8)']]);
+            else if (crossG.state === 'dead') {
+                const why = { car: '🚗 차에 치였어요!', train: '🚆 기차에 치였어요!', drown: '🌊 물에 빠졌어요!', carried: '🌊 떠내려갔어요!', slow: '⏳ 너무 머뭇거렸어요!' }[crossG.reason] || '끝!';
+                overlay([[why, 'bold 24px "Segoe UI", sans-serif', '#ff8a80'], [`${crossG.maxRow}칸${crossG.newBest ? '  🎉 최고 기록!' : ''}`, 'bold 26px "Segoe UI", sans-serif', '#fff'],
+                    [crossG.noIcon ? '🔒 컬렉션 아이콘을 지정해야 랭킹에 올라가요' : 'Space · 방향키 · 터치로 다시 시작', '14px "Segoe UI", sans-serif', crossG.noIcon ? '#ffb74d' : 'rgba(255,255,255,0.85)']]);
+            } else if (crossG.paused) overlay([['⏸ 일시정지', 'bold 26px "Segoe UI", sans-serif', '#fff'], ['P 또는 ⏸ 버튼으로 계속', '14px "Segoe UI", sans-serif', 'rgba(255,255,255,0.8)']]);
         }
 
-        function runnerLoop(ts) {
-            runnerRaf = null;
-            if (!runner) return;
-            if (!isRunnerVisible()) { if (runner.state === 'playing') runner.paused = true; return; }
-            if (runner.paused) { drawRunner(); return; }
-            if (!runnerLastTs) runnerLastTs = ts;
-            runnerAcc += Math.min(100, ts - runnerLastTs);
-            runnerLastTs = ts;
-            const STEP = 1000 / 60;
-            while (runnerAcc >= STEP) { runnerStep(); runnerAcc -= STEP; }
-            drawRunner();
-            if (runner.state === 'playing') runnerRaf = requestAnimationFrame(runnerLoop);
-        }
-
-        function toggleRunnerPause() {
-            if (!runner || runner.state !== 'playing') return;
-            runner.paused = !runner.paused;
-            if (!runner.paused) { runnerLastTs = 0; if (!runnerRaf) runnerRaf = requestAnimationFrame(runnerLoop); }
-            drawRunner();
-        }
-
-        function runnerJump() {
-            if (!runner || runner.state === 'dead') { startRunner(); return; }
-            if (runner.paused) { toggleRunnerPause(); return; }
-            runnerKeys.jumpPressed = true;
-        }
-
-        function renderRunnerRanking() {
-            const el = document.getElementById('runnerRanking');
+        function renderCrossRanking() {
+            const el = document.getElementById('crossRanking');
             if (!el) return;
             const me = statKey(myGameName());
-            const rows = Object.entries(runnerScores)
-                .map(([name, d]) => ({ name, best: d.best || 0, coins: d.bestCoins || 0, meters: d.bestMeters || 0, plays: d.plays || 0 }))
-                .filter(r => r.best > 0 && hasRankIcon(r.name)) // 컬렉션 아이콘 지정한 사람만
+            const rows = Object.entries(crossScores)
+                .map(([name, d]) => ({ name, best: (d && d.best) || 0, plays: (d && d.plays) || 0 }))
+                .filter(r => r.best > 0 && hasRankIcon(r.name))   // 컬렉션 아이콘 지정한 사람만
                 .sort((a, b) => b.best - a.best);
             const medal = (i) => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
             el.innerHTML = rows.length
-                ? `<table><tr><th>순위</th><th>이름</th><th>최고 점수</th><th>젤리 · 거리</th><th>판수</th></tr>${rows.slice(0, 10).map((r, i) => `
+                ? `<table><tr><th>순위</th><th>이름</th><th>최고 기록</th><th>판수</th></tr>${rows.slice(0, 10).map((r, i) => `
                     <tr class="${r.name === me ? 'dodge-me' : ''}"><td>${medal(i)}</td><td>${nameWithIcon(r.name)}</td>
-                    <td class="dodge-best">${r.best.toLocaleString()}점</td><td>🍬${r.coins} · ${r.meters}m</td><td>${r.plays}</td></tr>`).join('')}</table>`
+                    <td class="dodge-best">${r.best.toLocaleString()}칸</td><td>${r.plays}</td></tr>`).join('')}</table>`
                 : '<div class="gs-empty">아직 기록이 없어요. 첫 기록의 주인공이 되어 보세요!</div>';
-            const mine = runnerScores[me];
+            const mine = crossScores[me];
             const myRank = rows.findIndex(r => r.name === me);
-            document.getElementById('runnerMyBest').innerHTML = !hasRankIcon(myGameName())
+            document.getElementById('crossMyBest').innerHTML = !hasRankIcon(myGameName())
                 ? RANK_ICON_NOTICE
-                : mine && mine.best
-                    ? `내 최고 <b>${mine.best.toLocaleString()}점</b>${myRank >= 0 ? ` · ${myRank + 1}위` : ''} · ${mine.plays || 0}판`
-                    : '아직 내 기록이 없어요';
+                : mine && mine.best ? `내 최고 <b>${mine.best.toLocaleString()}칸</b>${myRank >= 0 ? ` · ${myRank + 1}위` : ''} · ${mine.plays || 0}판` : '아직 내 기록이 없어요';
         }
 
-        function setupRunnerRanking() {
+        function setupCrossRanking() {
             if (!db) return;
-            db.ref(RUNNER_PATH).off();
-            db.ref(RUNNER_PATH).on('value', snap => { runnerScores = snap.val() || {}; renderRunnerRanking(); });
+            db.ref(CROSS_PATH).off();
+            db.ref(CROSS_PATH).on('value', snap => { crossScores = snap.val() || {}; renderCrossRanking(); });
         }
 
-        let runnerInited = false;
-        function initRunner() {
-            if (runnerInited || !document.getElementById('runnerCanvas')) return;
-            runnerInited = true;
+        let crossInited = false;
+        function initCross() {
+            if (crossInited || !document.getElementById('crossCanvas')) return;
+            crossInited = true;
             const isTyping = (e) => { const t = e.target; return t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable); };
+            const KEYS = { ArrowUp: [0, 1], KeyW: [0, 1], ArrowDown: [0, -1], KeyS: [0, -1], ArrowLeft: [-1, 0], KeyA: [-1, 0], ArrowRight: [1, 0], KeyD: [1, 0] };
             document.addEventListener('keydown', (e) => {
-                if (!isRunnerVisible() || isTyping(e)) return;
-                if (['Space', 'ArrowUp', 'KeyW'].includes(e.code)) { e.preventDefault(); if (!e.repeat) runnerJump(); }
-                else if (['ArrowDown', 'KeyS'].includes(e.code)) { e.preventDefault(); runnerKeys.slide = true; }
-                else if (e.code === 'KeyP') toggleRunnerPause();
+                if (!isCrossVisible() || isTyping(e)) return;
+                if (KEYS[e.code]) { e.preventDefault(); if (!e.repeat) crossMove(...KEYS[e.code]); }
+                else if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); if (!crossG || crossG.state === 'dead') crossMove(0, 1); else if (crossG.paused) toggleCrossPause(); }
+                else if (e.code === 'KeyP') toggleCrossPause();
             });
-            document.addEventListener('keyup', (e) => { if (['ArrowDown', 'KeyS'].includes(e.code)) runnerKeys.slide = false; });
-            window.addEventListener('blur', () => { runnerKeys.slide = false; });
-            // 모바일 버튼 + 화면 터치(왼쪽 절반 점프 / 오른쪽 절반 누르고 있으면 슬라이드)
-            const jb = document.getElementById('runnerJumpBtn'), sb = document.getElementById('runnerSlideBtn');
-            jb.addEventListener('pointerdown', (e) => { e.preventDefault(); runnerJump(); });
-            sb.addEventListener('pointerdown', (e) => { e.preventDefault(); runnerKeys.slide = true; });
-            ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => sb.addEventListener(ev, () => { runnerKeys.slide = false; }));
-            const canvas = document.getElementById('runnerCanvas');
-            canvas.addEventListener('pointerdown', (e) => {
-                e.preventDefault();
-                const rect = canvas.getBoundingClientRect();
-                if (e.clientX - rect.left < rect.width / 2) runnerJump(); else runnerKeys.slide = true;
+            const DIRS = { up: [0, 1], down: [0, -1], left: [-1, 0], right: [1, 0] };
+            document.querySelectorAll('.cross-pad button').forEach(b => b.addEventListener('pointerdown', (e) => { e.preventDefault(); crossMove(...DIRS[b.dataset.dir]); }));
+            // 화면: 톡 = 앞으로, 밀기 = 그 방향
+            const cv = document.getElementById('crossCanvas');
+            let start = null;
+            cv.addEventListener('pointerdown', (e) => { e.preventDefault(); start = { x: e.clientX, y: e.clientY }; });
+            cv.addEventListener('pointerup', (e) => {
+                if (!start) return;
+                const dx = e.clientX - start.x, dy = e.clientY - start.y; start = null;
+                if (Math.hypot(dx, dy) < 18) return crossMove(0, 1);
+                if (Math.abs(dx) > Math.abs(dy)) crossMove(dx > 0 ? 1 : -1, 0); else crossMove(0, dy < 0 ? 1 : -1);
             });
-            ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => canvas.addEventListener(ev, () => { runnerKeys.slide = false; }));
-            drawRunner();
+            cv.addEventListener('pointercancel', () => { start = null; });
+            drawCross();
         }
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initRunner); else initRunner();
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initCross); else initCross();
 
         // =====================================================
         // 🔮 운세 (재미로 보는 오늘·내일·이번 주 운세)
@@ -15107,7 +14920,7 @@ ${text}
 
         function setupGameStatsAndChat() {
             if (!db) return;
-            ['omok', 'chess'].forEach(game => {
+            ['omok'].forEach(game => {
                 db.ref(`game_stats/${game}`).off();
                 db.ref(`game_stats/${game}`).on('value', snap => { gameStats[game] = snap.val() || {}; renderGameStats(game); });
                 db.ref(`game_chat/${game}`).off();
