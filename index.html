@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-06j">
+    <meta name="app-version" content="2026-11-06k">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -13112,23 +13112,29 @@ ${text}
         //  쓰러뜨리면 다음 주 보스가 한 단계 강해짐 · 데이터: raid/{주 키}/state·users·log, raid_meta/level
         // =====================================================
         const RAID_FREE = 3, RAID_EXTRA = 3, RAID_CRIT = 0.12;
-        // 보스 = 용암 동굴의 마왕 (그림 한 장의 색을 주마다 바꿔서 다른 마왕으로)
+        // 보스 목록 (레벨 순서대로 한 판에 하나씩, 다 돌면 처음부터 ★ 붙여서 반복)
+        //  img = 무대 그림(정사각형 권장, img/ 폴더), filter = 그림 색 바꾸기 (같은 그림으로 다른 보스를 만들 때)
+        //  새 보스 그림이 생기면 여기에 { name, img } 한 줄 추가
+        const RAID_STAGE_LAVA = 'img/raid_stage.webp?v=1';
         const RAID_BOSSES = [
-            { name: '용암 마왕', filter: 'none' },
-            { name: '빙결 마왕', filter: 'hue-rotate(185deg) saturate(1.1)' },
-            { name: '심연 마왕', filter: 'hue-rotate(245deg) saturate(1.15)' },
-            { name: '독무 마왕', filter: 'hue-rotate(95deg) saturate(1.05)' },
-            { name: '혈월 마왕', filter: 'hue-rotate(330deg) saturate(1.35)' },
-            { name: '황금 마왕', filter: 'hue-rotate(28deg) saturate(1.4) brightness(1.08)' }
+            { name: '용암 마왕', img: RAID_STAGE_LAVA, filter: 'none' },
+            { name: '빙결 마왕', img: RAID_STAGE_LAVA, filter: 'hue-rotate(185deg) saturate(1.1)' },
+            { name: '심연 마왕', img: RAID_STAGE_LAVA, filter: 'hue-rotate(245deg) saturate(1.15)' },
+            { name: '독무 마왕', img: RAID_STAGE_LAVA, filter: 'hue-rotate(95deg) saturate(1.05)' },
+            { name: '혈월 마왕', img: RAID_STAGE_LAVA, filter: 'hue-rotate(330deg) saturate(1.35)' },
+            { name: '황금 마왕', img: RAID_STAGE_LAVA, filter: 'hue-rotate(28deg) saturate(1.4) brightness(1.08)' }
         ];
+        // 레이드 파티·보스 체력 계산에서 뺄 사람 (그래도 공격하면 기록·보상은 그대로)
+        const RAID_EXCLUDE = ['정문세'];
+        const raidMembers = () => TEAM_MEMBERS.filter(n => !RAID_EXCLUDE.includes(n));
         let raidWeek = '', raidState = null, raidUsers = {}, raidLogs = [], raidSeenAt = 0, raidMetaLevel = 1, raidMetaLoaded = false, raidMetaSub = false, raidBusy = false, raidPrev = null, raidTimer = null;
         var raidReady = true;   // var: 이 줄이 실행되기 전(페이지 로딩 중)에 renderRaid가 불려도 안전하게 건너뛰도록
         const raidTxn = (ref, fn) => new Promise(res => ref.transaction(fn, (err, committed, snap) => res(!err && committed ? (snap ? snap.val() : true) : null)));
         function raidBossOf(level) {
             const b = RAID_BOSSES[(level - 1) % RAID_BOSSES.length], star = Math.floor((level - 1) / RAID_BOSSES.length);
-            return { filter: b.filter, name: (star ? '★'.repeat(Math.min(star, 5)) + ' ' : '') + b.name };
+            return { img: b.img || RAID_STAGE_LAVA, filter: b.filter || 'none', name: (star ? '★'.repeat(Math.min(star, 5)) + ' ' : '') + b.name };
         }
-        const raidMaxHp = (level) => niceWon(TEAM_MEMBERS.length * 2200 * Math.pow(1.25, level - 1));
+        const raidMaxHp = (level) => niceWon(raidMembers().length * 2200 * Math.pow(1.25, level - 1));
         const raidPower = (d) => Math.round(100 * (1 + Math.sqrt(fameOf(d || {})) / 3));   // 명성 0 → 100, 20 → 249, 100 → 433
         const raidToday = () => getLocalDateKey(new Date());
         function raidMyUse(u) {
@@ -13304,6 +13310,7 @@ ${text}
             const boss = raidBossOf(st.level || 1), dead = st.hp <= 0;
             box.classList.toggle('defeated', dead);
             const bg = document.getElementById('raidBg');
+            if (bg.dataset.src !== boss.img) { bg.src = boss.img; bg.dataset.src = boss.img; }
             if (bg.dataset.filter !== boss.filter) { bg.style.filter = boss.filter; bg.dataset.filter = boss.filter; }
             document.getElementById('raidName').innerHTML = `Lv.${st.level || 1} ${boss.name} <small>체력 ${fmtWonNum(st.maxHp)}</small>`;
             document.getElementById('raidHpFill').style.width = `${Math.max(0, Math.min(100, st.hp / st.maxHp * 100))}%`;
@@ -13332,7 +13339,8 @@ ${text}
                 claimBtn.textContent = `🎁 ${cand.label} 레이드 보상 받기 (코인 ${cand.r.coins}개 + ${fmtWon(cand.r.won)}${cand.r.mvp ? ' · 👑MVP' : ''}${cand.r.last ? ' · 🗡️마지막 일격' : ''})`;
             } else claimBtn.style.display = 'none';
             // 파티: 팀원 카드 (머리 위 파란 막대 = 1등 대비 기여도)
-            const party = [...TEAM_MEMBERS.map(n => [statKey(n), n]), ...Object.entries(raidUsers).filter(([k, x]) => x && x.hits > 0 && !TEAM_MEMBERS.some(n => statKey(n) === k)).map(([k, x]) => [k, x.name || k])];
+            const members = raidMembers();
+            const party = [...members.map(n => [statKey(n), n]), ...Object.entries(raidUsers).filter(([k, x]) => x && x.hits > 0 && !members.some(n => statKey(n) === k)).map(([k, x]) => [k, x.name || k])];
             const topDmg = users.length ? users[0][1].dmg : 0;
             const partyHtml = party
                 .map(([k, n]) => ({ k, n, x: raidUsers[k] || {} }))
