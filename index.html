@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-06k">
+    <meta name="app-version" content="2026-11-07a">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -4094,6 +4094,47 @@
         .raid-log .rl-crit { color: #ffd54f; font-weight: bold; }
         .raid-log .rl-kill { color: #ff8fa3; font-weight: bold; }
         .raid-rank-share { display: inline-block; height: 6px; border-radius: 3px; background: linear-gradient(90deg, #ff1744, #ff6d00); vertical-align: middle; margin-left: 6px; }
+        /* ===== 🎨 그림 퀴즈 ===== */
+        .dq-area { padding: 16px; background: linear-gradient(160deg, #1e2a44, #141a2e); border-radius: 20px; border: 3px solid rgba(255,214,102,0.35); margin-bottom: 20px; }
+        .dq-top { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+        .dq-new-btn { padding: 11px 26px; font-size: 16px; font-weight: bold; border: none; border-radius: 24px; cursor: pointer; color: #1a1a2e; background: linear-gradient(135deg, #ffd166, #ff9f1c); font-family: inherit; }
+        .dq-new-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .dq-mystat { font-size: 13px; color: rgba(255,255,255,0.75); }
+        .dq-mystat b { color: #ffd166; }
+        .dq-small { padding: 6px 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.08); color: #fff; font-size: 12px; cursor: pointer; font-family: inherit; }
+        .dq-small:disabled { opacity: 0.4; cursor: not-allowed; }
+        .dq-editor { max-width: 520px; margin: 0 auto 16px; text-align: center; background: rgba(0,0,0,0.25); border-radius: 14px; padding: 12px; }
+        .dq-word { font-size: 15px; margin-bottom: 8px; }
+        .dq-word b { font-size: 22px; color: #ffd166; margin: 0 6px; letter-spacing: 1px; }
+        .dq-tools { display: flex; justify-content: center; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+        .dq-color { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.35); cursor: pointer; padding: 0; }
+        .dq-color.on { border-color: #fff; box-shadow: 0 0 0 2px #ffd166; }
+        .dq-size { min-width: 34px; height: 28px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; font-family: inherit; }
+        .dq-size.on { background: #ffd166; color: #1a1a2e; font-weight: bold; }
+        #dqCanvas { width: 100%; max-width: 480px; height: auto; display: block; margin: 0 auto; background: #fff; border-radius: 10px; touch-action: none; cursor: crosshair; }
+        .dq-edit-actions { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .dq-post-btn { padding: 8px 20px; border-radius: 16px; border: none; background: linear-gradient(135deg, #06d6a0, #118ab2); color: #fff; font-weight: bold; cursor: pointer; font-family: inherit; }
+        .dq-post-btn:disabled { opacity: 0.5; cursor: wait; }
+        .dq-note { margin-top: 8px; font-size: 11px; color: rgba(255,255,255,0.55); }
+        .dq-rounds { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-bottom: 12px; }
+        .dq-card { background: rgba(0,0,0,0.28); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 10px; }
+        .dq-card.mine { border-color: rgba(255,209,102,0.5); }
+        .dq-card.solved { border-color: rgba(6,214,160,0.55); }
+        .dq-card .dq-img { width: 100%; aspect-ratio: 4 / 3; background: #fff; border-radius: 8px; object-fit: contain; display: block; }
+        .dq-card .dq-img.loading { background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 12px; color: rgba(255,255,255,0.5); }
+        .dq-meta { font-size: 12px; color: rgba(255,255,255,0.7); margin: 6px 0 4px; display: flex; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+        .dq-hint { font-size: 13px; margin-bottom: 6px; }
+        .dq-hint b { color: #ffd166; letter-spacing: 2px; }
+        .dq-answer { font-size: 15px; font-weight: bold; color: #06d6a0; margin-bottom: 6px; }
+        .dq-guess { display: flex; gap: 6px; }
+        .dq-guess input { flex: 1; min-width: 0; padding: 8px 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.08); color: #fff; font-size: 14px; }
+        .dq-guess button { padding: 8px 14px; border-radius: 10px; border: none; background: #ffd166; color: #1a1a2e; font-weight: bold; cursor: pointer; font-family: inherit; }
+        .dq-feed { margin-top: 6px; font-size: 12px; line-height: 1.6; max-height: 110px; overflow-y: auto; }
+        .dq-feed .ok { color: #06d6a0; font-weight: bold; }
+        .dq-feed .no { color: rgba(255,255,255,0.65); }
+        .dq-feed .no s { color: #ff8fa3; }
+        .dq-solvers { font-size: 12px; margin-top: 4px; }
+        .dq-closed summary { cursor: pointer; text-align: center; font-size: 13px; color: rgba(255,255,255,0.75); margin: 6px 0 10px; }
         /* ===== 운세 ===== */
         .fortune-area { max-width: 760px; margin: 0 auto 20px; padding: 18px; border-radius: 20px; background: linear-gradient(160deg, #2b1055, #1a1446 55%, #0f1c3f); border: 2px solid rgba(200,160,255,0.35); }
         .fortune-top { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; margin-bottom: 12px; }
@@ -5051,7 +5092,7 @@
                 <!-- 코인 획득 방법 안내 -->
                 <div class="coin-guide">
                     <span class="coin-guide-icon">💡</span>
-                    <span class="coin-guide-text">코인 얻는 법: 신기술 검토 등록 <strong>3</strong> · 특허 모션 생성 <strong>3</strong> (PDF당 1번) · QnA 안건 <strong>2</strong> (하루 최대 2개) · 학습 링크 공유 <strong>1</strong> (하루 최대 3개) · 매일 출첵 <strong>1</strong></span>
+                    <span class="coin-guide-text">코인 얻는 법: 신기술 검토 등록 <strong>3</strong> · 특허 모션 생성 <strong>3</strong> (PDF당 1번) · QnA 안건 <strong>2</strong> (하루 최대 2개) · 학습 링크 공유 <strong>1</strong> (하루 최대 3개) · 매일 출첵 <strong>1</strong> · 그림 퀴즈 정답 <strong>1</strong> (하루 최대 3개)</span>
                 </div>
 
                 <!-- 게임 선택 -->
@@ -5060,6 +5101,7 @@
                     <button class="minigame-tab" onclick="switchMinigame('enhance')">⚔️ 검 강화</button>
                     <button class="minigame-tab" onclick="switchMinigame('collection')">🏆 컬렉션</button>
                     <button class="minigame-tab" onclick="switchMinigame('raid')">🐲 레이드</button>
+                    <button class="minigame-tab" onclick="switchMinigame('drawquiz')">🎨 그림 퀴즈</button>
                     <button class="minigame-tab" onclick="switchMinigame('omok')">⚫ 오목</button>
                     <button class="minigame-tab" onclick="switchMinigame('omokai')">🤖 AI 오목</button>
                     <button class="minigame-tab" onclick="switchMinigame('chessai')">🤖 AI 체스</button>
@@ -5385,6 +5427,38 @@
                     <div class="leaderboard dodge-ranking">
                         <h4>📜 최근 공격 기록</h4>
                         <div id="raidLog" class="raid-log"><div class="gs-empty">아직 기록이 없어요</div></div>
+                    </div>
+                </div>
+
+                <!-- 🎨 그림 퀴즈 (비동기: 한 명이 그리면 나머지가 하루 동안 맞히기) -->
+                <div class="minigame-panel" id="panel-drawquiz">
+                    <div class="dq-area">
+                        <div class="dq-top">
+                            <button class="dq-new-btn" id="dqNewBtn" onclick="dqOpenEditor()">✏️ 그림 내기</button>
+                            <span class="dq-mystat" id="dqMyStat"></span>
+                        </div>
+                        <div class="dq-editor" id="dqEditor" style="display: none;">
+                            <div class="dq-word">제시어 <b id="dqWord"></b> <button class="dq-small" id="dqRerollBtn" onclick="dqReroll()">🔄 다른 단어</button></div>
+                            <div class="dq-tools" id="dqTools"></div>
+                            <canvas id="dqCanvas" width="480" height="360"></canvas>
+                            <div class="dq-edit-actions">
+                                <button class="dq-small" onclick="dqUndo()">↶ 되돌리기</button>
+                                <button class="dq-small" onclick="dqClear()">🗑 전부 지우기</button>
+                                <button class="dq-post-btn" id="dqPostBtn" onclick="dqPost()">📤 올리기</button>
+                                <button class="dq-small" onclick="dqCloseEditor()">취소</button>
+                            </div>
+                            <div class="dq-note">글자·숫자를 쓰면 안 돼요 🙅 그림으로만! · 올리면 24시간 동안 팀원들이 맞혀요</div>
+                        </div>
+                        <div class="dq-rounds" id="dqOpenRounds"></div>
+                        <details class="dq-closed">
+                            <summary>📚 지난 그림 보기</summary>
+                            <div class="dq-rounds" id="dqClosedRounds"></div>
+                        </details>
+                        <div class="pika-help">🎨 한 명이 제시어를 그려서 올리면, 나머지 팀원이 <b>24시간 동안</b> 각자 편할 때 맞혀요 (실시간으로 모일 필요 없음)<br>✍️ 한 문제에 5번까지 도전 · 틀린 답은 다 같이 보여요 · 힌트: 글자 수는 처음부터, 초성은 6시간 뒤에 공개<br>🏆 점수: 첫 정답 3점, 그다음 정답 2점, 그린 사람은 맞힌 사람 1명당 1점 (최대 3점) · 🪙 정답 코인 1개 (하루 3개까지), 내 그림을 누가 맞히면 그린 사람도 코인 1개 (하루 2개까지)<br>📝 출제는 하루 3개까지 · 아직 아무도 못 맞혔으면 내 그림은 지울 수 있어요</div>
+                    </div>
+                    <div class="leaderboard dodge-ranking">
+                        <h4>🏆 이번 주 그림 퀴즈 랭킹 <small style="font-weight: normal; opacity: 0.6; font-size: 11px;">(월~일)</small></h4>
+                        <div id="dqRank" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
                     </div>
                 </div>
 
@@ -9264,6 +9338,7 @@ ${text}
             if (typeof renderDodgeRanking === 'function') safe(renderDodgeRanking);
             if (typeof renderCrossRanking === 'function') safe(renderCrossRanking);
             if (typeof renderRaid === 'function') safe(renderRaid);
+            if (typeof renderDrawQuiz === 'function') safe(renderDrawQuiz);
             if (typeof renderWeeklyRanking === 'function') ['dodge', 'cross'].forEach(g => safe(() => renderWeeklyRanking(g)));
             if (typeof renderMafia === 'function') safe(renderMafia);
             if (typeof renderChessAiStats === 'function') safe(renderChessAiStats);
@@ -9295,6 +9370,7 @@ ${text}
             setupDodgeRanking();
             setupCrossRanking();
             setupRaid();
+            setupDrawQuiz();
             setupWeeklyRankings();
             setupQnaListener();
             setupMafia();
@@ -10857,6 +10933,8 @@ ${text}
             } else if (panel === 'dodge') {
                 drawDodge();
                 renderDodgeRanking();
+            } else if (panel === 'drawquiz') {
+                renderDrawQuiz();
             } else if (panel === 'raid') {
                 renderRaid();
             } else if (panel === 'cross') {
@@ -13369,6 +13447,291 @@ ${text}
                 : '<div class="gs-empty">아직 기록이 없어요</div>';
         }
         const fmtWonNum = (n) => (n || 0).toLocaleString('ko-KR');
+
+        // =====================================================
+        // 🎨 그림 퀴즈 (비동기): 한 명이 제시어를 그려서 올리면 나머지가 24시간 동안 각자 맞힘
+        //  정답은 해시로만 비교(평문을 바로 저장하지 않음), 마감 후 공개 · 데이터: drawquiz/rounds/{id}, drawquiz/imgs/{id}
+        //  점수: 첫 정답 3 · 그다음 2 · 그린 사람은 맞힌 사람 1명당 1 (최대 3)
+        //  코인: 정답 1 (하루 3개까지) · 내 그림을 누가 맞히면 그린 사람 1 (하루 2개까지) · 출제 하루 3개까지
+        // =====================================================
+        const DQ_WORDS = ['고양이', '강아지', '기린', '코끼리', '펭귄', '문어', '거북이', '토끼', '사자', '상어', '나비', '달팽이', '부엉이', '돼지', '말',
+            '사과', '바나나', '수박', '피자', '라면', '김밥', '햄버거', '아이스크림', '케이크', '치킨', '떡볶이', '커피', '도넛', '포도', '당근',
+            '자동차', '자전거', '비행기', '기차', '배', '헬리콥터', '로켓', '버스', '지게차', '트럭',
+            '우산', '안경', '시계', '열쇠', '가위', '연필', '책', '의자', '침대', '냉장고', '선풍기', '전구', '컴퓨터', '노트북', '휴대폰', '카메라', '텔레비전', '세탁기', '청소기', '마우스',
+            '배터리', '안전모', '장갑', '공구', '망치', '드라이버', '톱니바퀴', '자석', '돋보기', '현미경', '로봇', '컨베이어', '사다리', '소화기', '택배 상자',
+            '해', '달', '별', '구름', '번개', '무지개', '눈사람', '비', '산', '바다', '섬', '화산', '나무', '꽃', '선인장',
+            '집', '학교', '병원', '공장', '다리', '등대', '성', '텐트', '피라미드', '에펠탑',
+            '축구', '야구', '농구', '수영', '스키', '낚시', '캠핑', '등산', '노래방', '볼링',
+            '왕관', '반지', '선물', '풍선', '촛불', '눈물', '하트', '유령', '해골', '외계인', '공룡', '용', '천사', '마법사', '해적'];
+        const DQ_DAY_POST = 3, DQ_TRIES = 5, DQ_OPEN_MS = 24 * 3600 * 1000, DQ_CHO_MS = 6 * 3600 * 1000;
+        const DQ_COIN_SOLVE = 3, DQ_COIN_DRAW = 2;
+        const DQ_COLORS = ['#111111', '#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#8e24aa', '#6d4c41', '#9e9e9e', '#ffffff'];
+        let dqRounds = {}, dqImgs = {}, dqSeenAt = 0, dqReady = false, dqBusy = false, dqImgRender = 0;
+        let dqEd = null;   // 그리는 중: { word, rerolls, strokes, color, size }
+
+        const dqNorm = (t) => String(t || '').toLowerCase().replace(/[\s.,!?~'"`·\-_()]/g, '');
+        function dqHash(str) {   // cyrb53 (가벼운 해시: 개발자 도구로 정답을 바로 못 보게 하는 정도)
+            let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+            for (let i = 0, ch; i < str.length; i++) { ch = str.charCodeAt(i); h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677); }
+            h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507); h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+            h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507); h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+            return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+        }
+        const dqEnc = (w) => btoa(unescape(encodeURIComponent(w))).split('').reverse().join('');
+        const dqDec = (e) => { try { return decodeURIComponent(escape(atob(String(e || '').split('').reverse().join('')))); } catch (x) { return '?'; } };
+        function dqCho(word) {
+            const CHO = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
+            return [...String(word)].map(c => { const k = c.charCodeAt(0) - 0xAC00; return k >= 0 && k < 11172 ? CHO[Math.floor(k / 588)] : (c === ' ' ? ' ' : c); }).join('');
+        }
+        const dqClosed = (r) => !!(r && (r.closedAt || Date.now() - (r.at || 0) > DQ_OPEN_MS));
+        const dqSolvers = (r) => Object.entries((r && r.solvers) || {}).map(([k, v]) => Object.assign({ key: k }, v)).sort((a, b) => (a.at || 0) - (b.at || 0));
+        const dqAgo = (t) => { const m = Math.floor((Date.now() - t) / 60000); return m < 1 ? '방금' : m < 60 ? `${m}분 전` : m < 1440 ? `${Math.floor(m / 60)}시간 전` : `${Math.floor(m / 1440)}일 전`; };
+        const dqLeft = (r) => { const m = Math.max(0, Math.ceil((r.at + DQ_OPEN_MS - Date.now()) / 60000)); return m >= 60 ? `${Math.floor(m / 60)}시간 ${m % 60}분 남음` : `${m}분 남음`; };
+
+        function setupDrawQuiz() {
+            if (!db || dqReady) return;
+            dqReady = true;
+            dqSeenAt = Date.now();
+            db.ref('drawquiz/rounds').orderByChild('at').limitToLast(40).on('value', snap => {
+                dqRounds = snap.val() || {};
+                // 다른 팀원이 새 그림을 올리면 알림
+                const me = statKey(myGameName());
+                Object.values(dqRounds).filter(r => r && r.at > dqSeenAt && r.byKey !== me)
+                    .forEach(r => showCoinNotification(0, '', `🎨 ${r.by}님이 새 그림 퀴즈를 냈어요! (${r.len}글자)`));
+                dqSeenAt = Math.max(dqSeenAt, ...Object.values(dqRounds).map(r => (r && r.at) || 0));
+                renderDrawQuiz();
+            });
+            setInterval(() => { if (isMinigamePanelVisible('drawquiz')) renderDrawQuiz(); }, 60000);
+        }
+        function dqLoadImg(id) {
+            if (dqImgs[id] !== undefined || !db) return;
+            dqImgs[id] = null;
+            db.ref(`drawquiz/imgs/${id}`).once('value').then(snap => {
+                dqImgs[id] = snap.val() || '';
+                if (!dqImgRender) dqImgRender = requestAnimationFrame(() => { dqImgRender = 0; renderDrawQuiz(); });   // 그림이 오면 한 번에 다시 그림
+            }).catch(() => { delete dqImgs[id]; });
+        }
+        const dqMyTodayPosts = () => { const me = statKey(myGameName()), today = getLocalDateKey(new Date()); return Object.values(dqRounds).filter(r => r && r.byKey === me && getLocalDateKey(new Date(r.at)) === today).length; };
+
+        // ---------- 그리기 ----------
+        function dqOpenEditor() {
+            if (!db) { alert('서버에 연결된 뒤에 할 수 있어요.'); return; }
+            if (!localStorage.getItem('chat_nickname')) { alert('먼저 상단에서 이름을 입력해 주세요.'); return; }
+            if (dqMyTodayPosts() >= DQ_DAY_POST) { alert(`그림은 하루 ${DQ_DAY_POST}개까지 낼 수 있어요. 내일 또 내 주세요!`); return; }
+            dqEd = { word: DQ_WORDS[Math.floor(Math.random() * DQ_WORDS.length)], rerolls: 2, strokes: [], color: '#111111', size: 6, cur: null };
+            document.getElementById('dqEditor').style.display = 'block';
+            document.getElementById('dqTools').innerHTML = DQ_COLORS.map(c => `<button class="dq-color ${c === dqEd.color ? 'on' : ''}" style="background:${c}" title="${c === '#ffffff' ? '지우개(흰색)' : ''}" onclick="dqSetColor('${c}')"></button>`).join('')
+                + [['가늘게', 3], ['보통', 6], ['굵게', 14]].map(([n, v]) => `<button class="dq-size ${v === dqEd.size ? 'on' : ''}" data-size="${v}" onclick="dqSetSize(${v})">${n}</button>`).join('');
+            dqShowWord();
+            dqRedraw();
+            document.getElementById('dqEditor').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        function dqShowWord() {
+            document.getElementById('dqWord').textContent = dqEd.word;
+            const b = document.getElementById('dqRerollBtn');
+            b.textContent = `🔄 다른 단어 (${dqEd.rerolls}번 남음)`; b.disabled = dqEd.rerolls <= 0;
+        }
+        function dqReroll() {
+            if (!dqEd || dqEd.rerolls <= 0) return;
+            let w; do { w = DQ_WORDS[Math.floor(Math.random() * DQ_WORDS.length)]; } while (w === dqEd.word);
+            dqEd.word = w; dqEd.rerolls--; dqShowWord();
+        }
+        function dqSetColor(c) { if (!dqEd) return; dqEd.color = c; document.querySelectorAll('.dq-color').forEach(b => b.classList.toggle('on', b.style.background && b.getAttribute('onclick').includes(c))); }
+        function dqSetSize(v) { if (!dqEd) return; dqEd.size = v; document.querySelectorAll('.dq-size').forEach(b => b.classList.toggle('on', +b.dataset.size === v)); }
+        function dqCloseEditor() { dqEd = null; document.getElementById('dqEditor').style.display = 'none'; }
+        function dqUndo() { if (!dqEd) return; dqEd.strokes.pop(); dqRedraw(); }
+        function dqClear() { if (!dqEd || !dqEd.strokes.length) return; if (confirm('그림을 전부 지울까요?')) { dqEd.strokes = []; dqRedraw(); } }
+        function dqDrawStroke(ctx, st) {
+            ctx.strokeStyle = st.c; ctx.fillStyle = st.c; ctx.lineWidth = st.s; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            const p = st.p;
+            if (p.length === 1) { ctx.beginPath(); ctx.arc(p[0][0], p[0][1], st.s / 2, 0, Math.PI * 2); ctx.fill(); return; }
+            ctx.beginPath(); ctx.moveTo(p[0][0], p[0][1]);
+            for (let i = 1; i < p.length - 1; i++) { const mx = (p[i][0] + p[i + 1][0]) / 2, my = (p[i][1] + p[i + 1][1]) / 2; ctx.quadraticCurveTo(p[i][0], p[i][1], mx, my); }
+            ctx.lineTo(p[p.length - 1][0], p[p.length - 1][1]); ctx.stroke();
+        }
+        function dqRedraw() {
+            const cv = document.getElementById('dqCanvas'); if (!cv) return;
+            const ctx = cv.getContext('2d');
+            ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, cv.width, cv.height);
+            if (dqEd) { dqEd.strokes.forEach(st => dqDrawStroke(ctx, st)); if (dqEd.cur) dqDrawStroke(ctx, dqEd.cur); }
+        }
+        function dqInitCanvas() {
+            const cv = document.getElementById('dqCanvas');
+            if (!cv || cv.dataset.inited) return;
+            cv.dataset.inited = '1';
+            const pos = (e) => { const r = cv.getBoundingClientRect(); return [Math.round((e.clientX - r.left) * cv.width / r.width), Math.round((e.clientY - r.top) * cv.height / r.height)]; };
+            cv.addEventListener('pointerdown', (e) => { if (!dqEd) return; e.preventDefault(); cv.setPointerCapture(e.pointerId); dqEd.cur = { c: dqEd.color, s: dqEd.size, p: [pos(e)] }; dqRedraw(); });
+            cv.addEventListener('pointermove', (e) => { if (!dqEd || !dqEd.cur) return; e.preventDefault(); const q = pos(e), last = dqEd.cur.p[dqEd.cur.p.length - 1]; if (Math.abs(q[0] - last[0]) + Math.abs(q[1] - last[1]) >= 2) { dqEd.cur.p.push(q); dqRedraw(); } });
+            const end = () => { if (dqEd && dqEd.cur) { dqEd.strokes.push(dqEd.cur); dqEd.cur = null; dqRedraw(); } };
+            ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => cv.addEventListener(ev, end));
+            dqRedraw();
+        }
+        async function dqPost() {
+            if (!dqEd || !db) return;
+            if (dqEd.strokes.length < 3) { alert('조금 더 그려 주세요! (선 3개 이상)'); return; }
+            if (dqMyTodayPosts() >= DQ_DAY_POST) { alert(`그림은 하루 ${DQ_DAY_POST}개까지 낼 수 있어요.`); return; }
+            const btn = document.getElementById('dqPostBtn'); btn.disabled = true;
+            try {
+                dqRedraw();
+                const cv = document.getElementById('dqCanvas');
+                let url = cv.toDataURL('image/webp', 0.8);
+                if (!url.startsWith('data:image/webp')) url = cv.toDataURL('image/png');   // webp를 못 만드는 브라우저
+                if (url.length > 900000) url = cv.toDataURL('image/jpeg', 0.7);
+                const me = myGameName(), word = dqEd.word;
+                const ref = db.ref('drawquiz/rounds').push();
+                const id = ref.key;
+                await db.ref(`drawquiz/imgs/${id}`).set(url);
+                await ref.set({ by: me, byKey: statKey(me), at: Date.now(), len: [...word.replace(/\s/g, '')].length, cho: dqCho(word), hash: dqHash(id + ':' + dqNorm(word)), enc: dqEnc(word) });
+                dqImgs[id] = url;
+                dqCloseEditor();
+                showCoinNotification(0, '', `🎨 '${word}' 그림을 올렸어요! 팀원들이 맞히길 기다려요`);
+            } catch (e) {
+                alert('올리지 못했어요. 다시 시도해 주세요.');
+            } finally { btn.disabled = false; }
+        }
+
+        // ---------- 맞히기 ----------
+        const dqTxn = (ref, fn) => new Promise(res => ref.transaction(fn, (err, committed, snap) => res(!err && committed ? (snap ? snap.val() : true) : null)));
+        async function dqGuess(id) {
+            const input = document.getElementById(`dqIn_${id}`);
+            const text = (input && input.value || '').trim();
+            if (!text || dqBusy) return;
+            if (!localStorage.getItem('chat_nickname')) { alert('먼저 상단에서 이름을 입력해 주세요.'); return; }
+            const me = myGameName(), key = statKey(me), r = dqRounds[id];
+            if (!r || dqClosed(r) || r.byKey === key) return;
+            const ok = dqHash(id + ':' + dqNorm(text)) === r.hash;
+            const expect = raidMembers().filter(n => statKey(n) !== r.byKey).length;   // 다 맞히면 일찍 마감
+            dqBusy = true;
+            let firstSolve = false, result = '';
+            try {
+                const after = await dqTxn(db.ref(`drawquiz/rounds/${id}`), cur => {
+                    if (!cur || cur.closedAt || Date.now() - (cur.at || 0) > DQ_OPEN_MS) { result = 'closed'; return; }
+                    cur.solvers = cur.solvers || {}; cur.tries = cur.tries || {}; cur.guesses = cur.guesses || {};
+                    if (cur.solvers[key]) { result = 'already'; return; }
+                    if ((cur.tries[key] || 0) >= DQ_TRIES) { result = 'noTries'; return; }
+                    cur.tries[key] = (cur.tries[key] || 0) + 1;
+                    const gk = 'g' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+                    if (ok) {
+                        firstSolve = Object.keys(cur.solvers).length === 0;
+                        cur.solvers[key] = { name: me, at: Date.now(), tries: cur.tries[key] };
+                        cur.guesses[gk] = { name: me, ok: true, at: Date.now() };   // 정답 글자는 남기지 않음
+                        if (Object.keys(cur.solvers).length >= expect) cur.closedAt = Date.now();
+                        result = 'ok';
+                    } else {
+                        cur.guesses[gk] = { name: me, text: text.slice(0, 20), at: Date.now() };
+                        result = 'wrong';
+                    }
+                    return cur;
+                });
+                if (!after) {
+                    alert(result === 'already' ? '이미 맞혔어요!' : result === 'noTries' ? `이 그림은 ${DQ_TRIES}번 다 도전했어요.` : '이미 마감된 그림이에요.');
+                    return;
+                }
+                if (input) input.value = '';
+                if (result === 'ok') {
+                    const today = getLocalDateKey(new Date());
+                    // 정답 코인 (하루 3개까지)
+                    const got = await dqTxn(db.ref(`minigame/${me}`), cur => {
+                        cur = cur || { coins: 0, weaponLevel: 0, collection: [], gachaHistory: [] };
+                        if (cur.dqDay !== today) { cur.dqDay = today; cur.dqSolveCoins = 0; }
+                        if ((cur.dqSolveCoins || 0) >= DQ_COIN_SOLVE) return;
+                        cur.dqSolveCoins = (cur.dqSolveCoins || 0) + 1; cur.coins = (cur.coins || 0) + 1;
+                        return cur;
+                    });
+                    // 첫 정답이 나오면 그린 사람에게도 코인 (하루 2개까지)
+                    if (firstSolve) db.ref(`minigame/${r.by}`).transaction(cur => {
+                        if (!cur) return cur;
+                        if (cur.dqDrawDay !== today) { cur.dqDrawDay = today; cur.dqDrawCoins = 0; }
+                        if ((cur.dqDrawCoins || 0) >= DQ_COIN_DRAW) return;
+                        cur.dqDrawCoins = (cur.dqDrawCoins || 0) + 1; cur.coins = (cur.coins || 0) + 1;
+                        return cur;
+                    });
+                    showCoinNotification(got ? 1 : 0, '', `🎉 정답! '${dqDec(r.enc)}'${got ? ' · 코인 +1' : ' (오늘 정답 코인은 다 받았어요)'}`);
+                }
+            } finally { dqBusy = false; renderDrawQuiz(); }
+        }
+        async function dqEndRound(id) {
+            const r = dqRounds[id], key = statKey(myGameName());
+            if (!r || r.byKey !== key) return;
+            const solved = dqSolvers(r).length;
+            if (!solved) {
+                if (!confirm('아직 아무도 못 맞혔어요. 이 그림을 지울까요?')) return;
+                await db.ref(`drawquiz/rounds/${id}`).remove(); db.ref(`drawquiz/imgs/${id}`).remove();
+            } else {
+                if (!confirm('지금 마감하고 정답을 공개할까요?')) return;
+                await db.ref(`drawquiz/rounds/${id}/closedAt`).set(Date.now());
+            }
+        }
+
+        // 점수: 첫 정답 3 · 그다음 2 · 그린 사람은 맞힌 사람 1명당 1 (최대 3)
+        function dqWeekScores() {
+            const wk = weekKeyOf(), sc = {};
+            const add = (key, name, f) => { sc[key] = sc[key] || { name, pts: 0, solved: 0, drawn: 0 }; f(sc[key]); };
+            Object.values(dqRounds).forEach(r => {
+                if (!r || weekKeyOf(new Date(r.at)) !== wk) return;
+                const sv = dqSolvers(r);
+                add(r.byKey, r.by, x => { x.drawn++; x.pts += Math.min(3, sv.length); });
+                sv.forEach((v, i) => add(v.key, v.name || v.key, x => { x.solved++; x.pts += i === 0 ? 3 : 2; }));
+            });
+            return Object.entries(sc).sort((a, b) => b[1].pts - a[1].pts || b[1].solved - a[1].solved);
+        }
+
+        function dqCardHtml(id, r, key) {
+            const closed = dqClosed(r), mine = r.byKey === key, sv = dqSolvers(r), mineSolved = !!(r.solvers && r.solvers[key]);
+            const tries = (r.tries && r.tries[key]) || 0, showAnswer = closed || mine || mineSolved;
+            dqLoadImg(id);
+            const img = dqImgs[id];
+            const hintCho = Date.now() - r.at > DQ_CHO_MS || closed;
+            const feed = Object.values(r.guesses || {}).sort((a, b) => (a.at || 0) - (b.at || 0)).slice(-12)
+                .map(g => g.ok ? `<div class="ok">✅ ${escapeHtml(g.name)} 정답!</div>` : `<div class="no">${escapeHtml(g.name)}: <s>${escapeHtml(g.text || '')}</s></div>`).join('');
+            let action = '';
+            if (!closed && !mine && !mineSolved) {
+                action = tries >= DQ_TRIES
+                    ? `<div class="dq-meta">${DQ_TRIES}번 다 도전했어요 😢 마감되면 정답이 나와요</div>`
+                    : `<div class="dq-guess"><input id="dqIn_${id}" maxlength="20" placeholder="정답 입력 (${DQ_TRIES - tries}번 남음)" onkeydown="if(event.key==='Enter' && !event.isComposing) dqGuess('${id}')"><button onclick="dqGuess('${id}')">맞히기</button></div>`;
+            } else if (!closed && mine) {
+                action = `<button class="dq-small" onclick="dqEndRound('${id}')">${sv.length ? '⏹ 지금 마감하고 정답 공개' : '🗑 지우기'}</button>`;
+            }
+            return `<div class="dq-card ${mine ? 'mine' : ''} ${mineSolved ? 'solved' : ''}">
+                ${img ? `<img class="dq-img" src="${img}" alt="그림 퀴즈">` : `<div class="dq-img loading">${img === '' ? '그림을 찾을 수 없어요' : '그림 불러오는 중…'}</div>`}
+                <div class="dq-meta"><span>✏️ ${nameWithIcon(r.by)} · ${dqAgo(r.at)}</span><span>${closed ? '🔒 마감' : '⏳ ' + dqLeft(r)}</span></div>
+                ${showAnswer ? `<div class="dq-answer">정답: ${escapeHtml(dqDec(r.enc))}${mine && !closed ? ' <small style="font-weight:normal;color:rgba(255,255,255,0.6)">(내 그림)</small>' : ''}</div>`
+                    : `<div class="dq-hint">힌트: <b>${r.len}</b>글자${hintCho ? ` · 초성 <b>${escapeHtml(r.cho || '')}</b>` : ' · 초성은 6시간 뒤 공개'}</div>`}
+                ${action}
+                <div class="dq-solvers">${sv.length ? '🏅 ' + sv.map((v, i) => `${escapeHtml(v.name || v.key)}${i === 0 ? '(첫 정답)' : ''}`).join(', ') : '아직 맞힌 사람 없음'}</div>
+                ${feed ? `<div class="dq-feed">${feed}</div>` : ''}
+            </div>`;
+        }
+
+        function renderDrawQuiz() {
+            const openBox = document.getElementById('dqOpenRounds');
+            if (!openBox) return;
+            dqInitCanvas();
+            if (!db) { openBox.innerHTML = '<div class="gs-empty">서버에 연결되면 그림 퀴즈를 할 수 있어요.</div>'; return; }
+            const key = statKey(myGameName());
+            // 입력 중인 답은 다시 그려도 지워지지 않게 보존
+            const keep = {}; document.querySelectorAll('.dq-guess input').forEach(i => { if (i.value) keep[i.id] = i.value; });
+            const focused = document.activeElement && document.activeElement.id;
+            const list = Object.entries(dqRounds).filter(([, r]) => r && r.at).sort((a, b) => b[1].at - a[1].at);
+            const open = list.filter(([, r]) => !dqClosed(r)), closed = list.filter(([, r]) => dqClosed(r)).slice(0, 12);
+            openBox.innerHTML = open.length ? open.map(([id, r]) => dqCardHtml(id, r, key)).join('')
+                : '<div class="gs-empty">지금 맞힐 그림이 없어요. ✏️ 그림 내기로 첫 문제를 내 보세요!</div>';
+            const closedBox = document.getElementById('dqClosedRounds');
+            if (closedBox.closest('details').open) closedBox.innerHTML = closed.length ? closed.map(([id, r]) => dqCardHtml(id, r, key)).join('') : '<div class="gs-empty">아직 마감된 그림이 없어요</div>';
+            Object.entries(keep).forEach(([iid, v]) => { const el = document.getElementById(iid); if (el) el.value = v; });
+            if (focused && focused.startsWith('dqIn_')) { const el = document.getElementById(focused); if (el) el.focus(); }
+            // 내 현황 · 출제 버튼
+            const posted = dqMyTodayPosts();
+            const nb = document.getElementById('dqNewBtn'); nb.disabled = posted >= DQ_DAY_POST;
+            nb.textContent = posted >= DQ_DAY_POST ? '✏️ 오늘 출제 끝 (3/3)' : `✏️ 그림 내기 (오늘 ${posted}/${DQ_DAY_POST})`;
+            const rows = dqWeekScores(), myRow = rows.findIndex(([k]) => k === key);
+            document.getElementById('dqMyStat').innerHTML = `맞힐 그림 <b>${open.filter(([, r]) => r.byKey !== key && !(r.solvers && r.solvers[key])).length}</b>개${myRow >= 0 ? ` · 이번 주 <b>${rows[myRow][1].pts}점</b> (${myRow + 1}위)` : ''}`;
+            const medal = (i) => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+            document.getElementById('dqRank').innerHTML = rows.length
+                ? `<table><tr><th>순위</th><th>이름</th><th>점수</th><th>맞힘 · 출제</th></tr>${rows.slice(0, 10).map(([k, x], i) => `<tr class="${k === key ? 'dodge-me' : ''}"><td>${medal(i)}</td><td>${nameWithIcon(x.name)}</td><td class="dodge-best">${x.pts}점</td><td>${x.solved} · ${x.drawn}</td></tr>`).join('')}</table>`
+                : '<div class="gs-empty">이번 주 기록이 아직 없어요</div>';
+        }
+        document.addEventListener('toggle', (e) => { if (e.target && e.target.classList && e.target.classList.contains('dq-closed') && e.target.open) renderDrawQuiz(); }, true);
 
         // =====================================================
         // 🔮 운세 (재미로 보는 오늘·내일·이번 주 운세)
