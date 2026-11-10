@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-10a">
+    <meta name="app-version" content="2026-11-10b">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -5447,7 +5447,7 @@
                                 <button class="dq-post-btn" id="dqPostBtn" onclick="dqPost()">📤 올리기</button>
                                 <button class="dq-small" onclick="dqCloseEditor()">취소</button>
                             </div>
-                            <div class="dq-note">글자·숫자를 쓰면 안 돼요 🙅 그림으로만! · 올리면 24시간 동안 팀원들이 맞혀요</div>
+                            <div class="dq-note">글자·숫자를 쓰면 안 돼요 🙅 그림으로만! · 올리면 24시간 동안 팀원들이 맞혀요<br><span id="dqWordsLeft"></span></div>
                         </div>
                         <div class="dq-rounds" id="dqOpenRounds"></div>
                         <details class="dq-closed">
@@ -13455,19 +13455,49 @@ ${text}
         //  점수: 첫 정답 3 · 그다음 2 · 그린 사람은 맞힌 사람 1명당 1 (최대 3)
         //  코인: 1등(그 그림의 첫 정답)만 1개, 하루 3개까지 · 2등 이하·그린 사람은 점수만 · 출제 하루 3개까지
         // =====================================================
-        const DQ_WORDS = ['고양이', '강아지', '기린', '코끼리', '펭귄', '문어', '거북이', '토끼', '사자', '상어', '나비', '달팽이', '부엉이', '돼지', '말',
-            '사과', '바나나', '수박', '피자', '라면', '김밥', '햄버거', '아이스크림', '케이크', '치킨', '떡볶이', '커피', '도넛', '포도', '당근',
-            '자동차', '자전거', '비행기', '기차', '배', '헬리콥터', '로켓', '버스', '지게차', '트럭',
-            '우산', '안경', '시계', '열쇠', '가위', '연필', '책', '의자', '침대', '냉장고', '선풍기', '전구', '컴퓨터', '노트북', '휴대폰', '카메라', '텔레비전', '세탁기', '청소기', '마우스',
-            '배터리', '안전모', '장갑', '공구', '망치', '드라이버', '톱니바퀴', '자석', '돋보기', '현미경', '로봇', '컨베이어', '사다리', '소화기', '택배 상자',
-            '해', '달', '별', '구름', '번개', '무지개', '눈사람', '비', '산', '바다', '섬', '화산', '나무', '꽃', '선인장',
-            '집', '학교', '병원', '공장', '다리', '등대', '성', '텐트', '피라미드', '에펠탑',
-            '축구', '야구', '농구', '수영', '스키', '낚시', '캠핑', '등산', '노래방', '볼링',
-            '왕관', '반지', '선물', '풍선', '촛불', '눈물', '하트', '유령', '해골', '외계인', '공룡', '용', '천사', '마법사', '해적'];
+        // 제시어: 잘 안 쓰는 명사 위주 (그림으로는 그릴 수 있는 것) — 팀 전체에서 한 번 나온 단어는 다시 안 나옴 (drawquiz/used)
+        const DQ_WORDS = [
+            '오리너구리', '아르마딜로', '카멜레온', '해마', '불가사리', '가오리', '개미핥기', '나무늘보', '미어캣', '알파카', '고슴도치', '두더지', '박쥐', '펠리컨', '홍학', '공작', '앵무새', '딱따구리',
+            '해파리', '소라게', '바다사자', '하마', '코뿔소', '낙타', '수달', '비버', '전갈', '사마귀', '무당벌레', '잠자리', '반딧불이', '장수풍뎅이', '소금쟁이', '올챙이', '도롱뇽', '이구아나', '방울뱀',
+            '타조', '두루미', '백조', '갈매기', '꽃게', '랍스터', '성게', '해삼', '범고래', '일각고래', '바다거북', '북극곰', '순록', '스컹크', '캥거루', '코알라', '얼룩말', '치타', '고릴라', '오랑우탄',
+            '청설모', '너구리', '거미줄', '벌집', '개구리알', '메뚜기', '지렁이', '달팽이집', '모래시계', '나침반', '망원경', '청진기', '체온계', '양팔저울', '주판', '확성기', '메트로놈', '오르골', '풍향계',
+            '허수아비', '굴뚝', '맨홀', '소화전', '신호등', '바리케이드', '낙하산', '열기구', '잠수함', '풍차', '물레방아', '우물', '맷돌', '절구', '짚신', '갓', '방패연', '팽이', '제기', '윷', '가마솥',
+            '주전자', '다리미', '재봉틀', '실타래', '골무', '압정', '스테이플러', '클립', '각도기', '컴퍼스', '삼각자', '계산기', '타자기', '축음기', '카세트테이프', '플로피디스크', '무전기', '공중전화',
+            '우체통', '우표', '도장', '명함', '영수증', '바코드', '저금통', '금고', '자물쇠', '수갑', '닻', '조타륜', '돛단배', '뗏목', '카누', '구명조끼', '오리발', '스노클', '서핑보드', '스케이트보드',
+            '킥보드', '외발자전거', '썰매', '아령', '줄넘기', '훌라후프', '볼링핀', '다트', '탁구채', '셔틀콕', '호루라기', '트로피', '월계관', '쌍안경', '손전등', '랜턴', '촛대', '성냥', '빗자루',
+            '쓰레받기', '대걸레', '고무장갑', '빨래집게', '빨래판', '옷걸이', '단추', '지퍼', '나비넥타이', '멜빵', '장화', '슬리퍼', '하이힐', '베레모', '밀짚모자', '벙어리장갑', '우비', '양산', '지팡이',
+            '휠체어', '목발', '깁스', '반창고', '주사기', '알약', '칫솔', '치실', '면봉', '참빗', '고데기', '립스틱', '향수', '손톱깎이', '족집게', '체중계', '줄자', '수평계', '스패너', '펜치', '니퍼',
+            '톱', '대패', '사포', '페인트롤러', '손수레', '삽', '곡괭이', '호미', '낫', '물뿌리개', '화분', '비닐하우스', '새장', '어항', '개집', '해먹', '흔들의자', '안락의자', '2층침대', '벽시계',
+            '뻐꾸기시계', '알람시계', '해시계', '지구본', '칠판', '분필', '확대경', '돋보기안경', '선글라스', '물안경', '안대', '귀마개', '목도리', '털장갑', '보온병', '텀블러', '빨대', '이쑤시개', '젓가락',
+            '국자', '뒤집개', '거품기', '밀대', '도마', '강판', '채반', '찜기', '압력밥솥', '토스터', '믹서기', '전자레인지', '와플기계', '커피포트', '찻주전자', '머그잔', '와인잔', '샴페인', '코르크마개',
+            '병따개', '깡통', '도시락통', '피크닉바구니', '돗자리', '파라솔', '비치볼', '모래성', '조개껍데기', '유리병', '편지', '소포', '택배상자', '리본', '포장지', '생일모자', '폭죽', '불꽃놀이', '등불',
+            '연등', '풍등', '제등', '크리스마스트리', '양말', '굴렁쇠', '고무줄', '구슬', '딱지', '공기놀이', '연필깎이', '만년필', '붓', '벼루', '먹', '화선지', '팔레트', '이젤', '캔버스', '크레파스',
+            '물감', '조각칼', '찰흙', '도자기', '물레', '베틀', '실패', '뜨개바늘', '송편', '붕어빵', '호떡', '탕후루', '마카롱', '크루아상', '프레첼', '와플', '팬케이크', '타코', '초밥', '만두', '꼬치',
+            '솜사탕', '팝콘', '막대사탕', '푸딩', '컵라면', '삼각김밥', '팥빙수', '핫도그', '소시지', '계란말이', '오므라이스', '파인애플', '석류', '아보카도', '두리안', '코코넛', '연근', '파프리카', '브로콜리',
+            '표고버섯', '옥수수', '고구마', '인삼', '대파', '마늘', '생강', '고추', '가지', '단호박', '밤송이', '도토리', '땅콩', '호두', '체리', '블루베리', '무화과', '곶감', '떡국', '깍두기', '순대',
+            '어묵', '군고구마', '군밤', '약과', '경단', '꿀떡', '인절미', '시루떡', '식빵', '바게트', '베이글', '츄러스', '에그타르트', '슈크림', '롤케이크', '치즈', '피클', '올리브', '레몬',
+            '라임', '키위', '망고', '메론', '자두', '복숭아', '앵두', '오디', '산딸기', '귤껍질', '바나나껍질', '스핑크스', '자유의여신상', '만리장성', '모아이석상', '이글루', '원두막', '정자', '초가집',
+            '성벽', '감옥', '법원', '주유소', '세차장', '놀이공원', '수족관', '박물관', '경기장', '공항', '항구', '터널', '육교', '엘리베이터', '에스컬레이터', '회전문', '다락방', '지하실', '벽난로',
+            '샹들리에', '블라인드', '욕조', '변기', '샤워기', '세면대', '사우나', '목욕탕', '롤러코스터', '회전목마', '대관람차', '시소', '미끄럼틀', '그네', '트램펄린', '분수대', '동상', '전망대', '케이블카',
+            '곤돌라', '모노레일', '지하철', '버스정류장', '횡단보도', '과속방지턱', '톨게이트', '휴게소', '캠핑카', '오두막', '성당', '사찰', '탑', '다보탑', '첨성대', '남대문', '기와집', '돌담', '장독대',
+            '외양간', '닭장', '헛간', '사일로', '등대', '방파제', '선착장', '부두', '활주로', '관제탑', '우주정거장', '인공위성', '오로라', '블랙홀', '유성우', '일식', '월식', '신기루', '폭포', '빙하',
+            '빙산', '동굴', '종유석', '사막', '오아시스', '늪', '갯벌', '소용돌이', '회오리바람', '우박', '서리', '고드름', '단풍', '낙엽', '솔방울', '민들레홀씨', '해바라기', '연꽃', '대나무', '야자수',
+            '이끼', '산호초', '화석', '운석', '토성', '혜성', '은하수', '별자리', '초승달', '보름달', '쌍무지개', '안개', '눈보라', '모래폭풍', '용암', '간헐천', '협곡', '섬', '반도', '절벽', '계곡',
+            '크레인', '컨테이너', '컨베이어벨트', '용접기', '방진복', '방독면', '안전화', '비상구', '화재경보기', '스프링클러', '금형', '프레스기', '로봇팔', '바코드스캐너', '비커', '플라스크', '시험관', '스포이트',
+            '원심분리기', '건전지', '멀티탭', '콘센트', '회로기판', '반도체칩', '태양광패널', '풍력발전기', '송전탑', '변압기', '계량기', '가스통', '드럼통', '라바콘', '화이트보드', '포스트잇', '문서파쇄기',
+            '복합기', '프로젝터', '레이저포인터', '사원증', '결재판', '서류가방', '정수기', '커피머신', '회전의자', '안전모', '지게차', '핸드리프트', '리어카', '저울추', '나사', '볼트', '너트', '톱니바퀴',
+            '스프링', '베어링', '체인', '도르래', '지렛대', '깔때기', '호스', '수도꼭지', '밸브', '계기판', '신호기', '경광등', '소방관', '우주비행사', '잠수부', '광부', '마술사', '산타클로스', '루돌프',
+            '닌자', '기사', '바이킹', '카우보이', '미라', '강시', '도깨비', '구미호', '인어', '켄타우로스', '유니콘', '페가수스', '그리핀', '눈사람', '요정', '마녀', '해적선장', '경찰관', '집배원', '요리사',
+            '미용사', '정원사', '양치기', '어부', '사냥꾼', '탐험가', '고고학자', '지휘자', '발레리나', '피에로', '줄다리기', '씨름', '팔씨름', '제기차기', '널뛰기', '강강술래', '사물놀이', '탈춤', '줄타기',
+            '번지점프', '패러글라이딩', '스카이다이빙', '암벽등반', '요가', '태권도', '펜싱', '양궁', '컬링', '봅슬레이', '피겨스케이팅', '역도', '마라톤', '줄서기', '숨바꼭질', '술래잡기', '비석치기', '땅따먹기',
+            '고무줄놀이', '눈싸움', '썰매타기', '연날리기', '팽이치기', '윷놀이', '투호', '그림자놀이', '종이접기', '뜨개질', '바느질', '다림질', '빨래', '설거지', '낮잠', '하품', '재채기', '딸꾹질', '코골이',
+            '기지개'
+        ];
         const DQ_DAY_POST = 3, DQ_TRIES = 5, DQ_OPEN_MS = 24 * 3600 * 1000, DQ_CHO_MS = 6 * 3600 * 1000;
         const DQ_COIN_SOLVE = 3;   // 1등(첫 정답) 코인 하루 최대 개수
         const DQ_COLORS = ['#111111', '#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#8e24aa', '#6d4c41', '#9e9e9e', '#ffffff'];
         let dqRounds = {}, dqImgs = {}, dqSeenAt = 0, dqReady = false, dqBusy = false, dqImgRender = 0;
+        let dqUsed = {}, dqUsedLoaded = false, dqRoundsLoaded = false;   // 이미 나온 제시어 (단어 해시 → 나온 시각)
         let dqEd = null;   // 그리는 중: { word, rerolls, strokes, color, size }
 
         const dqNorm = (t) => String(t || '').toLowerCase().replace(/[\s.,!?~'"`·\-_()]/g, '');
@@ -13493,8 +13523,14 @@ ${text}
             if (!db || dqReady) return;
             dqReady = true;
             dqSeenAt = Date.now();
+            db.ref('drawquiz/used').on('value', snap => {
+                const v = snap.val() || {};
+                dqUsed = Object.fromEntries(Object.entries(v).map(([k, x]) => [k, (x && x.at) || 1]));
+                dqUsedLoaded = true; dqMarkUsedFromRounds();
+            });
             db.ref('drawquiz/rounds').orderByChild('at').limitToLast(40).on('value', snap => {
                 dqRounds = snap.val() || {};
+                dqRoundsLoaded = true; dqMarkUsedFromRounds();
                 // 다른 팀원이 새 그림을 올리면 알림
                 const me = statKey(myGameName());
                 Object.values(dqRounds).filter(r => r && r.at > dqSeenAt && r.byKey !== me)
@@ -13512,6 +13548,24 @@ ${text}
                 if (!dqImgRender) dqImgRender = requestAnimationFrame(() => { dqImgRender = 0; renderDrawQuiz(); });   // 그림이 오면 한 번에 다시 그림
             }).catch(() => { delete dqImgs[id]; });
         }
+        // 한 번 나온 제시어는 다시 안 나오게: 단어 해시만 기록 (진행 중인 그림의 정답이 드러나지 않게)
+        const dqUsedKey = (w) => 'u' + dqHash('w:' + dqNorm(w));
+        function dqMarkUsedFromRounds() {   // 이 기능 전에 나온 그림의 제시어도 '나옴'으로 기록
+            if (!dqUsedLoaded || !dqRoundsLoaded || !db) return;
+            Object.values(dqRounds).forEach(r => {
+                if (!r || !r.enc) return;
+                const k = dqUsedKey(dqDec(r.enc));
+                if (!dqUsed[k]) { dqUsed[k] = r.at || Date.now(); db.ref(`drawquiz/used/${k}`).transaction(cur => cur || { at: r.at || Date.now() }); }
+            });
+        }
+        function dqPickWord(exclude) {
+            const fresh = DQ_WORDS.filter(w => w !== exclude && !dqUsed[dqUsedKey(w)]);
+            if (fresh.length) return fresh[Math.floor(Math.random() * fresh.length)];
+            // 다 썼으면 가장 오래전에 나온 단어부터 다시
+            const old = DQ_WORDS.filter(w => w !== exclude).sort((a, b) => (dqUsed[dqUsedKey(a)] || 0) - (dqUsed[dqUsedKey(b)] || 0)).slice(0, 30);
+            return old[Math.floor(Math.random() * old.length)];
+        }
+        const dqWordsLeft = () => DQ_WORDS.filter(w => !dqUsed[dqUsedKey(w)]).length;
         const dqMyTodayPosts = () => { const me = statKey(myGameName()), today = getLocalDateKey(new Date()); return Object.values(dqRounds).filter(r => r && r.byKey === me && getLocalDateKey(new Date(r.at)) === today).length; };
 
         // ---------- 그리기 ----------
@@ -13519,7 +13573,7 @@ ${text}
             if (!db) { alert('서버에 연결된 뒤에 할 수 있어요.'); return; }
             if (!localStorage.getItem('chat_nickname')) { alert('먼저 상단에서 이름을 입력해 주세요.'); return; }
             if (dqMyTodayPosts() >= DQ_DAY_POST) { alert(`그림은 하루 ${DQ_DAY_POST}개까지 낼 수 있어요. 내일 또 내 주세요!`); return; }
-            dqEd = { word: DQ_WORDS[Math.floor(Math.random() * DQ_WORDS.length)], rerolls: 2, strokes: [], color: '#111111', size: 6, cur: null };
+            dqEd = { word: dqPickWord(), rerolls: 2, strokes: [], color: '#111111', size: 6, cur: null };
             document.getElementById('dqEditor').style.display = 'block';
             document.getElementById('dqTools').innerHTML = DQ_COLORS.map(c => `<button class="dq-color ${c === dqEd.color ? 'on' : ''}" style="background:${c}" title="${c === '#ffffff' ? '지우개(흰색)' : ''}" onclick="dqSetColor('${c}')"></button>`).join('')
                 + [['가늘게', 3], ['보통', 6], ['굵게', 14]].map(([n, v]) => `<button class="dq-size ${v === dqEd.size ? 'on' : ''}" data-size="${v}" onclick="dqSetSize(${v})">${n}</button>`).join('');
@@ -13531,11 +13585,12 @@ ${text}
             document.getElementById('dqWord').textContent = dqEd.word;
             const b = document.getElementById('dqRerollBtn');
             b.textContent = `🔄 다른 단어 (${dqEd.rerolls}번 남음)`; b.disabled = dqEd.rerolls <= 0;
+            const left = document.getElementById('dqWordsLeft');
+            if (left) left.textContent = `아직 안 나온 제시어 ${dqWordsLeft()}개 · 한 번 나온 단어는 다시 안 나와요`;
         }
         function dqReroll() {
             if (!dqEd || dqEd.rerolls <= 0) return;
-            let w; do { w = DQ_WORDS[Math.floor(Math.random() * DQ_WORDS.length)]; } while (w === dqEd.word);
-            dqEd.word = w; dqEd.rerolls--; dqShowWord();
+            dqEd.word = dqPickWord(dqEd.word); dqEd.rerolls--; dqShowWord();
         }
         function dqSetColor(c) { if (!dqEd) return; dqEd.color = c; document.querySelectorAll('.dq-color').forEach(b => b.classList.toggle('on', b.style.background && b.getAttribute('onclick').includes(c))); }
         function dqSetSize(v) { if (!dqEd) return; dqEd.size = v; document.querySelectorAll('.dq-size').forEach(b => b.classList.toggle('on', +b.dataset.size === v)); }
@@ -13579,6 +13634,15 @@ ${text}
                 if (!url.startsWith('data:image/webp')) url = cv.toDataURL('image/png');   // webp를 못 만드는 브라우저
                 if (url.length > 900000) url = cv.toDataURL('image/jpeg', 0.7);
                 const me = myGameName(), word = dqEd.word;
+                // 제시어를 '나옴'으로 먼저 찍음 — 그 사이 다른 팀원이 같은 단어를 냈으면 새 단어로
+                const uk = dqUsedKey(word), claimed = await dqTxn(db.ref(`drawquiz/used/${uk}`), cur => cur ? undefined : { at: Date.now() });
+                if (!claimed) {
+                    dqUsed[uk] = dqUsed[uk] || Date.now();
+                    dqEd.word = dqPickWord(word); dqEd.strokes = []; dqRedraw(); dqShowWord();
+                    alert(`방금 다른 팀원이 '${word}'을(를) 먼저 냈어요 😅\n새 제시어 '${dqEd.word}'(으)로 다시 그려 주세요.`);
+                    return;
+                }
+                dqUsed[uk] = Date.now();
                 const ref = db.ref('drawquiz/rounds').push();
                 const id = ref.key;
                 await db.ref(`drawquiz/imgs/${id}`).set(url);
