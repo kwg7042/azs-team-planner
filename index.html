@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-12a">
+    <meta name="app-version" content="2026-11-12b">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -4118,6 +4118,10 @@
         .dq-tools { display: flex; justify-content: center; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
         .dq-color { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.35); cursor: pointer; padding: 0; }
         .dq-color.on { border-color: #fff; box-shadow: 0 0 0 2px #ffd166; }
+        .dq-pick { position: relative; width: 26px; height: 26px; border-radius: 50%; border: 2px dashed rgba(255,255,255,0.6); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; overflow: hidden; }
+        .dq-pick.on { border-style: solid; border-color: #fff; box-shadow: 0 0 0 2px #ffd166; }
+        .dq-pick input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; padding: 0; border: none; }
+        .dq-tools-br { flex-basis: 100%; height: 0; }
         .dq-size { min-width: 34px; height: 28px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; font-family: inherit; }
         .dq-size.on { background: #ffd166; color: #1a1a2e; font-weight: bold; }
         #dqCanvas { width: 100%; max-width: 480px; height: auto; display: block; margin: 0 auto; background: #fff; border-radius: 10px; touch-action: none; cursor: crosshair; }
@@ -5465,7 +5469,7 @@
                             <summary>📚 지난 그림 보기</summary>
                             <div class="dq-rounds" id="dqClosedRounds"></div>
                         </details>
-                        <div class="pika-help">🎨 한 명이 제시어를 그려서 올리면, 나머지 팀원이 <b>24시간 동안</b> 각자 편할 때 맞혀요 (실시간으로 모일 필요 없음)<br>✍️ 한 문제에 5번까지 도전 · 틀린 답은 다 같이 보여요 · 힌트: 글자 수는 처음부터, 초성은 6시간 뒤에 공개<br>🏆 점수: 첫 정답 3점, 그다음 정답 2점, 그린 사람은 맞힌 사람 1명당 1점 (최대 3점) · 🪙 코인은 <b>1등(가장 먼저 맞힌 사람)만 1개</b>, 하루 3개까지<br>📝 출제는 하루 3개까지 · 아직 아무도 못 맞혔으면 내 그림은 지울 수 있어요</div>
+                        <div class="pika-help">🎨 한 명이 제시어를 그려서 올리면, 나머지 팀원이 <b>24시간 동안</b> 각자 편할 때 맞혀요 (실시간으로 모일 필요 없음)<br>✍️ 한 문제에 5번까지 도전 · 틀린 답은 다 같이 보여요 · 힌트: 글자 수는 처음부터, 초성은 6시간 뒤에 공개<br>🏆 점수: 첫 정답 3점, 그다음 정답 2점, 그린 사람은 맞힌 사람 1명당 1점 (최대 3점) · 🪙 코인은 <b>1등(가장 먼저 맞힌 사람)만 1개</b>, 하루 3개까지<br>📝 출제는 <b>오전 8시·오후 1시에 3번씩</b> 충전돼요 (하루 6번) · 아직 아무도 못 맞혔으면 내 그림은 지울 수 있어요</div>
                     </div>
                     <div class="leaderboard dodge-ranking">
                         <h4>🏆 이번 주 그림 퀴즈 랭킹 <small style="font-weight: normal; opacity: 0.6; font-size: 11px;">(월~일 · 컬렉션 아이콘을 지정한 사람만)</small></h4>
@@ -14046,9 +14050,12 @@ ${text}
             '바둑알', '장기판', '장기알', '체스판', '보드게임', '퍼즐조각', '블록쌓기', '탑쌓기', '도미노'
         ];
         DQ_WORDS.push(...DQ_WORDS_COMPOUND.filter(w => !DQ_WORDS.includes(w)));
-        const DQ_DAY_POST = 3, DQ_TRIES = 5, DQ_OPEN_MS = 24 * 3600 * 1000, DQ_CHO_MS = 6 * 3600 * 1000;
+        const DQ_DAY_POST = 3 /* 시간대(오전 8시~ / 오후 1시~)마다 낼 수 있는 그림 수 */, DQ_TRIES = 5, DQ_OPEN_MS = 24 * 3600 * 1000, DQ_CHO_MS = 6 * 3600 * 1000;
         const DQ_COIN_SOLVE = 3;   // 1등(첫 정답) 코인 하루 최대 개수
-        const DQ_COLORS = ['#111111', '#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#8e24aa', '#6d4c41', '#9e9e9e', '#ffffff'];
+        // [색, 이름] — 살구·베이지·황토·구릿빛은 사람 피부색용
+        const DQ_COLORS = [['#111111', '검정'], ['#616161', '진회색'], ['#bdbdbd', '회색'], ['#ffffff', '지우개(흰색)'],
+            ['#e53935', '빨강'], ['#fb8c00', '주황'], ['#fdd835', '노랑'], ['#9ccc65', '연두'], ['#2e7d32', '초록'], ['#4fc3f7', '하늘'], ['#1e88e5', '파랑'], ['#283593', '남색'], ['#8e24aa', '보라'], ['#f48fb1', '분홍'], ['#e91e63', '진분홍'],
+            ['#ffe0bd', '살구 (피부)'], ['#f1c27d', '베이지 (피부)'], ['#c68642', '황토 (피부)'], ['#8d5524', '구릿빛 (피부)'], ['#6d4c41', '갈색'], ['#3e2723', '고동'], ['#ffd54f', '금색']];
         let dqRounds = {}, dqImgs = {}, dqSeenAt = 0, dqReady = false, dqBusy = false, dqImgRender = 0;
         let dqUsed = {}, dqUsedLoaded = false, dqRoundsLoaded = false;   // 이미 나온 제시어 (단어 해시 → 나온 시각)
         let dqEd = null;   // 그리는 중: { word, rerolls, strokes, color, size }
@@ -14119,16 +14126,24 @@ ${text}
             return old[Math.floor(Math.random() * old.length)];
         }
         const dqWordsLeft = () => DQ_WORDS.filter(w => !dqUsed[dqUsedKey(w)]).length;
-        const dqMyTodayPosts = () => { const me = statKey(myGameName()), today = getLocalDateKey(new Date()); return Object.values(dqRounds).filter(r => r && r.byKey === me && getLocalDateKey(new Date(r.at)) === today).length; };
+        // 출제 횟수는 오전 8시와 오후 1시에 3번씩 충전 (하루 6번). 0~8시에 낸 그림은 전날 오후 시간대로 셈
+        function dqWindowOf(t) {
+            const d = new Date(t), h = d.getHours();
+            if (h < 8) { d.setDate(d.getDate() - 1); return getLocalDateKey(d) + '-pm'; }
+            return getLocalDateKey(d) + (h < 13 ? '-am' : '-pm');
+        }
+        const dqNextCharge = () => { const h = new Date().getHours(); return h >= 8 && h < 13 ? '오후 1시' : h < 8 ? '오전 8시' : '내일 오전 8시'; };
+        const dqMyTodayPosts = () => { const me = statKey(myGameName()), win = dqWindowOf(Date.now()); return Object.values(dqRounds).filter(r => r && r.byKey === me && dqWindowOf(r.at) === win).length; };
 
         // ---------- 그리기 ----------
         function dqOpenEditor() {
             if (!db) { alert('서버에 연결된 뒤에 할 수 있어요.'); return; }
             if (!localStorage.getItem('chat_nickname')) { alert('먼저 상단에서 이름을 입력해 주세요.'); return; }
-            if (dqMyTodayPosts() >= DQ_DAY_POST) { alert(`그림은 하루 ${DQ_DAY_POST}개까지 낼 수 있어요. 내일 또 내 주세요!`); return; }
+            if (dqMyTodayPosts() >= DQ_DAY_POST) { alert(`이번 시간대에 낼 수 있는 그림 ${DQ_DAY_POST}개를 다 냈어요. ${dqNextCharge()}에 다시 3개를 낼 수 있어요!`); return; }
             dqEd = { word: dqPickWord(), rerolls: 2, strokes: [], color: '#111111', size: 6, cur: null };
             document.getElementById('dqEditor').style.display = 'block';
-            document.getElementById('dqTools').innerHTML = DQ_COLORS.map(c => `<button class="dq-color ${c === dqEd.color ? 'on' : ''}" style="background:${c}" title="${c === '#ffffff' ? '지우개(흰색)' : ''}" onclick="dqSetColor('${c}')"></button>`).join('')
+            document.getElementById('dqTools').innerHTML = DQ_COLORS.map(([c, n]) => `<button class="dq-color ${c === dqEd.color ? 'on' : ''}" style="background:${c}" data-c="${c}" title="${n}" onclick="dqSetColor('${c}')"></button>`).join('')
+                + `<label class="dq-pick" title="원하는 색 직접 고르기">🎨<input type="color" id="dqColorPick" value="#ff7043" oninput="dqSetColor(this.value, true)" onclick="dqSetColor(this.value, true)"></label><span class="dq-tools-br"></span>`
                 + [['가늘게', 3], ['보통', 6], ['굵게', 14]].map(([n, v]) => `<button class="dq-size ${v === dqEd.size ? 'on' : ''}" data-size="${v}" onclick="dqSetSize(${v})">${n}</button>`).join('');
             dqShowWord();
             dqRedraw();
@@ -14145,7 +14160,12 @@ ${text}
             if (!dqEd || dqEd.rerolls <= 0) return;
             dqEd.word = dqPickWord(dqEd.word); dqEd.rerolls--; dqShowWord();
         }
-        function dqSetColor(c) { if (!dqEd) return; dqEd.color = c; document.querySelectorAll('.dq-color').forEach(b => b.classList.toggle('on', b.style.background && b.getAttribute('onclick').includes(c))); }
+        function dqSetColor(c, custom) {
+            if (!dqEd) return;
+            dqEd.color = c;
+            document.querySelectorAll('.dq-color').forEach(b => b.classList.toggle('on', !custom && b.dataset.c === c));
+            const pick = document.querySelector('.dq-pick'); if (pick) { pick.classList.toggle('on', !!custom); if (custom) pick.style.background = c; }
+        }
         function dqSetSize(v) { if (!dqEd) return; dqEd.size = v; document.querySelectorAll('.dq-size').forEach(b => b.classList.toggle('on', +b.dataset.size === v)); }
         function dqCloseEditor() { dqEd = null; document.getElementById('dqEditor').style.display = 'none'; }
         function dqUndo() { if (!dqEd) return; dqEd.strokes.pop(); dqRedraw(); }
@@ -14178,7 +14198,7 @@ ${text}
         async function dqPost() {
             if (!dqEd || !db) return;
             if (dqEd.strokes.length < 3) { alert('조금 더 그려 주세요! (선 3개 이상)'); return; }
-            if (dqMyTodayPosts() >= DQ_DAY_POST) { alert(`그림은 하루 ${DQ_DAY_POST}개까지 낼 수 있어요.`); return; }
+            if (dqMyTodayPosts() >= DQ_DAY_POST) { alert(`이번 시간대에 낼 수 있는 그림 ${DQ_DAY_POST}개를 다 냈어요. ${dqNextCharge()}에 다시 낼 수 있어요.`); return; }
             const btn = document.getElementById('dqPostBtn'); btn.disabled = true;
             try {
                 dqRedraw();
@@ -14333,7 +14353,7 @@ ${text}
             // 내 현황 · 출제 버튼
             const posted = dqMyTodayPosts();
             const nb = document.getElementById('dqNewBtn'); nb.disabled = posted >= DQ_DAY_POST;
-            nb.textContent = posted >= DQ_DAY_POST ? '✏️ 오늘 출제 끝 (3/3)' : `✏️ 그림 내기 (오늘 ${posted}/${DQ_DAY_POST})`;
+            nb.textContent = posted >= DQ_DAY_POST ? `✏️ ${dqNextCharge()}에 다시 3번 (${posted}/${DQ_DAY_POST})` : `✏️ 그림 내기 (${posted}/${DQ_DAY_POST})`;
             const rows = dqWeekScores().filter(([, x]) => hasRankIcon(x.name)), myRow = rows.findIndex(([k]) => k === key);   // 컬렉션 아이콘을 지정한 사람만 (다른 게임 랭킹과 같은 기준)
             document.getElementById('dqMyStat').innerHTML = `맞힐 그림 <b>${open.filter(([, r]) => r.byKey !== key && !(r.solvers && r.solvers[key])).length}</b>개${myRow >= 0 ? ` · 이번 주 <b>${rows[myRow][1].pts}점</b> (${myRow + 1}위)` : hasRankIcon(myGameName()) ? '' : ' · 🔒 컬렉션 아이콘을 지정해야 랭킹에 올라가요'}`;
             const medal = (i) => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
