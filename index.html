@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-12b">
+    <meta name="app-version" content="2026-11-12c">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -2624,8 +2624,8 @@
         .sword-fame { font-size: 14px; margin: -8px 0 10px; }
         .sword-fame small { color: rgba(255,255,255,0.55); font-size: 12px; }
         .fame-badge { display: inline-block; padding: 0 7px; border: 1px solid; border-radius: 10px; font-size: 11px; font-weight: bold; margin-right: 4px; background: rgba(0,0,0,0.25); }
-        .sword-book { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-        .book-card { width: 104px; padding: 6px 4px 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.25); color: #fff; cursor: pointer; font-family: inherit; transition: border-color 0.15s, transform 0.15s; }
+        .sword-book { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+        .book-card { width: 88px; padding: 6px 4px 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.25); color: #fff; cursor: pointer; font-family: inherit; transition: border-color 0.15s, transform 0.15s; }
         .book-card:hover { border-color: rgba(255,255,255,0.35); transform: translateY(-2px); }
         .book-card.cur { border: 2px solid #ffd700; background: rgba(255,215,0,0.1); }
         .book-card.done { box-shadow: inset 0 0 0 1px rgba(0,255,136,0.4); }
@@ -2669,7 +2669,11 @@
         .sword-charge-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(255,215,0,0.55); background: linear-gradient(135deg, rgba(255,215,0,0.22), rgba(255,140,0,0.22)); color: #ffd700; font-size: 13px; font-weight: bold; cursor: pointer; font-family: inherit; }
         .sword-charge-btn:hover:not(:disabled) { background: linear-gradient(135deg, rgba(255,215,0,0.35), rgba(255,140,0,0.35)); }
         .sword-charge-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .sword-rule { margin-top: 12px; font-size: 11px; color: rgba(255,255,255,0.5); }
+        .sword-rule { margin-top: 12px; font-size: 11px; color: rgba(255,255,255,0.5); line-height: 1.7; }
+        .sword-reset-note { margin: 0 auto 14px; max-width: 720px; padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(255,215,0,0.45); background: rgba(255,215,0,0.1); color: #ffe9a8; font-size: 13px; line-height: 1.6; text-align: center; }
+        .sword-reset-note button { margin-left: 6px; padding: 3px 12px; border-radius: 12px; border: 1px solid rgba(255,215,0,0.6); background: rgba(255,215,0,0.2); color: #fff; font-size: 12px; cursor: pointer; font-family: inherit; }
+        .sword-prices .sp-raid { display: inline-block; margin-top: 4px; color: #ffb38a; font-size: 12px; }
+        .sword-prices .sp-raid small { color: rgba(255,255,255,0.55); }
         .sword-table { margin-top: 12px; text-align: left; font-size: 12px; }
         .sword-table summary { cursor: pointer; text-align: center; color: rgba(255,255,255,0.7); }
         .sword-table table { width: 100%; border-collapse: collapse; margin-top: 8px; font-variant-numeric: tabular-nums; }
@@ -2680,8 +2684,8 @@
         .sword-table .t-break { color: #ff6b6b; }
         .leaderboard-level small { color: rgba(255,255,255,0.5); font-weight: normal; margin-left: 4px; }
         @media (max-width: 520px) {
-            .sword-book { gap: 4px; flex-wrap: nowrap; }
-            .book-card { width: auto; flex: 1 1 0; min-width: 0; padding: 4px 2px 6px; border-radius: 10px; }
+            .sword-book { gap: 4px; }
+            .book-card { width: auto; flex: 1 1 22%; max-width: 25%; min-width: 0; padding: 4px 2px 6px; border-radius: 10px; }   /* 무기 7종: 4 + 3 두 줄 */
             .book-card .book-art { height: 46px; }
             .book-card .book-art svg { width: 30px; height: 46px; }
             .book-card .book-name { font-size: 11px; }
@@ -3774,12 +3778,14 @@
 
         /* ===== 검 외형 애니메이션 ===== */
         .sword-svg { display: block; margin: 0 auto; overflow: visible; }
-        .sword-svg.tier-2, .sword-svg.tier-3, .sword-svg.tier-4, .sword-svg.tier-5 { animation: swordFloat 3s ease-in-out infinite; }
+        .sword-svg.tier-2, .sword-svg.tier-3, .sword-svg.tier-4, .sword-svg.tier-5, .sword-svg.tier-6 { animation: swordFloat 3s ease-in-out infinite; }
         .sword-svg .sw-aura { animation: swordAura 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
         .sword-svg .sw-rays { animation: swordRays 14s linear infinite; transform-box: fill-box; transform-origin: center; }
         .sword-svg .sw-flame { animation: swordFlame 0.6s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: bottom center; }
         .sword-svg .sw-star { animation: swordTwinkle 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
         .sword-svg .sw-gem { animation: swordGem 1.8s ease-in-out infinite; }
+        .sword-svg .sw-runes { animation: swordRunes 1.7s ease-in-out infinite; }
+        @keyframes swordRunes { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
         .sword-svg .sw-wings { animation: swordWings 2.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center bottom; }
         @keyframes swordFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
         @keyframes swordAura { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
@@ -4092,6 +4098,16 @@
         .raid-banner { margin-top: 10px; font-size: 15px; font-weight: bold; color: #ffd54f; min-height: 0; }
         .raid-me { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.7; margin-bottom: 12px; }
         .raid-me b { color: #ffd54f; }
+        .raid-weapons { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; margin: 0 auto 12px; max-width: 680px; }
+        .rw-chip { display: flex; flex-direction: column; align-items: center; flex: 1 1 0; min-width: 78px; max-width: 110px; padding: 6px 4px 7px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.14); background: rgba(0,0,0,0.3); color: #fff; font-family: inherit; cursor: pointer; line-height: 1.35; transition: border-color 0.15s, transform 0.15s; }
+        .rw-chip:hover { border-color: rgba(255,255,255,0.4); transform: translateY(-2px); }
+        .rw-chip .rw-ico { font-size: 20px; }
+        .rw-chip b { font-size: 12px; }
+        .rw-chip small { font-size: 10px; color: #ffcf99; }
+        .rw-chip em { font-style: normal; font-size: 9px; color: rgba(255,255,255,0.5); word-break: keep-all; text-align: center; }
+        .rw-chip.on { border: 2px solid #ffd54f; background: rgba(255,213,79,0.14); box-shadow: 0 0 12px rgba(255,213,79,0.25); }
+        .rw-chip.locked { opacity: 0.5; cursor: not-allowed; }
+        .rw-chip.locked small { color: rgba(255,255,255,0.6); }
         .raid-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
         .raid-attack { padding: 15px 38px; font-size: 18px; font-weight: bold; border: none; border-radius: 30px; color: #fff; cursor: pointer; background: linear-gradient(135deg, #ff1744, #d500f9); box-shadow: 0 4px 18px rgba(255,23,68,0.4); font-family: inherit; }
         .raid-attack:hover:not(:disabled) { transform: scale(1.05); }
@@ -5111,7 +5127,7 @@
                 <!-- 게임 선택 -->
                 <div class="minigame-tabs">
                     <button class="minigame-tab active" onclick="switchMinigame('gacha')">🎰 인형뽑기</button>
-                    <button class="minigame-tab" onclick="switchMinigame('enhance')">⚔️ 검 강화</button>
+                    <button class="minigame-tab" onclick="switchMinigame('enhance')">⚔️ 무기 강화</button>
                     <button class="minigame-tab" onclick="switchMinigame('collection')">🏆 컬렉션</button>
                     <button class="minigame-tab" onclick="switchMinigame('raid')">🐲 레이드</button>
                     <button class="minigame-tab" onclick="switchMinigame('drawquiz')">🎨 그림 퀴즈</button>
@@ -5151,20 +5167,21 @@
                     </div>
                 </div>
 
-                <!-- 검 강화 -->
+                <!-- 무기 강화 -->
                 <div class="minigame-panel" id="panel-enhance">
                     <div class="enhance-area">
+                        <div class="sword-reset-note" id="swordResetNote" style="display: none;"></div>
                         <div class="sword-fame" id="swordFame"></div>
-                        <div class="sword-book" id="swordBook" title="검을 골라 강화하고, 최종 단계까지 올리면 컬렉션 완성"></div>
+                        <div class="sword-book" id="swordBook" title="무기를 골라 강화하고, 최종 단계까지 올리면 완성 · 명성 등급이 오르면 다음 무기가 열려요"></div>
                         <div class="weapon-showcase">
                             <div class="weapon-glow" id="weaponGlow"></div>
                             <div class="weapon-big" id="weaponBig">🗡️</div>
-                            <div class="weapon-name" id="weaponName">일반 검 +0</div>
+                            <div class="weapon-name" id="weaponName">낡은 검 +0</div>
                         </div>
                         <div class="sword-wallet">
                             <div class="sw-money">💰 보유 금액 <b id="swordMoney">10,000원</b></div>
                             <div class="sw-best">🏅 최고 기록 <b id="swordBest">+0</b></div>
-                            <div class="sw-shard" title="검이 파괴되면 생겨요 · 모아서 방지권을 만들어요">🧩 조각 <b id="swordShards">0</b></div>
+                            <div class="sw-shard" title="무기가 부서지면 생겨요 · 모아서 방지권을 만들어요 (방지권은 조각으로만 만들 수 있어요)">🧩 조각 <b id="swordShards">0</b></div>
                             <button class="sword-charge-btn" id="swordChargeBtn" onclick="chargeSwordMoney()" title="코인 1개를 강화 머니 1만원으로 바꿔요">🪙 코인 1개 → 1만원 충전</button>
                         </div>
                         <div class="enhance-info">
@@ -5177,8 +5194,7 @@
                             <span class="sp-info" id="swordShieldInfo"></span>
                         </div>
                         <div class="sword-shop" id="swordShop">
-                            <button id="shieldBuyBtn" onclick="buySwordShield('won')">🛡️ 방지권 사기</button>
-                            <button id="shieldCraftBtn" onclick="buySwordShield('shard')">🧩 조각으로 방지권 만들기</button>
+                            <button id="shieldCraftBtn" onclick="buySwordShield()">🧩 조각으로 방지권 만들기</button>
                         </div>
                         <div class="sword-actions">
                             <button class="enhance-btn" id="enhanceBtn" onclick="doEnhance()">
@@ -5187,19 +5203,19 @@
                             <button class="sword-sell-btn" id="swordSellBtn" onclick="sellSword()">💰 판매하기</button>
                         </div>
                         <button class="sword-dex-claim" id="swordDexClaimBtn" onclick="claimDexRewards()" style="display: none;"></button>
-                        <div class="sword-rule">강화 비용은 <b>원</b>으로 내요 (코인 1개 = 1만원 충전) · <b>+0 강화는 무료</b> · 실패하면 <b>+0</b>으로 (방지권이 있으면 단계 유지) · 부서지면 🧩 조각 · 검을 팔면 판매가만큼 받고 새 +0 검으로 다시 시작<br>🎖️ 명성 = 검마다 최고 기록 × 가중치(단검 1 · 장검 2 · 쌍검 3 · 대검 4 · 전설검 6) + 최종 강화 완성 보너스 · 실버에 쌍검, 골드에 대검, 다이아에 전설검이 열려요</div>
+                        <div class="sword-rule">강화 비용은 <b>원</b>으로 내요 (코인 1개 = 1만원 충전) · <b>+0 강화는 무료</b> · 실패하면 <b>+0</b>으로 (방지권이 있으면 단계 유지) · 부서지면 🧩 조각 · 팔면 판매가만큼 받고 새 +0 무기로 다시 시작<br>🛡️ 방지권은 돈으로 살 수 없어요: 🧩 조각으로 만들거나 📖 도감 보상(5·10·15단계)으로만 얻어요<br>🎖️ 명성 = 무기마다 최고 기록 × 가중치(검 2 · 칼 3 · 창 4 · 곤봉 5 · 활 6 · 총 7 · 대포 8) + 최종 강화 완성 보너스 · 등급이 오를 때마다 다음 무기(칼 → 창 → 곤봉 → 활 → 총 → 대포)가 열려요<br>🐲 레이드에서는 무기마다 <b>최고 기록 단계</b>의 공격력으로 싸워요 (팔거나 부서져도 그대로) · 뒤 무기일수록 강하고 특성이 달라요</div>
                         <div class="enhance-history" id="enhanceHistory"></div>
                         <details class="sword-dex" id="swordDexBox" ontoggle="renderSwordDex(true)">
-                            <summary>📖 검 도감 <span id="swordDexCount">0/20</span> <small>· 처음 달성하면 보상금 (5·10·15단계는 방지권도) · 명성 점수도 올라요</small></summary>
+                            <summary>📖 무기 도감 <span id="swordDexCount">0/15</span> <small>· 처음 달성하면 보상금 (5·10·15단계는 방지권도) · 명성 점수도 올라요</small></summary>
                             <div class="sword-dex-grid" id="swordDex"></div>
                         </details>
                         <details class="sword-table">
-                            <summary>📋 강화표 (단계별 확률·비용·판매가·조각·방지권)</summary>
+                            <summary>📋 강화표 (단계별 확률·비용·판매가·조각·방지권·레이드 공격력)</summary>
                             <div id="swordTable"></div>
                         </details>
                     </div>
                     <div class="leaderboard">
-                        <h4>🏆 검 부자 랭킹 <small style="font-weight: normal; opacity: 0.6; font-size: 11px;">재산 = 보유 금액 + 지금 검 판매가 · 이름 옆은 명성 등급</small></h4>
+                        <h4>🏆 무기 명성 랭킹 <small style="font-weight: normal; opacity: 0.6; font-size: 11px;">명성 점수 순 · 가장 높은 무기 · 재산(보유 금액 + 지금 무기 판매가)</small></h4>
                         <div id="enhanceLeaderboard"></div>
                     </div>
                 </div>
@@ -5427,13 +5443,14 @@
                             <div class="raid-banner" id="raidBanner"></div>
                         </div>
                         <div class="raid-party" id="raidParty"></div>
+                        <div class="raid-weapons" id="raidWeapons" title="레이드에 들고 갈 무기를 골라요 (⚔️ 강화 탭에서 키운 무기 · 단계는 무기별 최고 기록)"></div>
                         <div class="raid-me" id="raidMe"></div>
                         <div class="raid-actions">
                             <button class="raid-attack" id="raidAttackBtn" onclick="raidAttack(false)">⚔️ 공격!</button>
                             <button class="raid-extra" id="raidExtraBtn" onclick="raidAttack(true)">🪙 코인 1개로 추가 공격</button>
                         </div>
                         <button class="raid-claim" id="raidClaimBtn" onclick="raidClaim()" style="display: none;"></button>
-                        <div class="pika-help">🔥 매주 새로운 마왕이 용암 동굴에 나타나요 (용암 → 빙결 → 심연 → 독무 → 혈월 → 황금 마왕 순, 쓰러뜨릴수록 강해짐)<br>🤝 팀이 다 같이 한 주(월~일) 동안 보스 체력을 깎는 협동 게임이에요. 실시간으로 모일 필요 없이 각자 편할 때 공격!<br>⚔️ 하루 <b>무료 3번</b> + 🪙 코인 1개로 <b>추가 3번</b>까지 · 공격력은 ⚔️ 검 강화 <b>명성</b>이 높을수록 세져요 (12% 확률 치명타 2배)<br>🗡️ 공격 모션은 지금 들고 있는 검에 따라 달라져요: 단검 연속 찌르기 · 장검 반월 베기 · 쌍검 십자 베기 · 대검 대지 가르기 · 전설검 천벌의 빛<br>🎉 쓰러뜨리면 이번 주에 공격한 사람 <b>모두</b> 보상: 코인 1개 + 강화 머니 (보스 레벨 × 3만원) · 👑 가장 많이 깎은 사람(최다 데미지) +코인 1<br>📈 쓰러뜨리면 다음 주 보스가 한 단계 강해져요 · 못 잡으면 같은 레벨로 다시 나와요</div>
+                        <div class="pika-help">🔥 매주 월요일 새로운 마왕이 용암 동굴에 나타나요 (용암 → 빙결 → 심연 → 독무 → 혈월 → 황금 마왕 순, 쓰러뜨릴수록 강해짐)<br>🤝 팀이 다 같이 한 주(월~일) 동안 보스 체력을 깎는 협동 게임이에요. 실시간으로 모일 필요 없이 각자 편할 때 공격!<br>⚔️ 하루 <b>무료 3번</b> + 🪙 코인 1개로 <b>추가 3번</b>까지 · 공격력 = 기본 100 + 무기 강화 <b>명성</b> + 고른 <b>무기 공격력</b> (기본 12% 확률 치명타 2배)<br>🧰 무기는 ⚔️ 강화 탭에서 키운 것 중에 골라요 (단계는 무기별 최고 기록): 🗡️ 검 반월 베기 · 🔪 칼 십자 베기(치명타↑) · 🔱 창 연속 찌르기(피해 고름) · 🔨 곤봉 대지 강타(치명타 2.5배) · 🏹 활 속사(30% 한 발 더) · 🔫 총 연발 사격(치명타↑↑) · 💣 대포 포격(피해 1.3배)<br>❤️ 보스 체력은 그 주 팀원들의 공격력에 맞춰 정해져요 — 다 같이 꾸준히 때려야 주 후반에 잡을 수 있어요<br>🎉 쓰러뜨리면 이번 주에 공격한 사람 <b>모두</b> 보상: 코인 1개 + 강화 머니 (보스 레벨 × 3만원) · 👑 가장 많이 깎은 사람(최다 데미지) +코인 1<br>📈 쓰러뜨리면 다음 주 보스가 한 단계 강해져요 · 못 잡으면 같은 레벨로 다시 나와요</div>
                     </div>
                     <div class="leaderboard dodge-ranking">
                         <h4>🏅 이번 주 기여도</h4>
@@ -9164,20 +9181,15 @@ ${text}
 
 
 
-        // ===== 검 외형 (강화 단계별로 점점 웅장해짐) =====
+        // ===== 무기 외형 (7종 × 강화 단계별 7가지 모습: 낡은 → 강철 → 서리 → 마력 → 황금 → 화염 → 천상) =====
         const SWORD_TIERS = [
-            // 0~2: 낡은 철검
-            { from: 0,  blade: ['#c9cdd1', '#7d8288'], guard: '#7a5a32', grip: '#5a3a1a', pommel: '#7a5a32', gem: null,      glow: null,      nameColor: '#cfcfcf' },
-            // 3~4: 강철검
-            { from: 3,  blade: ['#ffffff', '#9aa7b2'], guard: '#d7dde3', grip: '#2f2a3a', pommel: '#d7dde3', gem: null,      glow: '#9fd3ff', nameColor: '#e6f3ff' },
-            // 5~6: 서리검
-            { from: 5,  blade: ['#e6f7ff', '#2a8cff'], guard: '#cfe8ff', grip: '#1c2e4a', pommel: '#cfe8ff', gem: '#4fc3ff', glow: '#3aa0ff', nameColor: '#6cc8ff' },
-            // 7~8: 마검
-            { from: 7,  blade: ['#f6dcff', '#8a2be2'], guard: '#d9a6ff', grip: '#2a1240', pommel: '#d9a6ff', gem: '#c77dff', glow: '#a855f7', nameColor: '#c98bff' },
-            // 9~10: 성검 (날개)
-            { from: 9,  blade: ['#fffbe0', '#ffb300'], guard: '#ffd54f', grip: '#5a1a1a', pommel: '#ffd54f', gem: '#ff3b5c', glow: '#ffd700', nameColor: '#ffd700' },
-            // 11+: 신검 (불꽃 + 큰 날개 + 왕관)
-            { from: 11, blade: ['#ffffff', '#ff5e3a'], guard: '#fff0a8', grip: '#3a0a0a', pommel: '#fff0a8', gem: '#ffffff', glow: '#ff7a1a', nameColor: '#ff9a3c' }
+            { from: 0,  name: '낡은', metal: ['#d5d9dd', '#7d8288'], trim: '#8a6a3c', grip: '#5a3a1a', wood: ['#a47443', '#5e3d1c'], gem: null,      glow: null,      nameColor: '#cfcfcf' },
+            { from: 3,  name: '강철', metal: ['#ffffff', '#8fa1b3'], trim: '#cfd8e0', grip: '#2f2a3a', wood: ['#7b4f2c', '#4a2c14'], gem: null,      glow: '#9fd3ff', nameColor: '#e6f3ff' },
+            { from: 6,  name: '서리', metal: ['#eefaff', '#2a8cff'], trim: '#bfe3ff', grip: '#1c2e4a', wood: ['#3b5f8a', '#1c2e4a'], gem: '#4fc3ff', glow: '#3aa0ff', nameColor: '#6cc8ff' },
+            { from: 9,  name: '마력', metal: ['#f8e3ff', '#8a2be2'], trim: '#d9a6ff', grip: '#2a1240', wood: ['#5b2a86', '#2a1240'], gem: '#e040fb', glow: '#a855f7', nameColor: '#c98bff' },
+            { from: 12, name: '황금', metal: ['#fffbe0', '#ffb300'], trim: '#ffd54f', grip: '#5a1a1a', wood: ['#8a5a00', '#5a3a00'], gem: '#ff3b5c', glow: '#ffd700', nameColor: '#ffd700' },
+            { from: 15, name: '화염', metal: ['#fff3e0', '#ff5e3a'], trim: '#ffe082', grip: '#3a0a0a', wood: ['#7a1a0a', '#3a0a0a'], gem: '#ffffff', glow: '#ff7a1a', nameColor: '#ff9a3c' },
+            { from: 18, name: '천상', metal: ['#ffffff', '#7df9ff'], trim: '#e0c3ff', grip: '#1a1040', wood: ['#3a2a80', '#1a1040'], gem: '#ff8af0', glow: '#b388ff', nameColor: '#b9f6ff' }
         ];
 
         function getSwordTier(level) {
@@ -9186,120 +9198,185 @@ ${text}
             return t;
         }
 
-        // kind: 'long'(기본) · 'dagger'(짧은 칼날) · 'twin'(두 자루 교차) · 'great'(넓은 칼날) · 'legend'(처음부터 화려)
-        function swordSVG(level, kind = 'long') {
-            const L = Math.min(level, 15);
-            const t = kind === 'legend' ? Math.min(5, getSwordTier(L) + 2) : getSwordTier(L);
-            const T = SWORD_TIERS[t];
-            const cx = 100, guardY = 228;
-            const bladeLen = Math.min(205, 110 + L * 7) * (kind === 'dagger' ? 0.55 : kind === 'great' ? 1.04 : 1);
-            const w = (14 + t * 2.4) * (kind === 'great' ? 1.7 : kind === 'dagger' ? 0.9 : kind === 'twin' ? 0.8 : 1);
-            const tipY = guardY - bladeLen;
-            const tipBase = tipY + w * 1.3;
-            const parts = [];
-            const uid = `sw${kind}${L}`; // 그라디언트 id 충돌 방지
-
-            parts.push(`<defs>
-                <linearGradient id="${uid}Blade" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0" stop-color="${T.blade[1]}"/><stop offset="0.45" stop-color="${T.blade[0]}"/>
-                    <stop offset="0.55" stop-color="${T.blade[0]}"/><stop offset="1" stop-color="${T.blade[1]}"/>
-                </linearGradient>
-                <radialGradient id="${uid}Aura"><stop offset="0" stop-color="${T.glow || '#000'}" stop-opacity="0.55"/><stop offset="1" stop-color="${T.glow || '#000'}" stop-opacity="0"/></radialGradient>
-                <linearGradient id="${uid}Flame" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffde59"/><stop offset="0.5" stop-color="#ff7a1a"/><stop offset="1" stop-color="#ff2d55" stop-opacity="0"/></linearGradient>
-            </defs>`);
-
-            // 오라 / 후광
-            if (T.glow) parts.push(`<ellipse cx="${cx}" cy="${(tipY + guardY) / 2}" rx="${55 + t * 10}" ry="${bladeLen * 0.65}" fill="url(#${uid}Aura)" class="sw-aura"/>`);
-            if (t >= 4) {
-                const rays = [];
-                const n = t >= 5 ? 16 : 12;
-                for (let i = 0; i < n; i++) {
-                    rays.push(`<polygon points="${cx - 3},${guardY - 70} ${cx + 3},${guardY - 70} ${cx},${guardY - 70 - (t >= 5 ? 125 : 100)}" transform="rotate(${i * 360 / n} ${cx} ${guardY - 70})" fill="${T.glow}" opacity="0.35"/>`);
-                }
-                parts.push(`<g class="sw-rays">${rays.join('')}</g>`);
-            }
-
-            // 날개 (성검 이상)
-            if (t >= 4) {
-                const span = t >= 5 ? 92 : 70;
-                const wing = (s) => {
-                    const feathers = [];
-                    for (let i = 0; i < 4; i++) {
-                        const fx = cx + s * (22 + i * span / 4.4);
-                        const fy = guardY - 8 - i * 9;
-                        feathers.push(`<path d="M ${cx + s * 12} ${guardY - 4} Q ${fx} ${fy - 26} ${fx + s * 16} ${fy - 4} Q ${fx} ${fy + 6} ${cx + s * 12} ${guardY + 4} Z" fill="${i % 2 ? '#ffffff' : T.guard}" opacity="${0.95 - i * 0.12}"/>`);
-                    }
-                    return feathers.join('');
-                };
-                parts.push(`<g class="sw-wings">${wing(-1)}${wing(1)}</g>`);
-            }
-
-            // 불꽃 (신검)
-            if (t >= 5) {
-                parts.push(`<g class="sw-flame">
-                    <path d="M ${cx - w / 2 - 4} ${guardY - 6} Q ${cx - w - 14} ${(tipY + guardY) / 2} ${cx} ${tipY - 26} Q ${cx + w + 14} ${(tipY + guardY) / 2} ${cx + w / 2 + 4} ${guardY - 6} Z" fill="url(#${uid}Flame)" opacity="0.85"/>
-                </g>`);
-            }
-
-            // 칼날
-            parts.push(`<polygon points="${cx - w / 2},${guardY} ${cx - w / 2},${tipBase} ${cx},${tipY} ${cx + w / 2},${tipBase} ${cx + w / 2},${guardY}" fill="url(#${uid}Blade)" stroke="${T.blade[1]}" stroke-width="1"/>`);
-            parts.push(`<line x1="${cx}" y1="${guardY - 6}" x2="${cx}" y2="${tipBase + 4}" stroke="rgba(0,0,0,0.25)" stroke-width="${Math.max(1.5, w / 6)}"/>`);
-
-            // 룬 문양 (마검 이상)
-            if (t >= 3) {
-                const runes = [];
-                const count = 3 + (t - 3) * 2;
-                for (let i = 0; i < count; i++) {
-                    const ry = guardY - 22 - i * ((bladeLen - 50) / count);
-                    runes.push(`<path d="M ${cx - 3} ${ry} l 3 -6 l 3 6 M ${cx - 2} ${ry - 3} h 4" stroke="${T.glow}" stroke-width="1.3" fill="none"/>`);
-                }
-                parts.push(`<g class="sw-runes">${runes.join('')}</g>`);
-            }
-
-            // 가드 (코등이)
-            if (t === 0) {
-                parts.push(`<rect x="${cx - 30}" y="${guardY - 3}" width="60" height="9" rx="3" fill="${T.guard}"/>`);
-            } else {
-                const gw = 34 + t * 8;
-                parts.push(`<path d="M ${cx - gw} ${guardY - 2 - t * 2} Q ${cx - gw / 2} ${guardY + 10} ${cx} ${guardY + 4} Q ${cx + gw / 2} ${guardY + 10} ${cx + gw} ${guardY - 2 - t * 2} Q ${cx + gw / 2} ${guardY - 2} ${cx} ${guardY - 6} Q ${cx - gw / 2} ${guardY - 2} ${cx - gw} ${guardY - 2 - t * 2} Z" fill="${T.guard}" stroke="rgba(0,0,0,0.3)" stroke-width="1"/>`);
+        // 무기별 본체 그림 (200×300 화면, 위쪽이 날/총구). G = { L(단계), t(모습 단계), T(색), M·MV(금속 그라디언트), WD(나무), SP(구 그라디언트), FL(불꽃), glow }
+        const WEAPON_ART = {
+            // 검: 곧은 양날검
+            sword: ({ L, t, T, M, glow }) => {
+                const cx = 100, gy = 222, len = Math.min(196, 118 + L * 5.5), w = 15 + t * 2.4, tip = gy - len, sh = tip + w * 1.7, p = [];
+                p.push(`<polygon points="${cx - w / 2},${gy} ${cx - w * 0.44},${sh} ${cx},${tip} ${cx + w * 0.44},${sh} ${cx + w / 2},${gy}" fill="${M}" stroke="${T.metal[1]}" stroke-width="1"/>`);
+                p.push(`<line x1="${cx}" y1="${gy - 6}" x2="${cx}" y2="${sh + 8}" stroke="rgba(0,0,0,0.22)" stroke-width="${Math.max(1.6, w / 6)}"/>`);
+                p.push(`<polyline points="${cx - w * 0.36},${gy - 4} ${cx - w * 0.31},${sh + 2} ${cx - 1},${tip + 7}" fill="none" stroke="#fff" stroke-width="1.2" opacity="0.75"/>`);
                 if (t >= 3) {
-                    parts.push(`<circle cx="${cx - gw}" cy="${guardY - 3 - t * 2}" r="4" fill="${T.gem || T.guard}"/><circle cx="${cx + gw}" cy="${guardY - 3 - t * 2}" r="4" fill="${T.gem || T.guard}"/>`);
+                    const n = 3 + (t - 3) * 2, r = [];
+                    for (let i = 0; i < n; i++) { const ry = gy - 24 - i * ((len - 56) / n); r.push(`<path d="M ${cx - 3} ${ry} l 3 -6 l 3 6 M ${cx - 2} ${ry - 3} h 4" stroke="${glow}" stroke-width="1.3" fill="none"/>`); }
+                    p.push(`<g class="sw-runes">${r.join('')}</g>`);
                 }
+                if (t === 0) p.push(`<rect x="${cx - 30}" y="${gy - 3}" width="60" height="9" rx="3" fill="${T.trim}"/>`);
+                else {
+                    const gw = 32 + t * 7, up = 2 + t * 2.2;
+                    p.push(`<path d="M ${cx - gw} ${gy - up} Q ${cx - gw / 2} ${gy + 11} ${cx} ${gy + 4} Q ${cx + gw / 2} ${gy + 11} ${cx + gw} ${gy - up} Q ${cx + gw / 2} ${gy - 3} ${cx} ${gy - 7} Q ${cx - gw / 2} ${gy - 3} ${cx - gw} ${gy - up} Z" fill="${T.trim}" stroke="rgba(0,0,0,0.35)" stroke-width="1"/>`);
+                    if (t >= 2) p.push(`<circle cx="${cx - gw}" cy="${gy - up - 1}" r="4.5" fill="${T.gem || T.trim}" stroke="#fff" stroke-width="0.8"/><circle cx="${cx + gw}" cy="${gy - up - 1}" r="4.5" fill="${T.gem || T.trim}" stroke="#fff" stroke-width="0.8"/>`);
+                }
+                if (T.gem) p.push(`<circle cx="${cx}" cy="${gy + 1}" r="${5 + t * 0.8}" fill="${T.gem}" stroke="#fff" stroke-width="1.5" class="sw-gem"/>`);
+                p.push(`<rect x="${cx - 6}" y="${gy + 8}" width="12" height="40" rx="3" fill="${T.grip}"/>`);
+                for (let i = 0; i < 5; i++) p.push(`<line x1="${cx - 6}" y1="${gy + 13 + i * 8}" x2="${cx + 6}" y2="${gy + 17 + i * 8}" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>`);
+                if (t >= 5) { const py = gy + 53; p.push(`<path d="M ${cx - 12} ${py + 8} L ${cx - 12} ${py - 4} L ${cx - 6} ${py + 2} L ${cx} ${py - 8} L ${cx + 6} ${py + 2} L ${cx + 12} ${py - 4} L ${cx + 12} ${py + 8} Z" fill="${T.trim}" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>`); }
+                else p.push(`<circle cx="${cx}" cy="${gy + 54}" r="${7 + t}" fill="${T.trim}" stroke="rgba(0,0,0,0.3)" stroke-width="1"/>`);
+                return p.join('');
+            },
+            // 칼: 한쪽 날이 휜 도
+            blade: ({ L, t, T, M, glow }) => {
+                const gy = 228, len = Math.min(198, 122 + L * 5.2), w = 16 + t * 2.2, bx = 86, tipX = bx + 30 + t * 2, tipY = gy - len, midY = gy - len * 0.5, gx = bx + w / 2, p = [];
+                p.push(`<path d="M ${bx} ${gy} Q ${bx - 8} ${midY} ${tipX} ${tipY} Q ${bx + w + 20 + t * 2} ${midY + 18} ${bx + w} ${gy} Z" fill="${M}" stroke="${T.metal[1]}" stroke-width="1"/>`);
+                p.push(`<path d="M ${bx + w - 3} ${gy - 6} Q ${bx + w + 12 + t * 2} ${midY + 16} ${tipX - 1} ${tipY + 12}" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.8"${t >= 2 ? ' stroke-dasharray="11 3"' : ''}/>`);
+                p.push(`<path d="M ${bx + 4} ${gy - 6} Q ${bx - 2} ${midY} ${tipX - 7} ${tipY + 26}" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="1.8"/>`);
+                if (t >= 3) p.push(`<path class="sw-runes" d="M ${bx + 7} ${gy - 30} q 3 -12 0 -24 M ${bx + 6} ${gy - 70} q 4 -12 2 -24 M ${bx + 9} ${gy - 110} q 5 -10 5 -20" stroke="${glow}" stroke-width="1.6" fill="none"/>`);
+                p.push(`<ellipse cx="${gx}" cy="${gy + 2}" rx="${18 + t * 2.6}" ry="${5.5 + t * 0.4}" fill="${T.trim}" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>`);
+                if (T.gem) p.push(`<circle cx="${gx}" cy="${gy + 2}" r="${4 + t * 0.5}" fill="${T.gem}" stroke="#fff" stroke-width="1.2" class="sw-gem"/>`);
+                const d = [];
+                for (let i = 0; i < 4; i++) d.push(`<path d="M ${gx} ${gy + 11 + i * 10} l 5 5 l -5 5 l -5 -5 Z" fill="${T.trim}" opacity="0.85"/>`);
+                p.push(`<g transform="rotate(-5 ${gx} ${gy})"><rect x="${gx - 7}" y="${gy + 7}" width="14" height="46" rx="4" fill="${T.grip}"/>${d.join('')}<rect x="${gx - 8}" y="${gy + 50}" width="16" height="7" rx="3" fill="${T.trim}"/></g>`);
+                if (t >= 3) p.push(`<path d="M ${gx + 3} ${gy + 58} q 14 10 6 26 q -2 6 4 10" fill="none" stroke="${T.gem || glow}" stroke-width="3" stroke-linecap="round"/><circle cx="${gx + 13}" cy="${gy + 95}" r="3.5" fill="${T.trim}"/>`);
+                return p.join('');
+            },
+            // 창: 긴 자루 + 잎 모양 창날 (단계가 오르면 곁날 → 삼지창)
+            spear: ({ L, t, T, M, WD, glow }) => {
+                const cx = 100, bot = 286, hb = 104 - t * 2, hw = 13 + t * 2.2, tip = Math.max(12, hb - 58 - L * 1.5), p = [];
+                p.push(`<rect x="${cx - 3.4}" y="${hb - 4}" width="6.8" height="${bot - hb + 4}" rx="3" fill="${WD}" stroke="rgba(0,0,0,0.3)" stroke-width="0.8"/>`);
+                [hb + 20, hb + 74, 236, 272].forEach(y => p.push(`<rect x="${cx - 4.6}" y="${y}" width="9.2" height="${t >= 2 ? 6 : 4}" rx="1.5" fill="${T.trim}"/>`));
+                if (t >= 4) p.push(`<path d="M ${cx - 4} ${hb - 4} Q ${cx - 26 - t * 2} ${hb - 30} ${cx - 15 - t} ${hb - 66 - t * 2} Q ${cx - 10} ${hb - 34} ${cx - 2} ${hb - 22} Z" fill="${M}" stroke="${T.metal[1]}" stroke-width="1"/><path d="M ${cx + 4} ${hb - 4} Q ${cx + 26 + t * 2} ${hb - 30} ${cx + 15 + t} ${hb - 66 - t * 2} Q ${cx + 10} ${hb - 34} ${cx + 2} ${hb - 22} Z" fill="${M}" stroke="${T.metal[1]}" stroke-width="1"/>`);
+                else if (t >= 2) p.push(`<path d="M ${cx - 3} ${hb + 2} Q ${cx - 27 - t * 3} ${hb - 8} ${cx - 22 - t * 3} ${hb - 36} Q ${cx - 13} ${hb - 14} ${cx - 3} ${hb - 8} Z" fill="${M}" stroke="${T.metal[1]}" stroke-width="1"/><path d="M ${cx + 3} ${hb + 2} Q ${cx + 27 + t * 3} ${hb - 8} ${cx + 22 + t * 3} ${hb - 36} Q ${cx + 13} ${hb - 14} ${cx + 3} ${hb - 8} Z" fill="${M}" stroke="${T.metal[1]}" stroke-width="1"/>`);
+                p.push(`<path d="M ${cx} ${tip} L ${cx + hw} ${hb - 24} Q ${cx + hw * 0.55} ${hb - 4} ${cx + 4} ${hb} L ${cx - 4} ${hb} Q ${cx - hw * 0.55} ${hb - 4} ${cx - hw} ${hb - 24} Z" fill="${M}" stroke="${T.metal[1]}" stroke-width="1"/>`);
+                p.push(`<line x1="${cx}" y1="${tip + 8}" x2="${cx}" y2="${hb - 2}" stroke="rgba(0,0,0,0.22)" stroke-width="2"/><polyline points="${cx - hw * 0.7},${hb - 24} ${cx - 1},${tip + 8}" fill="none" stroke="#fff" stroke-width="1.1" opacity="0.75"/>`);
+                if (T.gem) p.push(`<circle cx="${cx}" cy="${hb + 4}" r="${4.5 + t * 0.5}" fill="${T.gem}" stroke="#fff" stroke-width="1.2" class="sw-gem"/>`);
+                if (t >= 1) { const c = T.gem || '#e53935', f = []; for (let i = -3; i <= 3; i++) f.push(`<path d="M ${cx} ${hb + 10} q ${i * 4} 12 ${i * 5} ${24 + Math.abs(i) * -2}" stroke="${c}" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.9"/>`); p.push(f.join('')); }
+                p.push(`<path d="M ${cx - 5} ${bot - 6} L ${cx + 5} ${bot - 6} L ${cx} ${bot + 9} Z" fill="${T.trim}"/>`);
+                return p.join('');
+            },
+            // 곤봉: 나무 몽둥이 → 가시 달린 철퇴
+            club: ({ L, t, T, WD, SP, glow }) => {
+                const cx = 100, hy = 98 - t, r = 30 + t * 2.6 + L * 0.3, p = [];
+                p.push(`<rect x="${cx - 6}" y="${hy + r - 10}" width="12" height="${274 - (hy + r - 10)}" rx="5" fill="${WD}" stroke="rgba(0,0,0,0.3)" stroke-width="0.8"/>`);
+                for (let i = 0; i < 5; i++) p.push(`<line x1="${cx - 6}" y1="${222 + i * 9}" x2="${cx + 6}" y2="${226 + i * 9}" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>`);
+                p.push(`<circle cx="${cx}" cy="278" r="${8 + t * 0.6}" fill="${T.trim}" stroke="rgba(0,0,0,0.3)" stroke-width="1"/>`);
+                if (t === 0) {
+                    p.push(`<path d="M ${cx - 8} ${hy + 76} Q ${cx - 32} ${hy + 12} ${cx - 23} ${hy - 26} Q ${cx} ${hy - 46} ${cx + 23} ${hy - 26} Q ${cx + 32} ${hy + 12} ${cx + 8} ${hy + 76} Z" fill="${WD}" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>`);
+                    [[-12, -18], [10, -22], [-2, -2], [14, 6], [-15, 12], [2, 26], [-8, 44]].forEach(([dx, dy]) => p.push(`<circle cx="${cx + dx}" cy="${hy + dy}" r="3.2" fill="#b9bfc5" stroke="#555" stroke-width="0.8"/>`));
+                    p.push(`<rect x="${cx - 21}" y="${hy + 30}" width="42" height="5" rx="2" fill="${T.trim}" opacity="0.9"/>`);
+                } else {
+                    const n = 8 + (t >= 3 ? 4 : 0), sl = 9 + t * 3.2, s = [];
+                    for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2 - Math.PI / 2, c = Math.cos(a), si = Math.sin(a); s.push(`<polygon points="${(cx + c * (r - 3) - si * 6).toFixed(1)},${(hy + si * (r - 3) + c * 6).toFixed(1)} ${(cx + c * (r + sl)).toFixed(1)},${(hy + si * (r + sl)).toFixed(1)} ${(cx + c * (r - 3) + si * 6).toFixed(1)},${(hy + si * (r - 3) - c * 6).toFixed(1)}" fill="${T.metal[0]}" stroke="${T.metal[1]}" stroke-width="1"/>`); }
+                    p.push(s.join(''));
+                    p.push(`<circle cx="${cx}" cy="${hy}" r="${r}" fill="${SP}" stroke="${T.metal[1]}" stroke-width="1.2"/>`);
+                    p.push(`<ellipse cx="${cx}" cy="${hy}" rx="${r}" ry="${r * 0.3}" fill="none" stroke="${T.trim}" stroke-width="3"/><ellipse cx="${cx}" cy="${hy}" rx="${r * 0.3}" ry="${r}" fill="none" stroke="${T.trim}" stroke-width="3"/>`);
+                    [[-0.55, -0.55], [0.55, -0.55], [-0.55, 0.55], [0.55, 0.55]].forEach(([dx, dy]) => p.push(`<circle cx="${cx + dx * r}" cy="${hy + dy * r}" r="3.4" fill="${T.trim}" stroke="rgba(0,0,0,0.35)" stroke-width="0.8"/>`));
+                    if (T.gem) p.push(`<circle cx="${cx}" cy="${hy}" r="${7 + t * 0.9}" fill="${T.gem}" stroke="#fff" stroke-width="1.6" class="sw-gem"/>`);
+                    p.push(`<rect x="${cx - 10}" y="${hy + r - 6}" width="20" height="10" rx="3" fill="${T.trim}" stroke="rgba(0,0,0,0.35)" stroke-width="0.8"/>`);
+                }
+                return p.join('');
+            },
+            // 활: 비스듬히 든 활과 메긴 화살
+            bow: ({ L, t, T, WD, M, glow }) => {
+                const cx = 100, cy = 150, h = 104 + L * 0.9, bend = 44 + t * 3, sx = 70, p = [], tk = 17 + t;
+                p.push(`<path d="M ${sx} ${cy - h} Q ${sx + bend * 2} ${cy} ${sx} ${cy + h} Q ${sx + bend * 2 - tk} ${cy} ${sx} ${cy - h} Z" fill="${t >= 2 ? M : WD}" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>`);
+                p.push(`<path d="M ${sx + 5} ${cy - h + 10} Q ${sx + bend * 2 - 5} ${cy} ${sx + 5} ${cy + h - 10}" fill="none" stroke="#fff" stroke-width="1" opacity="0.5"/>`);
+                [-1, 1].forEach(s => p.push(`<path d="M ${sx} ${cy + s * h} q -9 ${s * -3} -7 ${s * 9}" fill="none" stroke="${T.trim}" stroke-width="4" stroke-linecap="round"/>`));
+                if (t >= 2) [-0.5, 0.5].forEach(k => p.push(`<circle cx="${sx + bend * 1.44 - tk * 0.55}" cy="${cy + k * h}" r="${3.5 + t * 0.4}" fill="${T.gem || T.trim}" stroke="#fff" stroke-width="0.9"/>`));
+                p.push(`<rect x="${sx + bend - tk * 0.9}" y="${cy - 15}" width="${tk * 0.8 + 2}" height="30" rx="4" fill="${T.grip}" stroke="${T.trim}" stroke-width="1"/>`);
+                p.push(`<line x1="${sx}" y1="${cy - h}" x2="${sx}" y2="${cy + h}" stroke="${t >= 2 ? glow : '#efe6d5'}" stroke-width="${t >= 2 ? 1.9 : 1.3}"/>`);
+                const a0 = sx - 4, a1 = sx + bend + 66 + t * 2, ac = t >= 3 ? glow : '#c9a26b';
+                p.push(`<line x1="${a0}" y1="${cy}" x2="${a1 - 8}" y2="${cy}" stroke="${ac}" stroke-width="${t >= 3 ? 3.4 : 2.6}" stroke-linecap="round"/>`);
+                p.push(`<polygon points="${a1},${cy} ${a1 - 15 - t},${cy - 6 - t * 0.6} ${a1 - 11},${cy} ${a1 - 15 - t},${cy + 6 + t * 0.6}" fill="${M}" stroke="${T.metal[1]}" stroke-width="1"/>`);
+                p.push(`<polygon points="${a0 - 2},${cy} ${a0 + 12},${cy - 6} ${a0 + 18},${cy} ${a0 + 12},${cy + 6}" fill="${T.gem || '#e53935'}" opacity="0.9"/>`);
+                if (t >= 5) p.push(`<path class="sw-flame" d="M ${a1 - 18} ${cy - 9} Q ${a1 + 4} ${cy - 16} ${a1 + 22} ${cy} Q ${a1 + 4} ${cy + 16} ${a1 - 18} ${cy + 9} Z" fill="${glow}" opacity="0.55"/>`);
+                return `<g transform="translate(9 6) rotate(-45 ${cx} ${cy}) translate(${cx} ${cy}) scale(0.9) translate(${-cx} ${-cy})">${p.join('')}</g>`;
+            },
+            // 총: 화승총 → 장식 소총 (총구가 오른쪽 위)
+            gun: ({ L, t, T, WD, MV, M, glow }) => {
+                const y = 150, bx = 60, bl = 104 + L * 2.2, bh = 11 + t * 0.9, by = y - 14, p = [], mx = bx + bl;
+                p.push(`<path d="M 14 ${y - 2} Q 28 ${y - 15} 56 ${y - 11} L 100 ${y - 11} L 100 ${y + 9} L 76 ${y + 10} Q 60 ${y + 13} 53 ${y + 42} L 35 ${y + 37} Q 43 ${y + 14} 19 ${y + 13} Z" fill="${WD}" stroke="rgba(0,0,0,0.45)" stroke-width="1"/>`);
+                p.push(`<rect x="94" y="${y - 7}" width="${bl * 0.52}" height="9" rx="3" fill="${WD}" stroke="rgba(0,0,0,0.4)" stroke-width="0.8"/>`);
+                p.push(`<rect x="${bx}" y="${by - bh / 2}" width="${bl}" height="${bh}" rx="${(bh / 2.6).toFixed(1)}" fill="${MV}" stroke="${T.metal[1]}" stroke-width="1"/>`);
+                p.push(`<line x1="${bx + 6}" y1="${by - bh / 2 + 2.5}" x2="${mx - 8}" y2="${by - bh / 2 + 2.5}" stroke="#fff" stroke-width="1.2" opacity="0.7"/>`);
+                [0.2, 0.5, 0.8].forEach(k => p.push(`<rect x="${bx + bl * k - 3}" y="${by - bh / 2 - 1.5}" width="6" height="${bh + 3 + (k < 0.6 ? 9 : 0)}" rx="1.5" fill="${T.trim}" stroke="rgba(0,0,0,0.3)" stroke-width="0.6"/>`));
+                p.push(`<rect x="${mx - 5}" y="${by - bh / 2 - 2.5}" width="8" height="${bh + 5}" rx="2" fill="${T.trim}" stroke="rgba(0,0,0,0.35)" stroke-width="0.8"/><ellipse cx="${mx + 3}" cy="${by}" rx="2.2" ry="${bh / 2 - 1.5}" fill="#111"/>`);
+                p.push(`<path d="M 66 ${by - bh / 2} l 4 -12 l 9 3 l -3 9 Z" fill="${M}" stroke="${T.metal[1]}" stroke-width="1"/><circle cx="62" cy="${by + 1}" r="6" fill="${T.trim}" stroke="rgba(0,0,0,0.4)" stroke-width="0.8"/>`);
+                p.push(`<path d="M 72 ${y + 10} q 4 17 22 13 l 0 -13" fill="none" stroke="${T.trim}" stroke-width="3" stroke-linecap="round"/><line x1="82" y1="${y + 10}" x2="80" y2="${y + 19}" stroke="${T.metal[1]}" stroke-width="2.5" stroke-linecap="round"/>`);
+                if (T.gem) p.push(`<circle cx="62" cy="${by + 1}" r="3.4" fill="${T.gem}" stroke="#fff" stroke-width="1" class="sw-gem"/>`);
+                if (t >= 3) p.push(`<path class="sw-runes" d="M ${bx + 26} ${by} h 10 m 6 0 h 16 m 6 0 h 8" stroke="${glow}" stroke-width="2" stroke-linecap="round"/>`);
+                if (t >= 4) p.push(`<rect x="${bx + 14}" y="${by - bh / 2 - 15}" width="${42 + t * 3}" height="9" rx="4.5" fill="${MV}" stroke="${T.metal[1]}" stroke-width="1"/><circle cx="${bx + 14}" cy="${by - bh / 2 - 10.5}" r="5.5" fill="${T.trim}" stroke="rgba(0,0,0,0.4)" stroke-width="0.8"/><circle cx="${bx + 56 + t * 3}" cy="${by - bh / 2 - 10.5}" r="6.5" fill="${T.gem || glow}" stroke="#fff" stroke-width="1"/>`);
+                if (t >= 2) p.push(`<circle cx="${mx + 5}" cy="${by}" r="${6 + t}" fill="${glow}" opacity="0.5" class="sw-gem"/>`);
+                if (t >= 5) p.push(`<path class="sw-flame" d="M ${mx + 2} ${by - 7} Q ${mx + 22} ${by - 14} ${mx + 42} ${by} Q ${mx + 22} ${by + 14} ${mx + 2} ${by + 7} Z" fill="${glow}" opacity="0.6"/>`);
+                return `<g transform="rotate(-38 100 150)">${p.join('')}</g>`;
+            },
+            // 대포: 바퀴 달린 포가 + 비스듬히 올린 포신
+            cannon: ({ L, t, T, WD, MV, glow }) => {
+                const wx = 80, wy = 228, wr = 40, bl = 114 + L * 0.9, x0 = wx - 44, x1 = x0 + bl, cyb = wy - 30, hb = 24 + t * 0.8, hf = 17 + t * 0.6, p = [], b = [];
+                p.push(`<path d="M ${wx - 8} ${wy - 26} L ${wx + 22} ${wy - 14} L 36 272 L 20 264 Z" fill="${WD}" stroke="rgba(0,0,0,0.45)" stroke-width="1"/>`);
+                b.push(`<circle cx="${x0 - 9}" cy="${cyb}" r="8" fill="${T.trim}" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>`);
+                b.push(`<path d="M ${x0} ${cyb - hb} L ${x1} ${cyb - hf} L ${x1} ${cyb + hf} L ${x0} ${cyb + hb} Q ${x0 - 12} ${cyb} ${x0} ${cyb - hb} Z" fill="${MV}" stroke="${T.metal[1]}" stroke-width="1.2"/>`);
+                b.push(`<line x1="${x0 + 6}" y1="${cyb - hb + 5}" x2="${x1 - 6}" y2="${cyb - hf + 4}" stroke="#fff" stroke-width="1.6" opacity="0.65"/>`);
+                [0.1, 0.42, 0.74].forEach(k => { const x = x0 + bl * k, hh = hb + (hf - hb) * k + 2.5; b.push(`<rect x="${x - 3.5}" y="${cyb - hh}" width="7" height="${hh * 2}" rx="2" fill="${T.trim}" stroke="rgba(0,0,0,0.35)" stroke-width="0.7"/>`); });
+                b.push(`<rect x="${x1 - 11}" y="${cyb - hf - 4}" width="13" height="${hf * 2 + 8}" rx="3" fill="${T.trim}" stroke="rgba(0,0,0,0.4)" stroke-width="0.9"/><ellipse cx="${x1 + 2}" cy="${cyb}" rx="4.5" ry="${hf - 2}" fill="#0c0c10"/>`);
+                if (t >= 2) b.push(`<ellipse cx="${x1 + 2}" cy="${cyb}" rx="3" ry="${hf - 5}" fill="${glow}" opacity="0.85" class="sw-gem"/>`);
+                if (t >= 3) b.push(`<path class="sw-runes" d="M ${x0 + bl * 0.2} ${cyb} l 6 -7 l 6 7 l -6 7 Z M ${x0 + bl * 0.54} ${cyb} l 6 -7 l 6 7 l -6 7 Z" fill="none" stroke="${glow}" stroke-width="1.8"/>`);
+                if (t >= 4) [-1, 0, 1].forEach(k => b.push(`<path d="M ${x1 - 2} ${cyb + k * hf * 0.75 - 4} l 15 4 l -15 4 Z" fill="${T.trim}" stroke="rgba(0,0,0,0.35)" stroke-width="0.7"/>`));
+                if (t >= 5) b.push(`<path class="sw-flame" d="M ${x1 + 4} ${cyb - hf + 2} Q ${x1 + 34} ${cyb - hf - 8} ${x1 + 60} ${cyb} Q ${x1 + 34} ${cyb + hf + 8} ${x1 + 4} ${cyb + hf - 2} Z" fill="${glow}" opacity="0.6"/>`);
+                p.push(`<g transform="rotate(-34 ${wx} ${cyb})">${b.join('')}</g>`);
+                const sp = [];
+                for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; sp.push(`<line x1="${wx}" y1="${wy}" x2="${(wx + Math.cos(a) * (wr - 4)).toFixed(1)}" y2="${(wy + Math.sin(a) * (wr - 4)).toFixed(1)}" stroke="${T.wood[1]}" stroke-width="4.5" stroke-linecap="round"/>`); }
+                p.push(`<circle cx="${wx}" cy="${wy}" r="${wr}" fill="rgba(0,0,0,0.28)"/>${sp.join('')}<circle cx="${wx}" cy="${wy}" r="${wr - 4}" fill="none" stroke="${T.wood[0]}" stroke-width="8"/><circle cx="${wx}" cy="${wy}" r="${wr}" fill="none" stroke="${T.trim}" stroke-width="2.5"/>`);
+                p.push(`<circle cx="${wx}" cy="${wy}" r="${9 + t * 0.6}" fill="${T.trim}" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>`);
+                if (T.gem) p.push(`<circle cx="${wx}" cy="${wy}" r="${4.5 + t * 0.4}" fill="${T.gem}" stroke="#fff" stroke-width="1.1" class="sw-gem"/>`);
+                return p.join('');
             }
-            if (T.gem) parts.push(`<circle cx="${cx}" cy="${guardY + 1}" r="${5 + t}" fill="${T.gem}" stroke="#fff" stroke-width="1.5" class="sw-gem"/>`);
+        };
+        const WEAPON_WING_Y = { sword: 224, blade: 230, spear: 112, club: 150 };   // 날개가 달리는 높이 (없는 무기는 날개 대신 고리)
 
-            // 손잡이 + 폼멜
-            parts.push(`<rect x="${cx - 6}" y="${guardY + 7}" width="12" height="40" rx="3" fill="${T.grip}"/>`);
-            for (let i = 0; i < 5; i++) {
-                parts.push(`<line x1="${cx - 6}" y1="${guardY + 12 + i * 8}" x2="${cx + 6}" y2="${guardY + 16 + i * 8}" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>`);
+        function swordSVG(level, kind = 'sword') {
+            const L = Math.max(0, Math.round(level) || 0), t = getSwordTier(L), T = SWORD_TIERS[t], cx = 100, cy = 150;
+            if (!WEAPON_ART[kind]) kind = 'sword';
+            const uid = `w${kind}${L}`, glow = T.glow || '#ffffff', back = [], front = [];
+            const G = { L, t, T, uid, glow, M: `url(#${uid}M)`, MV: `url(#${uid}V)`, WD: `url(#${uid}W)`, SP: `url(#${uid}S)` };
+            const defs = `<defs>
+                <linearGradient id="${uid}M" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${T.metal[1]}"/><stop offset="0.42" stop-color="${T.metal[0]}"/><stop offset="0.58" stop-color="${T.metal[0]}"/><stop offset="1" stop-color="${T.metal[1]}"/></linearGradient>
+                <linearGradient id="${uid}V" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${T.metal[0]}"/><stop offset="0.55" stop-color="${T.metal[1]}"/><stop offset="1" stop-color="${T.metal[1]}"/></linearGradient>
+                <linearGradient id="${uid}W" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${T.wood[0]}"/><stop offset="1" stop-color="${T.wood[1]}"/></linearGradient>
+                <radialGradient id="${uid}S" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="${T.metal[0]}"/><stop offset="1" stop-color="${T.metal[1]}"/></radialGradient>
+                <radialGradient id="${uid}A"><stop offset="0" stop-color="${glow}" stop-opacity="0.55"/><stop offset="1" stop-color="${glow}" stop-opacity="0"/></radialGradient>
+                <linearGradient id="${uid}F" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffde59"/><stop offset="0.5" stop-color="${glow}"/><stop offset="1" stop-color="${glow}" stop-opacity="0"/></linearGradient>
+            </defs>`;
+            // 뒤쪽: 오라 → 마법진 → 광선 → 불꽃 → 날개/고리
+            if (t >= 1) back.push(`<ellipse cx="${cx}" cy="${cy}" rx="${60 + t * 6}" ry="${118 + t * 4}" fill="url(#${uid}A)" class="sw-aura"/>`);
+            if (t >= 3) {
+                const tk = [];
+                for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; tk.push(`<line x1="${(cx + Math.cos(a) * 70).toFixed(1)}" y1="${(cy + Math.sin(a) * 70).toFixed(1)}" x2="${(cx + Math.cos(a) * 82).toFixed(1)}" y2="${(cy + Math.sin(a) * 82).toFixed(1)}" stroke-width="${i % 3 ? 1.2 : 2.4}"/>`); }
+                back.push(`<g class="sw-rays" fill="none" stroke="${glow}" opacity="0.5"><circle cx="${cx}" cy="${cy}" r="82" stroke-width="1.6" stroke-dasharray="5 7"/><circle cx="${cx}" cy="${cy}" r="68" stroke-width="1"/>${tk.join('')}</g>`);
             }
-            if (t >= 5) {
-                // 왕관 폼멜
-                const py = guardY + 52;
-                parts.push(`<path d="M ${cx - 12} ${py + 8} L ${cx - 12} ${py - 4} L ${cx - 6} ${py + 2} L ${cx} ${py - 8} L ${cx + 6} ${py + 2} L ${cx + 12} ${py - 4} L ${cx + 12} ${py + 8} Z" fill="${T.pommel}" stroke="#c98a00" stroke-width="1"/>`);
-            } else {
-                parts.push(`<circle cx="${cx}" cy="${guardY + 53}" r="${7 + t}" fill="${T.pommel}" stroke="rgba(0,0,0,0.3)" stroke-width="1"/>`);
+            if (t >= 4) {
+                const rays = [], n = t >= 5 ? 16 : 12, len = t >= 5 ? 132 : 112;
+                for (let i = 0; i < n; i++) rays.push(`<polygon points="${cx - 3},${cy} ${cx + 3},${cy} ${cx},${cy - len}" transform="rotate(${i * 360 / n} ${cx} ${cy})" fill="${glow}" opacity="0.3"/>`);
+                back.push(`<g class="sw-rays">${rays.join('')}</g>`);
             }
-
-            // 반짝임 (서리검 이상)
+            if (t >= 5) back.push(`<path class="sw-flame" d="M ${cx - 30} 262 Q ${cx - 74} 150 ${cx} 8 Q ${cx + 74} 150 ${cx + 30} 262 Z" fill="url(#${uid}F)" opacity="0.5"/>`);
+            if (t >= 4 && WEAPON_WING_Y[kind]) {
+                const wy = WEAPON_WING_Y[kind], span = t >= 5 ? 92 : 72;
+                const wing = (s) => { const f = []; for (let i = 0; i < 4; i++) { const fx = cx + s * (22 + i * span / 4.4), fy = wy - 8 - i * 9; f.push(`<path d="M ${cx + s * 10} ${wy - 4} Q ${fx} ${fy - 26} ${fx + s * 16} ${fy - 4} Q ${fx} ${fy + 6} ${cx + s * 10} ${wy + 4} Z" fill="${i % 2 ? '#ffffff' : T.trim}" opacity="${0.95 - i * 0.12}"/>`); } return f.join(''); };
+                back.push(`<g class="sw-wings">${wing(-1)}${wing(1)}</g>`);
+            } else if (t >= 4) {
+                back.push(`<ellipse cx="${cx}" cy="${cy}" rx="92" ry="26" fill="none" stroke="${T.trim}" stroke-width="2.4" opacity="0.75" transform="rotate(-18 ${cx} ${cy})"/>`);
+            }
+            if (t >= 6) back.push(`<ellipse cx="${cx}" cy="${cy}" rx="96" ry="30" fill="none" stroke="${T.gem}" stroke-width="1.6" opacity="0.7" transform="rotate(24 ${cx} ${cy})" stroke-dasharray="3 5"/><circle cx="${cx - 78}" cy="${cy + 44}" r="5" fill="${T.gem}" class="sw-gem"/><circle cx="${cx + 82}" cy="${cy - 40}" r="4" fill="#fff" class="sw-gem"/>`);
+            // 앞쪽: 반짝이는 별
             if (t >= 2) {
-                const stars = [];
                 const count = 2 + t;
                 for (let i = 0; i < count; i++) {
-                    const sx = cx + (i % 2 ? 1 : -1) * (18 + (i * 13) % 40);
-                    const sy = tipY + 20 + (i * 47) % Math.max(60, bladeLen - 30);
-                    const r = 3 + (i % 3);
-                    stars.push(`<path d="M ${sx} ${sy - r * 2} L ${sx + r * 0.5} ${sy - r * 0.5} L ${sx + r * 2} ${sy} L ${sx + r * 0.5} ${sy + r * 0.5} L ${sx} ${sy + r * 2} L ${sx - r * 0.5} ${sy + r * 0.5} L ${sx - r * 2} ${sy} L ${sx - r * 0.5} ${sy - r * 0.5} Z" fill="#fff" class="sw-star" style="animation-delay:${(i * 0.37).toFixed(2)}s"/>`);
+                    const sx = cx + (i % 2 ? 1 : -1) * (26 + (i * 17) % 52), sy = 34 + (i * 53) % 220, r = 3 + (i % 3);
+                    front.push(`<path d="M ${sx} ${sy - r * 2} L ${sx + r * 0.5} ${sy - r * 0.5} L ${sx + r * 2} ${sy} L ${sx + r * 0.5} ${sy + r * 0.5} L ${sx} ${sy + r * 2} L ${sx - r * 0.5} ${sy + r * 0.5} L ${sx - r * 2} ${sy} L ${sx - r * 0.5} ${sy - r * 0.5} Z" fill="#fff" class="sw-star" style="animation-delay:${(i * 0.37).toFixed(2)}s"/>`);
                 }
-                parts.push(stars.join(''));
             }
-
-            // 쌍검: 같은 검 두 자루를 교차해서 그림
-            const body = kind === 'twin'
-                ? `${parts[0]}<g transform="rotate(-16 100 240) translate(-6 0)">${parts.slice(1).join('')}</g><g transform="rotate(16 100 240) translate(6 0)">${parts.slice(1).join('')}</g>`
-                : parts.join('');
-            return `<svg class="sword-svg tier-${t}" viewBox="0 0 200 300" width="150" height="225" aria-label="강화 검 +${level}"
-                style="filter: drop-shadow(0 0 ${T.glow ? 6 + t * 3 : 2}px ${T.glow || 'rgba(0,0,0,0.5)'})">${body}</svg>`;
+            return `<svg class="sword-svg tier-${t}" viewBox="0 0 200 300" width="150" height="225" aria-label="무기 +${L}"
+                style="filter: drop-shadow(0 0 ${T.glow ? 6 + t * 3 : 2}px ${T.glow || 'rgba(0,0,0,0.5)'})">${defs}${back.join('')}${WEAPON_ART[kind](G)}${front.join('')}</svg>`;
         }
 
         // ===== 컬렉션 아이콘 (이름 옆 표시) =====
@@ -10601,130 +10678,134 @@ ${text}
         const LEGACY_RARITY = { normal: 'bronze', rare: 'silver', epic: 'gold', legendary: 'emerald' };
         const rarityOf = (r) => LEGACY_RARITY[r] || r;
 
-        // ===== 검 강화 (2026-11-06 개편) =====
-        //  돈(원)으로 강화 → 검을 팔면 판매가를 받고 새 +0 검으로 다시 시작. 강화 머니는 코인과 별개 (코인 1개 → 1만원 충전만 가능)
-        //  +0 강화는 무료 · 실패하면 무조건 +0 (방지권이 있으면 유지) · 부서지면 🧩 조각
-        //  판매가는 단계마다 2~3배씩 급등: 한 번 도전의 기대값이 지금 판매가의 1.3배(+10부터 1.15배)가 되게 맞춤
-        //  검 종류(단검·장검·쌍검·대검·전설검)마다 확률·가격·최대 단계가 다르고, 명성 등급이 오르면 상위 검이 열림
+        // ===== 무기 강화 (2026-11-12 개편: 무기 7종 · 전체 초기화) =====
+        //  돈(원)으로 강화 → 팔면 판매가를 받고 새 +0 무기로 다시 시작. 강화 머니는 코인과 별개 (코인 1개 → 1만원 충전만 가능)
+        //  +0 강화는 무료 · 실패하면 +0 (방지권이 있으면 단계 유지) · 부서지면 🧩 조각
+        //  방지권은 돈으로 못 삼: 조각(그 단계 조각 × 6)으로 만들거나 도감 보상으로만 → 횟수는 무제한이지만 운이 따라야 함
+        //  무기 7종(검 → 칼 → 창 → 곤봉 → 활 → 총 → 대포)은 명성 등급이 오르면 차례로 열림.
+        //  뒤 무기일수록 성공 확률이 낮고 값이 크며 레이드 공격력이 높음. 시뮬레이션상 검 +15까지 평균 1만 5천 번, 대포 +20은 11만 번쯤
         const SWORD_START = 10000;       // 처음 받는 돈
         const SWORD_COIN_WON = 10000;    // 코인 1개로 충전되는 돈
-        // 장검(기본 검) 표 — 예전부터 쓰던 값 그대로
-        const SWORD_MAX = 20;
-        const ENHANCE_RATES = [95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 7, 5]; // +L → +L+1 성공 %
-        const SWORD_COST = [0, 120, 220, 400, 780, 1600, 3500, 8200, 21000, 60000, 180000, 580000, 2000000, 8000000, 38000000,
-            210000000, 1500000000, 14000000000, 190000000000, 3800000000000];                                   // +L에서 강화 1번 비용 (+0은 무료)
-        const SWORD_SELL = [0, 500, 860, 1600, 3100, 6400, 14000, 33000, 85000, 240000, 740000, 2300000, 8100000, 32000000,
-            150000000, 840000000, 5900000000, 55000000000, 770000000000, 15000000000000, 420000000000000];      // +L 검 판매가
-        // 🧩 조각: +L 검이 부서지면 받는 개수 (장검 기준, 다른 검은 배수)
-        const SWORD_SHARD = [0, 1, 2, 3, 4, 7, 10, 17, 27, 43, 69, 110, 176, 281, 450, 720, 1150, 1840, 2950, 4720, 0];
+        const WEAPON_RATES = [95, 90, 85, 80, 74, 68, 62, 56, 50, 44, 38, 33, 28, 24, 20];   // 검 기준 +L → +L+1 성공 % (다른 무기는 × pf)
+        const WEAPON_SHARD = [0, 1, 2, 3, 4, 7, 10, 17, 27, 43, 69, 110, 176, 281, 450, 520, 600, 680, 760, 840, 0];   // +L에서 부서지면 받는 조각
+        const SHIELD_SHARD_X = 6;        // 방지권 1장 = 그 단계 조각의 6배
         const niceWon = (x) => { if (x < 1000) return Math.max(10, Math.round(x / 10) * 10); const e = 10 ** (Math.floor(Math.log10(x)) - 1); return Math.round(x / e) * e; };
 
-        // 🎖️ 명성 등급: 검 종류별 최고 기록 × 가중치 + 최종 단계 완성 보너스
+        // 🎖️ 명성 등급: 무기별 최고 기록 × 가중치 + 최종 단계 완성 보너스. 등급마다 다음 무기가 열림
         const FAME_TIERS = [
             { name: '브론즈', min: 0, color: '#e0a060' },
-            { name: '실버', min: 15, color: '#dfe6ee' },
-            { name: '골드', min: 40, color: '#ffd700' },
-            { name: '다이아', min: 90, color: '#7fe0ff' },
-            { name: '마스터', min: 160, color: '#c98bff' },
-            { name: '전설', min: 280, color: '#ff9a3c' },
-            { name: '신', min: 450, color: '#ff4d6d' }
+            { name: '실버', min: 20, color: '#dfe6ee' },
+            { name: '골드', min: 55, color: '#ffd700' },
+            { name: '다이아', min: 110, color: '#7fe0ff' },
+            { name: '마스터', min: 180, color: '#c98bff' },
+            { name: '전설', min: 270, color: '#ff9a3c' },
+            { name: '신', min: 380, color: '#ff4d6d' }
         ];
-        // 검 종류 (unlock = 필요한 명성 등급 번호). 장검 외에는 같은 공식으로 표를 만듦:
-        //  성공 확률 = 장검 확률 × pf, 판매가(+L+1) = (R × 판매가(+L) + 비용) ÷ 성공 확률, 비용 = 판매가의 25%
+        // 무기 (unlock = 필요한 명성 등급 번호, w = 명성 가중치, atk = 레이드 기본 공격력, raid = 레이드 특성)
+        //  성공 확률 = 검 확률 × pf (대포 +15부터는 tail), 비용 = 판매가의 25%, 판매가(+L+1) = (R × 판매가(+L) + 비용) ÷ 성공 확률 (R = 1.3, +10부터 1.15)
         const SWORD_KINDS = [
-            { id: 'dagger', name: '단검', max: 15, unlock: 0, w: 1, bonus: 10, shardMul: 0.5, pf: 1.05, s1: 300, r: [1.2, 1.2], desc: '쉽고 싸요 · 연습용' },
-            { id: 'long', name: '장검', max: 15, unlock: 0, w: 2, bonus: 30, shardMul: 1, desc: '기본 검 · +15까지' },
-            { id: 'twin', name: '쌍검', max: 15, unlock: 1, w: 3, bonus: 40, shardMul: 3, pf: 0.92, s1: 3000, r: [1.35, 1.2], desc: '조금 어렵고 훨씬 비싸요' },
-            { id: 'great', name: '대검', max: 15, unlock: 2, w: 4, bonus: 60, shardMul: 8, pf: 0.85, s1: 20000, r: [1.4, 1.25], desc: '어렵지만 판매가가 커요' },
-            { id: 'legend', name: '전설검', max: 20, unlock: 3, w: 6, bonus: 150, shardMul: 30, pf: 0.8, s1: 200000, r: [1.5, 1.3], desc: '가장 어렵고 가장 비싼 검 · 혼자 +20까지' }
+            { id: 'sword', name: '검', icon: '🗡️', max: 15, unlock: 0, w: 2, bonus: 20, pf: 1, s1: 500, atk: 20, perk: '균형 잡힌 기본 무기', raid: {} },
+            { id: 'blade', name: '칼', icon: '🔪', max: 15, unlock: 1, w: 3, bonus: 30, pf: 0.97, s1: 3000, atk: 30, perk: '치명타 확률 +8%p', raid: { crit: 0.08 } },
+            { id: 'spear', name: '창', icon: '🔱', max: 15, unlock: 2, w: 4, bonus: 40, pf: 0.94, s1: 20000, atk: 42, perk: '피해가 고르게 높음', raid: { lo: 1 } },
+            { id: 'club', name: '곤봉', icon: '🔨', max: 15, unlock: 3, w: 5, bonus: 50, pf: 0.91, s1: 150000, atk: 56, perk: '치명타 피해 2.5배', raid: { critX: 2.5 } },
+            { id: 'bow', name: '활', icon: '🏹', max: 15, unlock: 4, w: 6, bonus: 60, pf: 0.88, s1: 1000000, atk: 72, perk: '30% 확률로 한 발 더', raid: { extra: 0.3 } },
+            { id: 'gun', name: '총', icon: '🔫', max: 15, unlock: 5, w: 7, bonus: 70, pf: 0.85, s1: 10000000, atk: 90, perk: '치명타 확률 +13%p', raid: { crit: 0.13 } },
+            { id: 'cannon', name: '대포', icon: '💣', max: 20, unlock: 6, w: 8, bonus: 120, pf: 0.85, tail: [30, 28, 26, 24, 22], s1: 100000000, atk: 110, perk: '피해 1.3배 · 치명타 2.5배', raid: { mul: 1.3, critX: 2.5 } }
         ];
         SWORD_KINDS.forEach(k => {
-            if (k.id === 'long') { k.P = ENHANCE_RATES; k.C = SWORD_COST; k.S = SWORD_SELL; }
-            else {
-                k.P = []; k.C = [0]; k.S = [0, k.s1];
-                for (let L = 0; L < k.max; L++) k.P[L] = L === 0 ? 95 : Math.max(2, Math.round(ENHANCE_RATES[L] * k.pf));
-                for (let L = 1; L < k.max; L++) {
-                    k.C[L] = niceWon(0.25 * k.S[L]);
-                    k.S[L + 1] = niceWon(((L < 10 ? k.r[0] : k.r[1]) * k.S[L] + k.C[L]) / (k.P[L] / 100));
-                }
+            k.P = []; k.C = [0]; k.S = [0, k.s1]; k.SH = [];
+            for (let L = 0; L < k.max; L++) k.P[L] = L === 0 ? 95 : L < 15 ? Math.max(2, Math.round(WEAPON_RATES[L] * k.pf)) : k.tail[L - 15];
+            for (let L = 1; L < k.max; L++) {
+                k.C[L] = niceWon(0.25 * k.S[L]);
+                k.S[L + 1] = niceWon(((L < 10 ? 1.3 : 1.15) * k.S[L] + k.C[L]) / (k.P[L] / 100));
             }
-            k.SH = [];
-            for (let L = 0; L <= k.max; L++) k.SH[L] = L === 0 || L >= k.max ? 0 : Math.max(1, Math.round(SWORD_SHARD[L] * k.shardMul));
+            for (let L = 0; L <= k.max; L++) k.SH[L] = L === 0 || L >= k.max ? 0 : WEAPON_SHARD[L];
         });
         const KIND_BY_ID = Object.fromEntries(SWORD_KINDS.map(k => [k.id, k]));
-        const swordKindOf = (d) => KIND_BY_ID[(d && d.swordKind) || 'long'] || KIND_BY_ID.long;
-        const curSwordLevel = (d) => Math.min((d && d.weaponLevel) || 0, swordKindOf(d).max);
+        // 개편 뒤 기록인지 (weaponVer 2). 아직 초기화 전인 예전 기록은 '빈 기록'으로 봄 — 본인이 접속하면 그때 초기화·환불됨
+        const wOK = (d) => !!d && (d.weaponVer || 0) >= 2;
+        const swordKindOf = (d) => (wOK(d) && KIND_BY_ID[d.wKind]) || SWORD_KINDS[0];
+        const curSwordLevel = (d) => wOK(d) ? Math.max(0, Math.min(d.wLevel || 0, swordKindOf(d).max)) : 0;
         const swordOdds = (k, L) => { const up = k.P[Math.min(L, k.max - 1)]; return { up, brk: 100 - up }; };  // 실패 = +0
         const swordSellOf = (k, L) => k.S[Math.max(0, Math.min(L || 0, k.max))];
-        const swordLevelName = (k, L) => k.id === 'long' ? WEAPON_NAMES[Math.min(L, WEAPON_NAMES.length - 1)] : k.name;
-        // 종류별 최고 기록·도감 보상 받은 단계 (장검은 예전 필드 그대로)
+        const swordLevelName = (k, L) => `${SWORD_TIERS[getSwordTier(L)].name} ${k.name}`;
+        const weaponAtk = (k, L) => Math.round(k.atk * (1 + L * 0.2));   // 레이드 무기 공격력
         function kindBest(d, k) {
-            const saved = k.id === 'long' ? (d.swordBest || 0) : ((d.swordBestBy || {})[k.id] || 0);
-            return Math.min(k.max, Math.max(saved, swordKindOf(d).id === k.id ? curSwordLevel(d) : 0));   // 최대 단계가 줄어든 예전 기록도 최대까지만
+            if (!wOK(d)) return 0;
+            return Math.min(k.max, Math.max((d.wBest || {})[k.id] || 0, swordKindOf(d).id === k.id ? curSwordLevel(d) : 0));
         }
-        function setKindBest(d, k, v) {
-            if (k.id === 'long') d.swordBest = Math.max(d.swordBest || 0, v);
-            else d.swordBestBy = Object.assign({}, d.swordBestBy || {}, { [k.id]: Math.max((d.swordBestBy || {})[k.id] || 0, v) });
-        }
-        const kindClaimed = (d, k) => k.id === 'long' ? (d.swordDexClaimed || 0) : ((d.swordDexBy || {})[k.id] || 0);
-        function setKindClaimed(d, k, v) {
-            if (k.id === 'long') d.swordDexClaimed = v;
-            else d.swordDexBy = Object.assign({}, d.swordDexBy || {}, { [k.id]: v });
-        }
-        const swordBestOf = (d) => kindBest(d, swordKindOf(d));
+        function setKindBest(d, k, v) { d.wBest = Object.assign({}, d.wBest || {}, { [k.id]: Math.min(k.max, Math.max((d.wBest || {})[k.id] || 0, v)) }); }
+        const kindClaimed = (d, k) => wOK(d) ? ((d.wDex || {})[k.id] || 0) : 0;
+        function setKindClaimed(d, k, v) { d.wDex = Object.assign({}, d.wDex || {}, { [k.id]: v }); }
         function fameOf(d) {
-            if (!d) return 0;
+            if (!wOK(d)) return 0;
             return SWORD_KINDS.reduce((a, k) => { const b = kindBest(d, k); return a + b * k.w + (b >= k.max ? k.bonus : 0); }, 0);
         }
         const fameTierIdx = (f) => FAME_TIERS.reduce((t, x, i) => (f >= x.min ? i : t), 0);
         const kindUnlocked = (d, k) => fameTierIdx(fameOf(d)) >= k.unlock;
         const fameBadge = (d) => { const t = FAME_TIERS[fameTierIdx(fameOf(d))]; return `<span class="fame-badge" style="color:${t.color};border-color:${t.color}66">${t.name}</span>`; };
 
-        // 🛡️ 방지권: '+L 방지권' 1장 = 그 검 종류의 +L 이하에서 실패해도 단계 유지 (1번 쓰면 사라짐)
-        //   원으로 사면 그 단계 판매가의 80%, 조각으로 만들면 그 단계 조각의 2배 · 종류마다 따로 (싼 검 방지권을 비싼 검에 못 씀)
-        const shieldPrice = (k, L) => niceWon(k.S[L] * 0.8);
-        const shieldShardCost = (k, L) => k.SH[L] * 2;
-        const shieldKey = (k, cap) => (k.id === 'long' ? '' : k.id + '_') + 'L' + cap;   // 키에 L을 붙임 (숫자 키는 Firebase가 배열로 바꿔버림)
+        // 🛡️ 방지권: '+L 방지권' 1장 = 그 무기의 +L 이하에서 실패해도 단계 유지 (1번 쓰면 사라짐). 무기마다 따로
+        const shieldShardCost = (k, L) => k.SH[L] * SHIELD_SHARD_X;
+        const shieldKey = (k, cap) => `${k.id}_L${cap}`;
         function shieldList(d, k) {
-            const re = new RegExp('^' + (k.id === 'long' ? '' : k.id + '_') + 'L(\\d+)$');
-            return Object.entries((d && d.swordShields) || {})
+            const re = new RegExp('^' + k.id + '_L(\\d+)$');
+            return Object.entries((wOK(d) && d.wShields) || {})
                 .map(([key, n]) => { const m = re.exec(key); return m ? { cap: parseInt(m[1], 10), n: n || 0 } : null; })
                 .filter(x => x && x.cap > 0 && x.n > 0).sort((a, b) => a.cap - b.cap);
         }
         const pickShield = (d, k, L) => (shieldList(d, k).find(x => x.cap >= L) || {}).cap || 0;  // 쓸 수 있는 것 중 가장 낮은 단계
         function addShield(d, k, cap, n = 1) {
-            d.swordShields = Object.assign({}, d.swordShields || {});
-            d.swordShields[shieldKey(k, cap)] = (d.swordShields[shieldKey(k, cap)] || 0) + n;
+            d.wShields = Object.assign({}, d.wShields || {});
+            d.wShields[shieldKey(k, cap)] = (d.wShields[shieldKey(k, cap)] || 0) + n;
         }
         function useShield(d, k, cap) {
-            d.swordShields = Object.assign({}, d.swordShields || {});
-            const left = (d.swordShields[shieldKey(k, cap)] || 0) - 1;
-            if (left > 0) d.swordShields[shieldKey(k, cap)] = left; else delete d.swordShields[shieldKey(k, cap)];
+            d.wShields = Object.assign({}, d.wShields || {});
+            const left = (d.wShields[shieldKey(k, cap)] || 0) - 1;
+            if (left > 0) d.wShields[shieldKey(k, cap)] = left; else delete d.wShields[shieldKey(k, cap)];
         }
-        // 📖 도감: 종류마다 처음 달성한 단계에 판매가의 30% 보상, 5·10·15단계는 그 단계 방지권 1장 더
+        // 📖 도감: 무기마다 처음 달성한 단계에 판매가의 30% 보상, 5·10·15단계는 그 단계 방지권 1장 더
         const dexReward = (k, L) => niceWon(k.S[L] * 0.3);
         const DEX_SHIELD_LEVELS = [5, 10, 15];
         const dexGivesShield = (k, L) => DEX_SHIELD_LEVELS.includes(L) && L < k.max;  // 최종 단계에선 방지권이 쓸모없어서 안 줌
         const swordProtectOn = () => { try { return localStorage.getItem('sword_protect') !== '0'; } catch (e) { return true; } };
         const swordMoneyOf = (d) => (d && typeof d.swordMoney === 'number') ? d.swordMoney : SWORD_START;
-        // 12,345원 / 3.8만원 / 1.4억원 / 2.2조원 / 3.1경원
+        // 12,345원 / 3.8만원 / 1.4억원 / 2.2조원 / 3.1경원 / … (만 배마다 단위가 바뀜)
         function fmtWon(n) {
             n = Math.floor(n || 0);
-            const unit = (v, u) => `${(Math.floor(v * 10) / 10).toLocaleString('ko-KR', { maximumFractionDigits: 1 })}${u}원`;
-            if (n >= 1e20) return unit(n / 1e20, '해');
-            if (n >= 1e16) return unit(n / 1e16, '경');
-            if (n >= 1e12) return unit(n / 1e12, '조');
-            if (n >= 1e8) return unit(n / 1e8, '억');
-            if (n >= 1e5) return unit(n / 1e4, '만');
-            return `${n.toLocaleString('ko-KR')}원`;
+            if (n < 1e5) return `${n.toLocaleString('ko-KR')}원`;
+            const U = ['만', '억', '조', '경', '해', '자', '양', '구', '간', '정', '재', '극'];
+            const i = Math.min(U.length - 1, Math.floor(Math.log10(n) / 4) - 1), v = n / Math.pow(10, (i + 1) * 4);
+            return `${(Math.floor(v * 10) / 10).toLocaleString('ko-KR', { maximumFractionDigits: 1 })}${U[i]}원`;
         }
 
-        const WEAPON_NAMES = [
-            '일반 검', '강화 검', '숙련자의 검', '전사의 검', '영웅의 검',
-            '전설의 검', '신비한 검', '용사의 검', '마검', '신검',
-            '천상의 검', '전설의 마검', '신의 검', '천둥의 검', '용아검',
-            '별빛의 검', '태양의 검', '심연의 검', '창세의 검', '절대검', '무한의 검'
-        ];
+        // ---- 2026-11-12 초기화: 예전 검(단검·장검·쌍검·대검·전설검) 기록을 지우고, 들고 있던 검의 판매가는 돌려줌 (보유 금액은 그대로) ----
+        function legacySwordSell(kindId, level) {
+            const OLD_P = [95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 7, 5];
+            const OLD_LONG = [0, 500, 860, 1600, 3100, 6400, 14000, 33000, 85000, 240000, 740000, 2300000, 8100000, 32000000, 150000000, 840000000];
+            const OLD = { dagger: [15, 1.05, 300, 1.2, 1.2], twin: [15, 0.92, 3000, 1.35, 1.2], great: [15, 0.85, 20000, 1.4, 1.25], legend: [20, 0.8, 200000, 1.5, 1.3] };
+            if (!OLD[kindId]) return OLD_LONG[Math.max(0, Math.min(level || 0, 15))] || 0;
+            const [max, pf, s1, r0, r1] = OLD[kindId], L = Math.max(0, Math.min(level || 0, max));
+            if (!L) return 0;
+            let S = s1;
+            for (let i = 1; i < L; i++) { const P = Math.max(2, Math.round(OLD_P[i] * pf)), C = niceWon(0.25 * S); S = niceWon(((i < 10 ? r0 : r1) * S + C) / (P / 100)); }
+            return S;
+        }
+        function migrateWeaponsV2(d) {
+            if (!d || (d.weaponVer || 0) >= 2) return false;
+            const oldKind = d.swordKind || 'long', oldLevel = d.weaponLevel || 0, refund = legacySwordSell(oldKind, oldLevel);
+            const had = oldLevel > 0 || typeof d.swordMoney === 'number' || !!d.swordBest || !!d.swordBestBy;
+            if (had) {   // 되돌릴 수 있게 예전 기록을 통째로 남겨 둠
+                d.weaponBackupV1 = JSON.parse(JSON.stringify({ weaponLevel: oldLevel, swordKind: oldKind, swordBest: d.swordBest || 0, swordBestBy: d.swordBestBy || {}, swordDexClaimed: d.swordDexClaimed || 0,
+                    swordDexBy: d.swordDexBy || {}, swordShields: d.swordShields || {}, swordShards: d.swordShards || 0, swordMoney: swordMoneyOf(d), at: Date.now() }));
+                d.weaponResetNote = { refund, kind: oldKind, level: oldLevel };   // 한 번 알려 주고 지움
+            }
+            d.swordMoney = swordMoneyOf(d) + refund;
+            ['swordKind', 'swordBest', 'swordBestBy', 'swordDexClaimed', 'swordDexBy', 'swordShields', 'enhancePaid'].forEach(key => { delete d[key]; });
+            d.weaponLevel = 0; d.swordShards = 0;
+            d.weaponVer = 2; d.wKind = 'sword'; d.wLevel = 0;
+            return true;
+        }
 
         // ===== 내 미니게임 데이터 불러오기·저장 (2026-11-04 안전장치) =====
         //  예전엔 페이지를 연 순간의 닉네임으로만 불러오고, 저장은 '지금' 닉네임에 통째로 덮어써서
@@ -10759,6 +10840,7 @@ ${text}
             if (applyCollectionKeepV3(d, me)) changed = 1;
             if (applyCollectionGrantV5(d, me)) changed = 1;
             if (removeRetiredItems(d)) changed = 1;
+            if (migrateWeaponsV2(d)) changed = 1;   // 2026-11-12 무기 강화 전체 초기화 (들고 있던 검 판매가 환불)
             return !!changed;
         }
 
@@ -10769,7 +10851,7 @@ ${text}
             if (minigameRef) minigameRef.off();
             gameDataOwner = myName;
             gameDataLoaded = false;
-            gameData = { coins: 0, weaponLevel: 0, collection: [], gachaHistory: [] };
+            gameData = { coins: 0, weaponLevel: 0, weaponVer: 2, collection: [], gachaHistory: [] };
             const ref = db.ref(`minigame/${myName}`);
             minigameRef = ref;
             ref.on('value', (snapshot) => {
@@ -10794,7 +10876,7 @@ ${text}
                     migrateMyIconV4();
                     showMyGiftNotices();
                 } else {
-                    gameData = { coins: 0, weaponLevel: 0, collection: [], gachaHistory: [] };
+                    gameData = { coins: 0, weaponLevel: 0, weaponVer: 2, collection: [], gachaHistory: [] };
                     gameDataLoaded = true;
                 }
                 updateMinigameUI();
@@ -10831,7 +10913,7 @@ ${text}
                             // 기록이 아예 없는 사람: 새로 만들어 지급
                             db.ref(`minigame/${name}`).transaction(cur2 => {
                                 if (cur2) return; // 그새 생겼으면 위 경로가 처리
-                                return { coins: g.coins, weaponLevel: 0, collection: [], gachaHistory: [], giftsReceived: { [g.id]: { coins: g.coins, reason: g.reason, at: Date.now() } } };
+                                return { coins: g.coins, weaponLevel: 0, weaponVer: 2, collection: [], gachaHistory: [], giftsReceived: { [g.id]: { coins: g.coins, reason: g.reason, at: Date.now() } } };
                             });
                         }
                         if (!err && --left === 0 && doneKey) { try { localStorage.setItem(doneKey, '1'); } catch (e) { /* noop */ } }
@@ -10896,10 +10978,11 @@ ${text}
         function updateMinigameUI() {
             document.getElementById('myCoinCount').textContent = gameData.coins || 0;
             const kind = swordKindOf(gameData);
-            document.getElementById('myWeaponLevel').textContent = `${kind.id === 'long' ? '' : kind.name + ' '}+${gameData.weaponLevel || 0}`;
+            const level = curSwordLevel(gameData);
+            document.getElementById('myWeaponIcon').textContent = kind.icon;
+            document.getElementById('myWeaponLevel').textContent = `${kind.name} +${level}`;
 
             // 강화 UI 업데이트
-            const level = curSwordLevel(gameData);
             const weaponBigEl = document.getElementById('weaponBig');
             if (weaponBigEl.dataset.level !== `${kind.id}:${level}`) {
                 weaponBigEl.innerHTML = swordSVG(level, kind.id);
@@ -11041,7 +11124,13 @@ ${text}
             `).join('');
         }
 
-        // 강화 패널: 검 종류·명성·돈·확률·비용·판매가·버튼 상태
+        // 강화 패널: 무기 종류·명성·돈·확률·비용·판매가·버튼 상태
+        const LEGACY_SWORD_NAMES = { dagger: '단검', long: '장검', twin: '쌍검', great: '대검', legend: '전설검' };
+        // 조사 붙이기 (검으로 / 칼로 / 대포로, 검을 / 대포를)
+        const josaTail = (w) => { const c = String(w).charCodeAt(String(w).length - 1) - 0xAC00; return c < 0 || c > 11171 ? 1 : c % 28; };
+        const josaRo = (w) => w + (josaTail(w) === 0 || josaTail(w) === 8 ? '로' : '으로');
+        const josaEul = (w) => w + (josaTail(w) ? '을' : '를');
+        const josaEun = (w) => w + (josaTail(w) ? '은' : '는');
         function renderSwordPanel() {
             const el = document.getElementById('swordMoney');
             if (!el) return;
@@ -11052,26 +11141,35 @@ ${text}
             el.title = `${Math.floor(money).toLocaleString('ko-KR')}원`;
             const maxed = L >= k.max;
             const o = swordOdds(k, L);
-            document.getElementById('weaponName').textContent = `${swordLevelName(k, L)} +${L}${k.id === 'long' ? '' : ` / +${k.max}`}`;
+            // 2026-11-12 초기화 안내 (확인을 누를 때까지 한 번)
+            const note = document.getElementById('swordResetNote'), rn = gameData.weaponResetNote;
+            if (rn) {
+                note.innerHTML = '🔄 <b>무기 강화가 새로 바뀌었어요!</b> 검 → 칼 → 창 → 곤봉 → 활 → 총 → 대포, 무기 7종을 차례로 키워 보세요.<br>'
+                    + (rn.refund > 0 ? `들고 있던 ${LEGACY_SWORD_NAMES[rn.kind] || '검'} +${rn.level | 0}의 판매가 <b>${fmtWon(rn.refund)}</b>을 돌려받았어요 · ` : '')
+                    + `보유 금액은 그대로이고, 강화 기록·명성·방지권·조각은 모두 처음부터예요. <button onclick="clearGameFlag('weaponResetNote'); renderSwordPanel();">확인</button>`;
+                note.style.display = 'block';
+            } else note.style.display = 'none';
+            document.getElementById('weaponName').textContent = `${swordLevelName(k, L)} +${L} / +${k.max}`;
             document.getElementById('swordOdds').innerHTML = maxed
-                ? `<span class="o-up">🏆 ${k.name} 최종 강화 완료! 팔아서 부자가 되거나 다른 검에 도전하세요</span>`
+                ? `<span class="o-up">🏆 ${k.name} 최종 강화 완료! 팔아서 부자가 되거나 다른 무기에 도전하세요</span>`
                 : `<span class="o-up">성공 ${o.up}%</span><span class="o-break">실패 ${o.brk}% → +0</span>`;
-            document.getElementById('swordPrices').innerHTML = maxed
+            document.getElementById('swordPrices').innerHTML = (maxed
                 ? `<span class="sp-sell">지금 판매가 <b>${fmtWon(swordSellOf(k, L))}</b></span>`
-                : `강화 비용 <b>${k.C[L] ? fmtWon(k.C[L]) : '무료'}</b> · <span class="sp-sell">지금 판매가 <b>${fmtWon(swordSellOf(k, L))}</b></span> · 성공하면 <b>${fmtWon(swordSellOf(k, L + 1))}</b>`;
+                : `강화 비용 <b>${k.C[L] ? fmtWon(k.C[L]) : '무료'}</b> · <span class="sp-sell">지금 판매가 <b>${fmtWon(swordSellOf(k, L))}</b></span> · 성공하면 <b>${fmtWon(swordSellOf(k, L + 1))}</b>`)
+                + `<br><span class="sp-raid">🐲 레이드 공격력 <b>${weaponAtk(k, kindBest(gameData, k))}</b> <small>(${k.name} 최고 기록 +${kindBest(gameData, k)} 기준 · ${k.perk})</small></span>`;
             const warn = document.getElementById('enhanceWarning');
-            warn.textContent = maxed || L === 0 ? '' : (o.brk >= 50 ? `⚠️ 실패할 확률이 더 높아요! 실패하면 ${fmtWon(swordSellOf(k, L))}짜리 검이 +0으로` : '⚠️ 실패하면 +0으로 돌아가요');
+            warn.textContent = maxed || L === 0 ? '' : (o.brk >= 50 ? `⚠️ 실패할 확률이 더 높아요! 실패하면 ${fmtWon(swordSellOf(k, L))}짜리 ${k.name}이(가) +0으로` : '⚠️ 실패하면 +0으로 돌아가요');
             warn.style.display = warn.textContent ? 'block' : 'none';
             const btn = document.getElementById('enhanceBtn');
             btn.disabled = maxed || money < k.C[L];
-            document.getElementById('enhanceBtnLabel').textContent = maxed ? '⚔️ 최종 단계' : `⚔️ 강화하기 (${k.C[L] ? fmtWon(k.C[L]) : '무료'})`;
+            document.getElementById('enhanceBtnLabel').textContent = maxed ? `${k.icon} 최종 단계` : `${k.icon} 강화하기 (${k.C[L] ? fmtWon(k.C[L]) : '무료'})`;
             const sellBtn = document.getElementById('swordSellBtn');
             sellBtn.disabled = L === 0;
-            sellBtn.textContent = L === 0 ? '💰 +0 검은 못 팔아요' : `💰 판매하기 (${fmtWon(swordSellOf(k, L))})`;
+            sellBtn.textContent = L === 0 ? `💰 +0 ${josaEun(k.name)} 못 팔아요` : `💰 판매하기 (${fmtWon(swordSellOf(k, L))})`;
             document.getElementById('swordChargeBtn').disabled = (gameData.coins || 0) < 1;
 
-            // 🧩 조각 · 🛡️ 방지권 (지금 고른 검 종류 것만)
-            const shards = gameData.swordShards || 0;
+            // 🧩 조각 · 🛡️ 방지권 (지금 고른 무기 것만). 방지권은 조각으로만 만들 수 있음
+            const shards = (wOK(gameData) && gameData.swordShards) || 0;
             document.getElementById('swordShards').textContent = shards.toLocaleString('ko-KR');
             const list = shieldList(gameData, k);
             const on = swordProtectOn();
@@ -11084,15 +11182,12 @@ ${text}
             const shop = document.getElementById('swordShop');
             shop.style.display = L === 0 || maxed ? 'none' : 'flex';
             if (L > 0 && !maxed) {
-                const price = shieldPrice(k, L), need = shieldShardCost(k, L);
-                const buy = document.getElementById('shieldBuyBtn'), craft = document.getElementById('shieldCraftBtn');
-                buy.textContent = `🛡️ +${L} 방지권 사기 (${fmtWon(price)})`;
-                buy.disabled = money < price;
-                craft.textContent = `🧩 조각 ${need.toLocaleString('ko-KR')}개로 +${L} 방지권 만들기`;
+                const need = shieldShardCost(k, L), craft = document.getElementById('shieldCraftBtn');
+                craft.textContent = `🧩 조각 ${need.toLocaleString('ko-KR')}개로 ${k.name} +${L} 방지권 만들기`;
                 craft.disabled = shards < need;
             }
 
-            // 🎖️ 명성 · 📖 도감 보상 버튼 (모든 검 종류의 남은 보상)
+            // 🎖️ 명성 · 📖 도감 보상 버튼 (모든 무기의 남은 보상)
             const fame = fameOf(gameData), ti = fameTierIdx(fame), tier = FAME_TIERS[ti], next = FAME_TIERS[ti + 1];
             const unlockNext = next ? SWORD_KINDS.filter(x => x.unlock === ti + 1).map(x => x.name).join('·') : '';
             document.getElementById('swordFame').innerHTML = `🎖️ 명성 <b style="color:${tier.color}">${tier.name}</b> <small>(${fame}점${next ? ` · ${next.name}까지 ${next.min - fame}점${unlockNext ? ` → ${unlockNext} 열림` : ''}` : ' · 최고 등급!'})</small>`;
@@ -11114,7 +11209,7 @@ ${text}
             renderSwordTable(k, L);
         }
 
-        // 📚 컬렉션 북 = 검 종류 고르기 (최종 단계까지 올리면 완성)
+        // 📚 무기 고르기 (명성 등급이 오르면 다음 무기가 열림 · 최종 단계까지 올리면 완성)
         function renderSwordBook() {
             const box = document.getElementById('swordBook');
             if (!box) return;
@@ -11124,10 +11219,10 @@ ${text}
             box.dataset.key = key;
             box.innerHTML = SWORD_KINDS.map(k => {
                 const best = kindBest(gameData, k), open = ti >= k.unlock, done = best >= k.max;
-                const state = !open ? `🔒 ${FAME_TIERS[k.unlock].name} 등급 필요` : done ? '✅ 최종 강화 완성' : `최고 +${best} / +${k.max}`;
-                return `<button class="book-card ${k.id === cur.id ? 'cur' : ''} ${open ? '' : 'locked'} ${done ? 'done' : ''}" onclick="selectSwordKind('${k.id}')" title="${k.desc}">
-                    <div class="book-art">${swordSVG(open ? Math.max(1, best) : 1, k.id)}</div>
-                    <div class="book-name">${k.name}${k.id === cur.id ? ' <small>사용 중</small>' : ''}</div>
+                const state = !open ? `🔒 ${FAME_TIERS[k.unlock].name}부터` : done ? '✅ 완성' : `최고 +${best} / +${k.max}`;
+                return `<button class="book-card ${k.id === cur.id ? 'cur' : ''} ${open ? '' : 'locked'} ${done ? 'done' : ''}" onclick="selectSwordKind('${k.id}')" title="${k.name} · 최대 +${k.max} · 레이드 기본 공격력 ${k.atk} (${k.perk})">
+                    <div class="book-art">${swordSVG(open ? best : 0, k.id)}</div>
+                    <div class="book-name">${k.icon} ${k.name}${k.id === cur.id ? ' <small>사용 중</small>' : ''}</div>
                     <div class="book-state">${state}</div>
                 </button>`;
             }).join('');
@@ -11135,27 +11230,28 @@ ${text}
 
         function selectSwordKind(id) {
             if (!gameMine(myMinigameName())) { bindMinigame(); alert('내 미니게임 데이터를 불러오는 중이에요. 잠시 후 다시 시도해주세요.'); return; }
+            migrateWeaponsV2(gameData);
             const k = KIND_BY_ID[id], cur = swordKindOf(gameData);
             if (!k || k.id === cur.id) return;
             if (!kindUnlocked(gameData, k)) {
                 const need = FAME_TIERS[k.unlock], fame = fameOf(gameData);
-                alert(`${k.name}은(는) 명성 ${need.name} 등급부터 쓸 수 있어요.\n지금 명성 ${fame}점 · ${need.min - fame}점 더 필요해요.\n(검마다 최고 기록과 최종 강화 완성으로 명성이 올라요)`);
+                alert(`${josaEun(k.name)} 명성 ${need.name} 등급부터 쓸 수 있어요.\n지금 명성 ${fame}점 · ${need.min - fame}점 더 필요해요.\n(무기마다 최고 기록과 최종 강화 완성으로 명성이 올라요)`);
                 return;
             }
             const L = curSwordLevel(gameData);
             if (L > 0) {
                 const price = swordSellOf(cur, L);
-                if (!confirm(`지금 ${cur.name} +${L} 검을 ${fmtWon(price)}에 팔고 ${k.name}으로 바꿀까요?`)) return;
+                if (!confirm(`지금 들고 있는 ${cur.name} +${L}을(를) ${fmtWon(price)}에 팔고 ${josaRo(k.name)} 바꿀까요?`)) return;
                 setKindBest(gameData, cur, kindBest(gameData, cur));
                 gameData.swordMoney = swordMoneyOf(gameData) + price;
-                swordLog('enhance-sell', `💰 ${cur.name} +${L} 검을 팔았어요 <b>+${fmtWon(price)}</b>`);
+                swordLog('enhance-sell', `💰 ${cur.name} +${L}을(를) 팔았어요 <b>+${fmtWon(price)}</b>`);
             }
-            gameData.swordKind = k.id;
-            gameData.weaponLevel = 0;
-            swordLog('enhance-dex', `🔁 ${k.name}으로 바꿨어요 · 최대 +${k.max}`);
+            gameData.wKind = k.id;
+            gameData.wLevel = 0;
+            swordLog('enhance-dex', `🔁 ${josaRo(k.name)} 바꿨어요 · 최대 +${k.max} · 레이드 ${k.perk}`);
             saveGameData();
             updateMinigameUI();
-            loadLeaderboard();
+            loadLeaderboardSoon();
         }
 
         function renderSwordDex(force) {
@@ -11164,14 +11260,14 @@ ${text}
             const k = swordKindOf(gameData);
             const best = kindBest(gameData, k), claimed = kindClaimed(gameData, k);
             const key = `${k.id}/${best}/${claimed}`;
-            if (!document.getElementById('swordDexBox').open) return;  // 펼쳤을 때만 그림 (검 그림 여러 개)
+            if (!document.getElementById('swordDexBox').open) return;  // 펼쳤을 때만 그림 (무기 그림 여러 개)
             if (!force && box.dataset.key === key) return;
             box.dataset.key = key;
             let html = '';
             for (let i = 1; i <= k.max; i++) {
                 const got = i <= best;
                 const reward = `${fmtWon(dexReward(k, i))}${dexGivesShield(k, i) ? ' + 🛡️' : ''}`;
-                html += `<div class="dex-card ${got ? 'got' : 'locked'}" title="${got ? swordLevelName(k, i) : '아직 못 본 검'} · 판매가 ${fmtWon(k.S[i])}">
+                html += `<div class="dex-card ${got ? 'got' : 'locked'}" title="${got ? swordLevelName(k, i) : '아직 못 본 무기'} · 판매가 ${fmtWon(k.S[i])} · 레이드 공격력 ${weaponAtk(k, i)}">
                     <div class="dex-art">${swordSVG(i, k.id)}</div>
                     <div class="dex-lv" style="color: ${got ? SWORD_TIERS[getSwordTier(i)].nameColor : 'rgba(255,255,255,0.4)'}">+${i}</div>
                     <div class="dex-name">${got ? swordLevelName(k, i) : '???'}</div>
@@ -11186,7 +11282,7 @@ ${text}
             renderSwordPanel();
         }
 
-        // 도감 보상 지급 (모든 검 종류의 처음 달성한 단계들). 강화 성공 때 자동으로, 예전 기록은 버튼으로
+        // 도감 보상 지급 (모든 무기의 처음 달성한 단계들). 강화 성공 때 자동으로, 밀린 것은 버튼으로
         function grantDexRewards(d) {
             const out = [];
             SWORD_KINDS.forEach(k => {
@@ -11205,17 +11301,18 @@ ${text}
             return out.length ? out : null;
         }
         function logDexGrant(list) {
-            (list || []).forEach(g => swordLog('enhance-dex', `📖 ${g.k.name} 도감 등록 +${g.from}${g.to > g.from ? `~+${g.to}` : ''}! 최초 달성 보상 <b>+${fmtWon(g.won)}</b>${g.shields.length ? ` · 🛡️ ${g.shields.map(c => `${g.k.name} +${c} 방지권`).join(', ')}` : ''}${g.to >= g.k.max ? ` · 📚 ${g.k.name} 컬렉션 완성!` : ''}`));
+            (list || []).forEach(g => swordLog('enhance-dex', `📖 ${g.k.name} 도감 등록 +${g.from}${g.to > g.from ? `~+${g.to}` : ''}! 최초 달성 보상 <b>+${fmtWon(g.won)}</b>${g.shields.length ? ` · 🛡️ ${g.shields.map(c => `${g.k.name} +${c} 방지권`).join(', ')}` : ''}${g.to >= g.k.max ? ` · 📚 ${g.k.name} 완성!` : ''}`));
         }
-        // 명성 등급이 올랐으면 알림 (새로 열린 검 포함)
+        // 명성 등급이 올랐으면 알림 (새로 열린 무기 포함)
         function logFameUp(before) {
             const after = fameTierIdx(fameOf(gameData));
             if (after <= before) return;
-            const opened = SWORD_KINDS.filter(k => k.unlock > before && k.unlock <= after).map(k => k.name);
+            const opened = SWORD_KINDS.filter(k => k.unlock > before && k.unlock <= after).map(k => `${k.icon} ${k.name}`);
             swordLog('enhance-fame', `🎖️ 명성 등급 상승! ${FAME_TIERS[before].name} → <b>${FAME_TIERS[after].name}</b>${opened.length ? ` · ${opened.join('·')} 열림` : ''}`);
         }
         function claimDexRewards() {
             if (!gameMine(myMinigameName())) { bindMinigame(); return; }
+            migrateWeaponsV2(gameData);
             const before = fameTierIdx(fameOf(gameData));
             const g = grantDexRewards(gameData);
             if (!g) return;
@@ -11223,24 +11320,19 @@ ${text}
             logFameUp(before);
             saveGameData();
             updateMinigameUI();
-            loadLeaderboard();
+            loadLeaderboardSoon();
         }
 
-        function buySwordShield(how) {
+        // 🛡️ 방지권 만들기: 조각으로만 (돈으로는 못 삼)
+        function buySwordShield() {
             if (!gameMine(myMinigameName())) { bindMinigame(); alert('내 미니게임 데이터를 불러오는 중이에요. 잠시 후 다시 시도해주세요.'); return; }
+            migrateWeaponsV2(gameData);
             const k = swordKindOf(gameData), L = curSwordLevel(gameData);
             if (L <= 0 || L >= k.max) return;
-            if (how === 'won') {
-                const price = shieldPrice(k, L), money = swordMoneyOf(gameData);
-                if (money < price) { alert(`돈이 부족해요 (${k.name} +${L} 방지권 ${fmtWon(price)})`); return; }
-                gameData.swordMoney = money - price;
-                swordLog('enhance-shield', `🛡️ ${k.name} +${L} 방지권을 샀어요 <small>(-${fmtWon(price)})</small>`);
-            } else {
-                const need = shieldShardCost(k, L), have = gameData.swordShards || 0;
-                if (have < need) { alert(`조각이 부족해요 (${k.name} +${L} 방지권은 조각 ${need}개, 지금 ${have}개)`); return; }
-                gameData.swordShards = have - need;
-                swordLog('enhance-shield', `🧩 조각 ${need.toLocaleString('ko-KR')}개로 ${k.name} +${L} 방지권을 만들었어요`);
-            }
+            const need = shieldShardCost(k, L), have = gameData.swordShards || 0;
+            if (have < need) { alert(`조각이 부족해요 (${k.name} +${L} 방지권은 조각 ${need.toLocaleString('ko-KR')}개, 지금 ${have.toLocaleString('ko-KR')}개)`); return; }
+            gameData.swordShards = have - need;
+            swordLog('enhance-shield', `🧩 조각 ${need.toLocaleString('ko-KR')}개로 ${k.name} +${L} 방지권을 만들었어요`);
             addShield(gameData, k, L);
             saveGameData();
             updateMinigameUI();
@@ -11257,9 +11349,10 @@ ${text}
                     + (i < k.max ? `<td>${o.up}%</td><td>${k.C[i] ? fmtWon(k.C[i]) : '무료'}</td>` : '<td>-</td><td>-</td>')
                     + `<td>${i ? fmtWon(k.S[i]) : '-'}</td>`
                     + `<td>${k.SH[i] ? k.SH[i].toLocaleString('ko-KR') : '-'}</td>`
-                    + `<td>${i && i < k.max ? fmtWon(shieldPrice(k, i)) + ' / 🧩' + shieldShardCost(k, i).toLocaleString('ko-KR') : '-'}</td></tr>`;
+                    + `<td>${i && i < k.max ? '🧩 ' + shieldShardCost(k, i).toLocaleString('ko-KR') : '-'}</td>`
+                    + `<td>${weaponAtk(k, i)}</td></tr>`;
             }
-            box.innerHTML = `<div class="st-kind">${k.name} 강화표</div><table><tr><th>단계</th><th>성공 (실패하면 +0)</th><th>강화 비용</th><th>판매가</th><th>부서지면 🧩</th><th>방지권 (원 / 조각)</th></tr>${rows}</table>`;
+            box.innerHTML = `<div class="st-kind">${k.icon} ${k.name} 강화표 <small>· 레이드 특성: ${k.perk}</small></div><table><tr><th>단계</th><th>성공 (실패하면 +0)</th><th>강화 비용</th><th>판매가</th><th>부서지면 🧩</th><th>방지권 만들기</th><th>레이드 공격력</th></tr>${rows}</table>`;
         }
 
         function swordLog(cls, html) {
@@ -11270,26 +11363,26 @@ ${text}
 
         function doEnhance() {
             if (!gameMine(myMinigameName())) { bindMinigame(); alert('내 미니게임 데이터를 불러오는 중이에요. 잠시 후 다시 시도해주세요.'); return; }
+            migrateWeaponsV2(gameData);   // 혹시 아직 예전 기록이면 먼저 초기화·환불
             const k = swordKindOf(gameData);
             const level = curSwordLevel(gameData);
             if (level >= k.max) return;
-            setKindBest(gameData, k, kindBest(gameData, k)); // 예전 방식으로 올린 검도 최고 기록에 남김 (부서지기 전에)
             const cost = k.C[level];
             const money = swordMoneyOf(gameData);
             if (money < cost) {
-                alert(level > 0 ? `돈이 부족해요 (강화 비용 ${fmtWon(cost)}). 검을 팔아서 돈을 마련하세요.` : `돈이 부족해요 (강화 비용 ${fmtWon(cost)}).`);
+                alert(level > 0 ? `돈이 부족해요 (강화 비용 ${fmtWon(cost)}). ${josaEul(k.name)} 팔아서 돈을 마련하세요.` : `돈이 부족해요 (강화 비용 ${fmtWon(cost)}).`);
                 return;
             }
             const fameBefore = fameTierIdx(fameOf(gameData));
             gameData.swordMoney = money - cost;
-            delete gameData.enhancePaid; // 예전(코인 강화) 기록 정리
+            gameData.wKind = k.id;
 
             const o = swordOdds(k, level);
             const r = Math.random() * 100;
             const weaponBig = document.getElementById('weaponBig');
             const shield = level > 0 && swordProtectOn() ? pickShield(gameData, k, level) : 0;
             if (r < o.up) {
-                gameData.weaponLevel = level + 1;
+                gameData.wLevel = level + 1;
                 setKindBest(gameData, k, level + 1);
                 swordLog('enhance-success', `✅ ${k.name} +${level} → +${level + 1} 강화 성공! <small>(${cost ? '-' + fmtWon(cost) : '무료'})</small>`);
                 logDexGrant(grantDexRewards(gameData));
@@ -11299,7 +11392,7 @@ ${text}
                 useShield(gameData, k, shield);
                 swordLog('enhance-shield', `🛡️ ${k.name} +${level} 강화 실패… <b>+${shield} 방지권</b>이 막아줘서 +${level} 그대로! <small>(-${cost ? fmtWon(cost) : '0원'})</small>`);
             } else {
-                gameData.weaponLevel = 0;
+                gameData.wLevel = 0;
                 const got = k.SH[level] || 0;
                 if (got) gameData.swordShards = (gameData.swordShards || 0) + got;
                 swordLog('enhance-fail', `💥 ${k.name} +${level} 강화 실패… +0으로 돌아갔어요 <small>(${cost ? '-' + fmtWon(cost) : '무료'}${level ? `, 판매가 ${fmtWon(swordSellOf(k, level))} 날아감` : ''})</small>${got ? ` · 🧩 조각 +${got}` : ''}`);
@@ -11310,27 +11403,28 @@ ${text}
 
             saveGameData();
             updateMinigameUI();
-            loadLeaderboard();
+            loadLeaderboardSoon();
         }
 
         function sellSword() {
             if (!gameMine(myMinigameName())) { bindMinigame(); alert('내 미니게임 데이터를 불러오는 중이에요. 잠시 후 다시 시도해주세요.'); return; }
+            migrateWeaponsV2(gameData);
             const k = swordKindOf(gameData);
             const level = curSwordLevel(gameData);
             if (level <= 0) return;
             setKindBest(gameData, k, kindBest(gameData, k));
             const price = swordSellOf(k, level);
-            if (!confirm(`${k.name} +${level} ${k.id === 'long' ? swordLevelName(k, level) : ''}을(를) ${fmtWon(price)}에 팔까요?\n팔고 나면 새 +0 ${k.name}으로 다시 시작해요.`)) return;
+            if (!confirm(`${swordLevelName(k, level)} +${level}을(를) ${fmtWon(price)}에 팔까요?\n팔고 나면 새 +0 ${josaRo(k.name)} 다시 시작해요. (최고 기록과 레이드 공격력은 그대로 남아요)`)) return;
             const fameBefore = fameTierIdx(fameOf(gameData));
             gameData.swordMoney = swordMoneyOf(gameData) + price;
-            gameData.weaponLevel = 0;
-            delete gameData.enhancePaid;
-            swordLog('enhance-sell', `💰 ${k.name} +${level} 검을 팔았어요 <b>+${fmtWon(price)}</b>`);
+            gameData.wKind = k.id;
+            gameData.wLevel = 0;
+            swordLog('enhance-sell', `💰 ${k.name} +${level}을(를) 팔았어요 <b>+${fmtWon(price)}</b>`);
             logDexGrant(grantDexRewards(gameData));
             logFameUp(fameBefore);
             saveGameData();
             updateMinigameUI();
-            loadLeaderboard();
+            loadLeaderboardSoon();
         }
 
         // 코인 1개 → 강화 머니 1만원 (한 방향만, 서버 값 기준 트랜잭션)
@@ -11521,13 +11615,14 @@ ${text}
             db.ref('minigame').once('value', (snapshot) => {
                 const data = snapshot.val() || {};
                 const leaderboard = Object.entries(data)
-                    .filter(([, d]) => d && typeof d === 'object')
+                    .filter(([, d]) => d && typeof d === 'object' && wOK(d))   // 개편 뒤에 접속한 사람만 (예전 기록은 초기화 대상)
                     .map(([name, d]) => {
                         const k = swordKindOf(d), level = curSwordLevel(d);
-                        return { name, d, k, level, fame: fameOf(d), assets: swordMoneyOf(d) + swordSellOf(k, level), played: typeof d.swordMoney === 'number' || level > 0 };
+                        const top = SWORD_KINDS.filter(x => kindBest(d, x) > 0).pop();   // 가장 뒤 무기의 최고 기록
+                        return { name, d, k, level, top, fame: fameOf(d), assets: swordMoneyOf(d) + swordSellOf(k, level) };
                     })
-                    .filter(item => item.played && hasRankIcon(item.name)) // 검 강화를 해 본 사람 중 컬렉션 아이콘 지정한 사람만
-                    .sort((a, b) => b.assets - a.assets || b.fame - a.fame)
+                    .filter(item => item.fame > 0 && hasRankIcon(item.name)) // 무기 강화를 해 본 사람 중 컬렉션 아이콘 지정한 사람만
+                    .sort((a, b) => b.fame - a.fame || b.assets - a.assets)
                     .slice(0, 5);
 
                 const container = document.getElementById('enhanceLeaderboard');
@@ -11537,10 +11632,16 @@ ${text}
                     <div class="leaderboard-item">
                         <span class="leaderboard-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`}</span>
                         <span class="leaderboard-name">${nameWithIcon(item.name)}</span>
-                        <span class="leaderboard-level" title="지금 ${item.k.name} +${item.level} · 명성 ${item.fame}점">${fameBadge(item.d)} ${fmtWon(item.assets)}<small>${item.k.name} +${item.level}</small></span>
+                        <span class="leaderboard-level" title="지금 ${item.k.name} +${item.level} · 재산 ${fmtWon(item.assets)}">${fameBadge(item.d)} ${item.fame}점<small>${item.top ? `${item.top.icon} ${item.top.name} +${kindBest(item.d, item.top)}` : ''} · ${fmtWon(item.assets)}</small></span>
                     </div>
                 `).join('');
             });
+        }
+        // 강화는 연타하는 게임이라 랭킹(전체 minigame 읽기)은 15초에 한 번만 새로 읽음
+        let lbTimer = null, lbLast = 0;
+        function loadLeaderboardSoon() {
+            if (lbTimer) return;
+            lbTimer = setTimeout(() => { lbTimer = null; lbLast = Date.now(); loadLeaderboard(); }, Math.max(300, 15000 - (Date.now() - lbLast)));
         }
 
         // =====================================================
@@ -11560,7 +11661,7 @@ ${text}
             const myName = localStorage.getItem('chat_nickname') || '';
             if (!db || !myName || !amount) { if (onDone) onDone(false); return; }
             db.ref(`minigame/${myName}`).transaction(cur => {
-                cur = cur || { coins: 0, weaponLevel: 0, collection: [], gachaHistory: [] };
+                cur = cur || { coins: 0, weaponLevel: 0, weaponVer: 2, collection: [], gachaHistory: [] };
                 if (mutate && mutate(cur) === false) return;
                 cur.coins = (cur.coins || 0) + amount;
                 return cur;
@@ -11727,7 +11828,7 @@ ${text}
 
             // 트랜잭션으로 처리해 중복 출첵(여러 탭/기기) 방지
             db.ref(`minigame/${myName}`).transaction((cur) => {
-                cur = cur || { coins: 0, weaponLevel: 0, collection: [], gachaHistory: [] };
+                cur = cur || { coins: 0, weaponLevel: 0, weaponVer: 2, collection: [], gachaHistory: [] };
                 if (cur.lastCheckIn === today) return; // 이미 출첵함 → 중단
                 cur.checkInStreak = cur.lastCheckIn === yesterday ? (cur.checkInStreak || 0) + 1 : 1;
                 cur.checkInTotal = (cur.checkInTotal || 0) + 1;
@@ -13201,11 +13302,24 @@ ${text}
 
         // =====================================================
         // 🐲 주간 레이드 보스 (팀 협동): 월~일 한 주 동안 다 같이 보스 체력을 깎음
-        //  각자 하루 무료 3번 + 코인 1개로 추가 3번 · 공격력 = 검 강화 명성에 비례 (12% 치명타 2배)
+        //  각자 하루 무료 3번 + 코인 1개로 추가 3번 · 공격력 = 기본 100 + 무기 강화 명성 + 고른 무기의 공격력 (무기마다 특성이 다름)
         //  쓰러뜨리면 이번 주에 공격한 사람 모두 보상 (코인 1 + 강화 머니 레벨×3만원), 최다 데미지(MVP) +코인 1
-        //  쓰러뜨리면 다음 주 보스가 한 단계 강해짐 · 데이터: raid/{주 키}/state·users·log, raid_meta/level
+        //  쓰러뜨리면 다음 주 보스가 한 단계 강해짐 · 보스 체력은 그 주 팀 공격력에 맞춰 정해짐 (너무 빨리 안 죽게)
+        //  데이터: raid/{판 키}/state·users·log, raid_meta/level · 판 키 = 그 주 월요일 날짜 (2026-11-09 주만 새 판 '…b')
         // =====================================================
-        const RAID_FREE = 3, RAID_EXTRA = 3, RAID_CRIT = 0.12;
+        const RAID_FREE = 3, RAID_EXTRA = 3, RAID_CRIT = 0.12, RAID_BASE = 100;
+        // 2026-11-12 무기 개편: 이번 주(11/09 주)는 두 번째 보스로 새 판을 시작. 그다음 주부터는 원래대로 월요일마다 한 판
+        const RAID_RESET = { week: '2026-11-09', round: '2026-11-09b', level: 2, floorPower: 300 };   // floorPower: 초기화 직후라 다들 약하지만 금방 크니까, 체력은 공격력 300 기준으로
+        const raidRoundOf = (d) => { const wk = weekKeyOf(d); return wk === RAID_RESET.week ? RAID_RESET.round : wk; };
+        const raidWeekStart = (round) => new Date(String(round || weekKeyOf()).slice(0, 10) + 'T00:00:00');
+        // 이 판 앞의 판들 (못 받은 보상이 있으면 받을 수 있게). 새 판으로 바뀐 주에는 같은 주의 앞 판도 포함
+        function raidPrevRounds(round) {
+            const out = round === RAID_RESET.round ? [RAID_RESET.week] : [];
+            const pw = weekKeyOf(new Date(raidWeekStart(round).getTime() + 12 * 36e5 - 7 * 864e5));
+            if (pw === RAID_RESET.week) out.push(RAID_RESET.round);
+            out.push(pw);
+            return out;
+        }
         // 보스 목록 (레벨 순서대로 한 판에 하나씩, 다 돌면 처음부터 ★ 붙여서 반복)
         //  img = 무대 그림(정사각형 권장, img/ 폴더), filter = 그림 색 바꾸기 (같은 그림으로 다른 보스를 만들 때)
         //  새 보스 그림이 생기면 여기에 { name, img } 한 줄 추가
@@ -13222,15 +13336,50 @@ ${text}
         const RAID_EXCLUDE = ['정문세'];
         const raidMembers = () => TEAM_MEMBERS.filter(n => !RAID_EXCLUDE.includes(n));
         let raidHpHold = null, raidDeathHold = false, raidRoarTimer = null;   // 연출 중: 체력 바에 보여줄 값 / 토벌 표시 미루기
-        let raidWeek = '', raidState = null, raidUsers = {}, raidLogs = [], raidSeenAt = 0, raidMetaLevel = 1, raidMetaLoaded = false, raidMetaSub = false, raidBusy = false, raidPrev = null, raidTimer = null;
+        let raidWeek = '', raidState = null, raidStateLoaded = false, raidMaking = false, raidUsers = {}, raidLogs = [], raidSeenAt = 0, raidMetaLevel = 1, raidMetaLoaded = false, raidMetaSub = false, raidBusy = false, raidPrev = [], raidTimer = null;
         var raidReady = true;   // var: 이 줄이 실행되기 전(페이지 로딩 중)에 renderRaid가 불려도 안전하게 건너뛰도록
         const raidTxn = (ref, fn) => new Promise(res => ref.transaction(fn, (err, committed, snap) => res(!err && committed ? (snap ? snap.val() : true) : null)));
         function raidBossOf(level) {
             const b = RAID_BOSSES[(level - 1) % RAID_BOSSES.length], star = Math.floor((level - 1) / RAID_BOSSES.length);
             return { img: b.img || RAID_STAGE_LAVA, filter: b.filter || 'none', name: (star ? '★'.repeat(Math.min(star, 5)) + ' ' : '') + b.name };
         }
-        const raidMaxHp = (level) => niceWon(raidMembers().length * 2200 * Math.pow(1.25, level - 1));
-        const raidPower = (d) => Math.round(100 * (1 + Math.sqrt(fameOf(d || {})) / 3));   // 명성 0 → 100, 20 → 249, 100 → 433
+        // ---- 무기별 공격 ----
+        //  공격력 = 기본 100 + 명성 + 무기 공격력(그 무기 '최고 기록' 단계 기준 — 팔거나 부서져도 그대로)
+        //  특성(k.raid): crit 치명타 확률 +, critX 치명타 배수(기본 2), lo 피해 범위 아래쪽(기본 0.8~1.25), mul 피해 배수, extra 한 발 더(+60%) 확률
+        const raidKinds = (d) => SWORD_KINDS.filter(k => kindUnlocked(d, k));
+        const raidPowerWith = (d, k) => RAID_BASE + fameOf(d) + weaponAtk(k, kindBest(d, k));
+        function raidAvgDmg(d, k) {   // 한 번 공격의 평균 피해 (보스 체력 계산·추천 무기용)
+            const r = k.raid || {}, c = RAID_CRIT + (r.crit || 0);
+            return raidPowerWith(d, k) * (r.mul || 1) * ((r.lo || 0.8) + 1.25) / 2 * (1 + c * ((r.critX || 2) - 1)) * (1 + (r.extra || 0) * 0.6);
+        }
+        const raidBestKind = (d) => raidKinds(d).reduce((a, k) => raidAvgDmg(d, k) > raidAvgDmg(d, a) ? k : a, SWORD_KINDS[0]);
+        // 내가 레이드에 들고 갈 무기 (직접 고른 게 없거나 잠겨 있으면 평균 피해가 가장 큰 무기)
+        function raidMyKind() {
+            let id = ''; try { id = localStorage.getItem('raid_weapon') || ''; } catch (e) { /* noop */ }
+            const d = gameData || {}, k = KIND_BY_ID[id];
+            return k && kindUnlocked(d, k) ? k : raidBestKind(d);
+        }
+        function raidPickKind(id) {
+            const k = KIND_BY_ID[id], d = gameData || {};
+            if (!k || raidBusy) return;
+            if (!kindUnlocked(d, k)) { alert(`${josaEun(k.name)} 무기 강화 명성 ${FAME_TIERS[k.unlock].name} 등급부터 쓸 수 있어요.\n(⚔️ 강화 탭에서 무기를 키우면 명성이 올라요)`); return; }
+            try { localStorage.setItem('raid_weapon', id); } catch (e) { /* noop */ }
+            renderRaid();
+        }
+        // 보스 체력 = 팀원별 '한 번 공격 평균 피해'의 합 × 하루 무료 3번 × 남은 날 수(평일 1 · 주말 0.25) × 0.7 × 레벨 보정(레벨당 +8%, 최대 3배)
+        //  → 전원이 매일 무료 공격만 하면 목요일쯤, 70%만 참여하면 주말까지 걸림. 코인 추가 공격이나 무기 강화로 앞당길 수 있음
+        function raidHpFor(level, avgs, now, floorPower) {
+            const end = raidWeekStart(raidRoundOf(now)); end.setDate(end.getDate() + 7);
+            const day = new Date(now); day.setHours(0, 0, 0, 0);
+            let days = 0;
+            for (let i = 0; day < end; day.setDate(day.getDate() + 1), i++) {
+                const w = day.getDay() === 0 || day.getDay() === 6 ? 0.25 : 1;
+                days += i ? w : w * (now.getHours() < 12 ? 1 : now.getHours() < 17 ? 0.6 : 0.3);   // 오늘은 남은 시간만큼
+            }
+            const floor = Math.max(RAID_BASE, floorPower || 0) * 1.148;   // 1.148 = 특성 없는 무기의 평균 피해 배수
+            const sum = avgs.reduce((a, v) => a + Math.max(floor, v || 0), 0);
+            return Math.max(3000, niceWon(sum * RAID_FREE * days * 0.7 * Math.min(3, Math.pow(1.08, level - 1))));
+        }
         const raidToday = () => getLocalDateKey(new Date());
         function raidMyUse(u) {
             const today = raidToday();
@@ -13246,12 +13395,12 @@ ${text}
 
         function setupRaid() {
             if (!raidReady || !db) return;
-            const wk = weekKeyOf();
+            const wk = raidRoundOf();
             if (raidWeek === wk) return;
             if (raidWeek) ['state', 'users', 'log'].forEach(k => db.ref(`raid/${raidWeek}/${k}`).off());
-            raidWeek = wk; raidState = null; raidUsers = {}; raidLogs = [];
+            raidWeek = wk; raidState = null; raidStateLoaded = false; raidUsers = {}; raidLogs = []; raidPrev = [];
             if (!raidMetaSub) raidMetaSub = true, db.ref('raid_meta/level').on('value', snap => { raidMetaLevel = snap.val() || 1; raidMetaLoaded = true; ensureRaidState(); renderRaid(); });
-            db.ref(`raid/${wk}/state`).on('value', snap => { raidState = snap.val(); if (!raidState) ensureRaidState(); renderRaid(); });
+            db.ref(`raid/${wk}/state`).on('value', snap => { if (raidWeek !== wk) return; raidState = snap.val(); raidStateLoaded = true; if (!raidState) ensureRaidState(); renderRaid(); });
             db.ref(`raid/${wk}/users`).on('value', snap => { raidUsers = snap.val() || {}; renderRaid(); });
             raidSeenAt = Date.now();
             db.ref(`raid/${wk}/log`).orderByChild('at').limitToLast(20).on('value', snap => {
@@ -13263,18 +13412,27 @@ ${text}
                 raidSeenAt = Math.max(raidSeenAt, ...raidLogs.map(l => l.at || 0));
                 renderRaid();
             });
-            // 지난주 보상을 아직 안 받았으면 받을 수 있게
-            const prev = weekKeyOf(new Date(new Date(wk + 'T12:00:00').getTime() - 7 * 864e5));
-            Promise.all([db.ref(`raid/${prev}/state`).once('value'), db.ref(`raid/${prev}/users`).once('value')])
-                .then(([a, b]) => { raidPrev = { wk: prev, state: a.val(), users: b.val() || {} }; renderRaid(); }).catch(() => {});
-            if (!raidTimer) raidTimer = setInterval(() => { if (raidWeek && raidWeek !== weekKeyOf()) setupRaid(); renderRaid(); }, 60000);
+            // 앞 판 보상을 아직 안 받았으면 받을 수 있게
+            Promise.all(raidPrevRounds(wk).map(prev => Promise.all([db.ref(`raid/${prev}/state`).once('value'), db.ref(`raid/${prev}/users`).once('value')])
+                .then(([a, b]) => ({ wk: prev, state: a.val(), users: b.val() || {} }))))
+                .then(list => { if (raidWeek === wk) { raidPrev = list.filter(x => x.state); renderRaid(); } }).catch(() => {});
+            if (!raidTimer) raidTimer = setInterval(() => { if (raidWeek && raidWeek !== raidRoundOf()) setupRaid(); renderRaid(); }, 60000);
             if (!raidRoarTimer) raidRoarTimer = setInterval(() => { if (Math.random() < 0.6) raidIdleRoar(); }, 9000);
         }
-        // 이번 주 보스가 아직 없으면 만들기 (여러 명이 동시에 열어도 하나만 생김)
-        function ensureRaidState() {
-            if (!db || !raidWeek || raidState || !raidMetaLoaded) return;
-            const L = raidMetaLevel || 1, hp = raidMaxHp(L);
-            db.ref(`raid/${raidWeek}/state`).transaction(cur => cur ? undefined : { level: L, maxHp: hp, hp, createdAt: Date.now() });
+        // 이번 판 보스가 아직 없으면 만들기 (여러 명이 동시에 열어도 하나만 생김). 체력은 지금 팀원들의 공격력에 맞춤
+        async function ensureRaidState() {
+            if (!db || !raidWeek || raidState || !raidStateLoaded || !raidMetaLoaded || raidMaking) return;
+            raidMaking = true;
+            const wk = raidWeek, reset = wk === RAID_RESET.round;
+            try {
+                const L = reset ? RAID_RESET.level : (raidMetaLevel || 1);
+                const all = (await db.ref('minigame').once('value')).val() || {};
+                const avgs = raidMembers().map(n => { const d = all[n] || {}; return raidAvgDmg(d, raidBestKind(d)); });
+                const hp = raidHpFor(L, avgs, new Date(), reset ? RAID_RESET.floorPower : 0);
+                await raidTxn(db.ref(`raid/${wk}/state`), cur => cur ? undefined : { level: L, maxHp: hp, hp, createdAt: Date.now() });
+                if (reset) db.ref('raid_meta/level').transaction(cur => Math.max(cur || 1, L));   // 다음 주 보스가 이 판보다 낮아지지 않게
+            } catch (e) { console.warn('raid state', e); }
+            finally { raidMaking = false; }
         }
 
         async function raidAttack(extra) {
@@ -13292,9 +13450,10 @@ ${text}
                 if (!confirm(`코인 1개로 추가 공격할까요? (지금 코인 ${gameData.coins}개)`)) return;
             }
             const wk = raidWeek, today = raidToday();
+            const kd = raidMyKind(), tr = kd.raid || {}, power = raidPowerWith(gameMine(me) ? gameData : {}, kd);   // 이번 공격에 쓸 무기
             raidBusy = true;
             raidHpHold = raidState.hp;          // 타격 순간까지 체력 바는 그대로
-            const hero = raidFxBegin();         // 누르자마자 기 모으기 시작 (서버 응답을 기다리는 동안)
+            const hero = raidFxBegin(kd.id);    // 누르자마자 기 모으기 시작 (서버 응답을 기다리는 동안)
             let fxLive = true;
             renderRaid();
             try {
@@ -13312,8 +13471,8 @@ ${text}
                 });
                 if (!reserved) { refund(); throw new Error('오늘 공격 횟수를 다 썼어요.'); }
                 // 2) 보스 체력 깎기
-                const crit = Math.random() < RAID_CRIT;
-                const dmg = Math.max(1, Math.round(raidPower(gameData) * (0.8 + Math.random() * 0.45) * (crit ? 2 : 1)));
+                const crit = Math.random() < RAID_CRIT + (tr.crit || 0), bonus = !!tr.extra && Math.random() < tr.extra, lo = tr.lo || 0.8;
+                const dmg = Math.max(1, Math.round(power * (tr.mul || 1) * (lo + Math.random() * (1.25 - lo)) * (crit ? (tr.critX || 2) : 1) * (bonus ? 1.6 : 1)));
                 let dealt = 0, killed = false, level = raidState.level || 1;
                 const after = await raidTxn(db.ref(`raid/${wk}/state`), cur => {
                     if (!cur || cur.hp <= 0) return;
@@ -13329,14 +13488,14 @@ ${text}
                 }
                 // 3) 기여도·기록
                 await raidTxn(db.ref(`raid/${wk}/users/${key}`), cur => { cur = cur || {}; cur.dmg = (cur.dmg || 0) + dealt; if (crit) cur.crits = (cur.crits || 0) + 1; cur.lastAt = Date.now(); cur.name = me; return cur; });
-                const kind = swordKindOf(gameData || {}).id;
-                db.ref(`raid/${wk}/log`).push({ name: me, dmg: dealt, crit, extra: !!extra, kill: killed, kind, at: Date.now() });
+                const kind = kd.id;
+                db.ref(`raid/${wk}/log`).push({ name: me, dmg: dealt, crit, extra: !!extra, kill: killed, kind, more: bonus, at: Date.now() });
                 if (killed) db.ref('raid_meta/level').transaction(cur => Math.max(cur || 1, level + 1));
                 // 연출: 타격마다 체력 바가 깎이고, 토벌이면 폭발이 끝난 뒤에 '토벌 성공'
                 let pend = dealt;
                 raidHpHold = ((raidState && raidState.hp) || 0) + pend; raidDeathHold = killed;
                 try {
-                    await raidFxStrike(hero, { dmg: dealt, crit, killed, kind,
+                    await raidFxStrike(hero, { dmg: dealt, crit, killed, kind, more: bonus,
                         onHit: (f) => { if (!fxLive) return; pend = Math.max(0, pend - dealt * f); raidHpHold = ((raidState && raidState.hp) || 0) + pend; raidRenderHp(); },
                         onDead: () => { if (!fxLive) return; raidDeathHold = false; raidHpHold = null; renderRaid(); } });
                 } catch (e) { console.error('raid fx', e); }
@@ -13357,13 +13516,17 @@ ${text}
         // ⚔️ 레이드 전투 연출 (캔버스): 기 모으기 → 돌진 → 무기별 스킬 → 타격 정지·흔들림·불꽃 → 복귀
         //  '보여주기'만 담당 (피해량 계산과 무관). 체력 바는 타격 순간에 맞춰 깎이도록 raidHpHold로 잠깐 붙잡아 둠
         // =====================================================
+        // 무기별 스킬 (ranged = 제자리에서 쏘는 무기)
         const RAID_SKILLS = {
-            dagger: { name: '연속 찌르기', color: '#9dffb0', style: 'stab' },
-            long: { name: '반월 베기', color: '#9fe6ff', style: 'slash' },
-            twin: { name: '십자 베기', color: '#ffa6f3', style: 'cross' },
-            great: { name: '대지 가르기', color: '#ffb35c', style: 'smash' },
-            legend: { name: '천벌의 빛', color: '#ffe680', style: 'beam' }
+            sword: { name: '반월 베기', color: '#9fe6ff', style: 'slash' },
+            blade: { name: '십자 베기', color: '#ffa6f3', style: 'cross' },
+            spear: { name: '연속 찌르기', color: '#9dffb0', style: 'stab' },
+            club: { name: '대지 강타', color: '#ffb35c', style: 'smash' },
+            bow: { name: '속사', color: '#c8ff7a', style: 'arrow', ranged: true },
+            gun: { name: '연발 사격', color: '#ffe680', style: 'gun', ranged: true },
+            cannon: { name: '포격', color: '#ff8a5c', style: 'cannon', ranged: true }
         };
+        const raidSkillOf = (kind) => RAID_SKILLS[kind] || RAID_SKILLS.sword;   // 예전 기록(단검·장검…)은 검으로
         const RFX = { ctx: null, W: 0, H: 0, dpr: 1, stage: null, items: [], parts: [], heroes: [], queue: [], clock: 0, raf: 0, last: 0, shake: 0, zoom: 0, stop: 0, lite: false };
         const RFX_T = { x: 0.5, y: 0.45 };      // 보스 가슴께 (타격 지점)
         const RFX_HOME = { x: 0.5, y: 0.84 };   // 내 캐릭터가 서는 자리
@@ -13529,20 +13692,6 @@ ${text}
                 ctx.shadowBlur = 0; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2.4 * RFX.W / 640; ctx.stroke();
             });
         }
-        // 빛기둥: 하늘에서 (x, y)까지
-        function rfxBeam(x, y, o = {}) {
-            const { color = '#ffe680', dur = 640, w = RFX.W * 0.2 } = o;
-            rfxAdd(dur, (ctx, p) => {
-                const grow = Math.min(1, p / 0.14), shrink = p > 0.72 ? 1 - (p - 0.72) / 0.28 : 1, ww = w * grow * shrink * (1 + 0.07 * Math.sin(p * 46));
-                if (ww < 1) return;
-                const g = ctx.createLinearGradient(x - ww / 2, 0, x + ww / 2, 0);
-                g.addColorStop(0, rfxRgba(color, 0)); g.addColorStop(0.28, rfxRgba(color, 0.7)); g.addColorStop(0.5, 'rgba(255,255,255,0.98)'); g.addColorStop(0.72, rfxRgba(color, 0.7)); g.addColorStop(1, rfxRgba(color, 0));
-                ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = g; ctx.fillRect(x - ww / 2, 0, ww, y);
-                const e = ctx.createRadialGradient(x, y, 0, x, y, ww * 1.1);
-                e.addColorStop(0, 'rgba(255,255,255,0.95)'); e.addColorStop(0.5, rfxRgba(color, 0.5)); e.addColorStop(1, rfxRgba(color, 0));
-                ctx.fillStyle = e; ctx.beginPath(); ctx.ellipse(x, y, ww * 1.1, ww * 0.42, 0, 0, Math.PI * 2); ctx.fill();
-            });
-        }
         // 바닥 균열: (x, y)에서 사방으로 갈라짐
         function rfxCracks(x, y, o = {}) {
             const { color = '#ffb35c', dur = 900, len = RFX.W * 0.3 } = o, cracks = [];
@@ -13559,6 +13708,53 @@ ${text}
                 ctx.globalAlpha = a * 0.85; ctx.strokeStyle = '#1a0d08'; ctx.lineWidth = 7 * RFX.W / 640; path(); ctx.stroke();
                 ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = a; ctx.shadowColor = color; ctx.shadowBlur = 12; ctx.strokeStyle = color; ctx.lineWidth = 2.4 * RFX.W / 640; path(); ctx.stroke();
             }, 0);
+        }
+        // 날아가는 것: (x1, y1) → (x2, y2). arc > 0 이면 포물선(높이 px), kind = 'arrow' | 'bullet' | 'shell'
+        function rfxShot(x1, y1, x2, y2, o = {}) {
+            const { color = '#ffffff', dur = 200, arc = 0, kind = 'bullet', size = 1, onHit } = o, u = RFX.W / 640 * size;
+            let fired = false;
+            const at = (p) => [x1 + (x2 - x1) * p, y1 + (y2 - y1) * p - arc * 4 * p * (1 - p)];
+            rfxAdd(dur, (ctx, p) => {
+                const [x, y] = at(p), [bx, by] = at(Math.max(0, p - 0.06)), ang = Math.atan2(y - by, x - bx);
+                ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round';
+                if (kind === 'shell') {         // 포탄: 검은 탄 + 불꼬리 + 연기
+                    const g = ctx.createRadialGradient(x, y, 0, x, y, 30 * u);
+                    g.addColorStop(0, rfxRgba(color, 0.9)); g.addColorStop(1, rfxRgba(color, 0));
+                    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 30 * u, 0, Math.PI * 2); ctx.fill();
+                    ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = '#1b1b22'; ctx.beginPath(); ctx.arc(x, y, 9 * u, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = 'rgba(255,255,255,0.75)'; ctx.beginPath(); ctx.arc(x - 3 * u, y - 3 * u, 2.6 * u, 0, Math.PI * 2); ctx.fill();
+                    if (Math.random() < 0.8) rfxSpark(bx, by, 1, { type: 'smoke', color: '#8a8078', speed: 0.8 * u, grav: -0.02, life: 520, size: 6 * u });
+                    if (Math.random() < 0.8) rfxSpark(bx, by, 1, { color, speed: 2 * u, life: 260, size: 2.4 * u });
+                } else if (kind === 'arrow') {  // 화살: 긴 빛줄기 + 화살촉
+                    const L = 46 * u;
+                    ctx.shadowColor = color; ctx.shadowBlur = 12 * u; ctx.strokeStyle = color; ctx.lineWidth = 3.4 * u;
+                    ctx.beginPath(); ctx.moveTo(x - Math.cos(ang) * L, y - Math.sin(ang) * L); ctx.lineTo(x, y); ctx.stroke();
+                    ctx.shadowBlur = 0; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.4 * u;
+                    ctx.beginPath(); ctx.moveTo(x - Math.cos(ang) * L * 0.6, y - Math.sin(ang) * L * 0.6); ctx.lineTo(x, y); ctx.stroke();
+                    ctx.fillStyle = '#ffffff'; ctx.beginPath();
+                    ctx.moveTo(x + Math.cos(ang) * 9 * u, y + Math.sin(ang) * 9 * u);
+                    ctx.lineTo(x + Math.cos(ang + 2.5) * 7 * u, y + Math.sin(ang + 2.5) * 7 * u);
+                    ctx.lineTo(x + Math.cos(ang - 2.5) * 7 * u, y + Math.sin(ang - 2.5) * 7 * u); ctx.closePath(); ctx.fill();
+                } else {                        // 총알: 짧고 밝은 예광탄
+                    const L = 70 * u;
+                    ctx.shadowColor = color; ctx.shadowBlur = 10 * u; ctx.strokeStyle = color; ctx.lineWidth = 4 * u; ctx.globalAlpha = 0.9;
+                    ctx.beginPath(); ctx.moveTo(x - Math.cos(ang) * L, y - Math.sin(ang) * L); ctx.lineTo(x, y); ctx.stroke();
+                    ctx.shadowBlur = 0; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.8 * u;
+                    ctx.beginPath(); ctx.moveTo(x - Math.cos(ang) * L * 0.5, y - Math.sin(ang) * L * 0.5); ctx.lineTo(x, y); ctx.stroke();
+                }
+                if (p >= 1 && !fired) { fired = true; if (onHit) onHit(); }
+            });
+        }
+        // 총구 불꽃 (방향 ang)
+        function rfxMuzzle(x, y, ang, o = {}) {
+            const { color = '#ffe680', size = 1 } = o, u = RFX.W / 640 * size;
+            rfxGlow(x, y, 46 * u, { color: '255,230,150', dur: 110 });
+            rfxSpark(x, y, 7, { color, speed: 9 * u, size: 2.2 * u, dir: ang, spread: 0.7, life: 200, grav: 0.05 });
+            rfxAdd(90, (ctx, p) => {
+                ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 1 - p; ctx.fillStyle = '#ffffff';
+                ctx.translate(x, y); ctx.rotate(ang);
+                ctx.beginPath(); ctx.moveTo(0, -5 * u); ctx.lineTo(34 * u * (0.6 + p), 0); ctx.lineTo(0, 5 * u); ctx.closePath(); ctx.fill();
+            });
         }
         function rfxFlash(a, dur = 280) {
             const el = document.getElementById('raidFlash');
@@ -13688,9 +13884,9 @@ ${text}
         }
 
         // ---------- 내 공격: 누르자마자 기 모으기 → (서버 결과가 오면) 스킬 ----------
-        function raidFxBegin() {
+        function raidFxBegin(kind) {
             if (!rfxReady()) return null;
-            const sk = RAID_SKILLS[swordKindOf(gameData || {}).id] || RAID_SKILLS.long;
+            const sk = raidSkillOf(kind);
             const h = rfxHero(myGameName(), RFX_HOME.x, RFX_HOME.y);
             h.color = sk.color; h.charge = true; h.lift = 0.05;
             rfxTween(h, { alpha: 1, aura: 1, lift: 0 }, 180);
@@ -13716,7 +13912,7 @@ ${text}
                     finish(); return;
                 }
                 const W = RFX.W, H = RFX.H, u = W / 640, T = RFX_T;
-                const sk = RAID_SKILLS[r.kind] || RAID_SKILLS.long, col = r.crit ? '#ffd54f' : sk.color, P = r.crit ? 1.25 : 1;
+                const sk = raidSkillOf(r.kind), col = r.crit ? '#ffd54f' : sk.color, P = r.crit ? 1.25 : 1;
                 h.charge = false; h.color = col;
                 raidFxBanner(`${sk.name}!`, 'raid-skill', col);
                 rfxRing(h.x * W, h.y * H, 8 * u, 70 * u, { color: col, dur: 280, lw: 4 * u });
@@ -13757,7 +13953,7 @@ ${text}
                     rfxAt(t0 + 290, () => { rfxTween(h, { x: T.x + 0.1, rot: Math.PI * 2 }, 120); rfxStreak((T.x + 0.2) * W, (T.y - 0.19) * H, (T.x - 0.2) * W, (T.y + 0.17) * H, { color: col, w: 15 * u, dur: 300 }); });
                     rfxAt(t0 + 340, () => hit(0.5, 0.8, T.x + 0.02, T.y, true));
                     end = t0 + 340;
-                } else if (sk.style === 'smash') {    // 대지 가르기: 뛰어올라 내려찍기
+                } else if (sk.style === 'smash') {    // 대지 강타: 뛰어올라 내려찍기
                     rfxAt(t0, () => dashTo(T.x, T.y + 0.2));
                     rfxAt(t0 + 150, () => rfxTween(h, { lift: 0.2, scale: 1.3 }, 170));
                     rfxAt(t0 + 340, () => { rfxTween(h, { lift: 0 }, 70, rfxEase.in); rfxStreak(T.x * W, (T.y - 0.34) * H, T.x * W, (T.y + 0.2) * H, { color: col, w: 30 * u, dur: 380 }); });
@@ -13770,16 +13966,53 @@ ${text}
                         hit(1, 1.25, T.x, T.y + 0.03, true);
                     });
                     end = t0 + 410;
-                } else if (sk.style === 'beam') {     // 천벌의 빛: 떠올라 하늘에서 빛기둥
+                } else if (sk.style === 'arrow') {    // 속사: 제자리에서 화살 3발 (한 발 더가 터지면 큰 화살 1발 추가)
                     multi = true;
-                    rfxAt(t0, () => rfxTween(h, { lift: 0.08, scale: 1.12, aura: 1.6 }, 220));
-                    rfxAt(t0 + 230, () => rfxBeam(T.x * W, (T.y + 0.17) * H, { color: col, dur: 700 }));
-                    [[0.3, 0.5, 90], [0.3, 0.5, 250], [0.4, 1.05, 420]].forEach(([frac, pw, at], i) => rfxAt(t0 + 230 + at, () => {
-                        rfxRing(T.x * W, (T.y + 0.17) * H, 10 * u, (150 + i * 60) * u, { color: col, dur: 420, lw: 6 * u, ry: 0.32, layer: 0 });
-                        rfxSpark(T.x * W, (T.y + 0.05) * H, 10, { color: col, type: 'star', speed: 8 * u, size: 3.2 * u, grav: -0.02, life: 700 });
-                        hit(frac, pw, T.x, T.y, i === 2);
-                    }));
-                    end = t0 + 230 + 420;
+                    const n = r.more ? 4 : 3, sx = () => h.x * W, sy = () => (h.y - 0.05) * H;
+                    rfxAt(t0, () => rfxTween(h, { scale: 1.1, aura: 1.2 }, 120));
+                    for (let i = 0; i < n; i++) rfxAt(t0 + 120 + i * 130, () => {
+                        const big = r.more && i === n - 1, px = T.x + (i - (n - 1) / 2) * 0.07 + (Math.random() - 0.5) * 0.03, py = T.y + (Math.random() - 0.5) * 0.09;
+                        if (big) raidPopNum('🏹 한 발 더!', 'total', 0.5, 0.62);
+                        rfxTween(h, { scale: 0.96 }, 50); rfxAt(60, () => rfxTween(h, { scale: 1.1 }, 70));
+                        rfxSpark(sx(), sy(), 5, { color: col, speed: 5 * u, size: 2 * u, dir: -Math.PI / 2, spread: 1.2, life: 240 });
+                        rfxShot(sx(), sy(), px * W, py * H, { kind: 'arrow', color: col, dur: 150, arc: 26 * u, size: big ? 1.7 : 1,
+                            onHit: () => hit(r.more ? (big ? 0.37 : 0.21) : 1 / 3, big ? 0.9 : i === n - 1 ? 0.7 : 0.32, px, py, i === n - 1) });
+                    });
+                    end = t0 + 120 + (n - 1) * 130 + 150;
+                } else if (sk.style === 'gun') {      // 연발 사격: 빠르게 6발, 마지막 한 발은 크게
+                    multi = true;
+                    const n = 6, sx = () => (h.x + 0.03) * W, sy = () => (h.y - 0.04) * H;
+                    rfxAt(t0, () => rfxTween(h, { scale: 1.08, aura: 1 }, 100));
+                    for (let i = 0; i < n; i++) rfxAt(t0 + 110 + i * 75, () => {
+                        const last = i === n - 1, px = T.x + (Math.random() - 0.5) * 0.2, py = T.y + (Math.random() - 0.5) * 0.14;
+                        const ang = Math.atan2(py * H - sy(), px * W - sx());
+                        rfxMuzzle(sx(), sy(), ang, { color: col, size: last ? 1.5 : 1 });
+                        h.y = RFX_HOME.y + 0.008; rfxTween(h, { y: RFX_HOME.y }, 60);   // 반동
+                        rfxShot(sx(), sy(), px * W, py * H, { kind: 'bullet', color: col, dur: 70, size: last ? 1.5 : 1,
+                            onHit: () => hit(last ? 0.25 : 0.15, last ? 0.75 : 0.22, px, py, last) });
+                    });
+                    end = t0 + 110 + (n - 1) * 75 + 70;
+                } else if (sk.style === 'cannon') {   // 포격: 한 방 크게 — 포물선으로 날아가 대폭발
+                    const sx = h.x * W, sy = (h.y - 0.05) * H;
+                    rfxAt(t0, () => rfxTween(h, { scale: 1.2, aura: 1.7 }, 260));
+                    rfxAt(t0 + 280, () => {
+                        rfxMuzzle(sx, sy, -Math.PI / 2, { color: col, size: 2.4 });
+                        rfxRing(sx, (h.y + 0.05) * H, 12 * u, 150 * u, { color: col, dur: 380, lw: 6 * u, ry: 0.3, layer: 0 });
+                        rfxSpark(sx, sy, 10, { type: 'smoke', color: '#8a8078', speed: 2.6 * u, grav: -0.03, life: 700, size: 9 * u, dir: -Math.PI / 2, spread: 2.4 });
+                        if (!RFX.lite) RFX.shake = Math.max(RFX.shake, 8 * u);
+                        h.y = RFX_HOME.y + 0.03; rfxTween(h, { y: RFX_HOME.y, scale: 1 }, 260);   // 반동으로 뒤로 밀림
+                        rfxShot(sx, sy, T.x * W, (T.y + 0.02) * H, { kind: 'shell', color: col, dur: 430, arc: 70 * u, size: 1.5, onHit: () => {
+                            const x = T.x * W, y = (T.y + 0.02) * H;
+                            rfxGlow(x, y, 260 * u, { color: '255,190,120', dur: 380 });
+                            rfxRing(x, y, 20 * u, 330 * u, { color: col, dur: 560, lw: 12 * u });
+                            rfxRing(x, (T.y + 0.2) * H, 20 * u, 300 * u, { color: '#ffd9a0', dur: 620, lw: 8 * u, ry: 0.3, layer: 0 });
+                            rfxSpark(x, y, 40, { color: '#ffb347', speed: 15 * u, size: 3.2 * u, life: 650 });
+                            rfxSpark(x, y, 12, { type: 'smoke', color: '#4a4040', speed: 3 * u, grav: -0.03, life: 1000, size: 13 * u });
+                            if (!RFX.lite) RFX.zoom = Math.max(RFX.zoom, 0.05);
+                            hit(1, 1.5, T.x, T.y + 0.02, true);
+                        } });
+                    });
+                    end = t0 + 280 + 430;
                 } else {                              // 반월 베기: 한 바퀴 돌며 크게 한 번
                     rfxAt(t0, () => dashTo(T.x - 0.05, T.y + 0.18));
                     rfxAt(t0 + 150, () => { rfxTween(h, { rot: Math.PI * 2 }, 260); rfxSlash((T.x - 0.05) * W, (T.y + 0.2) * H, 0.25 * W, -Math.PI / 2 + 0.15, { span: 2.9, w: 0.26, color: col, dur: 340 }); });
@@ -13803,17 +14036,34 @@ ${text}
             raidCardHop(l.name);
             if (!rfxReady()) return;
             const W = RFX.W, H = RFX.H, u = W / 640, T = RFX_T, side = Math.random() < 0.5 ? -1 : 1;
-            const sk = RAID_SKILLS[l.kind] || RAID_SKILLS.long, col = l.crit ? '#ffd54f' : sk.color;
-            const h = rfxHero(l.name, 0.5 + side * 0.34, 0.86);
+            const sk = raidSkillOf(l.kind), col = l.crit ? '#ffd54f' : sk.color;
+            const hx = 0.5 + side * 0.34, hy = 0.86;
+            const h = rfxHero(l.name, hx, hy);
             h.size = 0.1; h.color = col;
             rfxTween(h, { alpha: 1 }, 100);
+            const land = () => {
+                rfxImpact(T.x + side * 0.03, T.y + 0.02, l.crit ? 0.55 : 0.3, col, { noStop: true });
+                raidPopNum(dmgText, 'other' + (l.crit ? ' crit' : ''), 0.5 + side * 0.14, 0.33, l.name);
+            };
+            if (sk.ranged) {   // 활·총·대포: 제자리에서 쏨
+                const kind = sk.style === 'arrow' ? 'arrow' : sk.style === 'cannon' ? 'shell' : 'bullet';
+                const n = kind === 'shell' ? 1 : 3;
+                for (let i = 0; i < n; i++) rfxAt(120 + i * 70, () => {
+                    const sx = hx * W, sy = (hy - 0.04) * H, tx = (T.x + side * 0.03 + (Math.random() - 0.5) * 0.08) * W, ty = (T.y + 0.02 + (Math.random() - 0.5) * 0.06) * H;
+                    if (kind !== 'arrow') rfxMuzzle(sx, sy, Math.atan2(ty - sy, tx - sx), { color: col, size: kind === 'shell' ? 1.6 : 0.8 });
+                    rfxShot(sx, sy, tx, ty, { kind, color: col, dur: kind === 'shell' ? 320 : kind === 'arrow' ? 170 : 90, arc: kind === 'shell' ? 50 * u : kind === 'arrow' ? 18 * u : 0, size: 0.8, onHit: i === n - 1 ? land : null });
+                });
+                rfxAt(700, () => rfxTween(h, { alpha: 0 }, 160));
+                rfxAt(880, () => rfxDropHero(h));
+                if (l.kill) rfxAt(500, () => rfxKillSeq());
+                return;
+            }
             rfxAt(100, () => { h.trailOn = true; rfxTween(h, { x: T.x + side * 0.1, y: T.y + 0.17 }, 170, rfxEase.in); });
             rfxAt(270, () => {
                 rfxSlash((T.x + side * 0.1) * W, (T.y + 0.19) * H, 0.2 * W, -Math.PI / 2 - side * 0.3, { span: 2.4, w: 0.2, color: col, dur: 280, rev: side > 0 });
-                rfxImpact(T.x + side * 0.03, T.y + 0.02, l.crit ? 0.55 : 0.3, col, { noStop: true });
-                raidPopNum(dmgText, 'other' + (l.crit ? ' crit' : ''), 0.5 + side * 0.14, 0.33, l.name);
+                land();
             });
-            rfxAt(450, () => { h.trailOn = false; rfxTween(h, { x: 0.5 + side * 0.34, y: 0.86 }, 240, rfxEase.io); });
+            rfxAt(450, () => { h.trailOn = false; rfxTween(h, { x: hx, y: hy }, 240, rfxEase.io); });
             rfxAt(700, () => rfxTween(h, { alpha: 0 }, 160));
             rfxAt(880, () => rfxDropHero(h));
             if (l.kill) rfxAt(330, () => rfxKillSeq());
@@ -13827,12 +14077,12 @@ ${text}
             for (let i = 0; i < 24; i++) rfxSpark(Math.random() * W, H * (0.8 + Math.random() * 0.2), 1, { color: '#ffcc80', speed: 3.2 * u, dir: -Math.PI / 2, spread: 0.9, grav: -0.04, life: 1100, size: 2.2 * u });
         }
 
-        // 보상 받기 (이번 주 또는 지난주) — 받았다는 표시를 먼저 트랜잭션으로 찍어서 두 번 못 받게
+        // 보상 받기 (이번 판 또는 앞 판) — 받았다는 표시를 먼저 트랜잭션으로 찍어서 두 번 못 받게
         async function raidClaim() {
             const me = myGameName(), key = statKey(me);
             if (!db || raidBusy) return;
-            const pick = [[raidWeek, raidState, raidUsers], raidPrev ? [raidPrev.wk, raidPrev.state, raidPrev.users] : null]
-                .filter(Boolean).map(([wk, st, us]) => ({ wk, st, r: raidRewardOf(st, us, key) })).find(x => x.r && !x.r.claimed);
+            const pick = [[raidWeek, raidState, raidUsers, null], ...raidPrev.map(x => [x.wk, x.state, x.users, x])]
+                .map(([wk, st, us, prev]) => ({ wk, st, prev, r: raidRewardOf(st, us, key) })).find(x => x.r && !x.r.claimed);
             if (!pick) return;
             raidBusy = true; renderRaid();
             try {
@@ -13840,12 +14090,12 @@ ${text}
                 if (!ok) throw new Error('이미 보상을 받았어요.');
                 const r = pick.r;
                 await raidTxn(db.ref(`minigame/${me}`), cur => {
-                    cur = cur || { coins: 0, weaponLevel: 0, collection: [], gachaHistory: [] };
+                    cur = cur || { coins: 0, weaponLevel: 0, weaponVer: 2, collection: [], gachaHistory: [] };
                     cur.coins = (cur.coins || 0) + r.coins;
                     cur.swordMoney = swordMoneyOf(cur) + r.won;
                     return cur;
                 });
-                if (pick.wk !== raidWeek && raidPrev) raidPrev.users[key] = Object.assign({}, raidPrev.users[key], { claimed: Date.now() });
+                if (pick.prev) pick.prev.users[key] = Object.assign({}, pick.prev.users[key], { claimed: Date.now() });
                 showCoinNotification(r.coins, '', `🎉 레이드 보상: 코인 ${r.coins}개 + 강화 머니 ${fmtWon(r.won)}${r.mvp ? ' (👑 최다 데미지)' : ''}`);
             } catch (e) {
                 alert(e.message || '보상을 받지 못했어요. 다시 시도해 주세요.');
@@ -13861,9 +14111,9 @@ ${text}
             if (!db) { weekEl.textContent = '서버에 연결되면 레이드가 열려요.'; return; }
             const key = statKey(myGameName()), st = raidState;
             // 남은 시간 (다음 주 월요일 0시까지)
-            const end = new Date((raidWeek || weekKeyOf()) + 'T00:00:00'); end.setDate(end.getDate() + 7);
+            const end = raidWeekStart(raidWeek); end.setDate(end.getDate() + 7);
             const left = Math.max(0, end - Date.now()), dd = Math.floor(left / 864e5), hh = Math.floor(left % 864e5 / 36e5), mm = Math.floor(left % 36e5 / 6e4);
-            weekEl.innerHTML = `📅 이번 주 레이드 (${(raidWeek || '').slice(5).replace('-', '/')}~) · 남은 시간 <b>${dd ? dd + '일 ' : ''}${hh}시간 ${mm}분</b>`;
+            weekEl.innerHTML = `📅 이번 주 레이드 (${raidWeek === RAID_RESET.round ? '11/12 새 보스' : (raidWeek || '').slice(5, 10).replace('-', '/') + '~'}) · 남은 시간 <b>${dd ? dd + '일 ' : ''}${hh}시간 ${mm}분</b> <small>· 매주 월요일 새 보스</small>`;
             const box = document.getElementById('raidBoss');
             if (!st) {
                 document.getElementById('raidName').textContent = '보스가 나타나는 중…';
@@ -13886,19 +14136,30 @@ ${text}
                 ? `🎉 토벌 성공! ${when ? `${'일월화수목금토'[when.getDay()]}요일 ${String(when.getHours()).padStart(2, '0')}:${String(when.getMinutes()).padStart(2, '0')}` : ''} · 🗡️ 마지막 일격 ${escapeHtml(st.lastHit || '')}<br><small style="color: rgba(255,255,255,0.7); font-weight: normal;">다음 주 월요일에 Lv.${(st.level || 1) + 1} ${raidBossOf((st.level || 1) + 1).name} 등장!</small>`
                 : '';
             // 내 상태 · 버튼
-            const u = raidUsers[key], use = raidMyUse(u), power = raidPower(gameData);
+            const u = raidUsers[key], use = raidMyUse(u), gd = gameData || {}, myKind = raidMyKind(), power = raidPowerWith(gd, myKind);
             const users = Object.entries(raidUsers).filter(([, x]) => x && x.dmg > 0).sort((a, b) => b[1].dmg - a[1].dmg);
             const myRank = users.findIndex(([k]) => k === key);
-            document.getElementById('raidMe').innerHTML = `내 공격력 약 <b>${power.toLocaleString('ko-KR')}</b> <small>(검 강화 명성 ${fameOf(gameData || {})}점 기준)</small> · 오늘 무료 공격 <b>${RAID_FREE - use.free}</b>번 남음 · 추가 공격 ${use.extra}/${RAID_EXTRA}<br>이번 주 내 피해량 <b>${((u && u.dmg) || 0).toLocaleString('ko-KR')}</b>${myRank >= 0 ? ` · ${myRank + 1}위` : ''}`;
+            document.getElementById('raidMe').innerHTML = `내 공격력 <b>${power.toLocaleString('ko-KR')}</b> <small>(기본 ${RAID_BASE} + 명성 ${fameOf(gd)} + ${myKind.icon} ${myKind.name} +${kindBest(gd, myKind)} 공격력 ${weaponAtk(myKind, kindBest(gd, myKind))})</small> · 오늘 무료 공격 <b>${RAID_FREE - use.free}</b>번 남음 · 추가 공격 ${use.extra}/${RAID_EXTRA}<br>이번 주 내 피해량 <b>${((u && u.dmg) || 0).toLocaleString('ko-KR')}</b>${myRank >= 0 ? ` · ${myRank + 1}위` : ''}`;
+            // 들고 갈 무기 (열린 무기 중에서 고름 · 단계는 그 무기 최고 기록)
+            const best = raidBestKind(gd);
+            const wHtml = SWORD_KINDS.map(k => {
+                const open = kindUnlocked(gd, k), lv = kindBest(gd, k);
+                return `<button class="rw-chip ${k.id === myKind.id ? 'on' : ''} ${open ? '' : 'locked'}" onclick="raidPickKind('${k.id}')" title="${k.name} · ${k.perk}${open ? '' : ` · ${FAME_TIERS[k.unlock].name} 등급부터`}">
+                    <span class="rw-ico">${open ? k.icon : '🔒'}</span><b>${k.name}${open ? ` +${lv}` : ''}</b>
+                    <small>${open ? `공격력 ${weaponAtk(k, lv)}${k.id === best.id ? ' · 추천' : ''}` : FAME_TIERS[k.unlock].name}</small><em>${k.perk}</em>
+                </button>`;
+            }).join('');
+            const wEl = document.getElementById('raidWeapons');
+            if (wEl.dataset.html !== wHtml) { wEl.innerHTML = wHtml; wEl.dataset.html = wHtml; }
             const atk = document.getElementById('raidAttackBtn'), ext = document.getElementById('raidExtraBtn');
             atk.disabled = raidBusy || realDead || use.free >= RAID_FREE;
-            atk.textContent = dead ? '🎉 토벌 완료' : raidBusy ? '⚔️ 공격 중…' : use.free >= RAID_FREE ? '⏳ 오늘 무료 공격 끝' : `⚔️ 공격! (${RAID_FREE - use.free}번 남음)`;
+            atk.textContent = dead ? '🎉 토벌 완료' : raidBusy ? `${myKind.icon} 공격 중…` : use.free >= RAID_FREE ? '⏳ 오늘 무료 공격 끝' : `${myKind.icon} ${josaRo(myKind.name)} 공격! (${RAID_FREE - use.free}번 남음)`;
             ext.disabled = raidBusy || realDead || use.extra >= RAID_EXTRA || ((gameData && gameData.coins) || 0) < 1;
             ext.textContent = `🪙 코인 1개로 추가 공격 (${use.extra}/${RAID_EXTRA})`;
-            // 보상 버튼 (이번 주 → 지난주 순)
+            // 보상 버튼 (이번 판 → 앞 판 순)
             const claimBtn = document.getElementById('raidClaimBtn');
             const fxOn = raidHpHold != null || raidDeathHold;   // 공격 연출 중에는 이번 주 보상 버튼을 미리 보여주지 않음
-            const cand = [fxOn ? null : [raidWeek, st, raidUsers, '이번 주'], raidPrev ? [raidPrev.wk, raidPrev.state, raidPrev.users, '지난주'] : null]
+            const cand = [fxOn ? null : [raidWeek, st, raidUsers, '이번 주'], ...raidPrev.map(x => [x.wk, x.state, x.users, `지난 ${raidBossOf((x.state && x.state.level) || 1).name}`])]
                 .filter(Boolean).map(([wk, s2, us, label]) => ({ label, r: raidRewardOf(s2, us, key) })).find(x => x.r && !x.r.claimed);
             if (cand) {
                 claimBtn.style.display = 'inline-block';
@@ -14270,7 +14531,7 @@ ${text}
                     const today = getLocalDateKey(new Date());
                     // 코인은 1등(그 그림의 첫 정답)만 1개, 하루 3개까지 — 2등 이하·그린 사람은 코인 없음 (점수만)
                     const got = firstSolve && await dqTxn(db.ref(`minigame/${me}`), cur => {
-                        cur = cur || { coins: 0, weaponLevel: 0, collection: [], gachaHistory: [] };
+                        cur = cur || { coins: 0, weaponLevel: 0, weaponVer: 2, collection: [], gachaHistory: [] };
                         if (cur.dqDay !== today) { cur.dqDay = today; cur.dqSolveCoins = 0; }
                         if ((cur.dqSolveCoins || 0) >= DQ_COIN_SOLVE) return;
                         cur.dqSolveCoins = (cur.dqSolveCoins || 0) + 1; cur.coins = (cur.coins || 0) + 1;
