@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-12e">
+    <meta name="app-version" content="2026-11-12f">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -4127,6 +4127,54 @@
         .raid-rank-share { display: inline-block; height: 6px; border-radius: 3px; background: linear-gradient(90deg, #ff1744, #ff6d00); vertical-align: middle; margin-left: 6px; }
         /* ===== 🎨 그림 퀴즈 ===== */
         /* ===== 🐢 거북이 수프 ===== */
+        /* 🖼️ 거북이 수프 문제 그림 */
+        .soup-pic { max-width: 720px; margin: 0 auto 10px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(94,234,212,0.3); background: #0a1014; box-shadow: 0 8px 26px rgba(0,0,0,0.45); }
+        .soup-pic img { display: block; width: 100%; height: auto; max-height: 420px; object-fit: contain; background: #000; }
+        .soup-svg { display: block; width: 100%; height: auto; }
+        .soup-svg .a-flick { animation: svFlick 4.6s steps(1) infinite; }
+        .soup-svg .a-pulse { animation: svPulse 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+        .soup-svg .a-float { animation: svFloat 7s ease-in-out infinite; }
+        .soup-svg .a-rain { animation: svRain 0.55s linear infinite; }
+        .soup-svg .a-drift { animation: svDrift 46s linear infinite; }
+        .soup-svg .a-spin { animation: svSpin 9s linear infinite; transform-box: fill-box; transform-origin: center; }
+        .soup-svg .a-sway { animation: svSway 3.4s ease-in-out infinite; transform-box: fill-box; transform-origin: top center; }
+        .soup-svg .a-wig { animation: svWig 0.42s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: bottom center; }
+        .soup-svg .a-twk { animation: svTwk 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+        .soup-svg .a-blink { animation: svBlink 1.1s steps(1) infinite; }
+        .soup-svg .a-rise { animation: svRise 3s ease-out infinite; }
+        .soup-svg .a-fall { animation: svFall 2.6s ease-in infinite; }
+        .soup-svg .a-bob { animation: svBob 2.2s ease-in-out infinite; }
+        .soup-svg .a-pop { animation: svPop 1.8s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+        .soup-svg .a-move { animation: svMove 5s linear infinite; }
+        .soup-svg .a-spinr { animation: svSpin 12s linear infinite reverse; transform-box: fill-box; transform-origin: center; }
+        .soup-svg .a-die { animation: svDie 6s steps(1) infinite; }
+        .soup-svg .a-up { animation: svUp 3.2s linear infinite; }
+        .soup-svg .a-curtain { animation: svCurtain 3.6s ease-in-out infinite; transform-box: fill-box; transform-origin: top left; }
+        @keyframes svFlick { 0%, 100% { opacity: 1; } 46% { opacity: 1; } 48% { opacity: 0.35; } 50% { opacity: 1; } 52% { opacity: 0.5; } 54% { opacity: 1; } 86% { opacity: 0.75; } 88% { opacity: 1; } }
+        @keyframes svPulse { 0%, 100% { opacity: 0.6; transform: scale(0.94); } 50% { opacity: 1; transform: scale(1.06); } }
+        @keyframes svFloat { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(7px, -11px); } }
+        @keyframes svRain { from { transform: translate(0, -60px); } to { transform: translate(-16.8px, 0); } }
+        @keyframes svDrift { from { transform: translateX(-80px); } to { transform: translateX(80px); } }
+        @keyframes svSpin { to { transform: rotate(360deg); } }
+        @keyframes svSway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+        @keyframes svWig { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
+        @keyframes svTwk { 0%, 100% { opacity: 0.25; transform: scale(0.7); } 50% { opacity: 1; transform: scale(1.1); } }
+        @keyframes svBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.15; } }
+        @keyframes svRise { 0% { opacity: 0; transform: translateY(8px); } 30% { opacity: 0.6; } 100% { opacity: 0; transform: translateY(-22px); } }
+        @keyframes svFall { 0% { opacity: 0; transform: translateY(-40px) rotate(0deg); } 15% { opacity: 1; } 100% { opacity: 0; transform: translateY(60px) rotate(40deg); } }
+        @keyframes svBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @keyframes svPop { 0% { opacity: 0; transform: scale(0.5); } 25% { opacity: 1; transform: scale(1.08); } 70% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.15); } }
+        @keyframes svDie { 0% { opacity: 1; } 5% { opacity: 0.25; } 7% { opacity: 0.9; } 9% { opacity: 0.15; } 11% { opacity: 0.6; } 13%, 100% { opacity: 0; } }
+        @keyframes svUp { from { transform: translateY(0); } to { transform: translateY(-48px); } }
+        @keyframes svCurtain { 0%, 100% { transform: skewX(-4deg) scaleX(1); } 50% { transform: skewX(-13deg) scaleX(1.12); } }
+        @keyframes svMove { from { transform: translateX(0); } to { transform: translateX(-200px); } }
+        @media (prefers-reduced-motion: reduce) { .soup-svg * { animation: none !important; } }
+        .soup-post-file { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+        .soup-post-file label { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 14px; border: 1px dashed rgba(255,255,255,0.35); color: rgba(255,255,255,0.8); font-size: 12px; cursor: pointer; white-space: nowrap; }
+        .soup-post-file input { font-size: 12px; color: rgba(255,255,255,0.7); max-width: 210px; }
+        #soupPostPreview { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        #soupPostPreview img { max-width: 260px; max-height: 180px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.25); }
+        #soupPostPreview button { padding: 2px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); background: transparent; color: #fca5a5; font-size: 11px; cursor: pointer; font-family: inherit; }
         .soup-area { padding: 16px; background: linear-gradient(160deg, #14332e, #111c24); border-radius: 20px; border: 3px solid rgba(94,234,212,0.35); margin-bottom: 20px; }
         .soup-head { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; font-size: 16px; margin-bottom: 10px; }
         .soup-head .soup-title { color: #99f6e4; font-weight: bold; }
@@ -5577,6 +5625,7 @@
                 <div class="minigame-panel" id="panel-soup">
                     <div class="soup-area">
                         <div class="soup-head" id="soupHead">거북이 수프를 불러오는 중…</div>
+                        <div class="soup-pic" id="soupPic" style="display: none;"></div>
                         <div class="soup-story" id="soupStory"></div>
                         <div class="soup-hints" id="soupHints"></div>
                         <div class="soup-author" id="soupAuthor" style="display: none;"></div>
@@ -5605,8 +5654,12 @@
                                 <textarea id="soupPostStory" maxlength="400" rows="3" placeholder="문제: 팀원에게 보여 줄 이상한 상황 (예: 남자는 식당에서 수프를 한 숟갈 먹고는 주방장을 불렀다…)"></textarea>
                                 <textarea id="soupPostTruth" maxlength="400" rows="3" placeholder="정답: 숨겨진 진실 전체 (AI 진행자만 보고 이 내용으로 예/아니오를 답해요. 자세히 쓸수록 정확해요)"></textarea>
                                 <input type="text" id="soupPostHint" maxlength="100" placeholder="힌트 (선택 · 질문이 8개 쌓이면 팀이 열 수 있어요)">
+                                <div class="soup-post-file">
+                                    <label>📷 사진 붙이기 (선택) <input type="file" id="soupPostFile" accept="image/*" onchange="soupPickImg(this)"></label>
+                                    <div id="soupPostPreview"></div>
+                                </div>
                                 <button class="soup-post-btn" id="soupPostBtn" onclick="soupPost()">📤 문제 내기</button>
-                                <div class="soup-note">낸 문제는 대기열에 들어가고, 지금 문제가 끝나면 차례대로 나와요 · 내가 낸 문제에는 참여할 수 없어요 · 문제가 풀리면 출제 점수 2점</div>
+                                <div class="soup-note">낸 문제는 대기열에 들어가고, 지금 문제가 끝나면 차례대로 나와요 · 내가 낸 문제에는 참여할 수 없어요 · 문제가 풀리면 출제 점수 2점<br>📷 사진은 문제와 함께 팀 전체에게 보여요 (정답이 보이는 사진은 피해 주세요)</div>
                                 <div id="soupMyQueue"></div>
                             </div>
                         </details>
@@ -5614,7 +5667,7 @@
                             <summary>📚 지난 문제 보기</summary>
                             <div id="soupPast"></div>
                         </details>
-                        <div class="pika-help">🐢 이상한 상황 하나를 두고, 팀이 다 같이 <b>'예/아니오'로 답할 수 있는 질문</b>을 던져 숨겨진 진실을 찾아내는 추리 게임이에요 (실시간으로 모일 필요 없이 각자 편할 때)<br>🤖 진행자는 AI(EXAONE)예요: 질문에 ⭕ 예 · ❌ 아니오 · ➖ 상관없음으로 답하고, 정답 도전도 채점해요. AI라서 가끔 틀린 답을 할 수 있어요<br>🙋 진실을 알 것 같으면 <b>정답 도전</b>! 맞히면 🪙 코인 2개 + 5점 · 누군가 맞히면 정답이 공개되고 다음 문제로 넘어가요<br>❓ 하루 질문 20개 · 정답 도전 5번 · '예'를 끌어낸 질문은 1점 (문제당 3점까지) · 💡 힌트는 팀 질문이 8개 · 16개 쌓이면 열려요<br>🏳️ 너무 어려우면 포기 투표 (3명이 모이면 정답 공개, 코인 없음) · ✍️ 직접 문제를 낼 수도 있어요 (하루 2개)</div>
+                        <div class="pika-help">🐢 이상한 상황 하나를 두고, 팀이 다 같이 <b>'예/아니오'로 답할 수 있는 질문</b>을 던져 숨겨진 진실을 찾아내는 추리 게임이에요 (실시간으로 모일 필요 없이 각자 편할 때)<br>🖼️ 그림은 문제에 나온 상황만 보여 줘요 — 정답은 그림에 없어요<br>🤖 진행자는 AI(EXAONE)예요: 질문에 ⭕ 예 · ❌ 아니오 · ➖ 상관없음으로 답하고, 정답 도전도 채점해요. AI라서 가끔 틀린 답을 할 수 있어요<br>🙋 진실을 알 것 같으면 <b>정답 도전</b>! 맞히면 🪙 코인 2개 + 5점 · 누군가 맞히면 정답이 공개되고 다음 문제로 넘어가요<br>❓ 하루 질문 20개 · 정답 도전 5번 · '예'를 끌어낸 질문은 1점 (문제당 3점까지) · 💡 힌트는 팀 질문이 8개 · 16개 쌓이면 열려요<br>🏳️ 너무 어려우면 포기 투표 (3명이 모이면 정답 공개, 코인 없음) · ✍️ 직접 문제를 낼 수도 있어요 (하루 2개)</div>
                     </div>
                     <div class="leaderboard dodge-ranking">
                         <h4>🏆 이번 주 거북이 수프 랭킹 <small style="font-weight: normal; opacity: 0.6; font-size: 11px;">(월~일 · 컬렉션 아이콘을 지정한 사람만)</small></h4>
@@ -14823,10 +14876,595 @@ ${text}
             { id: 'b25', lv: 3, title: '월요일 아침의 불량', story: '한 사출 공장에서는 매주 월요일 아침 첫 한 시간 동안 만든 제품에서만 치수 불량이 쏟아졌다. 화요일부터 금요일 아침에는 그런 일이 없었다. 자재도, 작업자도, 설비의 설정값도 모두 똑같았다. 원인은 무엇일까?',
               x: '=0XXi4ClayOpguOuxqOI02J7ECr6cuI7gQpirDbjrDClKuOgnyOtV2+ucuOsUuOIuQpmsTrlsDpnrz6irDClKuOnD2egDyOIcCK7kuI7gQ4jrTYlsnJsqDCgdyukwqelgyOpEyuIsIiLUqJ70aJ7I6J7gA5lsT6krDqgrTIosDCu3qOIA2J7QCK7ggbprT6irDCvzqOvdyOlayOI4W66ku46gQbnszbnsTpmsT5msLyW6ICaiwSXiQ6irjoltDrgs35gsDCnhuOhxyOIA2J7KWJ7gA4psTKmszbnrzKmsDCie2Oh2ueq2yOIACr6E+46oiJ7gQpirD5lsjausTYlsDCvdyOlayOlbyuIsICpLuOiXyenLyOIACr6pUJmtjIuqjCh5uOpEyOIcSI70aJ7QG56gwruqDCvluOh5uOpEyOIIWJ7Z+46gA5prz7osLyW6IyaiwiIuQ6irjZlsrYlsDCgnyenLyOII6Z7ECK7EmJ7gAIsqTYurTKhsDCkXyOtdyOrCyOpwuOIUq46QeJ782J7J+Y7g4CpLuOkQuOI02J7BOI7VCK7gQbqrjJkrXJosjYlsDCgwqOhPuOqYyOIYK46AeK7gQ6rsTIsqz5isDCnV2OIsA6sqzYosTrlsD4itDCgwqOmIyOm5yOIcSI70WZ7R6J7cuI7gQYnsDrgs35gsDCnEyOkXyOnD2egDyOIA2J7KWJ7gA4psTKmszbnrzKmsDCie2Oh2ueq2yOIACr6E+46oiJ7gwJosT6isDCmdyelY2Oi4qOIE+46EWJ7ZCr6gAYnsLJsqXJosTKhsDClKuOkXyOq5yOhVyOI82J7UqJ7UuJ7g4CpLuOiXyenLyOIMKr6RCr6oCL7gAIsqTYurTKhsDCvzqelY2Oi4qOIcSI70aJ7QG56gwruqDCie2OhgyOhZyOI8W66Em76kSI7ggYlsn5jrDCgL2OtdyOIQe668OK7iojI0Jye' }
         ];
+        // 기본 문제 25개의 장면 (정답이 보이지 않게 문제에 나온 상황만)
+        const SOUP_SCENES = {
+            // 15층에서 내리는 남자 — 엘리베이터 안 (사람은 뒷모습 일부만)
+            b01: (k) => {
+                k.bg([[0, '#22323c'], [1, '#090f13']]);
+                k.rect(0, 300, 640, 60, k.lin([[0, '#141d23'], [1, '#05080a']]));
+                k.rect(150, 46, 300, 262, '#0c1317');
+                k.rect(160, 54, 138, 254, k.lin([[0, '#31424d'], [0.5, '#5d7887'], [1, '#2b3a44']], 0, 0, 1, 0));
+                k.rect(302, 54, 138, 254, k.lin([[0, '#2b3a44'], [0.5, '#587280'], [1, '#31424d']], 0, 0, 1, 0));
+                k.rect(298, 54, 4, 254, '#05080a');
+                k.rect(255, 12, 90, 28, '#04070a', 'rx="5" stroke="#3b4d58" stroke-width="1.5"');
+                k.text(292, 33, '15', 20, '#ffb347', 'class="a-flick"');
+                k.path('M 318 31 l 8 -13 l 8 13 Z', '#ffb347', 'class="a-blink"');
+                k.glow(300, 0, 230, '#bfe6ff', 0.3);
+                // 버튼 판: 아래부터 1층 … 맨 위가 25층
+                k.rect(488, 40, 92, 290, k.lin([[0, '#3d4f5a'], [1, '#1c282f']]), 'rx="8" stroke="#56707f" stroke-width="1.5"');
+                for (let i = 0; i < 26; i++) {
+                    const col = i % 2, row = Math.floor(i / 2), x = 515 + col * 38, y = 314 - row * 21, lit = i === 14;
+                    if (lit) k.glow(x, y, 22, '#ffb347', 0.9, 'class="a-pulse"');
+                    k.circ(x, y, 7.5, lit ? '#ffcf7a' : '#0e161b', `stroke="${lit ? '#fff0c4' : '#6f8997'}" stroke-width="1.4"`);
+                }
+                k.fig({ x: 300, y: 520, h: 400, c: '#04070a', coat: true, hair: 'short', arms: [[6, 2], [-6, -3]], rim: '#ffb347' });
+                k.rect(345, 318, 62, 42, '#04070a', 'rx="5"').rect(366, 308, 20, 12, 'none', 'rx="5" stroke="#04070a" stroke-width="5"');
+            },
+            // 물 한 잔 — 가게 주인이 '왁!' 하고 놀래킴
+            b02: (k) => {
+                k.bg([[0, '#3a2418'], [1, '#120a07']]);
+                k.glow(430, 60, 260, '#ffb060', 0.5);
+                for (let i = 0; i < 4; i++) k.rect(40 + i * 150, 40, 110, 8, '#1c110b').rect(40 + i * 150, 110, 110, 8, '#1c110b');
+                [[60, 18, '#7a3d2a'], [85, 26, '#2f5d50'], [108, 20, '#8a6a2a'], [215, 24, '#2f4a6d'], [240, 18, '#7a3d2a'], [520, 26, '#8a6a2a'], [548, 18, '#2f5d50'], [80, 20, '#2f4a6d', 70], [520, 22, '#7a3d2a', 70]].forEach(([x, h, c, dy]) => k.rect(x, 40 - h + (dy || 0), 16, h, c, 'rx="3" opacity="0.8"'));
+                // 놀래키는 주인 + 외침 (두 사람 사이)
+                k.fig({ x: 500, y: 330, h: 236, c: '#0d0705', arms: [[-125, -165], [125, 165]], hat: 'chef', lean: -10 });
+                k.rect(0, 250, 640, 110, k.lin([[0, '#5a3a22'], [0.12, '#3a2415'], [1, '#150c07']]));
+                k.rect(0, 246, 640, 8, '#7a5230');
+                k.add(`<g class="a-pop"><path d="M 330 92 l 24 -60 l 8 50 l 50 -36 l -28 54 l 60 0 l -50 28 l 44 38 l -58 -8 l 6 54 l -36 -44 l -32 46 l 2 -56 l -58 12 l 42 -42 l -52 -24 l 60 -4 l -32 -50 l 54 32 l 4 -50 Z" fill="#ffd166"/><text x="336" y="122" font-size="50" font-weight="900" text-anchor="middle" fill="#7a1f0a" font-family="'Segoe UI','Malgun Gothic',sans-serif">왁!</text></g>`);
+                // 물잔
+                k.path('M 386 196 L 422 196 L 417 248 L 391 248 Z', 'rgba(200,235,255,0.28)', 'stroke="#d8f1ff" stroke-width="2"');
+                k.path('M 389 214 L 419 214 L 416 246 L 392 246 Z', 'rgba(120,200,255,0.6)').spark(426, 200, 7, '#ffffff', 0.4);
+                // 깜짝 놀란 손님 (왼쪽, 뒤로 젖혀짐)
+                k.fig({ x: 150, y: 480, h: 340, c: '#080403', arms: [[-120, -160], [110, 150]], lean: -8, hair: 'short', coat: true, wrap: 'a-bob', rim: '#ffd166' });
+            },
+            // 다시는 안 올게요 — 식당 앞에서 손 흔드는 사장과 떠나는 손님
+            b03: (k) => {
+                k.bg([[0, '#2b2f5a'], [0.55, '#c7663f'], [1, '#2a1a1a']]);
+                k.glow(120, 210, 200, '#ffd08a', 0.55);
+                k.stars(18, 110);
+                k.rect(0, 286, 640, 74, k.lin([[0, '#2b2424'], [1, '#0d0a0a']]));
+                // 식당 건물
+                k.rect(250, 96, 340, 196, k.lin([[0, '#3b2a26'], [1, '#1c1312']]));
+                k.path('M 236 104 L 604 104 L 580 70 L 260 70 Z', '#7a2b22');
+                for (let i = 0; i < 9; i++) k.path(`M ${244 + i * 40} 104 l 40 0 l 0 16 q -20 14 -40 0 Z`, i % 2 ? '#f1e6d8' : '#b5382b');
+                k.rect(292, 150, 92, 142, k.lin([[0, '#ffe2a6'], [1, '#e89a45']]), 'rx="4"').glow(338, 222, 120, '#ffc56b', 0.55, 'class="a-pulse"');
+                k.rect(420, 150, 140, 80, k.lin([[0, '#ffe7b5'], [1, '#f0a651']]), 'rx="4"').line(490, 150, 490, 230, '#3b2a26', 4).line(420, 190, 560, 190, '#3b2a26', 4);
+                k.rect(440, 64, 100, 30, '#f1e6d8', 'rx="6"').text(490, 86, '밥 집', 20, '#7a2b22');
+                k.steam(455, 150, '#ffffff', 2);
+                // 문 앞에서 손 흔드는 사장
+                k.add(`<g class="a-bob">`).fig({ x: 338, y: 292, h: 128, c: '#140c0a', arms: [[150, 190], [-12, -6]], hat: 'chef' }).add('</g>');
+                // 걸어 나가며 돌아보고 손 흔드는 손님
+                k.fig({ x: 128, y: 338, h: 190, c: '#07090f', arms: [[150, 175], [-14, -8]], legs: [[16, 6], [-18, -4]], hair: 'short', rim: '#ffb070' });
+            },
+            // 주문하지 않은 식사 — 작은 접이식 탁자 위의 식판 (가까이서)
+            b04: (k) => {
+                k.bg([[0, '#1a2233'], [1, '#0a0d14']]);
+                [[90, 60, 34, '#ffd08a'], [520, 80, 40, '#9ad0ff'], [300, 40, 26, '#ffb3a0'], [430, 110, 20, '#ffe9b0'], [180, 120, 22, '#9ad0ff']].forEach(([x, y, r, c], i) => k.glow(x, y, r, c, 0.5, `class="a-pulse" style="animation-delay:-${i * 0.6}s"`));
+                k.rect(70, 196, 500, 20, k.lin([[0, '#6b7686'], [1, '#3c4452']]), 'rx="8"').rect(70, 212, 500, 8, '#1c212b', 'rx="4"');
+                k.rect(300, 220, 40, 140, k.lin([[0, '#2a303c'], [1, '#0d1016']]));
+                // 식판
+                k.rect(130, 150, 380, 50, k.lin([[0, '#e9edf2'], [1, '#aeb6c2']]), 'rx="12"');
+                k.rect(150, 116, 150, 60, k.lin([[0, '#f6d38a'], [1, '#c98b3a']]), 'rx="10"').rect(150, 116, 150, 14, '#fff3cf', 'rx="7" opacity="0.7"');
+                k.rect(160, 132, 60, 34, '#e06b4a', 'rx="8"').rect(226, 132, 64, 34, '#7fb069', 'rx="8"');
+                k.circ(352, 150, 30, '#f4f4f0').circ(352, 150, 21, '#d9a35b').circ(352, 150, 21, 'none', 'stroke="#b8793a" stroke-width="2"');
+                k.path('M 408 108 L 458 108 L 452 176 L 414 176 Z', k.lin([[0, '#ffffff'], [1, '#c9d2dc']])).rect(404, 102, 58, 10, '#8b95a3', 'rx="5"');
+                k.steam(433, 98, '#ffffff', 3).steam(225, 108, '#ffffff', 2);
+                k.rect(478, 128, 6, 56, '#dfe5ec', 'rx="3"').rect(490, 128, 6, 56, '#dfe5ec', 'rx="3"').path('M 474 128 q 4 -22 8 0 Z M 486 128 l 0 -20 l 3 0 l 0 20 Z M 492 128 l 0 -20 l 3 0 l 0 20 Z', '#dfe5ec');
+                k.dust(14, '#ffffff', 0, 0, 640, 180);
+            },
+            // 수요일의 불량 — 검사 장비가 멀쩡한 제품에 불량 판정
+            b05: (k) => {
+                k.bg([[0, '#1c2a36'], [1, '#0a1016']]);
+                k.rect(0, 250, 640, 110, k.lin([[0, '#18222b'], [1, '#07090c']]));
+                // 달력 (수요일) · 시계 (2시)
+                k.rect(48, 40, 96, 104, '#f2f2ee', 'rx="6"').rect(48, 40, 96, 30, '#c0392b', 'rx="6"').text(96, 62, 'WED', 17, '#ffffff').text(96, 124, '수', 50, '#1c2a36');
+                k.circ(214, 92, 44, '#e9eef2', 'stroke="#56707f" stroke-width="5"');
+                for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; k.line(214 + Math.sin(a) * 36, 92 - Math.cos(a) * 36, 214 + Math.sin(a) * 40, 92 - Math.cos(a) * 40, '#1c2a36', 2.4); }
+                k.line(214, 92, 214, 58, '#1c2a36', 3.4).line(214, 92, 238, 78, '#1c2a36', 4.4).circ(214, 92, 4, '#c0392b');
+                // 컨베이어 + 제품
+                k.rect(0, 232, 640, 22, k.lin([[0, '#56636e'], [1, '#2a333b']])).rect(0, 254, 640, 6, '#0c1115');
+                for (let i = 0; i < 12; i++) k.circ(28 + i * 54, 262, 9, '#2a333b', 'stroke="#6b7a86" stroke-width="2"');
+                k.add('<g class="a-move">');
+                for (let i = 0; i < 6; i++) k.rect(40 + i * 200, 194, 62, 38, k.lin([[0, '#d9a35b'], [1, '#a8742f']]), 'rx="4"').line(71 + i * 200, 194, 71 + i * 200, 232, '#8a5a1f', 2);
+                k.add('</g>');
+                // 검사 카메라 + 판정 화면
+                k.rect(356, 0, 14, 104, '#3c4a55').rect(318, 100, 90, 44, k.lin([[0, '#55636e'], [1, '#2a333b']]), 'rx="8"').circ(363, 150, 16, '#0a0f13', 'stroke="#8fa3b0" stroke-width="3"').circ(363, 150, 6, '#ff5a4a', 'class="a-blink"');
+                k.beam(363, 162, 26, 110, 72, '#ff6b5a', 0.4, 'class="a-flick"');
+                k.rect(470, 56, 136, 96, '#070b0e', 'rx="8" stroke="#56707f" stroke-width="3"').rect(480, 66, 116, 76, '#3a0f0f', 'rx="4"');
+                k.add('<g class="a-blink">').text(538, 104, 'NG', 34, '#ff5a4a').line(504, 118, 572, 118, '#ff5a4a', 3).add('</g>').text(538, 136, '불량', 13, '#ffb3aa');
+                k.glow(538, 104, 120, '#ff5a4a', 0.28, 'class="a-pulse"');
+                k.fig({ x: 590, y: 352, h: 190, c: '#05080a', arms: [[30, 150], [-10, -4]], hair: 'short', tilt: -8 });
+            },
+            // 불 꺼진 방의 독서 — 정전된 방, 안락의자에서 책 읽는 여자
+            b06: (k) => {
+                k.bg([[0, '#0b1124'], [1, '#04060d']]);
+                k.rect(0, 286, 640, 74, k.lin([[0, '#0b1020'], [1, '#03040a']]));
+                // 창밖도 정전 (불 꺼진 건물들)
+                k.rect(396, 44, 190, 170, k.lin([[0, '#111c3a'], [1, '#0a1226']]), 'rx="4" stroke="#1c2a52" stroke-width="5"');
+                [[404, 150, 30, 60], [438, 124, 36, 86], [478, 160, 28, 50], [510, 110, 34, 100], [548, 146, 32, 64]].forEach(([x, y, w, h]) => k.rect(x, y, w, h, '#070c1a'));
+                k.line(491, 44, 491, 214, '#1c2a52', 4).line(396, 128, 586, 128, '#1c2a52', 4);
+                // 스탠드: 깜빡이다 꺼짐
+                k.glow(120, 110, 170, '#ffd9a0', 0.75, 'class="a-die"');
+                k.line(120, 150, 120, 300, '#1a2444', 5).rect(98, 296, 44, 8, '#1a2444', 'rx="4"').path('M 92 150 L 148 150 L 136 96 L 104 96 Z', '#222f58');
+                k.path('M 92 150 L 148 150 L 136 96 L 104 96 Z', '#ffe2b0', 'class="a-die"');
+                // 안락의자 + 책 읽는 여자
+                k.path('M 214 300 L 214 150 Q 214 118 246 118 L 300 118 Q 332 118 332 150 L 332 300 Z', '#16203f').rect(196, 218, 36, 86, '#1a2648', 'rx="14"').rect(318, 218, 36, 86, '#1a2648', 'rx="14"').rect(214, 244, 122, 60, '#131c38', 'rx="10"');
+                k.fig({ x: 272, y: 246, h: 190, c: '#25345f', sit: true, legs: [[78, 6], [70, 2]], arms: [[50, 118], [38, 110]], hair: 'long', tilt: 10, skirt: false });
+                k.path('M 300 214 L 344 206 L 348 226 L 304 234 Z', '#3a4a7a').path('M 300 214 L 258 208 L 256 228 L 304 234 Z', '#32416d').line(301, 214, 304, 234, '#18223f', 2);
+                k.add('<g class="a-die" opacity="0.9">').line(64, 70, 44, 54, '#ffe2b0', 3).line(176, 70, 196, 54, '#ffe2b0', 3).line(120, 50, 120, 28, '#ffe2b0', 3).add('</g>');
+                k.dust(10, '#8fa6e0', 0, 40, 640, 220);
+            },
+            // 말 없는 택시 기사 — 뒷자리에서 본 택시 안
+            b07: (k) => {
+                k.bg([[0, '#0d1220'], [1, '#05070c']]);
+                const cid = k.id();
+                k.def(`<clipPath id="${cid}"><path d="M 70 46 L 570 46 L 612 206 L 28 206 Z"/></clipPath>`);
+                k.path('M 70 46 L 570 46 L 612 206 L 28 206 Z', k.lin([[0, '#1a2550'], [1, '#3a2a55']]));
+                k.add(`<g clip-path="url(#${cid})"><g class="a-move">`);
+                for (let i = 0; i < 14; i++) { const x = 60 + i * 74, c = ['#ffd08a', '#ff8a8a', '#8ad0ff', '#ffe9b0'][i % 4]; k.glow(x, 96 + (i % 3) * 26, 26 + (i % 2) * 12, c, 0.75); k.rect(x - 26, 130 + (i % 4) * 8, 46, 90, '#0c1226', 'opacity="0.9"'); }
+                k.add('</g>').path('M 250 206 L 300 140 L 340 140 L 390 206 Z', '#141a2e').line(320, 206, 320, 150, '#ffe9b0', 3, 'stroke-dasharray="10 12"').add('</g>');
+                k.path('M 70 46 L 570 46 L 612 206 L 28 206 Z', 'none', 'stroke="#05070c" stroke-width="12" stroke-linejoin="round"');
+                k.rect(280, 52, 80, 22, '#0a0d16', 'rx="6" stroke="#2a3350" stroke-width="2"');
+                // 계기판 · 미터기 · 핸들
+                k.rect(0, 200, 640, 60, k.lin([[0, '#1a2033'], [1, '#0a0d16']]));
+                k.rect(292, 208, 86, 34, '#05070c', 'rx="5" stroke="#2a3350" stroke-width="2"').text(335, 232, '4,800', 17, '#ff5a4a', 'class="a-flick"');
+                k.circ(150, 262, 50, 'none', 'stroke="#141c30" stroke-width="12"');
+                // 기사: 귀를 가리키며 고개를 젓는 시늉 (도시 불빛이 윤곽을 비춤)
+                k.path('M 70 360 Q 74 268 150 254 Q 226 268 230 360 Z', '#060912', 'stroke="#5a78b8" stroke-width="2" stroke-opacity="0.55"');
+                k.add('<g class="a-sway">').ell(152, 200, 36, 42, '#060912', 'stroke="#7fa2e6" stroke-width="2" stroke-opacity="0.6"').path('M 116 196 Q 116 150 152 152 Q 190 150 188 198 Q 152 172 116 196 Z', '#060912').add('</g>');
+                k.line(238, 318, 210, 212, '#060912', 22).circ(208, 206, 14, '#060912', 'stroke="#7fa2e6" stroke-width="2" stroke-opacity="0.6"');
+                k.add('<g class="a-blink">').path('M 228 178 q 14 -8 12 -24', 'none', 'stroke="#ffd166" stroke-width="3.4" stroke-linecap="round"').path('M 240 190 q 26 -14 22 -46', 'none', 'stroke="#ffd166" stroke-width="3.4" stroke-linecap="round"').line(246, 130, 270, 106, '#ff6b6b', 4).line(270, 130, 246, 106, '#ff6b6b', 4).add('</g>');
+                // 손님 (앞쪽, 크게) + 말풍선
+                k.path('M 372 360 Q 376 262 470 246 Q 566 262 572 360 Z', '#020305', 'stroke="#5a78b8" stroke-width="2" stroke-opacity="0.5"').ell(470, 196, 48, 56, '#020305', 'stroke="#7fa2e6" stroke-width="2" stroke-opacity="0.55"').path('M 420 190 Q 424 128 472 132 Q 522 128 520 196 Q 470 160 420 190 Z', '#020305');
+                [[540, 96, 84, 44, 0], [470, 60, 66, 36, 0.6], [566, 156, 60, 34, 1.2]].forEach(([x, y, w, h, d], i) => k.add(`<g class="a-pop" style="animation-delay:-${d}s"><rect x="${x - w / 2}" y="${y - h / 2}" width="${w}" height="${h}" rx="${h / 2}" fill="#f4f6fb"/><path d="M ${x - 14} ${y + h / 2 - 2} l -8 14 l 18 -12 Z" fill="#f4f6fb"/><text x="${x}" y="${y + 6}" font-size="18" font-weight="900" text-anchor="middle" fill="#28324d">${['어쩌고…', '그래서', '저쩌고'][i]}</text></g>`));
+            },
+            // 젖지 않는 머리카락 — 장대비 속을 걷는 남자 (어깨 아래만)
+            b08: (k) => {
+                k.bg([[0, '#1b2a3d'], [1, '#080d14']]);
+                [[40, 40, 70, 260], [130, 90, 60, 210], [470, 60, 80, 240], [570, 110, 70, 190]].forEach(([x, y, w, h]) => { k.rect(x, y, w, h, '#0c131d'); for (let r = 0; r < 5; r++) for (let c = 0; c < 2; c++) if ((r + c + x) % 3) k.rect(x + 10 + c * (w / 2 - 4), y + 16 + r * 36, w / 2 - 16, 16, '#ffd08a', 'opacity="0.35"'); });
+                k.line(300, 0, 300, 70, '#0a0f17', 6).glow(300, 74, 200, '#ffe2a6', 0.6, 'class="a-flick"').ell(300, 74, 22, 9, '#fff3cf');
+                k.beam(300, 80, 30, 330, 250, '#ffe2a6', 0.3);
+                k.rect(0, 296, 640, 64, k.lin([[0, '#16212f'], [1, '#05080c']]));
+                k.ell(310, 336, 150, 13, '#ffe2a6', 'opacity="0.2"').ell(120, 346, 80, 8, '#9ad0ff', 'opacity="0.16"').ell(520, 332, 70, 7, '#9ad0ff', 'opacity="0.16"');
+                // 남자: 어깨 아래만 보임 (화면 위로 잘림)
+                k.fig({ x: 318, y: 334, h: 420, c: '#04070b', coat: true, arms: [[14, 8], [-16, -10]], legs: [[20, 6], [-20, -2]], rim: '#bfe3ff' });
+                [[282, 8], [318, 4], [352, 8]].forEach(([x, y], i) => k.add(`<g class="a-pop" style="animation-delay:-${i * 0.4}s;animation-duration:0.9s">`).line(x, y, x - 8, y - 12, '#d8f1ff', 2).line(x + 6, y, x + 12, y - 13, '#d8f1ff', 2).add('</g>'));
+                [[214, 338], [420, 342], [300, 350]].forEach(([x, y], i) => k.ell(x, y, 22, 5, 'none', `stroke="#bfe3ff" stroke-width="1.6" class="a-pop" style="animation-delay:-${i * 0.5}s"`));
+                k.rain(90, '#cfe9ff', 0.55);
+            },
+            // 꼴찌가 받은 트로피 — 결승선과 트로피, 가장 늦게 들어오는 선수
+            b09: (k) => {
+                k.bg([[0, '#3a7bd5'], [0.6, '#9ad0ff'], [1, '#d8f1c0']]);
+                k.glow(520, 70, 150, '#fff6c9', 0.9).circ(520, 70, 34, '#fff3b0');
+                k.add('<g class="a-drift">').ell(160, 70, 60, 16, '#ffffff', 'opacity="0.85"').ell(210, 60, 44, 14, '#ffffff', 'opacity="0.85"').ell(400, 110, 50, 12, '#ffffff', 'opacity="0.7"').add('</g>');
+                k.path('M 0 250 Q 160 210 320 240 T 640 226 L 640 360 L 0 360 Z', '#6fae5e').rect(0, 280, 640, 80, k.lin([[0, '#5a5f66'], [1, '#2c3036']]));
+                k.line(0, 320, 640, 320, '#f1f1ee', 3, 'stroke-dasharray="26 22" opacity="0.7"');
+                // 결승선
+                k.rect(404, 96, 8, 196, '#2c3036').rect(596, 96, 8, 196, '#2c3036').rect(404, 96, 200, 44, '#f4f4f0');
+                for (let i = 0; i < 20; i++) for (let j = 0; j < 4; j++) if ((i + j) % 2) k.rect(404 + i * 10, 96 + j * 11, 10, 11, '#1c1f24');
+                for (let i = 0; i < 10; i++) for (let j = 0; j < 2; j++) if ((i + j) % 2) k.rect(404 + i * 20, 284 + j * 8, 20, 8, '#f4f4f0');
+                // 트로피
+                k.glow(506, 196, 80, '#ffe680', 0.8, 'class="a-pulse"');
+                k.rect(482, 250, 48, 14, '#7a5230', 'rx="3"').rect(498, 232, 16, 20, '#e0a020').path('M 478 176 L 534 176 Q 534 224 506 232 Q 478 224 478 176 Z', k.lin([[0, '#fff3b0'], [1, '#e0a020']])).path('M 478 184 q -22 4 -8 30 q 8 10 18 6', 'none', 'stroke="#e0a020" stroke-width="6"').path('M 534 184 q 22 4 8 30 q -8 10 -18 6', 'none', 'stroke="#e0a020" stroke-width="6"');
+                k.spark(476, 168, 9, '#ffffff', 0).spark(540, 200, 7, '#ffffff', 1.1);
+                // 맨 뒤에서 천천히 오는 선수
+                const wheel = (x, y) => { k.add('<g class="a-spin" style="animation-duration:6s">').circ(x, y, 34, 'none', 'stroke="#12161b" stroke-width="5"'); for (let i = 0; i < 4; i++) { const a = i * Math.PI / 4; k.line(x - Math.cos(a) * 32, y - Math.sin(a) * 32, x + Math.cos(a) * 32, y + Math.sin(a) * 32, '#12161b', 1.6); } k.add('</g>'); };
+                wheel(96, 296); wheel(212, 296);
+                k.path('M 96 296 L 140 240 L 196 240 L 212 296 M 140 240 L 158 296 L 196 240 M 132 228 L 150 228 M 196 240 L 204 216 L 222 214', 'none', 'stroke="#c0392b" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"');
+                k.fig({ x: 142, y: 226, h: 168, c: '#12161b', sit: true, side: true, lean: 32, legs: [[40, -20], [10, -10]], arms: [[50, 70], [44, 66]], hat: 'cap', wrap: 'a-bob' });
+                for (let i = 0; i < 22; i++) k.rect(380 + k.rnd() * 250, 60 + k.rnd() * 200, 7, 4, ['#ff6b6b', '#ffd166', '#5eead4', '#ffffff'][i % 4], `class="a-fall" style="animation-delay:-${(k.rnd() * 2.6).toFixed(1)}s"`);
+            },
+            // 접시를 깨는 손님들 — 벽에 부딪혀 산산조각 나는 접시
+            b10: (k) => {
+                k.bg([[0, '#3a2a2a'], [1, '#120c0c']]);
+                for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) k.rect(c * 78 - (r % 2) * 39, r * 30 + 4, 72, 24, r % 3 ? '#5a3530' : '#4b2c28', 'rx="2" opacity="0.75"');
+                k.glow(430, 120, 240, '#ffb060', 0.45);
+                k.rect(0, 286, 640, 74, k.lin([[0, '#241818'], [1, '#090606']]));
+                // 부딪힌 자리 + 조각
+                k.add('<g class="a-pop" style="animation-duration:1.4s">').path('M 430 120 l 14 -60 l 10 44 l 46 -30 l -28 44 l 56 6 l -52 18 l 34 42 l -50 -22 l -6 54 l -22 -48 l -40 36 l 18 -50 l -54 -6 l 48 -22 l -30 -42 l 46 22 Z', '#fff3cf', 'opacity="0.9"').add('</g>');
+                [[-70, -50, 20], [-30, -84, -30], [40, -78, 50], [86, -30, 10], [94, 34, -40], [44, 80, 70], [-26, 86, 20], [-84, 30, -60], [-110, -10, 30], [10, -30, 0], [120, -70, 80]].forEach(([dx, dy, rot], i) =>
+                    k.add(`<g class="a-float" style="animation-duration:${2.4 + (i % 3) * 0.5}s;animation-delay:-${i * 0.3}s"><path transform="translate(${430 + dx} ${120 + dy}) rotate(${rot})" d="M -14 -8 L 12 -12 L 16 6 L -6 12 Z" fill="#f4f4f0" stroke="#cfd6dd" stroke-width="1.5"/></g>`));
+                // 탁자 위에 쌓인 접시
+                k.rect(18, 250, 150, 12, '#5a3a22', 'rx="4"').rect(34, 262, 10, 50, '#3a2415').rect(142, 262, 10, 50, '#3a2415');
+                for (let i = 0; i < 6; i++) k.ell(92, 246 - i * 8, 44, 7, '#f4f4f0', 'stroke="#b8c0c8" stroke-width="1.5"');
+                // 던진 손님 · 흐뭇하게 보는 주인
+                k.fig({ x: 236, y: 338, h: 214, c: '#070404', arms: [[96, 84], [-40, -70]], legs: [[26, 8], [-22, -6]], lean: 14, hair: 'short' });
+                k.fig({ x: 574, y: 352, h: 200, c: '#050303', arms: [[150, 178], [-12, -6]], hat: 'chef', flip: true, wrap: 'a-bob' });
+                k.add('<g class="a-pulse">').path('M 520 150 q -10 -14 0 -22 q 8 -6 14 2 q 6 -8 14 -2 q 10 8 0 22 l -14 14 Z', '#ff8a8a').add('</g>');
+            },
+            // 아버지의 거짓말 — 앞만 보고 가는 아들(가슴 위만), 뒤에 선 아버지
+            b11: (k) => {
+                k.bg([[0, '#f6a35c'], [0.5, '#f4c98a'], [1, '#6a8f5a']]);
+                k.glow(470, 120, 220, '#fff3cf', 0.9).circ(470, 120, 42, '#fff6dc');
+                k.add('<g class="a-move" style="animation-duration:9s">');
+                for (let i = 0; i < 9; i++) { const x = 40 + i * 200; k.rect(x - 6, 150, 12, 120, '#3b4a2c').ell(x, 130, 56, 62, '#4f6b38').ell(x - 22, 150, 34, 38, '#5c7a42'); }
+                k.add('</g>');
+                k.path('M 0 250 Q 320 226 640 250 L 640 360 L 0 360 Z', k.lin([[0, '#6f9a52'], [1, '#3a5630']]));
+                k.path('M 0 290 Q 320 262 640 290 L 640 360 L 0 360 Z', k.lin([[0, '#d9c49a'], [1, '#a88f63']]));
+                // 뒤에 선 아버지 (한 팔을 앞으로 뻗은 채)
+                k.fig({ x: 150, y: 300, h: 170, c: '#2a2118', arms: [[78, 70], [-10, -4]], legs: [[16, 4], [-14, -4]], hair: 'short', lean: 6 });
+                // 아들: 가슴 위만, 앞만 보고 있음
+                k.add('<g class="a-bob">').fig({ x: 420, y: 566, h: 380, c: '#1a1410', arms: [[30, 10], [-30, -10]], hair: 'short', rim: '#fff3cf' }).add('</g>');
+                for (let i = 0; i < 7; i++) k.line(250 + k.rnd() * 80, 150 + i * 28, 320 + k.rnd() * 60, 150 + i * 28, '#ffffff', 3, `class="a-blink" opacity="0.6" style="animation-delay:-${(i * 0.17).toFixed(2)}s"`);
+                k.path('M 80 60 q 8 -8 16 0 q 8 -8 16 0', 'none', 'stroke="#3b2a1c" stroke-width="2.4" stroke-linecap="round" class="a-float"').path('M 140 90 q 6 -6 12 0 q 6 -6 12 0', 'none', 'stroke="#3b2a1c" stroke-width="2" stroke-linecap="round" class="a-float"');
+            },
+            // 30년 만에 돌아온 책 — 도서관 대출대, 감사패를 건네는 사서
+            b12: (k) => {
+                k.bg([[0, '#2b1f16'], [1, '#0d0906']]);
+                k.path('M 250 0 L 390 0 L 390 120 Q 320 150 250 120 Z', k.lin([[0, '#fff0c4'], [1, '#e8b56a']])).line(320, 0, 320, 134, '#3a2a1c', 4).line(250, 62, 390, 62, '#3a2a1c', 4);
+                k.beam(320, 120, 140, 420, 240, '#ffe2a6', 0.42);
+                const shelf = (x0) => { k.rect(x0, 0, 200, 290, '#1c130c'); for (let r = 0; r < 5; r++) { k.rect(x0, 52 + r * 56, 200, 6, '#3a2a1c'); let x = x0 + 8; while (x < x0 + 186) { const w = 8 + Math.floor(k.rnd() * 10), h = 30 + k.rnd() * 16; k.rect(x, 52 + r * 56 - h, w, h, ['#7a3d2a', '#2f5d50', '#8a6a2a', '#2f4a6d', '#5a3a5a', '#6b5a3a'][Math.floor(k.rnd() * 6)], 'opacity="0.85"'); x += w + 2; } } };
+                shelf(0); shelf(440);
+                k.rect(0, 288, 640, 72, k.lin([[0, '#1a120c'], [1, '#070504']]));
+                // 사서 (대출대 뒤에서 감사패를 내밀고 있음)
+                k.fig({ x: 400, y: 238, h: 180, c: '#0d0906', sit: true, arms: [[-70, -110], [-60, -100]], hair: 'bun', legs: [[0, 0], [0, 0]] });
+                // 대출대 + 오래된 책
+                k.rect(200, 236, 240, 124, k.lin([[0, '#6b4a2c'], [1, '#2a1b10']]), 'rx="6"').rect(190, 226, 260, 16, '#8a6238', 'rx="5"');
+                k.glow(300, 214, 60, '#ffe2a6', 0.7, 'class="a-pulse"');
+                k.path('M 262 226 L 338 226 L 334 204 L 266 204 Z', '#7a2b22').rect(266, 198, 68, 8, '#e9dcc0').rect(262, 196, 76, 4, '#5a1f18').spark(346, 196, 8, '#fff6c9', 0.3);
+                k.add('<g class="a-bob">').rect(322, 142, 44, 56, k.lin([[0, '#ffe680'], [1, '#c8901e']]), 'rx="4"').rect(328, 150, 32, 6, '#7a5230').rect(328, 162, 32, 4, '#7a5230').rect(328, 172, 22, 4, '#7a5230').spark(318, 138, 9, '#ffffff', 0.8).spark(372, 176, 7, '#ffffff', 1.6).add('</g>');
+                // 책을 돌려주러 온 남자 (뒷모습)
+                k.fig({ x: 236, y: 372, h: 250, c: '#050403', arms: [[30, 80], [-8, -4]], coat: true, hair: 'short', rim: '#ffe2a6' });
+                k.dust(26, '#fff0c4', 200, 20, 260, 240);
+            },
+            // 거꾸로 가는 시계 — 이발소 벽의 뒤집힌 시계
+            b13: (k) => {
+                k.bg([[0, '#2a5a5a'], [1, '#143434']]);
+                for (let i = 0; i < 16; i++) k.rect(i * 40, 0, 20, 250, '#2f6464', 'opacity="0.35"');
+                k.rect(0, 250, 640, 12, '#0f2a2a').rect(0, 262, 640, 98, k.lin([[0, '#1b2a2a'], [1, '#081212']]));
+                for (let i = 0; i < 9; i++) for (let j = 0; j < 2; j++) if ((i + j) % 2) k.rect(i * 72, 262 + j * 49, 72, 49, '#243636', 'opacity="0.8"');
+                // 뒤집힌 시계 (숫자가 거울상, 초침은 거꾸로)
+                const cx = 320, cy = 124, R = 92;
+                k.glow(cx, cy, 170, '#ffe9b0', 0.35).circ(cx, cy, R + 10, '#7a5230').circ(cx, cy, R, '#f6f1e4');
+                for (let i = 1; i <= 12; i++) { const a = -i * Math.PI / 6, x = cx + Math.sin(a) * (R - 20), y = cy - Math.cos(a) * (R - 20); k.add(`<g transform="translate(${x.toFixed(1)} ${(y + 7).toFixed(1)}) scale(-1 1)"><text font-size="19" font-weight="900" text-anchor="middle" fill="#2a2018" font-family="Georgia,serif">${i}</text></g>`); }
+                k.line(cx, cy, cx - 34, cy - 30, '#2a2018', 6).line(cx, cy, cx + 20, cy - 62, '#2a2018', 4);
+                k.add('<g class="a-spinr">').circ(cx, cy, R - 6, 'none').line(cx, cy + 16, cx, cy - R + 14, '#c0392b', 2.4).add('</g>').circ(cx, cy, 6, '#c0392b');
+                // 이발소 표시등 (돌아가는 줄무늬)
+                const cid = k.id();
+                k.def(`<clipPath id="${cid}"><rect x="70" y="70" width="34" height="150" rx="6"/></clipPath>`);
+                k.rect(70, 70, 34, 150, '#f4f4f0', 'rx="6"').add(`<g clip-path="url(#${cid})"><g class="a-up">`);
+                for (let i = 0; i < 12; i++) k.path(`M 70 ${92 + i * 24} L 104 ${68 + i * 24} L 104 ${80 + i * 24} L 70 ${104 + i * 24} Z`, i % 2 ? '#c0392b' : '#2f5fae');
+                k.add('</g></g>').rect(64, 56, 46, 16, '#cfd6dd', 'rx="6"').rect(64, 218, 46, 16, '#cfd6dd', 'rx="6"').glow(87, 145, 70, '#ffffff', 0.25);
+                // 선반 · 도구 · 의자 등받이
+                k.rect(470, 150, 130, 8, '#0f2a2a').rect(486, 112, 18, 38, '#e8a04a', 'rx="4"').rect(512, 100, 16, 50, '#7fb8d8', 'rx="4"').rect(538, 120, 22, 30, '#d86a6a', 'rx="5"').rect(568, 106, 14, 44, '#f4f4f0', 'rx="4"');
+                k.path('M 500 200 l 34 28 M 534 200 l -34 28', 'none', 'stroke="#dfe5ec" stroke-width="4" stroke-linecap="round"').circ(497, 232, 7, 'none', 'stroke="#dfe5ec" stroke-width="3.4"').circ(537, 232, 7, 'none', 'stroke="#dfe5ec" stroke-width="3.4"');
+                k.path('M 232 360 L 232 300 Q 232 262 270 262 L 370 262 Q 408 262 408 300 L 408 360 Z', '#0a1414').rect(288, 236, 64, 34, '#0a1414', 'rx="12"');
+            },
+            // 소리 없는 박수 — 두 손을 들어 흔드는 관객
+            b14: (k) => {
+                k.bg([[0, '#1a1036'], [1, '#07040f']]);
+                k.beam(330, 0, 60, 300, 250, '#fff0c4', 0.55).ell(330, 246, 170, 22, '#fff0c4', 'opacity="0.3"');
+                k.path('M 0 0 L 90 0 Q 60 120 80 250 L 0 250 Z', '#5a1626').path('M 640 0 L 550 0 Q 580 120 560 250 L 640 250 Z', '#5a1626');
+                k.rect(0, 244, 640, 20, '#2a1a12').rect(0, 262, 640, 98, '#05030a');
+                // 피아노와 연주자
+                k.path('M 356 150 L 500 150 Q 520 150 516 176 L 508 206 L 356 206 Z', '#0a0612').path('M 360 150 L 500 96 L 506 150 Z', '#120a1f').rect(364, 206, 8, 40, '#0a0612').rect(494, 206, 8, 40, '#0a0612').rect(350, 196, 60, 8, '#f4f4f0', 'opacity="0.8"');
+                k.fig({ x: 290, y: 246, h: 150, c: '#0a0612', arms: [[40, 150], [-12, -6]], hair: 'long', skirt: true, lean: 6, rim: '#fff0c4' });
+                // 관객: 두 손을 들고 반짝반짝 흔듦 (무대 빛을 등지고)
+                k.rect(0, 286, 640, 74, k.lin([[0, '#0a0616', 0], [0.4, '#06030c', 1]]));
+                for (let i = 0; i < 7; i++) {
+                    const x = 46 + i * 92, y = 318 + (i % 2) * 12, c = '#0b0718', rim = 'stroke="#8f7ae6" stroke-width="1.6" stroke-opacity="0.7"';
+                    [-1, 1].forEach((sd, j) => {
+                        const hx = x + sd * 38, hy = y - 78 - (i % 3) * 10;
+                        k.add(`<g class="a-wig" style="animation-delay:-${((i * 2 + j) * 0.09).toFixed(2)}s">`).line(hx, y + 10, hx, hy + 8, c, 12).circ(hx, hy, 12, c, rim);
+                        for (let f = -2; f <= 2; f++) k.line(hx + f * 4.8, hy - 4, hx + f * 7.4, hy - 25 + Math.abs(f) * 3, c, 4.6);
+                        k.add('</g>');
+                    });
+                    k.path(`M ${x - 48} 360 Q ${x} ${y + 14} ${x + 48} 360 Z`, c, rim).ell(x, y, 30, 34, c, rim);
+                }
+                for (let i = 0; i < 14; i++) k.spark(30 + k.rnd() * 580, 200 + k.rnd() * 70, 4 + k.rnd() * 5, '#fff6c9', (k.rnd() * 2).toFixed(1));
+            },
+            // 호텔 앞에서 파산한 남자 — 호텔 앞에 차를 밀어다 세운 남자
+            b15: (k) => {
+                k.bg([[0, '#101a3a'], [1, '#24163a']]);
+                k.stars(30, 150).glow(90, 60, 90, '#fff6dc', 0.6).circ(90, 60, 22, '#fff6dc');
+                k.rect(0, 300, 640, 60, k.lin([[0, '#1a1c26'], [1, '#07080c']]));
+                // 호텔
+                k.rect(330, 20, 250, 284, k.lin([[0, '#2a2440'], [1, '#161226']])).rect(322, 12, 266, 12, '#3a3258');
+                for (let r = 0; r < 6; r++) for (let c = 0; c < 5; c++) k.rect(346 + c * 46, 38 + r * 36, 28, 22, (r * 5 + c * 3) % 4 ? '#ffd98a' : '#1c1830', `rx="2" opacity="${(r * 5 + c * 3) % 4 ? 0.9 : 1}"`);
+                k.path('M 400 262 L 510 262 L 524 244 L 386 244 Z', '#b5382b').rect(424, 262, 62, 42, k.lin([[0, '#ffe2a6'], [1, '#e89a45']])).glow(455, 284, 80, '#ffc56b', 0.5);
+                k.rect(250, 60, 60, 190, '#0c0a16', 'rx="6" stroke="#ff5aa0" stroke-width="2"');
+                'HOTEL'.split('').forEach((ch, i) => k.text(280, 96 + i * 34, ch, 30, '#ff7ab8', `class="a-flick" style="animation-delay:-${i * 0.7}s"`));
+                k.glow(280, 150, 130, '#ff5aa0', 0.3, 'class="a-pulse"');
+                // 차 + 뒤에서 미는 남자
+                k.path('M 250 300 L 250 268 Q 252 258 268 256 L 300 232 Q 310 224 326 224 L 392 224 Q 408 224 418 236 L 440 258 Q 468 260 470 276 L 470 300 Z', k.lin([[0, '#3d6fd8'], [1, '#1c3a80']]));
+                k.path('M 306 252 L 322 234 L 356 234 L 356 252 Z', '#bfe3ff', 'opacity="0.75"').path('M 364 252 L 364 234 L 392 234 Q 402 234 408 242 L 416 252 Z', '#bfe3ff', 'opacity="0.75"');
+                k.circ(296, 300, 20, '#0a0b10', 'stroke="#8b95a3" stroke-width="4"').circ(424, 300, 20, '#0a0b10', 'stroke="#8b95a3" stroke-width="4"').circ(466, 274, 5, '#fff3b0');
+                k.fig({ x: 188, y: 322, h: 176, c: '#05050a', arms: [[70, 84], [64, 80]], legs: [[-26, -16], [20, -6]], lean: 22, hair: 'short' });
+                // 날아가는 지폐
+                for (let i = 0; i < 7; i++) k.add(`<g class="a-rise" style="animation-delay:-${(i * 0.42).toFixed(2)}s"><rect x="${130 + i * 16}" y="${150 - (i % 3) * 22}" width="26" height="14" rx="2" fill="#7fd88f" stroke="#2f7a44" stroke-width="1.5" transform="rotate(${-20 + i * 9} ${143 + i * 16} ${157 - (i % 3) * 22})"/></g>`);
+            },
+            // 한밤중의 전화 — 잠 못 드는 호텔 방
+            b16: (k) => {
+                k.bg([[0, '#141c3a'], [1, '#080b18']]);
+                k.rect(0, 280, 640, 80, k.lin([[0, '#10152c'], [1, '#05070f']]));
+                // 창문 · 달
+                k.rect(430, 40, 150, 160, k.lin([[0, '#1c2c66'], [1, '#101a40']]), 'rx="4" stroke="#0a0e20" stroke-width="6"');
+                k.glow(520, 90, 70, '#fff6dc', 0.8, 'class="a-pulse"').circ(520, 90, 22, '#fff6dc').circ(529, 84, 20, '#1c2c66');
+                k.line(505, 40, 505, 200, '#0a0e20', 5);
+                k.add('<g class="a-curtain">').path('M 410 30 L 452 30 Q 444 120 458 212 L 410 212 Z', '#3a2a5a').add('</g>').path('M 600 30 L 566 30 Q 572 120 560 212 L 600 212 Z', '#3a2a5a');
+                k.beam(505, 200, 130, 300, 140, '#9ab6ff', 0.2);
+                // 침대
+                k.rect(40, 150, 26, 150, '#241a3a', 'rx="8"').rect(52, 232, 330, 60, k.lin([[0, '#e9edf7'], [1, '#9aa6c8']]), 'rx="12"').rect(160, 226, 226, 68, k.lin([[0, '#5a6fb8'], [1, '#2a3870']]), 'rx="12"');
+                k.rect(70, 206, 78, 34, '#f4f6fb', 'rx="14"');
+                // 수화기를 든 남자
+                k.fig({ x: 150, y: 240, h: 170, c: '#06081a', sit: true, legs: [[90, 80], [90, 84]], arms: [[150, 30], [-20, -10]], hair: 'short', rim: '#9ab6ff', lean: -4 });
+                k.rect(184, 118, 12, 34, '#06081a', 'rx="5"');
+                // 협탁: 전화기 · 시계
+                k.rect(250, 238, 96, 62, '#2a1f14', 'rx="4"').rect(244, 230, 108, 10, '#3d2e1e', 'rx="3"');
+                k.rect(262, 206, 50, 24, '#101010', 'rx="6"').circ(287, 218, 7, '#2a2a2a').path('M 196 150 Q 226 240 262 216', 'none', 'stroke="#101010" stroke-width="3" class="a-float" style="animation-duration:4s"');
+                k.rect(318, 204, 30, 26, '#050505', 'rx="3"').text(333, 222, '3:07', 11, '#ff5a4a', 'class="a-blink" style="animation-duration:2s"');
+                k.glow(333, 216, 34, '#ff5a4a', 0.35);
+                k.dust(8, '#9ab6ff', 380, 60, 240, 220);
+            },
+            // 멈춰 서는 로봇 — 작업자 근처에서 급정지한 물류 로봇
+            b17: (k) => {
+                k.bg([[0, '#1d2a33'], [1, '#0a1014']]);
+                for (let i = 0; i < 4; i++) { const x = 20 + i * 110; k.rect(x, 40, 92, 190, '#131c22'); for (let r = 0; r < 3; r++) { k.rect(x, 96 + r * 56, 92, 6, '#2c3b45'); k.rect(x + 8, 62 + r * 56, 30, 34, '#b98a4a', 'opacity="0.8"').rect(x + 46, 70 + r * 56, 36, 26, '#8a6a3a', 'opacity="0.8"'); } }
+                k.rect(0, 248, 640, 112, k.lin([[0, '#27333b'], [1, '#0b1014']]));
+                k.path('M 0 300 L 640 276 L 640 292 L 0 318 Z', '#e0b020', 'opacity="0.75"');
+                for (let i = 0; i < 10; i++) k.path(`M ${i * 70} ${317 - i * 2.6} l 30 -1.2 l -10 -14.6 l -30 1.2 Z`, '#12181c', 'opacity="0.8"');
+                // 로봇 (급정지)
+                k.glow(250, 190, 120, '#ff5a4a', 0.45, 'class="a-blink"');
+                k.rect(160, 226, 200, 62, k.lin([[0, '#f0a030'], [1, '#b06a10']]), 'rx="12"').rect(176, 200, 168, 32, k.lin([[0, '#3a4650'], [1, '#1c242a']]), 'rx="8"');
+                k.rect(330, 244, 26, 14, '#7fe0ff', 'rx="4" class="a-pulse"').rect(236, 184, 28, 18, '#ff5a4a', 'rx="8" class="a-blink"');
+                k.circ(196, 294, 16, '#0a0d10', 'stroke="#6b7a86" stroke-width="4"').circ(324, 294, 16, '#0a0d10', 'stroke="#6b7a86" stroke-width="4"');
+                for (let i = 0; i < 3; i++) k.line(90 + i * 6, 236 + i * 18, 148 + i * 4, 236 + i * 18, '#ffffff', 3.4, 'opacity="0.55" class="a-blink"');
+                k.path('M 360 250 L 520 196 L 520 306 Z', k.lin([[0, '#7fe0ff', 0.5], [1, '#7fe0ff', 0]], 0, 0, 1, 0), 'class="a-pulse" style="animation-duration:1.6s"');
+                k.add('<g class="a-pop" style="animation-duration:1.5s">').circ(250, 140, 26, '#ff5a4a').text(250, 152, '!', 34, '#ffffff').add('</g>');
+                // 작업자 (작업대 앞, 등을 돌리고 있음)
+                k.rect(500, 216, 140, 12, '#3c4a55', 'rx="3"').rect(516, 228, 10, 70, '#232d34').rect(620, 228, 10, 70, '#232d34').rect(560, 190, 44, 26, '#55636e', 'rx="4"');
+                k.fig({ x: 520, y: 330, h: 200, c: '#04070a', arms: [[50, 96], [40, 90]], hair: 'short' });
+            },
+            // 야간조의 비밀 — 같은 설비, 낮과 밤의 정밀도 차이
+            b18: (k) => {
+                k.rect(0, 0, 320, 360, k.lin([[0, '#f6c66a'], [1, '#e98a4a']])).rect(320, 0, 320, 360, k.lin([[0, '#101a44'], [1, '#1a1440']]));
+                k.glow(110, 70, 120, '#fff6c9', 0.9).circ(110, 70, 30, '#fff3b0');
+                k.add('<g class="a-spin" style="animation-duration:30s">'); for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5; k.line(110 + Math.cos(a) * 42, 70 + Math.sin(a) * 42, 110 + Math.cos(a) * 58, 70 + Math.sin(a) * 58, '#fff3b0', 4); } k.add('</g>');
+                k.add('<g transform="translate(320 0)">').stars(26, 150).add('</g>').glow(530, 70, 90, '#dfe9ff', 0.7).circ(530, 70, 24, '#f4f6ff').circ(540, 62, 22, '#101a44');
+                // 같은 공장, 같은 설비
+                const half = (x0, wall, dark, lit) => {
+                    k.path(`M ${x0 + 20} 300 L ${x0 + 20} 176 L ${x0 + 90} 140 L ${x0 + 90} 176 L ${x0 + 160} 140 L ${x0 + 160} 176 L ${x0 + 230} 140 L ${x0 + 230} 176 L ${x0 + 300} 176 L ${x0 + 300} 300 Z`, wall);
+                    k.rect(x0 + 250, 110, 26, 70, wall);
+                    for (let i = 0; i < 4; i++) k.rect(x0 + 40 + i * 62, 196, 40, 26, lit, 'rx="2"');
+                    k.rect(x0, 300, 320, 60, dark);
+                    k.rect(x0 + 96, 250, 128, 50, dark, 'rx="6"').rect(x0 + 130, 226, 60, 26, dark, 'rx="4"').circ(x0 + 160, 274, 13, 'none', `stroke="${lit}" stroke-width="3"`);
+                };
+                half(0, '#8a4a2a', '#4a2414', '#ffe9b0'); half(320, '#0a1030', '#05081a', '#ffd98a');
+                // 정밀도 표시
+                const gauge = (x, v, col, label, sub) => {
+                    k.rect(x - 78, 20, 156, 64, 'rgba(0,0,0,0.5)', 'rx="10"').text(x, 42, label, 15, '#ffffff').rect(x - 60, 52, 120, 12, 'rgba(255,255,255,0.2)', 'rx="6"').rect(x - 60, 52, 120 * v, 12, col, 'rx="6"').text(x, 79, sub, 11, col);
+                };
+                gauge(216, 0.62, '#ffb347', '주간조 정밀도', '보통'); gauge(424, 0.97, '#5eead4', '야간조 정밀도', '우수');
+                k.rect(317, 0, 6, 360, '#ffffff', 'opacity="0.85"');
+                k.fig({ x: 70, y: 318, h: 96, c: '#2a140a', arms: [[40, 90], [-8, -4]] }).fig({ x: 390, y: 318, h: 96, c: '#02030c', arms: [[40, 90], [-8, -4]] });
+            },
+            // 바닥에 쓰러진 둘 — 열린 창, 바닥의 물과 유리 조각
+            b19: (k) => {
+                k.bg([[0, '#2b3a55'], [1, '#111827']]);
+                k.rect(0, 250, 640, 110, k.lin([[0, '#3a2c22'], [1, '#120d0a']]));
+                for (let i = 0; i < 9; i++) k.line(i * 80 - 20, 250, i * 96 - 80, 360, '#0d0906', 2, 'opacity="0.6"');
+                // 활짝 열린 창 + 날리는 커튼
+                k.rect(240, 30, 200, 180, k.lin([[0, '#8fc4f0'], [1, '#d8eefc']]), 'stroke="#f1ede4" stroke-width="10"');
+                k.add('<g class="a-drift" style="animation-duration:30s">').ell(300, 80, 40, 12, '#ffffff', 'opacity="0.9"').ell(380, 120, 34, 10, '#ffffff', 'opacity="0.8"').add('</g>');
+                k.path('M 240 30 L 200 30 L 196 214 L 240 210 Z', '#f1ede4', 'opacity="0.9"').path('M 440 30 L 480 30 L 484 214 L 440 210 Z', '#f1ede4', 'opacity="0.9"');
+                k.add('<g class="a-curtain">').path('M 236 30 Q 300 110 268 230 Q 300 210 330 236 Q 300 130 330 30 Z', '#fff7e6', 'opacity="0.85"').add('</g>');
+                k.beam(340, 210, 190, 420, 150, '#d8eefc', 0.3);
+                for (let i = 0; i < 5; i++) k.path(`M ${470 + i * 26} ${70 + i * 22} q 18 -8 34 2`, 'none', `stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" class="a-blink" opacity="0.7" style="animation-delay:-${i * 0.22}s"`);
+                // 창가의 작은 탁자 (위는 비어 있고 물 자국만)
+                k.rect(84, 218, 120, 10, '#6b4a2c', 'rx="4"').rect(96, 228, 8, 70, '#4a321c').rect(184, 228, 8, 70, '#4a321c').ell(144, 218, 30, 4, '#9ad0ff', 'opacity="0.55"');
+                // 물웅덩이 · 유리 조각
+                k.ell(350, 312, 170, 26, k.rad([[0, '#bfe3ff', 0.75], [1, '#5a9fd8', 0.25]])).ell(300, 306, 60, 7, '#ffffff', 'opacity="0.35"').ell(430, 320, 40, 5, '#ffffff', 'opacity="0.3"');
+                [[250, 300, 20], [300, 330, -30], [372, 296, 50], [420, 334, 10], [470, 306, -50], [330, 310, 80], [226, 326, 40], [500, 326, 15]].forEach(([x, y, r], i) => { k.add(`<path transform="translate(${x} ${y}) rotate(${r})" d="M -12 4 L 2 -10 L 14 6 L -2 10 Z" fill="rgba(220,240,255,0.55)" stroke="#f4fbff" stroke-width="1.6"/>`); if (i % 2) k.spark(x + 8, y - 8, 6, '#ffffff', i * 0.35); });
+                // 몽이와 콩이 (정체는 가려 둠)
+                [[392, 300, '몽이'], [448, 316, '콩이']].forEach(([x, y, n], i) => k.add(`<g class="a-bob" style="animation-delay:-${i * 0.8}s"><ellipse cx="${x}" cy="${y}" rx="17" ry="8" fill="none" stroke="#ffd166" stroke-width="2" stroke-dasharray="4 4"/><text x="${x}" y="${y + 5}" font-size="13" font-weight="900" text-anchor="middle" fill="#ffd166" font-family="sans-serif">?</text><rect x="${x - 20}" y="${y - 36}" width="40" height="18" rx="9" fill="#101827" stroke="#ffd166" stroke-width="1.4"/><text x="${x}" y="${y - 23}" font-size="11" font-weight="bold" text-anchor="middle" fill="#ffd166" font-family="'Segoe UI','Malgun Gothic',sans-serif">${n}</text></g>`));
+            },
+            // 불을 끈 남자 — 피곤해서 스위치를 내리는 남자, 다음 날 신문
+            b20: (k) => {
+                k.bg([[0, '#1a1712'], [1, '#080705']]);
+                k.glow(250, 70, 300, '#ffd98a', 0.75, 'class="a-die" style="animation-duration:5s"');
+                k.rect(0, 290, 640, 70, k.lin([[0, '#14110d'], [1, '#050403']]));
+                k.line(250, 0, 250, 44, '#0a0806', 4).path('M 222 44 L 278 44 L 292 78 L 208 78 Z', '#2a241c').ell(250, 80, 24, 9, '#fff3cf', 'class="a-die" style="animation-duration:5s"');
+                // 책상
+                k.rect(40, 232, 200, 12, '#3d2e1e', 'rx="3"').rect(52, 244, 10, 56, '#2a1f14').rect(218, 244, 10, 56, '#2a1f14').rect(70, 214, 60, 18, '#e9dcc0', 'rx="2" opacity="0.8"').rect(150, 204, 22, 28, '#8a6238', 'rx="4"');
+                k.add('<text x="186" y="196" font-size="20" font-weight="900" fill="#cfd6dd" opacity="0.7" class="a-rise" font-family="sans-serif">z</text><text x="204" y="176" font-size="26" font-weight="900" fill="#cfd6dd" opacity="0.7" class="a-rise" style="animation-delay:-1.2s" font-family="sans-serif">z</text>');
+                // 벽의 큰 스위치를 내리는 남자 (하품)
+                k.rect(396, 110, 54, 84, '#2a2620', 'rx="8" stroke="#5a5244" stroke-width="2"').rect(416, 150, 14, 34, '#cfd6dd', 'rx="6"').circ(423, 126, 6, '#3a3a3a').circ(423, 126, 6, '#7dff9a', 'class="a-die" style="animation-duration:5s"');
+                k.fig({ x: 344, y: 322, h: 214, c: '#030302', arms: [[100, 140], [-150, -40]], hair: 'short', lean: 4, tilt: -10, rim: '#ffd98a' });
+                // 다음 날 아침 신문
+                k.add('<g transform="rotate(7 540 250)">').rect(468, 184, 150, 132, '#efe9da', 'rx="3"').rect(478, 194, 130, 22, '#1c1a16').text(543, 211, '아침 뉴스', 14, '#efe9da').text(543, 244, '대형 사고', 21, '#b5241a').rect(478, 256, 58, 48, '#a8a294').rect(544, 258, 64, 5, '#8a8576').rect(544, 270, 64, 5, '#8a8576').rect(544, 282, 50, 5, '#8a8576').rect(544, 294, 60, 5, '#8a8576').add('</g>');
+            },
+            // 발자국 없는 눈사람 — 달밤의 눈밭 한가운데
+            b21: (k) => {
+                k.bg([[0, '#0d1a40'], [0.7, '#2a3f7a'], [1, '#55689a']]);
+                k.stars(46, 190).glow(520, 70, 110, '#eef4ff', 0.8).circ(520, 70, 30, '#f4f8ff');
+                for (let i = 0; i < 9; i++) { const x = 20 + i * 76 + (i % 2) * 14, h = 70 + (i % 3) * 22; k.path(`M ${x} ${236 - h} L ${x + 26} 236 L ${x - 26} 236 Z`, '#12244a').path(`M ${x} ${236 - h} L ${x + 12} ${236 - h * 0.55} L ${x - 12} ${236 - h * 0.55} Z`, '#dbe6ff', 'opacity="0.55"'); }
+                // 불 켜진 집
+                k.rect(54, 176, 110, 70, '#1a2444').path('M 44 180 L 109 132 L 174 180 Z', '#e8efff').rect(128, 138, 14, 28, '#1a2444').rect(84, 200, 30, 28, '#ffd98a').glow(99, 214, 60, '#ffd98a', 0.6, 'class="a-pulse"');
+                k.steam(135, 132, '#dfe9ff', 2);
+                // 눈밭 (발자국 없이 매끈함)
+                k.path('M 0 236 Q 160 214 320 232 T 640 224 L 640 360 L 0 360 Z', k.lin([[0, '#f4f8ff'], [1, '#9fb4dc']]));
+                k.path('M 0 300 Q 200 280 400 300 T 640 292 L 640 360 L 0 360 Z', '#ffffff', 'opacity="0.35"');
+                // 눈사람
+                k.ell(352, 318, 110, 14, '#3a4f86', 'opacity="0.35"');
+                k.circ(330, 276, 52, k.rad([[0, '#ffffff'], [1, '#b9c9ea']], 0.38, 0.32, 0.8)).circ(330, 204, 38, k.rad([[0, '#ffffff'], [1, '#b9c9ea']], 0.38, 0.32, 0.8)).circ(330, 150, 28, k.rad([[0, '#ffffff'], [1, '#c3d1ee']], 0.38, 0.32, 0.8));
+                k.circ(320, 144, 3.4, '#1a2444').circ(340, 144, 3.4, '#1a2444').path('M 330 152 L 356 158 L 330 162 Z', '#ff8a3c');
+                k.path('M 304 172 Q 330 186 356 172 L 358 184 Q 330 198 302 184 Z', '#d8433c').path('M 350 182 L 366 216 L 352 220 L 342 188 Z', '#b5342e');
+                k.rect(308, 110, 44, 22, '#1a2444', 'rx="3"').rect(298, 128, 64, 7, '#1a2444', 'rx="3"');
+                k.line(296, 200, 250, 176, '#5a3a22', 4).line(250, 176, 240, 162, '#5a3a22', 3).line(364, 200, 410, 176, '#5a3a22', 4).line(410, 176, 422, 164, '#5a3a22', 3);
+                [276, 204, 252].forEach((y) => k.circ(330, y, 4, '#1a2444'));
+                for (let i = 0; i < 14; i++) k.spark(20 + k.rnd() * 600, 250 + k.rnd() * 100, 3 + k.rnd() * 4, '#ffffff', (k.rnd() * 2.4).toFixed(1));
+            },
+            // 20층에서 떨어진 청소부 — 까마득한 20층 유리창
+            b22: (k) => {
+                k.bg([[0, '#4a90e2'], [1, '#bfe3ff']]);
+                k.add('<g class="a-drift">').ell(110, 250, 120, 26, '#ffffff', 'opacity="0.9"').ell(190, 236, 80, 22, '#ffffff', 'opacity="0.9"').ell(560, 300, 110, 22, '#ffffff', 'opacity="0.85"').ell(60, 110, 70, 16, '#ffffff', 'opacity="0.7"').add('</g>');
+                // 고층 건물 (위쪽 층들)
+                k.path('M 230 0 L 520 0 L 560 360 L 200 360 Z', k.lin([[0, '#2a4a7a'], [1, '#1a2f52']]));
+                for (let r = 0; r < 7; r++) for (let c = 0; c < 4; c++) { const y = 14 + r * 52, x0 = 236 - r * 4.2, w = (290 + r * 8.4) / 4; k.rect(x0 + c * w + 5, y, w - 10, 40, k.lin([[0, '#9ad0ff'], [1, '#5a9fd8']]), 'rx="2" opacity="0.92"'); k.path(`M ${x0 + c * w + 10} ${y + 36} L ${x0 + c * w + 30} ${y + 4} L ${x0 + c * w + 40} ${y + 4} L ${x0 + c * w + 20} ${y + 36} Z`, '#ffffff', 'opacity="0.25"'); }
+                k.rect(150, 96, 74, 34, '#101827', 'rx="8"').text(187, 121, '20F', 22, '#ffd166').path('M 224 113 l 14 0', 'none', 'stroke="#ffd166" stroke-width="3"');
+                // 닦던 창: 비누 거품 · 닦개 · 양동이
+                k.rect(312, 118, 66, 40, '#ffffff', 'opacity="0.55"').path('M 316 152 q 10 -30 30 -8 q 14 -20 28 6', 'none', 'stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity="0.9"');
+                k.add('<g class="a-sway" style="transform-origin:center bottom">').rect(336, 124, 30, 8, '#ffd166', 'rx="3"').line(351, 132, 356, 168, '#e0e6ee', 5).add('</g>');
+                k.path('M 394 150 L 426 150 L 421 180 L 399 180 Z', '#e94e4e').path('M 396 150 Q 410 128 424 150', 'none', 'stroke="#8b95a3" stroke-width="3"');
+                for (let i = 0; i < 12; i++) k.circ(300 + k.rnd() * 110, 70 + k.rnd() * 110, 3 + k.rnd() * 6, 'none', `stroke="#ffffff" stroke-width="1.6" class="a-float" opacity="0.9" style="animation-delay:-${(k.rnd() * 6).toFixed(1)}s"`);
+                k.path('M 80 60 q 10 -10 20 0 q 10 -10 20 0', 'none', 'stroke="#1a2f52" stroke-width="2.6" stroke-linecap="round" class="a-float"').path('M 600 140 q 8 -8 16 0 q 8 -8 16 0', 'none', 'stroke="#1a2f52" stroke-width="2.2" stroke-linecap="round" class="a-float"');
+                k.spark(470, 40, 12, '#ffffff', 0.2).spark(276, 196, 9, '#ffffff', 1.1);
+            },
+            // 일방통행을 거꾸로 간 버스 기사 — 일방통행 길과 지켜보는 경찰관
+            b23: (k) => {
+                k.bg([[0, '#2a3a6a'], [0.6, '#e08a5a'], [1, '#3a2a2a']]);
+                [[0, 110, 110, 150], [100, 70, 90, 190], [470, 90, 80, 170], [540, 50, 100, 210]].forEach(([x, y, w, h]) => { k.rect(x, y, w, h, '#1a1626'); for (let r = 0; r < 5; r++) for (let c = 0; c < 3; c++) if ((r * 3 + c + x) % 3) k.rect(x + 10 + c * (w / 3 - 2), y + 14 + r * 30, w / 3 - 14, 14, '#ffd98a', 'opacity="0.55"'); });
+                k.path('M 250 250 L 390 250 L 640 360 L 0 360 Z', k.lin([[0, '#3a3d46'], [1, '#17181c']]));
+                // 도로 위의 큰 화살표 (진행 방향: 위쪽)
+                k.path('M 320 262 L 352 296 L 334 296 L 344 350 L 296 350 L 306 296 L 288 296 Z', '#f4f4f0', 'opacity="0.92"');
+                // 일방통행 표지판
+                k.rect(92, 150, 10, 190, '#8b95a3').rect(30, 96, 134, 60, '#1f5fd0', 'rx="8" stroke="#ffffff" stroke-width="4"');
+                k.path('M 50 126 L 112 126 L 112 112 L 144 126 L 112 140 L 112 126', '#ffffff', 'stroke="#ffffff" stroke-width="8" stroke-linejoin="round"').text(97, 178, '일방통행', 15, '#ffffff');
+                k.spark(160, 100, 9, '#ffffff', 0.5);
+                // 진입 금지
+                k.rect(548, 170, 8, 150, '#8b95a3').circ(552, 150, 30, '#d8342b', 'stroke="#ffffff" stroke-width="4"').rect(532, 144, 40, 12, '#ffffff', 'rx="2"');
+                // 지켜보는 경찰관 (뒷모습)
+                k.fig({ x: 430, y: 372, h: 250, c: '#05060c', arms: [[-34, 60], [34, -60]], hat: 'police', rim: '#ffb070' });
+                k.glow(320, 236, 90, '#ffb070', 0.35, 'class="a-pulse"');
+            },
+            // 이달의 우수 직원 — 벽에 걸린 '이달의 우수 직원' 액자
+            b24: (k) => {
+                k.bg([[0, '#4a3226'], [1, '#1c120d']]);
+                k.glow(320, 110, 260, '#ffd98a', 0.45);
+                for (let i = 0; i < 9; i++) k.path(`M ${20 + i * 70} 0 L ${90 + i * 70} 0 L ${55 + i * 70} 36 Z`, ['#e94e4e', '#ffd166', '#5eead4', '#7fb8ff'][i % 4], 'opacity="0.9"');
+                // 액자
+                k.rect(214, 56, 212, 178, k.lin([[0, '#ffe680'], [1, '#b8860b']]), 'rx="8"').rect(230, 72, 180, 146, '#f6f1e4', 'rx="3"');
+                k.rect(240, 80, 160, 28, '#b5382b', 'rx="4"').text(320, 100, '이달의 우수 직원', 15, '#ffffff');
+                k.ell(320, 196, 50, 26, '#2a2018').circ(320, 150, 28, '#2a2018').text(320, 164, '?', 38, '#ffd166', 'class="a-pulse"');
+                k.add('<g class="a-sway" style="transform-origin:center top">').circ(410, 212, 20, '#e94e4e', 'stroke="#ffd166" stroke-width="4"').path('M 398 228 L 392 262 L 406 252 L 410 266 L 418 234 Z', '#e94e4e').text(410, 219, '1', 18, '#ffffff').add('</g>');
+                k.spark(206, 60, 12, '#ffffff', 0).spark(436, 76, 9, '#ffffff', 0.9).spark(230, 232, 8, '#ffffff', 1.6);
+                // 카운터 · 커피
+                k.rect(0, 286, 640, 74, k.lin([[0, '#6b4a2c'], [1, '#22150c']])).rect(0, 280, 640, 10, '#8a6238');
+                k.rect(40, 200, 90, 82, '#2a2a2e', 'rx="8"').rect(54, 214, 62, 26, '#101012', 'rx="4"').circ(70, 256, 7, '#e94e4e').circ(100, 256, 7, '#5eead4').rect(74, 262, 22, 20, '#f4f4f0', 'rx="3"');
+                k.steam(85, 196, '#ffffff', 2);
+                // 박수 치는 동료들
+                k.fig({ x: 520, y: 372, h: 230, c: '#0a0605', arms: [[-70, -130], [-60, -124]], hair: 'bun', wrap: 'a-bob' });
+                k.fig({ x: 606, y: 380, h: 250, c: '#050302', arms: [[-66, -128], [-58, -120]], hair: 'short' });
+                [[470, 190], [486, 172], [560, 180]].forEach(([x, y], i) => k.add(`<g class="a-pop" style="animation-duration:0.9s;animation-delay:-${i * 0.3}s">`).line(x, y, x - 10, y - 12, '#ffd166', 3).line(x + 6, y - 4, x + 6, y - 20, '#ffd166', 3).line(x + 12, y, x + 22, y - 12, '#ffd166', 3).add('</g>'));
+            },
+            // 월요일 아침의 불량 — 월요일 아침 첫 한 시간의 불량품
+            b25: (k) => {
+                k.bg([[0, '#22303c'], [1, '#0b1116']]);
+                // 아침 해가 드는 창
+                const cid = k.id();
+                k.def(`<clipPath id="${cid}"><rect x="410" y="30" width="190" height="126"/></clipPath>`);
+                k.rect(410, 30, 190, 130, k.lin([[0, '#f9c56a'], [1, '#f58a5a']]), 'rx="4" stroke="#12191f" stroke-width="6"');
+                k.add(`<g clip-path="url(#${cid})">`).glow(505, 150, 90, '#fff3b0', 0.9, 'class="a-pulse"').circ(505, 152, 30, '#fff6c9').add('</g>').rect(404, 154, 202, 12, '#12191f', 'rx="3"').line(505, 30, 505, 160, '#12191f', 5);
+                k.beam(505, 160, 190, 480, 200, '#ffd98a', 0.22);
+                // 달력 (월요일) · 시계 (8시)
+                k.rect(40, 34, 96, 104, '#f2f2ee', 'rx="6"').rect(40, 34, 96, 30, '#2f5fae', 'rx="6"').text(88, 56, 'MON', 17, '#ffffff').text(88, 118, '월', 50, '#1c2a36');
+                k.circ(206, 86, 44, '#e9eef2', 'stroke="#56707f" stroke-width="5"');
+                for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; k.line(206 + Math.sin(a) * 36, 86 - Math.cos(a) * 36, 206 + Math.sin(a) * 40, 86 - Math.cos(a) * 40, '#1c2a36', 2.4); }
+                k.line(206, 86, 206, 54, '#1c2a36', 3.4).line(206, 86, 186, 98, '#1c2a36', 4.4).circ(206, 86, 4, '#c0392b');
+                k.rect(0, 280, 640, 80, k.lin([[0, '#1a242c'], [1, '#07090c']]));
+                // 사출기
+                k.rect(60, 196, 330, 84, k.lin([[0, '#3f8f7a'], [1, '#1f4f44']]), 'rx="8"').rect(84, 172, 120, 30, '#2a6a5a', 'rx="5"').path('M 250 132 L 310 132 L 296 176 L 264 176 Z', '#55636e').rect(240, 124, 80, 10, '#6b7a86', 'rx="3"');
+                k.rect(100, 212, 70, 44, '#0c1418', 'rx="4"').rect(108, 220, 54, 10, '#5eead4', 'class="a-flick"').rect(108, 236, 34, 8, '#ffd166');
+                k.rect(330, 206, 60, 60, '#17363a', 'rx="4"').circ(360, 236, 16, 'none', 'stroke="#8fd8c8" stroke-width="3" class="a-spin"').line(360, 222, 360, 250, '#8fd8c8', 3);
+                // 불량품이 떨어지는 통
+                k.path('M 390 250 L 470 286 L 470 296 L 390 262 Z', '#55636e');
+                for (let i = 0; i < 4; i++) k.add(`<g class="a-fall" style="animation-delay:-${i * 0.65}s"><rect x="${470 + i * 6}" y="${262 + i * 3}" width="22" height="16" rx="3" fill="#cfd6dd" stroke="#8b95a3" stroke-width="1.5"/></g>`);
+                k.path('M 452 300 L 548 300 L 538 352 L 462 352 Z', '#b5382b').rect(446, 294, 108, 10, '#d8433c', 'rx="4"').text(500, 338, '✕ 불량', 17, '#ffffff');
+                k.add('<g class="a-blink">').circ(430, 216, 16, '#ff5a4a').text(430, 224, '!', 20, '#ffffff').add('</g>');
+                k.fig({ x: 596, y: 356, h: 190, c: '#04070a', arms: [[-150, -20], [8, 4]], hair: 'short', tilt: 8, flip: true });
+            }
+        };
+        // ---------- 🖼️ 문제 그림 (코드로 그린 움직이는 장면, 640×360) ----------
+        //  정답이 드러나지 않게 '문제에 나온 상황'만 그림. 공통 도구(k): 배경·빛·사람 실루엣·비·먼지·별 등
+        let soupSvgSeq = 0;
+        function soupSceneSVG(pid) {
+            const draw = SOUP_SCENES[pid];
+            if (!draw) return '';
+            const u = 'sv' + (++soupSvgSeq), defs = [], out = [];
+            let seed = 7; for (const ch of String(pid)) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
+            const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
+            const n1 = (v) => Math.round(v * 10) / 10;
+            let gi = 0;
+            const k = {
+                rnd,
+                add: (s) => { out.push(s); return k; },
+                id: () => `${u}x${gi++}`,
+                def: (s) => { defs.push(s); return k; },
+                // 그러데이션: stops = [[위치 0~1, 색, 불투명도?], …]
+                lin: (stops, x1 = 0, y1 = 0, x2 = 0, y2 = 1) => { const id = `${u}g${gi++}`; defs.push(`<linearGradient id="${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${stops.map(s => `<stop offset="${s[0]}" stop-color="${s[1]}"${s[2] !== undefined ? ` stop-opacity="${s[2]}"` : ''}/>`).join('')}</linearGradient>`); return `url(#${id})`; },
+                rad: (stops, cx = 0.5, cy = 0.5, r = 0.5) => { const id = `${u}g${gi++}`; defs.push(`<radialGradient id="${id}" cx="${cx}" cy="${cy}" r="${r}">${stops.map(s => `<stop offset="${s[0]}" stop-color="${s[1]}"${s[2] !== undefined ? ` stop-opacity="${s[2]}"` : ''}/>`).join('')}</radialGradient>`); return `url(#${id})`; },
+                rect: (x, y, w, h, fill, a = '') => k.add(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" ${a}/>`),
+                circ: (x, y, r, fill, a = '') => k.add(`<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" ${a}/>`),
+                ell: (x, y, rx, ry, fill, a = '') => k.add(`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${fill}" ${a}/>`),
+                path: (d, fill, a = '') => k.add(`<path d="${d}" fill="${fill}" ${a}/>`),
+                line: (x1, y1, x2, y2, stroke, w = 2, a = '') => k.add(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${stroke}" stroke-width="${w}" stroke-linecap="round" ${a}/>`),
+                text: (x, y, s, size, fill, a = '') => k.add(`<text x="${x}" y="${y}" font-size="${size}" fill="${fill}" font-family="'Segoe UI','Malgun Gothic',sans-serif" font-weight="bold" text-anchor="middle" ${a}>${s}</text>`),
+                bg: (stops) => k.rect(0, 0, 640, 360, k.lin(stops)),
+                // 빛 번짐 (가운데가 밝고 바깥으로 사라짐)
+                glow: (x, y, r, color, op = 0.8, a = '') => k.add(`<circle cx="${x}" cy="${y}" r="${r}" fill="${k.rad([[0, color, op], [0.45, color, op * 0.35], [1, color, 0]])}" ${a}/>`),
+                // 빛줄기 (위에서 아래로 퍼지는 사다리꼴)
+                beam: (x, y, w1, w2, h, color, op = 0.35, a = '') => k.add(`<path d="M ${x - w1 / 2} ${y} L ${x + w1 / 2} ${y} L ${x + w2 / 2} ${y + h} L ${x - w2 / 2} ${y + h} Z" fill="${k.lin([[0, color, op], [1, color, 0]])}" ${a}/>`),
+                // 사람 실루엣. y = 발 높이(서 있을 때) 또는 엉덩이 높이(sit), 각도는 '아래 = 0, 앞(+x) = +'
+                fig: (o) => {
+                    const { x, y, h = 150, c = '#0a1014', arms = [[8, 4], [-8, -4]], legs = [[5, 2], [-5, -2]], lean = 0, flip = false, hair = '', hat = '', coat = false, skirt = false, sit = false, side = false, tilt = 0, a = '', rim = '', wrap = '' } = o;
+                    const rad = (d) => d * Math.PI / 180, hipY = sit ? y : y - h * 0.47;
+                    const sw = side ? 0.035 : 0.1, hw = side ? 0.03 : 0.07;
+                    const limb = (x0, y0, a1, a2, len, w) => { const x1 = x0 + Math.sin(rad(a1)) * len, y1 = y0 + Math.cos(rad(a1)) * len, x2 = x1 + Math.sin(rad(a2)) * len, y2 = y1 + Math.cos(rad(a2)) * len; return `<path d="M ${n1(x0)} ${n1(y0)} L ${n1(x1)} ${n1(y1)} L ${n1(x2)} ${n1(y2)}" fill="none" stroke="${c}" stroke-width="${n1(w)}" stroke-linecap="round" stroke-linejoin="round"/>`; };
+                    const p = [];
+                    if (hair === 'long') p.push(`<path d="M ${-h * 0.085} ${-h * 0.47} Q ${-h * 0.1} ${-h * 0.56} 0 ${-h * 0.545} Q ${h * 0.1} ${-h * 0.56} ${h * 0.085} ${-h * 0.47} L ${h * 0.095} ${-h * 0.29} L ${-h * 0.095} ${-h * 0.29} Z" fill="${c}"/>`);
+                    p.push(limb(sw * h * 0.2 - hw * h * 0.5, 0, legs[1][0], legs[1][1], h * 0.235, h * 0.066));
+                    p.push(limb(-sw * h * 0.9, -h * 0.305, arms[1][0], arms[1][1], h * 0.165, h * 0.05));
+                    const bot = coat ? h * 0.22 : 0, bw = coat ? hw * 1.85 : hw;
+                    p.push(`<path d="M ${-sw * h} ${-h * 0.33} L ${sw * h} ${-h * 0.33} L ${bw * h} ${bot} L ${-bw * h} ${bot} Z" fill="${c}" stroke="${c}" stroke-width="${n1(h * 0.035)}" stroke-linejoin="round"/>`);
+                    if (skirt) p.push(`<path d="M ${-hw * h} ${-h * 0.03} L ${hw * h} ${-h * 0.03} L ${h * 0.13} ${h * 0.2} L ${-h * 0.13} ${h * 0.2} Z" fill="${c}" stroke="${c}" stroke-width="${n1(h * 0.02)}" stroke-linejoin="round"/>`);
+                    p.push(limb(hw * h * 0.5, 0, legs[0][0], legs[0][1], h * 0.235, h * 0.066));
+                    p.push(`<rect x="${-h * 0.022}" y="${-h * 0.4}" width="${h * 0.044}" height="${h * 0.08}" fill="${c}"/>`);
+                    p.push(`<g transform="rotate(${tilt} 0 ${-h * 0.38})"><ellipse cx="0" cy="${-h * 0.455}" rx="${h * 0.066}" ry="${h * 0.078}" fill="${c}"/>`
+                        + (rim ? `<path d="M ${h * 0.03} ${-h * 0.525} A ${h * 0.066} ${h * 0.078} 0 0 1 ${h * 0.03} ${-h * 0.385}" fill="none" stroke="${rim}" stroke-width="${n1(h * 0.012)}" stroke-linecap="round" opacity="0.7"/>` : '')
+                        + (hair === 'bun' ? `<circle cx="${-h * 0.045}" cy="${-h * 0.54}" r="${h * 0.036}" fill="${c}"/>` : '')
+                        + (hair === 'short' ? `<path d="M ${-h * 0.072} ${-h * 0.46} Q ${-h * 0.08} ${-h * 0.555} 0 ${-h * 0.548} Q ${h * 0.085} ${-h * 0.555} ${h * 0.07} ${-h * 0.47} Q 0 ${-h * 0.5} ${-h * 0.072} ${-h * 0.46} Z" fill="${c}"/>` : '')
+                        + (hat === 'cap' ? `<path d="M ${-h * 0.075} ${-h * 0.5} Q 0 ${-h * 0.59} ${h * 0.075} ${-h * 0.5} L ${h * 0.13} ${-h * 0.485} L ${h * 0.13} ${-h * 0.47} L ${-h * 0.075} ${-h * 0.48} Z" fill="${c}"/>` : '')
+                        + (hat === 'police' ? `<path d="M ${-h * 0.085} ${-h * 0.505} L ${-h * 0.1} ${-h * 0.575} Q 0 ${-h * 0.62} ${h * 0.1} ${-h * 0.575} L ${h * 0.085} ${-h * 0.505} L ${h * 0.125} ${-h * 0.49} L ${h * 0.12} ${-h * 0.475} L ${-h * 0.085} ${-h * 0.485} Z" fill="${c}"/>` : '')
+                        + (hat === 'chef' ? `<path d="M ${-h * 0.07} ${-h * 0.5} L ${-h * 0.075} ${-h * 0.58} Q ${-h * 0.11} ${-h * 0.66} ${-h * 0.03} ${-h * 0.65} Q 0 ${-h * 0.7} ${h * 0.03} ${-h * 0.65} Q ${h * 0.11} ${-h * 0.66} ${h * 0.075} ${-h * 0.58} L ${h * 0.07} ${-h * 0.5} Z" fill="${c}"/>` : '')
+                        + `</g>`);
+                    p.push(limb(sw * h * 0.9, -h * 0.305, arms[0][0], arms[0][1], h * 0.165, h * 0.05));
+                    return k.add(`${wrap ? `<g class="${wrap}">` : ''}<g transform="translate(${n1(x)} ${n1(hipY)}) scale(${flip ? -1 : 1} 1) rotate(${lean})" ${a}>${p.join('')}</g>${wrap ? '</g>' : ''}`);   // 움직임 클래스는 바깥 g에 (transform 속성과 겹치지 않게)
+                },
+                // 비: 사선으로 떨어지는 빗줄기 (아래로 계속 흐름)
+                rain: (n = 60, color = '#bfe3ff', op = 0.5) => {
+                    let s = '';
+                    for (let i = 0; i < n; i++) { const x = rnd() * 760 - 60, y = rnd() * 480 - 120, l = 14 + rnd() * 16; s += `<line x1="${n1(x)}" y1="${n1(y)}" x2="${n1(x - l * 0.28)}" y2="${n1(y + l)}"/>`; }
+                    return k.add(`<g class="a-rain" stroke="${color}" stroke-width="1.3" stroke-linecap="round" opacity="${op}">${s}</g>`);
+                },
+                // 떠다니는 먼지·빛 알갱이
+                dust: (n = 22, color = '#ffe9b0', x0 = 0, y0 = 0, w = 640, h = 360) => {
+                    let s = '';
+                    for (let i = 0; i < n; i++) s += `<circle class="a-float" cx="${n1(x0 + rnd() * w)}" cy="${n1(y0 + rnd() * h)}" r="${n1(0.8 + rnd() * 1.8)}" fill="${color}" opacity="${n1(0.25 + rnd() * 0.5)}" style="animation-delay:-${n1(rnd() * 8)}s;animation-duration:${n1(5 + rnd() * 6)}s"/>`;
+                    return k.add(s);
+                },
+                stars: (n = 40, yMax = 180, color = '#ffffff') => {
+                    let s = '';
+                    for (let i = 0; i < n; i++) s += `<circle class="a-twk" cx="${n1(rnd() * 640)}" cy="${n1(rnd() * yMax)}" r="${n1(0.6 + rnd() * 1.3)}" fill="${color}" style="animation-delay:-${n1(rnd() * 4)}s"/>`;
+                    return k.add(s);
+                },
+                // 반짝임 (네 갈래 별)
+                spark: (x, y, r = 8, color = '#fff6c9', delay = 0) => k.add(`<path class="a-twk" d="M ${x} ${y - r} Q ${x + r * 0.14} ${y - r * 0.14} ${x + r} ${y} Q ${x + r * 0.14} ${y + r * 0.14} ${x} ${y + r} Q ${x - r * 0.14} ${y + r * 0.14} ${x - r} ${y} Q ${x - r * 0.14} ${y - r * 0.14} ${x} ${y - r} Z" fill="${color}" style="animation-delay:-${delay}s"/>`),
+                // 김 (위로 피어오름)
+                steam: (x, y, color = '#ffffff', n = 3) => {
+                    let s = '';
+                    for (let i = 0; i < n; i++) s += `<path class="a-rise" d="M ${x + (i - (n - 1) / 2) * 9} ${y} q -6 -9 0 -18 q 6 -9 0 -18" fill="none" stroke="${color}" stroke-width="2.4" stroke-linecap="round" opacity="0.55" style="animation-delay:-${n1(i * 0.9)}s"/>`;
+                    return k.add(s);
+                }
+            };
+            draw(k);
+            const vig = `<rect width="640" height="360" fill="${k.rad([[0.55, '#000000', 0], [1, '#000000', 0.62]], 0.5, 0.5, 0.75)}"/>`;
+            return `<svg class="soup-svg" viewBox="0 0 640 360" preserveAspectRatio="xMidYMid slice" role="img" aria-label="문제 그림"><defs>${defs.join('')}</defs>${out.join('')}${vig}</svg>`;
+        }
         const SOUP_BY_ID = Object.fromEntries(SOUP_BANK.map(p => [p.id, p]));
         let soupReady = false, soupState = null, soupStateLoaded = false, soupFeedId = '', soupRound = null, soupRoundLoaded = false, soupFeed = [];
         let soupRounds = {}, soupQueue = {}, soupUsers = {}, soupWeekly = {}, soupWeekKey = '';
         let soupBusy = '', soupMaking = false, soupOpening = '', soupFilter = 'all', soupNotedRound = null, soupNotedDone = null;
+        let soupImgs = {}, soupPostImg = '';   // 팀원 문제에 붙인 사진 (key → data URL) · 지금 붙이려는 사진
 
         const soupDone = (r) => !!(r && (r.solvedAt || r.gaveUpAt));
         const soupToday = () => getLocalDateKey(new Date());
@@ -14903,6 +15541,7 @@ ${text}
                 if (queued) {
                     const q = queued[1];
                     round = { by: q.by || '', byKey: q.byKey || '', title: q.title || '', story: q.story, x: q.x, lv: 0 };
+                    if (q.img) round.img = q.img;
                 } else {
                     const fresh = SOUP_BANK.filter(p => !used[p.id]);
                     if (fresh.length) { const p = fresh[Math.floor(Math.random() * fresh.length)]; round = { pid: p.id, title: p.title, story: p.story, lv: p.lv }; }
@@ -15138,8 +15777,11 @@ ${keys}
             try {
                 if (!(await soupUse('p', 1, SOUP_POST_DAY))) { alert(`문제는 하루에 ${SOUP_POST_DAY}개까지 낼 수 있어요.`); return; }
                 const me = myGameName();
-                db.ref('soup/queue').push({ by: me, byKey: statKey(me), title, story, x: dqEnc(JSON.stringify({ t: truth, k: [], h: hint ? [hint] : [] })), at: Date.now() });
+                const ref = db.ref('soup/queue').push(), item = { by: me, byKey: statKey(me), title, story, x: dqEnc(JSON.stringify({ t: truth, k: [], h: hint ? [hint] : [] })), at: Date.now() };
+                if (soupPostImg) { db.ref(`soup/imgs/${ref.key}`).set(soupPostImg); item.img = ref.key; }   // 사진은 따로 저장 (목록을 읽을 때 같이 딸려 오지 않게)
+                ref.set(item);
                 ['soupPostTitle', 'soupPostStory', 'soupPostTruth', 'soupPostHint'].forEach(id => { document.getElementById(id).value = ''; });
+                soupClearImg();
                 showCoinNotification(0, '', '🐢 문제를 냈어요! 지금 문제가 끝나면 차례대로 나와요');
             } finally { soupBusy = ''; renderSoup(); }
         }
@@ -15147,8 +15789,42 @@ ${keys}
             const q = soupQueue[id];
             if (!db || !q || q.byKey !== statKey(myGameName()) || !confirm('대기 중인 이 문제를 취소할까요?')) return;
             db.ref(`soup/queue/${id}`).remove();
+            if (q.img) db.ref(`soup/imgs/${q.img}`).remove();
         }
         function soupSetFilter(f) { soupFilter = f; renderSoup(); }
+        // 📷 사진 붙이기: 브라우저에서 줄여서(최대 960×720, JPEG) 보관
+        function soupPickImg(input) {
+            const file = input.files && input.files[0];
+            if (!file) return;
+            if (!/^image\//.test(file.type)) { alert('사진 파일만 붙일 수 있어요.'); input.value = ''; return; }
+            const url = URL.createObjectURL(file), im = new Image();
+            im.onload = () => {
+                URL.revokeObjectURL(url);
+                const sc = Math.min(1, 960 / im.naturalWidth, 720 / im.naturalHeight), w = Math.max(1, Math.round(im.naturalWidth * sc)), h = Math.max(1, Math.round(im.naturalHeight * sc));
+                const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+                const ctx = cv.getContext('2d'); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(im, 0, 0, w, h);
+                let q = 0.82, data = cv.toDataURL('image/jpeg', q);
+                while (data.length > 260000 && q > 0.4) { q -= 0.12; data = cv.toDataURL('image/jpeg', q); }
+                if (data.length > 400000) { alert('사진이 너무 커요. 더 작은 사진으로 해 주세요.'); input.value = ''; return; }
+                soupPostImg = data; renderSoupPostImg();
+            };
+            im.onerror = () => { URL.revokeObjectURL(url); alert('사진을 읽지 못했어요.'); input.value = ''; };
+            im.src = url;
+        }
+        function soupClearImg() { soupPostImg = ''; const i = document.getElementById('soupPostFile'); if (i) i.value = ''; renderSoupPostImg(); }
+        function renderSoupPostImg() {
+            const box = document.getElementById('soupPostPreview');
+            if (box) box.innerHTML = soupPostImg ? `<img src="${soupPostImg}" alt="붙인 사진"><button onclick="soupClearImg()">사진 빼기</button>` : '';
+        }
+        function soupLoadImg(key) {
+            if (soupImgs[key] !== undefined || !db) return;
+            soupImgs[key] = null;
+            db.ref(`soup/imgs/${key}`).once('value').then(snap => {
+                const v = snap.val();
+                soupImgs[key] = typeof v === 'string' && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(v) ? v : '';   // 사진 데이터가 아니면 안 보여 줌
+                renderSoup();
+            }).catch(() => { delete soupImgs[key]; });
+        }
 
         function renderSoup() {
             const head = document.getElementById('soupHead');
@@ -15168,12 +15844,21 @@ ${keys}
                 const none = soupStateLoaded && !soupState && !soupMaking;
                 set('soupHead', `🐢 거북이 수프 ${aiChip}`);
                 set('soupStory', soupMaking ? '새 문제를 준비하는 중…' : none ? '남은 문제가 없어요. ✍️ 아래에서 문제를 내 주세요!' : '문제를 불러오는 중…');
-                set('soupHints', ''); set('soupFeed', ''); set('soupFilter', ''); show('soupResult', false); show('soupAuthor', false);
+                set('soupHints', ''); set('soupFeed', ''); set('soupFilter', ''); show('soupResult', false); show('soupAuthor', false); show('soupPic', false);
             } else {
                 const secret = soupSecret(r), no = r.no || (soupState && soupState.no) || '';
                 set('soupHead', `<b>🐢 거북이 수프 ${no ? '#' + no : ''}</b>${r.title ? ` <span class="soup-title">${escapeHtml(r.title)}</span>` : ''}`
                     + `<span class="soup-lv">${r.lv ? '★'.repeat(r.lv) + '☆'.repeat(3 - r.lv) : '✍️ ' + nameWithIcon(r.by || '팀원') + '님 출제'}</span> ${aiChip}`);
                 set('soupStory', multiline(r.story));
+                // 그림: 기본 문제는 코드로 그린 장면, 팀원 문제는 붙인 사진 (바뀔 때만 다시 그려서 움직임이 끊기지 않게)
+                const picEl = document.getElementById('soupPic');
+                if (r.img) soupLoadImg(r.img);
+                const picKey = r.pid && SOUP_SCENES[r.pid] ? 's:' + r.pid : r.img && soupImgs[r.img] ? 'i:' + r.img : '';
+                if (picEl.dataset.key !== picKey) {
+                    picEl.dataset.key = picKey;
+                    picEl.innerHTML = picKey.startsWith('s:') ? soupSceneSVG(r.pid) : picKey ? `<img src="${soupImgs[r.img]}" alt="문제 사진">` : '';
+                }
+                picEl.style.display = picKey ? 'block' : 'none';
                 const opened = secret.h.slice(0, r.hints || 0);
                 set('soupHints', opened.map((h, i) => `<div class="soup-hint">💡 힌트 ${i + 1}: ${escapeHtml(h)}</div>`).join(''));
                 // 내가 낸 문제: 정답을 보면서 지켜보기만
