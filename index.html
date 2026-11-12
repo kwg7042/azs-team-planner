@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-12c">
+    <meta name="app-version" content="2026-11-12d">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -2521,7 +2521,7 @@
 
         .weapon-showcase {
             position: relative;
-            margin-bottom: 30px;
+            margin-bottom: 14px;
         }
 
         .weapon-glow {
@@ -2556,7 +2556,7 @@
         }
 
         .enhance-info {
-            margin: 20px 0;
+            margin: 0 0 14px;
         }
 
         .enhance-rate {
@@ -2606,17 +2606,20 @@
         .enhance-history:empty { display: none; }
 
         /* 검 강화: 돈(원)으로 강화하고 검을 팔아 다시 강화 */
-        .sword-wallet { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin: -6px 0 6px; }
+        .sword-wallet { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin: 0 0 10px; }
         .sword-wallet > div { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,215,0,0.3); border-radius: 20px; padding: 6px 16px; font-size: 14px; }
         .sword-wallet b { color: #ffd700; font-variant-numeric: tabular-nums; }
         .sword-wallet .sw-best b { color: #ff9a3c; }
-        .sword-odds { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+        .sword-odds { display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: nowrap; height: 30px; margin-bottom: 12px; white-space: nowrap; }
         .sword-odds span { padding: 4px 12px; border-radius: 14px; font-size: 13px; font-weight: bold; background: rgba(255,255,255,0.06); }
         .sword-odds .o-up { color: #00ff88; } .sword-odds .o-keep { color: #ffd93d; } .sword-odds .o-break { color: #ff6b6b; }
         .sword-prices { font-size: 13px; color: rgba(255,255,255,0.75); margin-bottom: 8px; line-height: 1.7; }
         .sword-prices b { color: #fff; font-variant-numeric: tabular-nums; }
         .sword-prices .sp-sell b { color: #ffd700; }
-        .sword-actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+        /* 버튼 두 개는 칸 크기 고정 (글자가 바뀌어도 위치·크기가 그대로라 연타하기 쉬움) */
+        .sword-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 540px; margin: 0 auto 14px; }
+        .sword-actions button { height: 58px; padding: 6px 12px; line-height: 1.25; overflow: hidden; }
+        .sword-actions .enhance-btn:hover:not(:disabled), .sword-actions .sword-sell-btn:hover:not(:disabled) { transform: scale(1.03); }
         .sword-sell-btn { padding: 15px 30px; font-size: 17px; background: linear-gradient(135deg, #ffd700, #ff9f1a); border: none; border-radius: 30px; color: #1a1a2e; cursor: pointer; font-weight: bold; transition: all 0.3s; font-family: inherit; }
         .sword-sell-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 5px 20px rgba(255,215,0,0.35); }
         .sword-sell-btn:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -2631,9 +2634,9 @@
         .book-card.done { box-shadow: inset 0 0 0 1px rgba(0,255,136,0.4); }
         .book-card .book-art { height: 64px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .book-card .book-art svg { width: 44px; height: 66px; }
-        .book-card .book-name { font-weight: bold; font-size: 13px; }
+        .book-card .book-name { font-weight: bold; font-size: 13px; height: 19px; line-height: 19px; white-space: nowrap; overflow: hidden; }
         .book-card .book-name small { color: #ffd700; font-weight: normal; font-size: 10px; }
-        .book-card .book-state { font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+        .book-card .book-state { font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 2px; height: 14px; line-height: 14px; white-space: nowrap; overflow: hidden; }
         .book-card.done .book-state { color: #00ff88; }
         .book-card.locked { cursor: not-allowed; opacity: 0.7; }
         .book-card.locked .book-art svg { filter: brightness(0) opacity(0.35) !important; }
@@ -2688,10 +2691,13 @@
             .book-card { width: auto; flex: 1 1 22%; max-width: 25%; min-width: 0; padding: 4px 2px 6px; border-radius: 10px; }   /* 무기 7종: 4 + 3 두 줄 */
             .book-card .book-art { height: 46px; }
             .book-card .book-art svg { width: 30px; height: 46px; }
-            .book-card .book-name { font-size: 11px; }
+            .book-card .book-name { font-size: 11px; height: 16px; line-height: 16px; }
             .book-card .book-name small { display: none; }
-            .book-card .book-state { font-size: 9px; line-height: 1.25; }
-            .sword-actions button { flex: 1; padding: 13px 10px; font-size: 15px; }
+            .book-card .book-state { font-size: 9px; height: 12px; line-height: 12px; }
+            .sword-actions { gap: 8px; }
+            .sword-actions button { height: 62px; padding: 6px 8px; font-size: 15px; }
+            .sword-fame small { display: block; }   /* 항상 두 줄 → 글자 길이가 바뀌어도 아래가 안 밀림 */
+            .sword-odds span { font-size: 12px; padding: 4px 9px; }
             .sword-table { overflow-x: auto; }
         }
 
@@ -5178,16 +5184,23 @@
                             <div class="weapon-big" id="weaponBig">🗡️</div>
                             <div class="weapon-name" id="weaponName">낡은 검 +0</div>
                         </div>
+                        <!-- 강화·판매 버튼은 여기 고정: 위쪽에는 높이가 변하지 않는 것만 둠 (연타해도 버튼이 안 움직이게) -->
+                        <div class="sword-odds" id="swordOdds"></div>
+                        <div class="sword-actions">
+                            <button class="enhance-btn" id="enhanceBtn" onclick="doEnhance()">
+                                <span id="enhanceBtnLabel">⚔️ 강화하기</span>
+                            </button>
+                            <button class="sword-sell-btn" id="swordSellBtn" onclick="sellSword()">💰 판매하기</button>
+                        </div>
+                        <div class="enhance-info">
+                            <div class="sword-prices" id="swordPrices"></div>
+                            <div class="enhance-warning" id="enhanceWarning"></div>
+                        </div>
                         <div class="sword-wallet">
                             <div class="sw-money">💰 보유 금액 <b id="swordMoney">10,000원</b></div>
                             <div class="sw-best">🏅 최고 기록 <b id="swordBest">+0</b></div>
                             <div class="sw-shard" title="무기가 부서지면 생겨요 · 모아서 방지권을 만들어요 (방지권은 조각으로만 만들 수 있어요)">🧩 조각 <b id="swordShards">0</b></div>
                             <button class="sword-charge-btn" id="swordChargeBtn" onclick="chargeSwordMoney()" title="코인 1개를 강화 머니 1만원으로 바꿔요">🪙 코인 1개 → 1만원 충전</button>
-                        </div>
-                        <div class="enhance-info">
-                            <div class="sword-odds" id="swordOdds"></div>
-                            <div class="sword-prices" id="swordPrices"></div>
-                            <div class="enhance-warning" id="enhanceWarning"></div>
                         </div>
                         <div class="sword-protect">
                             <label><input type="checkbox" id="swordProtectOn" onchange="toggleSwordProtect(this.checked)"> 🛡️ 실패하면 방지권 쓰기</label>
@@ -5195,12 +5208,6 @@
                         </div>
                         <div class="sword-shop" id="swordShop">
                             <button id="shieldCraftBtn" onclick="buySwordShield()">🧩 조각으로 방지권 만들기</button>
-                        </div>
-                        <div class="sword-actions">
-                            <button class="enhance-btn" id="enhanceBtn" onclick="doEnhance()">
-                                <span id="enhanceBtnLabel">⚔️ 강화하기</span>
-                            </button>
-                            <button class="sword-sell-btn" id="swordSellBtn" onclick="sellSword()">💰 판매하기</button>
                         </div>
                         <button class="sword-dex-claim" id="swordDexClaimBtn" onclick="claimDexRewards()" style="display: none;"></button>
                         <div class="sword-rule">강화 비용은 <b>원</b>으로 내요 (코인 1개 = 1만원 충전) · <b>+0 강화는 무료</b> · 실패하면 <b>+0</b>으로 (방지권이 있으면 단계 유지) · 부서지면 🧩 조각 · 팔면 판매가만큼 받고 새 +0 무기로 다시 시작<br>🛡️ 방지권은 돈으로 살 수 없어요: 🧩 조각으로 만들거나 📖 도감 보상(5·10·15단계)으로만 얻어요<br>🎖️ 명성 = 무기마다 최고 기록 × 가중치(검 2 · 칼 3 · 창 4 · 곤봉 5 · 활 6 · 총 7 · 대포 8) + 최종 강화 완성 보너스 · 등급이 오를 때마다 다음 무기(칼 → 창 → 곤봉 → 활 → 총 → 대포)가 열려요<br>🐲 레이드에서는 무기마다 <b>최고 기록 단계</b>의 공격력으로 싸워요 (팔거나 부서져도 그대로) · 뒤 무기일수록 강하고 특성이 달라요</div>
@@ -11151,10 +11158,10 @@ ${text}
             } else note.style.display = 'none';
             document.getElementById('weaponName').textContent = `${swordLevelName(k, L)} +${L} / +${k.max}`;
             document.getElementById('swordOdds').innerHTML = maxed
-                ? `<span class="o-up">🏆 ${k.name} 최종 강화 완료! 팔아서 부자가 되거나 다른 무기에 도전하세요</span>`
+                ? `<span class="o-up">🏆 ${k.name} 최종 강화 완료!</span>`
                 : `<span class="o-up">성공 ${o.up}%</span><span class="o-break">실패 ${o.brk}% → +0</span>`;
             document.getElementById('swordPrices').innerHTML = (maxed
-                ? `<span class="sp-sell">지금 판매가 <b>${fmtWon(swordSellOf(k, L))}</b></span>`
+                ? `<span class="sp-sell">지금 판매가 <b>${fmtWon(swordSellOf(k, L))}</b></span> · 팔아서 부자가 되거나 다른 무기에 도전하세요`
                 : `강화 비용 <b>${k.C[L] ? fmtWon(k.C[L]) : '무료'}</b> · <span class="sp-sell">지금 판매가 <b>${fmtWon(swordSellOf(k, L))}</b></span> · 성공하면 <b>${fmtWon(swordSellOf(k, L + 1))}</b>`)
                 + `<br><span class="sp-raid">🐲 레이드 공격력 <b>${weaponAtk(k, kindBest(gameData, k))}</b> <small>(${k.name} 최고 기록 +${kindBest(gameData, k)} 기준 · ${k.perk})</small></span>`;
             const warn = document.getElementById('enhanceWarning');
@@ -11219,8 +11226,8 @@ ${text}
             box.dataset.key = key;
             box.innerHTML = SWORD_KINDS.map(k => {
                 const best = kindBest(gameData, k), open = ti >= k.unlock, done = best >= k.max;
-                const state = !open ? `🔒 ${FAME_TIERS[k.unlock].name}부터` : done ? '✅ 완성' : `최고 +${best} / +${k.max}`;
-                return `<button class="book-card ${k.id === cur.id ? 'cur' : ''} ${open ? '' : 'locked'} ${done ? 'done' : ''}" onclick="selectSwordKind('${k.id}')" title="${k.name} · 최대 +${k.max} · 레이드 기본 공격력 ${k.atk} (${k.perk})">
+                const state = !open ? `🔒 ${FAME_TIERS[k.unlock].name}` : done ? '✅ 완성' : `최고 +${best}`;   // 한 줄에 들어가게 짧게 (칸 높이 고정)
+                return `<button class="book-card ${k.id === cur.id ? 'cur' : ''} ${open ? '' : 'locked'} ${done ? 'done' : ''}" onclick="selectSwordKind('${k.id}')" title="${k.name} · 최대 +${k.max}${open ? '' : ` · 명성 ${FAME_TIERS[k.unlock].name} 등급부터 열려요`} · 레이드 기본 공격력 ${k.atk} (${k.perk})">
                     <div class="book-art">${swordSVG(open ? best : 0, k.id)}</div>
                     <div class="book-name">${k.icon} ${k.name}${k.id === cur.id ? ' <small>사용 중</small>' : ''}</div>
                     <div class="book-state">${state}</div>
