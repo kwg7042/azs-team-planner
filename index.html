@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-17b">
+    <meta name="app-version" content="2026-11-17c">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -4919,9 +4919,9 @@
                         </div>
                         <div style="margin-top: 15px;">
                             <label style="display: block; margin-bottom: 8px; font-size: 13px;"><i class="fas fa-microchip" style="color: #00d4ff;"></i> EXAONE 모델 이름 (선택 · 팀 전체 적용)</label>
-                            <input type="text" id="exaoneModelName" maxlength="80" placeholder="비워 두면 기본값 exaone-v4.5_33b · 새 플랫폼(api.exaone.ai)은 k-exaone_v2.5"
+                            <input type="text" id="exaoneModelName" maxlength="80" placeholder="비워 두면 기본값 k-exaone_v2 · 새 플랫폼(api.exaone.ai)은 k-exaone_v2.5"
                                    style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 13px;">
-                            <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 8px;">EXAONE 쪽에서 모델 이름이 바뀌었을 때만 고치세요. 위의 <b>연결 테스트</b>로 먼저 확인한 뒤 저장하면 팀원 모두에게 적용됩니다.<br>새 플랫폼 모델 <b>k-exaone_v2.5</b>는 글자 전용이라 특허 모션의 도면 이미지는 읽지 못하고 본문 글만 씁니다.</p>
+                            <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 8px;">EXAONE 쪽에서 모델 이름이 바뀌었을 때만 고치세요. 위의 <b>연결 테스트</b>로 먼저 확인한 뒤 저장하면 팀원 모두에게 적용됩니다.<br>K-EXAONE(<b>k-exaone_v2</b>, <b>k-exaone_v2.5</b>)는 글자 전용이라 특허 모션의 도면 이미지는 읽지 못하고 본문 글만 씁니다.</p>
                         </div>
                     </div>
 
@@ -6939,24 +6939,29 @@
         //  → 경로를 순서대로 시도: ① 설정에 직접 넣은 프록시 ② API 키가 있으면 직접 호출 ③ 이 PC의 로컬 프록시
         const EXAONE_API_URL = 'https://api.lgresearch.ai/v1/chat/completions';
         // 모델 이름은 여기 한 곳에서. EXAONE 쪽에서 이름이 바뀌면 AI 설정(EXAONE → 모델 이름)에서 고치면 팀 전체에 적용됨 (exaone_relay/model)
-        const EXAONE_MODEL_DEFAULT = 'exaone-v4.5_33b';
+        //  2026-11-17: exaone-v4.5_33b 서비스 종료(500) → 같은 주소·키로 되는 k-exaone_v2 로 바꿈 (팀 설정 exaone_relay/model 도 k-exaone_v2)
+        const EXAONE_MODEL_DEFAULT = 'k-exaone_v2';
         const EXAONE_MODEL_OK = /^[A-Za-z0-9][\w.\-:\/]{1,79}$/;
         let exaoneTeamModel = '';
         function exaoneModel() { return exaoneTeamModel || EXAONE_MODEL_DEFAULT; }
         window.exaoneModel = exaoneModel;
-        // K-EXAONE 2.5 (2026-11-09 새 플랫폼 https://api.exaone.ai, 모델 k-exaone_v2.5) 규칙에 맞게 요청을 바꿈
-        //  · 글자 전용: 이미지(도면)는 못 읽어서 빼고 글만 보냄
-        //  · 항상 추론함: enable_thinking 대신 reasoning_effort(low/high), 추론 토큰도 max_tokens에 포함 → 넉넉히
-        //  EXAONE 4.5(exaone-v4.5_33b)는 그대로 보냄. 모든 EXAONE 호출이 exaoneFetch를 지나므로 여기 한 곳만 고치면 됨
+        // K-EXAONE 모델 규칙에 맞게 요청을 바꿈 (모든 EXAONE 호출이 exaoneFetch를 지나므로 여기 한 곳만 고치면 됨)
+        //  · k-exaone_v2 · v2.5 모두 글자 전용 (이미지를 보내면 "not a multimodal model" 500) → 이미지(도면)는 빼고 글만
+        //  · k-exaone_v2.5 (새 플랫폼 api.exaone.ai)는 항상 추론함 → enable_thinking 대신 reasoning_effort(low/high), 추론 토큰도 max_tokens에 포함 → 넉넉히
+        //  · k-exaone_v2 는 enable_thinking:false 가 그대로 됨 (11/17 실측: 끄면 4초·22토큰, 켜면 6초·111토큰)
         const exaoneTextOnly = (m) => /^k-exaone/i.test(String(m || ''));
+        const exaoneAlwaysThinks = (m) => /^k-exaone_v2\.5/i.test(String(m || ''));
         function exaoneAdaptPayload(p) {
             if (!p || !exaoneTextOnly(p.model)) return p;
-            const q = Object.assign({}, p), kw = Object.assign({}, q.chat_template_kwargs || {});
-            const think = !!kw.enable_thinking;
-            delete kw.enable_thinking;
-            if (Object.keys(kw).length) q.chat_template_kwargs = kw; else delete q.chat_template_kwargs;
-            if (!q.reasoning_effort) q.reasoning_effort = think ? 'high' : 'low';
-            q.max_tokens = Math.max(q.max_tokens || 0, think ? 16000 : 4000);
+            const q = Object.assign({}, p);
+            if (exaoneAlwaysThinks(q.model)) {
+                const kw = Object.assign({}, q.chat_template_kwargs || {});
+                const think = !!kw.enable_thinking;
+                delete kw.enable_thinking;
+                if (Object.keys(kw).length) q.chat_template_kwargs = kw; else delete q.chat_template_kwargs;
+                if (!q.reasoning_effort) q.reasoning_effort = think ? 'high' : 'low';
+                q.max_tokens = Math.max(q.max_tokens || 0, think ? 16000 : 4000);
+            }
             let dropped = 0;
             q.messages = (q.messages || []).map(m => {
                 if (!m || !Array.isArray(m.content)) return m;
@@ -7073,10 +7078,11 @@
             // 2026-11-16 장애: 키·주소·모델 이름은 모두 맞는데 EXAONE 서버 안쪽에서 그 모델의 서비스를 못 찾아 500을 돌려줌
             //  (없는 모델 이름이면 422 'unsupported model'이 나오므로 이름 문제와 구분됨)
             //  → 11/17 확인: 공식 문서(docs.exaone.ai)에서 EXAONE 4.5 페이지가 사라짐(404). 새 플랫폼은 K-EXAONE 2.5(api.exaone.ai)만 제공
-            if (/Failed to find matching model/i.test(t)) return exaoneTextOnly(mdl)
-                ? `EXAONE 서버에서 모델(${mdl}) 서비스가 내려가 있습니다. 우리 쪽 키·주소·프록시 문제가 아니라 EXAONE 쪽 장애입니다. 오래 계속되면 EXAONE 담당 부서에 문의하세요.`
-                : `EXAONE 쪽에서 모델(${mdl}) 서비스가 내려갔습니다 (2026-11-16부터, 공식 문서에서도 EXAONE 4.5가 빠지고 새 플랫폼의 K-EXAONE 2.5만 남음). 우리 키·주소·코드 문제가 아닙니다. → 공유 PC에서 새 플랫폼 키(docs.exaone.ai 발급)로 프록시를 다시 설정(주소 https://api.exaone.ai/v1)하고, AI 설정 → EXAONE → 모델 이름을 k-exaone_v2.5 로 바꾸세요.`;
-            if (/unsupported model/i.test(t)) return `EXAONE이 모델 이름(${mdl})을 지원하지 않는다고 합니다. 모델 이름이 바뀌었는지 확인하고 AI 설정 → EXAONE → 모델 이름을 고치세요.`;
+            if (/Failed to find matching model/i.test(t)) return /^exaone-v4\.5/i.test(mdl)
+                ? `EXAONE 쪽에서 모델(${mdl}) 서비스가 내려갔습니다 (2026-11-16부터). 우리 키·주소·코드 문제가 아닙니다. → AI 설정 → EXAONE → 모델 이름을 k-exaone_v2 로 바꾸세요 (지금 키·주소 그대로 됩니다).`
+                : `EXAONE 서버에서 모델(${mdl}) 서비스가 내려가 있습니다. 우리 쪽 키·주소·프록시 문제가 아니라 EXAONE 쪽 장애입니다. 다른 모델(${/^k-exaone_v2$/i.test(mdl) ? '새 플랫폼 api.exaone.ai의 k-exaone_v2.5 — 새 키 필요' : 'k-exaone_v2'})로 바꿔 보거나, 오래 계속되면 EXAONE 담당 부서에 문의하세요.`;
+            if (/not a multimodal model/i.test(t)) return `모델(${mdl})은 글자 전용이라 이미지를 읽지 못합니다. 이미지를 빼고 다시 시도하세요.`;
+            if (/unsupported model/i.test(t)) return `EXAONE이 모델 이름(${mdl})을 지원하지 않는다고 합니다. 주소에 맞는 이름인지 확인하고 AI 설정 → EXAONE → 모델 이름을 고치세요 (지금 주소 api.lgresearch.ai는 k-exaone_v2, 새 플랫폼 api.exaone.ai는 k-exaone_v2.5).`;
             if (/Forbidden origin|허용되지 않은 주소/i.test(t)) return '프록시가 이 주소를 허용하지 않습니다. 최신 로컬 프록시(AI 설정 > 로컬 프록시 내려받기)로 다시 실행하세요.';
             // 응답 대기 시간 초과: 서버 연결은 됐는데 답이 늦어서 프록시가 끊은 경우 (연결 실패와 구분)
             const rt = t.match(/read timed?\s*out[^(]*\(read timeout=(\d+)/i);
@@ -18827,6 +18833,6 @@ ${keys}
     })();
     </script>
     <!-- 특허 모션 탭: PDF → EXAONE 해석 → 동작 애니메이션 -->
-    <script src="patent_motion.js?v=2026-11-17a"></script>
+    <script src="patent_motion.js?v=2026-11-17c"></script>
 </body>
 </html>
