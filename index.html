@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-17d">
+    <meta name="app-version" content="2026-11-17e">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -5682,7 +5682,7 @@
                             <summary>📚 지난 문제 보기</summary>
                             <div id="soupPast"></div>
                         </details>
-                        <div class="pika-help">🐢 이상한 상황 하나를 두고, 팀이 다 같이 <b>'예/아니오'로 답할 수 있는 질문</b>을 던져 숨겨진 진실을 찾아내는 추리 게임이에요 (실시간으로 모일 필요 없이 각자 편할 때)<br>🖼️ 그림은 문제에 나온 상황만 보여 줘요 — 정답은 그림에 없어요<br>🤖 진행자는 AI(EXAONE)예요: 질문에 ⭕ 예 · ❌ 아니오 · ➖ 상관없음으로 답하고, 정답 도전도 채점해요. AI라서 가끔 틀린 답을 할 수 있어요<br>🙋 진실을 알 것 같으면 <b>정답 도전</b>! 맞히면 🪙 코인 2개 + 5점 · 누군가 맞히면 정답이 공개되고 다음 문제로 넘어가요<br>❓ 하루 질문 20개 · 정답 도전 5번 · '예'를 끌어낸 질문은 1점 (문제당 3점까지) · 💡 힌트는 팀 질문이 8개 · 16개 쌓이면 열려요<br>🏳️ 너무 어려우면 포기 투표 (3명이 모이면 정답 공개, 코인 없음) · ✍️ 직접 문제를 낼 수도 있어요 (하루 2개)</div>
+                        <div class="pika-help">🐢 이상한 상황 하나를 두고, 팀이 다 같이 <b>'예/아니오'로 답할 수 있는 질문</b>을 던져 숨겨진 진실을 찾아내는 추리 게임이에요 (실시간으로 모일 필요 없이 각자 편할 때)<br>🖼️ 그림은 문제에 나온 상황만 보여 줘요 — 정답은 그림에 없어요<br>🤖 진행자는 AI(EXAONE)예요: 질문에 ⭕ 예 · ❌ 아니오 · ➖ 상관없음으로 답하고, 정답 도전도 채점해요. AI라서 가끔 틀린 답을 할 수 있어요<br>🙋 진실을 알 것 같으면 <b>정답 도전</b>! 맞히면 🪙 코인 2개 + 5점 · 누군가 맞히면 정답이 공개되고 다음 문제로 넘어가요<br>❓ 질문 · 정답 도전 <b>무제한</b> · '예'를 끌어낸 질문은 1점 (문제당 3점까지) · 💡 힌트는 팀 질문이 8개 · 16개 쌓이면 열려요<br>🏳️ 너무 어려우면 포기 투표 (3명이 모이면 정답 공개, 코인 없음) · ✍️ 직접 문제를 낼 수도 있어요 (하루 2개)</div>
                     </div>
                     <div class="leaderboard dodge-ranking">
                         <h4>🏆 이번 주 거북이 수프 랭킹 <small style="font-weight: normal; opacity: 0.6; font-size: 11px;">(월~일 · 컬렉션 아이콘을 지정한 사람만)</small></h4>
@@ -14896,12 +14896,13 @@ ${text}
         //  한 번에 한 문제 → 누가 맞히거나 포기 투표 3명이면 정답 공개 → '다음 문제'
         //  문제: 팀원이 낸 문제(대기열) 먼저, 없으면 기본 문제 중 아직 안 나온 것
         //  코인: 정답자만 2개 · 점수: 정답 5 · '예'를 끌어낸 질문 1(문제당 3점까지) · 내 문제가 풀리면 출제자 2
-        //  하루 한도: 질문 20 · 정답 도전 5 · 문제 내기 2
+        //  하루 한도: 질문·정답 도전은 무제한 (2026-11-17) · 문제 내기만 하루 2개
         //  데이터: soup/state {id, no} · soup/rounds/{id} · soup/feed/{id}/{push} · soup/queue/{push} · soup/used/{기본 문제 id}
         //          soup/users/{key} (오늘 쓴 횟수) · soup_weekly/{주}/{key} (주간 점수)
         //  정답은 살짝 가려서 저장 (개발자 도구로 바로 안 보이는 정도 — 그림 퀴즈와 같은 방식)
         // =====================================================
-        const SOUP_Q_DAY = 20, SOUP_G_DAY = 5, SOUP_POST_DAY = 2, SOUP_COIN = 2, SOUP_GIVEUP = 3, SOUP_YES_CAP = 3;
+        const SOUP_Q_DAY = Infinity, SOUP_G_DAY = Infinity, SOUP_POST_DAY = 2;   // 질문·정답 도전 무제한 (횟수는 기록만 함)
+        const SOUP_COIN = 2, SOUP_GIVEUP = 3, SOUP_YES_CAP = 3;
         const SOUP_HINT_AT = [8, 16];   // 팀 전체 질문이 이만큼 쌓이면 힌트를 하나씩 열 수 있음
         const SOUP_ANS = { yes: '⭕ 예', no: '❌ 아니오', irr: '➖ 상관없음', ok: '🎉 정답!', close: '🔶 아깝다! 거의 다 왔어요' };
         // 기본 문제 (x = 진실·핵심·힌트를 가려 둔 것). 널리 알려진 고전 수수께끼와 새로 만든 문제를 섞음
@@ -16577,7 +16578,7 @@ ${keys}
                     const askBtn = document.getElementById('soupAskBtn'), gBtn = document.getElementById('soupGuessBtn');
                     askBtn.disabled = !!soupBusy || use.q >= SOUP_Q_DAY; askBtn.textContent = soupBusy === 'q' ? '🤖 생각 중…' : '❓ 질문';
                     gBtn.disabled = !!soupBusy || use.g >= SOUP_G_DAY; gBtn.textContent = soupBusy === 'g' ? '🤖 채점 중…' : '🙋 정답 도전';
-                    set('soupMy', `오늘 질문 <b>${use.q}</b>/${SOUP_Q_DAY} · 정답 도전 <b>${use.g}</b>/${SOUP_G_DAY} · 정답을 맞히면 🪙 코인 ${SOUP_COIN}개`);
+                    set('soupMy', `오늘 질문 <b>${use.q}</b>개 · 정답 도전 <b>${use.g}</b>번 <small>(무제한)</small> · 정답을 맞히면 🪙 코인 ${SOUP_COIN}개`);
                     const hBtn = document.getElementById('soupHintBtn'), need = SOUP_HINT_AT[nH] !== undefined ? SOUP_HINT_AT[nH] : 8 * (nH + 1);
                     hBtn.style.display = totalH ? '' : 'none';
                     hBtn.disabled = nH >= totalH || qs.length < need;
