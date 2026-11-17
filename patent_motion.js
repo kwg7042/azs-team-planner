@@ -1106,7 +1106,7 @@
 
   async function exaoneChat(messages, opt) {
     const payload = {
-      model: EXAONE_MODEL, messages, temperature: 0.4, top_p: 0.95, top_k: 20,
+      model: (window.exaoneModel && window.exaoneModel()) || EXAONE_MODEL, messages, temperature: 0.4, top_p: 0.95, top_k: 20,   // 모델 이름은 AI 설정(팀 공통)에서 바꿀 수 있음
       max_tokens: (opt && opt.maxTokens) || 6000,
       chat_template_kwargs: { enable_thinking: !!(opt && opt.thinking) },
     };

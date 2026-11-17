@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-13a">
+    <meta name="app-version" content="2026-11-17a">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -4181,6 +4181,14 @@
         .soup-head .soup-lv { font-size: 12px; color: #ffd166; padding: 2px 9px; border-radius: 10px; background: rgba(255,209,102,0.12); }
         .soup-ai { font-size: 11px; padding: 2px 9px; border-radius: 10px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
         .soup-ai.on { color: #86efac; background: rgba(134,239,172,0.12); }
+        .soup-ai.warn { color: #fde68a; background: rgba(253,230,138,0.14); }
+        .soup-ai.bad { color: #fca5a5; background: rgba(248,113,113,0.16); }
+        .soup-aidown { max-width: 720px; margin: 0 auto 10px; padding: 11px 14px; border-radius: 12px; border: 1px solid rgba(248,113,113,0.5); background: rgba(248,113,113,0.1); color: #fecaca; font-size: 13px; line-height: 1.65; text-align: center; }
+        .soup-aidown small { color: rgba(255,255,255,0.6); }
+        .soup-aidown button { margin-top: 7px; padding: 5px 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.35); background: rgba(255,255,255,0.1); color: #fff; font-size: 12px; cursor: pointer; font-family: inherit; }
+        .soup-aidown button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .soup-aidown details { margin-top: 6px; font-size: 11px; color: rgba(255,255,255,0.6); text-align: left; }
+        .soup-aidown details summary { cursor: pointer; text-align: center; }
         .soup-story { max-width: 720px; margin: 0 auto 10px; padding: 16px 18px; border-radius: 14px; background: rgba(0,0,0,0.32); border: 1px solid rgba(94,234,212,0.3); font-size: 15px; line-height: 1.75; text-align: left; word-break: keep-all; }
         .soup-hint { max-width: 720px; margin: 0 auto 6px; padding: 7px 12px; border-radius: 10px; background: rgba(255,209,102,0.1); border: 1px dashed rgba(255,209,102,0.45); color: #ffe7a8; font-size: 13px; text-align: left; }
         .soup-author { max-width: 720px; margin: 0 auto 10px; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.06); font-size: 13px; line-height: 1.6; }
@@ -4909,6 +4917,12 @@
                                    style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 13px;">
                             <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 8px;">프록시를 사용하면 브라우저에 API 키를 저장하거나 전송하지 않습니다.</p>
                         </div>
+                        <div style="margin-top: 15px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 13px;"><i class="fas fa-microchip" style="color: #00d4ff;"></i> EXAONE 모델 이름 (선택 · 팀 전체 적용)</label>
+                            <input type="text" id="exaoneModelName" maxlength="80" placeholder="비워 두면 기본값 exaone-v4.5_33b"
+                                   style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 13px;">
+                            <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 8px;">EXAONE 쪽에서 모델 이름이 바뀌었을 때만 고치세요. 위의 <b>연결 테스트</b>로 먼저 확인한 뒤 저장하면 팀원 모두에게 적용됩니다.</p>
+                        </div>
                     </div>
 
                     <!-- Gemini API 설정 (숨김) -->
@@ -5625,6 +5639,7 @@
                 <div class="minigame-panel" id="panel-soup">
                     <div class="soup-area">
                         <div class="soup-head" id="soupHead">거북이 수프를 불러오는 중…</div>
+                        <div class="soup-aidown" id="soupAiDown" style="display: none;"></div>
                         <div class="soup-pic" id="soupPic" style="display: none;"></div>
                         <div class="soup-story" id="soupStory"></div>
                         <div class="soup-hints" id="soupHints"></div>
@@ -6923,6 +6938,12 @@
         //  다른 사람 PC에서는 프록시가 없어서 항상 연결 오류가 났고, API 키를 넣어도 키를 쓰지 않았음.
         //  → 경로를 순서대로 시도: ① 설정에 직접 넣은 프록시 ② API 키가 있으면 직접 호출 ③ 이 PC의 로컬 프록시
         const EXAONE_API_URL = 'https://api.lgresearch.ai/v1/chat/completions';
+        // 모델 이름은 여기 한 곳에서. EXAONE 쪽에서 이름이 바뀌면 AI 설정(EXAONE → 모델 이름)에서 고치면 팀 전체에 적용됨 (exaone_relay/model)
+        const EXAONE_MODEL_DEFAULT = 'exaone-v4.5_33b';
+        const EXAONE_MODEL_OK = /^[A-Za-z0-9][\w.\-:\/]{1,79}$/;
+        let exaoneTeamModel = '';
+        function exaoneModel() { return exaoneTeamModel || EXAONE_MODEL_DEFAULT; }
+        window.exaoneModel = exaoneModel;
         const EXAONE_PROXY_KIT = 'tools/exaone-proxy/';
         function exaoneRoutes(override) {
             const o = override || {};
@@ -6958,6 +6979,12 @@
             if (!db) return;
             db.ref('.info/serverTimeOffset').on('value', s => { exaoneRelayOffset = s.val() || 0; });
             db.ref('exaone_relay/worker').on('value', s => { exaoneRelayWorker = s.val(); renderExaoneRelayStatus(); });
+            db.ref('exaone_relay/model').on('value', s => {
+                const v = s.val();
+                exaoneTeamModel = typeof v === 'string' && EXAONE_MODEL_OK.test(v) ? v : '';
+                const el = document.getElementById('exaoneModelName');
+                if (el && document.activeElement !== el) el.value = exaoneTeamModel;
+            });
             setInterval(renderExaoneRelayStatus, 15000);
         }
         function renderExaoneRelayStatus() {
@@ -7014,8 +7041,12 @@
             lines.push(`2) 내 PC에서 직접: AI 설정 > EXAONE에서 exaone_proxy.py · EXAONE_proxy_start.bat 내려받아 실행 (처음 한 번 API 키 입력). 브라우저가 '이 기기의 다른 앱·서비스 접근' 권한을 물으면 '허용'`);
             return lines.join('\n');
         }
-        function exaoneHttpHint(status, text) {
-            const t = String(text || '');
+        function exaoneHttpHint(status, text, model) {
+            const t = String(text || ''), mdl = model || exaoneModel();
+            // 2026-11-16 장애: 키·주소·모델 이름은 모두 맞는데 EXAONE 서버 안쪽에서 그 모델의 서비스를 못 찾아 500을 돌려줌
+            //  (없는 모델 이름이면 422 'unsupported model'이 나오므로 이름 문제와 구분됨)
+            if (/Failed to find matching model/i.test(t)) return `EXAONE 서버에서 모델(${mdl}) 서비스가 내려가 있습니다. 우리 쪽 키·주소·프록시 문제가 아니라 EXAONE 쪽 장애이고, 서버가 복구되면 그대로 다시 됩니다. 오래 계속되면 EXAONE 담당 부서에 문의하세요.`;
+            if (/unsupported model/i.test(t)) return `EXAONE이 모델 이름(${mdl})을 지원하지 않는다고 합니다. 모델 이름이 바뀌었는지 확인하고 AI 설정 → EXAONE → 모델 이름을 고치세요.`;
             if (/Forbidden origin|허용되지 않은 주소/i.test(t)) return '프록시가 이 주소를 허용하지 않습니다. 최신 로컬 프록시(AI 설정 > 로컬 프록시 내려받기)로 다시 실행하세요.';
             // 응답 대기 시간 초과: 서버 연결은 됐는데 답이 늦어서 프록시가 끊은 경우 (연결 실패와 구분)
             const rt = t.match(/read timed?\s*out[^(]*\(read timeout=(\d+)/i);
@@ -7091,6 +7122,7 @@
             // 기본 로컬 프록시는 칸에 채우지 않음 (저장하면 '직접 지정'으로 굳어서 API 키 직접 호출을 막았음)
             const savedProxy = localStorage.getItem('exaoneProxyUrl') || '';
             document.getElementById('exaoneProxyUrl').value = savedProxy === DEFAULT_EXAONE_PROXY_URL ? '' : savedProxy;
+            document.getElementById('exaoneModelName').value = exaoneTeamModel;
             document.getElementById('geminiApiKey').value = localStorage.getItem('geminiApiKey') || '';
             // Groq가 설정되어 있으면 Groq 탭, 아니면 저장된 선호 탭
             const preferredApi = localStorage.getItem('preferredAiApi') || 'groq';
@@ -7112,6 +7144,15 @@
             const geminiKey = document.getElementById('geminiApiKey').value.trim();
             const proxyUrl = document.getElementById('groqProxyUrl').value.trim();
             const exaoneProxyUrl = document.getElementById('exaoneProxyUrl').value.trim();
+            // EXAONE 모델 이름 (팀 전체 설정): 바뀌었을 때만 저장
+            const modelName = document.getElementById('exaoneModelName').value.trim();
+            if (modelName !== exaoneTeamModel) {
+                if (modelName && !EXAONE_MODEL_OK.test(modelName)) { alert('모델 이름에 쓸 수 없는 글자가 들어 있어요. (영문·숫자·. _ - : / 만)'); return; }
+                if (!db) { alert('서버에 연결된 뒤에 모델 이름을 바꿀 수 있어요.'); return; }
+                if (!confirm(`EXAONE 모델 이름을 '${modelName || EXAONE_MODEL_DEFAULT + ' (기본값)'}'(으)로 바꿀까요?\n팀원 모두에게 적용됩니다.`)) return;
+                db.ref('exaone_relay/model').set(modelName || null);
+                exaoneTeamModel = modelName;
+            }
             
             if (groqKey) {
                 localStorage.setItem('groqApiKey', groqKey);
@@ -7198,13 +7239,14 @@
             const resultDiv = document.getElementById('exaoneTestResult');
             resultDiv.innerHTML = `<span style="color: #ffa500;"><i class="fas fa-spinner fa-spin"></i> 테스트 중...</span>`;
             try {
-                const { res: response, route } = await exaoneFetch({ model: 'exaone-v4.5_33b', messages: [{ role: 'user', content: '안녕' }], max_tokens: 16, chat_template_kwargs: { enable_thinking: false } },
+                const modelEl = document.getElementById('exaoneModelName'), testModel = (modelEl && modelEl.value.trim()) || EXAONE_MODEL_DEFAULT;   // 저장 전에 새 이름을 시험해 볼 수 있게 칸의 값으로
+                const { res: response, route } = await exaoneFetch({ model: testModel, messages: [{ role: 'user', content: '안녕' }], max_tokens: 16, chat_template_kwargs: { enable_thinking: false } },
                     { override: { proxy: proxyUrl, key: apiKey } });
                 if (response.ok) resultDiv.innerHTML = `<span style="color: #00ff88;"><i class="fas fa-check-circle"></i> 연결 성공! (${escapeHtml(route.label)}) EXAONE API가 정상 작동합니다.</span>`;
                 else {
                     const errorText = await response.text();
-                    const hint = exaoneHttpHint(response.status, errorText);
-                    resultDiv.innerHTML = `<span style="color: #ff6b6b;"><i class="fas fa-times-circle"></i> ${escapeHtml(route.label)} → 오류 ${response.status}${hint ? ': ' + escapeHtml(hint) : ''}<br><small>${escapeHtml(errorText.slice(0, 160))}</small></span>`;
+                    const hint = exaoneHttpHint(response.status, errorText, testModel);
+                    resultDiv.innerHTML = `<span style="color: #ff6b6b;"><i class="fas fa-times-circle"></i> ${escapeHtml(route.label)} → 오류 ${response.status}${hint ? ': ' + escapeHtml(hint) : ''}<br><small>${escapeHtml(errorText.slice(0, 300))}</small></span>`;
                 }
             } catch (err) {
                 resultDiv.innerHTML = `<span style="color: #ff6b6b; white-space: pre-line;"><i class="fas fa-times-circle"></i> ${escapeHtml(err.message)}</span>`;
@@ -7479,7 +7521,7 @@ ${text}
             const timeoutId = setTimeout(() => controller.abort(), 30000);
             try {
                 const { res: response } = await exaoneFetch({
-                    model: 'exaone-v4.5_33b',
+                    model: exaoneModel(),
                     messages: [{ role: 'user', content: prompt }],
                     temperature: 0.1,
                     max_tokens: 2048,
@@ -14824,7 +14866,6 @@ ${text}
         // =====================================================
         const SOUP_Q_DAY = 20, SOUP_G_DAY = 5, SOUP_POST_DAY = 2, SOUP_COIN = 2, SOUP_GIVEUP = 3, SOUP_YES_CAP = 3;
         const SOUP_HINT_AT = [8, 16];   // 팀 전체 질문이 이만큼 쌓이면 힌트를 하나씩 열 수 있음
-        const SOUP_MODEL = 'exaone-v4.5_33b';
         const SOUP_ANS = { yes: '⭕ 예', no: '❌ 아니오', irr: '➖ 상관없음', ok: '🎉 정답!', close: '🔶 아깝다! 거의 다 왔어요' };
         // 기본 문제 (x = 진실·핵심·힌트를 가려 둔 것). 널리 알려진 고전 수수께끼와 새로 만든 문제를 섞음
         const SOUP_BANK = [
@@ -15490,6 +15531,7 @@ ${text}
             db.ref('soup/rounds').orderByChild('at').limitToLast(10).on('value', snap => { soupRounds = snap.val() || {}; renderSoup(); });
             db.ref('soup/queue').on('value', snap => { soupQueue = snap.val() || {}; renderSoup(); });
             db.ref('soup/users').on('value', snap => { soupUsers = snap.val() || {}; renderSoup(); });
+            db.ref('soup/ai').on('value', snap => { soupAiShared = snap.val(); renderSoup(); });
             soupBindWeekly();
             setInterval(() => { soupBindWeekly(); if (isMinigamePanelVisible('soup')) renderSoup(); }, 30000);
         }
@@ -15589,21 +15631,110 @@ ${text}
         }
 
         // ---------- AI 진행자 ----------
-        async function soupAI(prompt) {
-            const ctrl = new AbortController(), tm = setTimeout(() => ctrl.abort(), 45000);
+        //  기본은 EXAONE. EXAONE이 안 되면(서버 장애·연결 실패) 이 브라우저에 설정된 예비 AI(Groq → Gemini)가 대신 판정함
+        //  2026-11-16: EXAONE 서버에서 모델 서비스가 내려가 모든 요청이 500 → 게임이 통째로 멈췄던 일이 있어 넣음
+        //  장애 여부는 팀이 같이 봄 (soup/ai): 한 명이 겪으면 다른 사람 화면에도 바로 안내가 뜸
+        const SOUP_AI_SKIP_MS = 3 * 60 * 1000;      // EXAONE이 방금 실패했고 예비 AI가 있으면 이 시간 동안은 예비부터
+        const SOUP_AI_STALE_MS = 30 * 60 * 1000;    // 장애 표시는 이 시간이 지나면 '모름'으로 (다음 질문 때 다시 확인됨)
+        let soupAiLocal = { downAt: 0, err: '', okAt: 0 };   // 이 브라우저에서 본 EXAONE 결과 (마지막 실패 / 마지막 성공 시각)
+        let soupAiShared = null;                    // 팀이 같이 보는 상태 { ok, at, err, by }
+        const soupTimer = (ms) => { const c = new AbortController(), t = setTimeout(() => c.abort(), ms); return { signal: c.signal, done: () => clearTimeout(t) }; };
+        async function soupAskExaone(prompt, maxTokens = 200) {
+            const tm = soupTimer(45000);
             try {
-                const { res } = await exaoneFetch({ model: SOUP_MODEL, messages: [{ role: 'user', content: prompt }], temperature: 0, max_tokens: 200, chat_template_kwargs: { enable_thinking: false } }, { signal: ctrl.signal });
+                const { res } = await exaoneFetch({ model: exaoneModel(), messages: [{ role: 'user', content: prompt }], temperature: 0, max_tokens: maxTokens, chat_template_kwargs: { enable_thinking: false } }, { signal: tm.signal });
                 if (!res.ok) {
                     const t = await res.text().catch(() => ''), hint = exaoneHttpHint(res.status, t);
-                    throw new Error(`AI 진행자(EXAONE)가 오류를 돌려줬어요 (${res.status})${hint ? '\n' + hint : ''}`);
+                    console.warn('거북이 수프: EXAONE 오류', res.status, t.slice(0, 600));   // 서버가 보낸 실제 내용은 콘솔에 남김
+                    throw Object.assign(new Error(`EXAONE 오류 ${res.status}${hint ? ' — ' + hint : ''}`), { status: res.status });
                 }
                 const data = await res.json();
                 return String((data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '');
             } catch (e) {
-                if (e && e.name === 'AbortError') throw new Error('AI 진행자의 답이 너무 늦어요 (45초). 잠시 후 다시 시도해 주세요.');
-                if (e && e.code === 'connect') throw new Error('AI 진행자(EXAONE)에 연결하지 못했어요.\n팀 공유 EXAONE이 켜져 있는지 확인해 주세요. (⚙️ AI 설정 → EXAONE)');
+                if (e && e.name === 'AbortError') throw new Error('EXAONE의 답이 45초 안에 오지 않았어요.');
+                if (e && e.code === 'connect') throw Object.assign(new Error('EXAONE에 연결하지 못했어요 (팀 공유 EXAONE이 꺼져 있어요).'), { offline: true });
                 throw e;
-            } finally { clearTimeout(tm); }
+            } finally { tm.done(); }
+        }
+        async function soupAskGroq(prompt) {
+            const proxy = getGroqProxyUrl(), key = localStorage.getItem('groqApiKey') || '', headers = { 'Content-Type': 'application/json' };
+            if (!proxy && key) headers.Authorization = `Bearer ${key}`;
+            const tm = soupTimer(25000);
+            try {
+                const res = await fetch(proxy || 'https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers, signal: tm.signal,
+                    body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: prompt }], temperature: 0, max_tokens: 200 }) });
+                if (!res.ok) throw new Error(`Groq 오류 ${res.status}`);
+                const data = await res.json();
+                return String((data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '');
+            } finally { tm.done(); }
+        }
+        async function soupAskGemini(prompt) {
+            const tm = soupTimer(25000);
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(localStorage.getItem('geminiApiKey') || '')}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: tm.signal,
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0, maxOutputTokens: 200 } }) });
+                if (!res.ok) throw new Error(`Gemini 오류 ${res.status}`);
+                const data = await res.json(), parts = (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) || [];
+                return parts.map(x => x.text || '').join('');
+            } finally { tm.done(); }
+        }
+        // 이 브라우저에서 쓸 수 있는 예비 AI (⚙️ AI 설정에 넣어 둔 것)
+        function soupBackups() {
+            const list = [];
+            try {
+                if (getGroqProxyUrl() || localStorage.getItem('groqApiKey')) list.push(['Groq', soupAskGroq]);
+                if (localStorage.getItem('geminiApiKey')) list.push(['Gemini', soupAskGemini]);
+            } catch (e) { /* noop */ }
+            return list;
+        }
+        // EXAONE 결과를 기록하고 팀과 나눔 (같은 상태를 계속 다시 쓰지는 않음)
+        function soupAiReport(ok, err) {
+            const now = Date.now(), s = soupAiShared;
+            soupAiLocal = ok ? { downAt: 0, err: '', okAt: now } : { downAt: now, err: err || '', okAt: soupAiLocal.okAt };
+            if (!db) return;
+            if (ok ? (!s || s.ok !== false) : (s && s.ok === false && s.err === err && now - (s.at || 0) < 5 * 60 * 1000)) return;
+            db.ref('soup/ai').set({ ok, at: now, err: ok ? '' : String(err || '').slice(0, 300), by: myGameName() });
+        }
+        // 지금 EXAONE이 멈춘 것으로 알려져 있는지 (내가 겪었거나 팀원이 겪음) → { err, at } 또는 null
+        function soupAiDown() {
+            const now = Date.now(), s = soupAiShared, l = soupAiLocal;
+            if (l.downAt && now - l.downAt < SOUP_AI_STALE_MS) return { err: l.err, at: l.downAt };
+            if (s && s.ok === false && now - (s.at || 0) < SOUP_AI_STALE_MS && !(l.okAt > (s.at || 0))) return { err: s.err || '', at: s.at };
+            return null;
+        }
+        async function soupAI(prompt) {
+            const backups = soupBackups(), down = soupAiDown();
+            const exaone = ['EXAONE', soupAskExaone];
+            // 방금 EXAONE이 실패했고 예비가 있으면 예비부터 (매번 몇 초씩 헛기다리지 않게). 3분 뒤에는 EXAONE부터 다시 확인
+            const order = backups.length && down && Date.now() - down.at < SOUP_AI_SKIP_MS ? [...backups, exaone] : [exaone, ...backups];
+            const errs = [];
+            for (const [name, ask] of order) {
+                try {
+                    const text = await ask(prompt);
+                    if (!String(text).trim()) throw new Error(`${name}이(가) 빈 답을 보냈어요.`);
+                    if (name === 'EXAONE') soupAiReport(true);
+                    return text;
+                } catch (e) {
+                    const msg = e && e.name === 'AbortError' ? `${name}의 답이 너무 늦어요.` : (e && e.message) || String(e);
+                    if (name === 'EXAONE' && !(e && e.offline)) soupAiReport(false, msg);   // 공유 PC가 꺼진 것은 '서버 장애'로 치지 않음
+                    errs.push(msg);
+                }
+            }
+            throw new Error(`AI 진행자가 답하지 못했어요. (질문 횟수는 줄지 않아요)\n\n${errs.join('\n')}`
+                + (backups.length ? '' : '\n\n💡 ⚙️ AI 설정에 Groq나 Gemini 키를 넣어 두면, EXAONE이 멈췄을 때 그 AI가 대신 진행해요.'));
+        }
+        // 🔄 EXAONE이 돌아왔는지 아주 짧은 요청으로 확인
+        async function soupAiCheck() {
+            if (soupBusy) return;
+            soupBusy = 'c'; renderSoup();
+            try {
+                await soupAskExaone('안녕', 8);
+                soupAiReport(true);
+                showCoinNotification(0, '', '🟢 EXAONE이 다시 됩니다! 질문해 보세요');
+            } catch (e) {
+                if (!(e && e.offline)) soupAiReport(false, (e && e.message) || String(e));
+                alert(`아직 안 돼요.\n\n${(e && e.message) || e}`);
+            } finally { soupBusy = ''; renderSoup(); }
         }
         // 답에서 판정 단어 뽑기: JSON의 answer/verdict 값, 없으면 글에서 마지막에 나온 판정 단어
         function soupVerdict(text, words) {
@@ -15837,8 +15968,17 @@ ${keys}
             const multiline = (t) => escapeHtml(String(t || '')).replace(/\n/g, '<br>');
             if (!db) { head.textContent = '서버에 연결되면 거북이 수프가 열려요.'; return; }
             const me = myGameName(), key = statKey(me), r = soupRound, done = soupDone(r), mine = !!(r && r.byKey && r.byKey === key);
-            const ai = soupAiOnline();
-            const aiChip = `<span class="soup-ai ${ai ? 'on' : ''}" title="질문과 정답 도전은 AI 진행자(EXAONE)가 판정해요">${ai ? '🟢 AI 진행자 연결됨' : '⚪ AI 진행자 꺼짐 (팀 공유 EXAONE이 켜지면 답해요)'}</span>`;
+            const ai = soupAiOnline(), down = soupAiDown(), backupNames = soupBackups().map(x => x[0]);
+            const aiChip = down
+                ? (backupNames.length ? `<span class="soup-ai warn" title="${escapeHtml(down.err)}">🟡 EXAONE 장애 → 예비 AI(${backupNames.join('·')})가 진행</span>`
+                    : `<span class="soup-ai bad" title="${escapeHtml(down.err)}">🔴 EXAONE 서버 장애</span>`)
+                : `<span class="soup-ai ${ai ? 'on' : ''}" title="질문과 정답 도전은 AI 진행자(EXAONE)가 판정해요">${ai ? '🟢 AI 진행자 연결됨' : '⚪ AI 진행자 꺼짐 (팀 공유 EXAONE이 켜지면 답해요)'}</span>`;
+            // EXAONE 장애 안내 (예비 AI가 없을 때만 크게)
+            const dAt = down ? new Date(down.at) : null;
+            show('soupAiDown', !!down && !backupNames.length);
+            if (down && !backupNames.length) set('soupAiDown', `⚠️ <b>지금은 EXAONE 서버 쪽 문제로 AI 진행자가 답하지 못해요.</b> 우리 설정 문제가 아니고, 서버가 복구되면 바로 다시 돼요. <small>(${String(dAt.getHours()).padStart(2, '0')}:${String(dAt.getMinutes()).padStart(2, '0')} 확인 · 질문 횟수는 줄지 않아요)</small>`
+                + `<br><button onclick="soupAiCheck()" ${soupBusy ? 'disabled' : ''}>${soupBusy === 'c' ? '확인 중…' : '🔄 지금 다시 확인'}</button>`
+                + `<details><summary>서버가 보낸 내용</summary>${escapeHtml(down.err || '(없음)')}</details>`);
             const playing = !!r && !done && !mine;
             show('soupAskBox', playing);
             show('soupTools', playing, 'flex');
@@ -18656,6 +18796,6 @@ ${keys}
     })();
     </script>
     <!-- 특허 모션 탭: PDF → EXAONE 해석 → 동작 애니메이션 -->
-    <script src="patent_motion.js?v=2026-11-05a"></script>
+    <script src="patent_motion.js?v=2026-11-17a"></script>
 </body>
 </html>
