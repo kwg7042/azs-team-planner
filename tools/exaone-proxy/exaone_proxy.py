@@ -45,7 +45,7 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-VERSION = 6
+VERSION = 7
 BACKGROUND = False  # --background: 창 없이 실행, 사용자에게 묻지 않음
 LOG_PATH = Path(__file__).with_name("exaone_proxy.log")
 HOST = "127.0.0.1"
@@ -80,23 +80,24 @@ NEW_PLATFORM_URL = "https://api.exaone.ai/v1"  # 2026-11-09 새 EXAONE API Platf
 
 
 def check_model_for(url: str) -> str:
-    """시작할 때 확인용으로 부를 모델: 새 플랫폼은 K-EXAONE 2.5, 예전 주소는 EXAONE 4.5"""
+    """시작할 때 확인용으로 부를 모델: 새 플랫폼은 K-EXAONE 2.5, 지금 주소(api.lgresearch.ai)는 K-EXAONE 2
+    (2026-11-17: exaone-v4.5_33b 서비스 종료 → 같은 주소·키로 k-exaone_v2 가 됨)"""
     if CHECK_MODEL:
         return CHECK_MODEL
-    return "k-exaone_v2.5" if "api.exaone.ai" in (url or "") else "exaone-v4.5_33b"
+    return "k-exaone_v2.5" if "api.exaone.ai" in (url or "") else "k-exaone_v2"
 
 
 def check_body(model: str) -> bytes:
-    if model.lower().startswith("k-exaone"):  # 항상 추론하는 모델: enable_thinking 대신 reasoning_effort
+    if model.lower().startswith("k-exaone_v2.5"):  # 항상 추론하는 모델: enable_thinking 대신 reasoning_effort
         return json.dumps({"model": model, "messages": [{"role": "user", "content": "ping"}], "max_tokens": 16,
                            "reasoning_effort": "low"}).encode("utf-8")
     return json.dumps({"model": model, "messages": [{"role": "user", "content": "ping"}], "max_tokens": 1,
                        "chat_template_kwargs": {"enable_thinking": False}}).encode("utf-8")
 
 
-MODEL_GONE = ("EXAONE 쪽에서 이 모델의 서비스가 내려가 있습니다 (키·주소는 정상). 2026-11-16부터 EXAONE 4.5가 응답하지 않고, "
-              f"공식 문서에는 새 플랫폼의 K-EXAONE 2.5만 남아 있습니다 → docs.exaone.ai 에서 키를 받아 --reset 으로 주소 {NEW_PLATFORM_URL} 와 함께 넣고, "
-              "팀플래너 AI 설정 → EXAONE → 모델 이름을 k-exaone_v2.5 로 바꾸세요.")
+MODEL_GONE = ("EXAONE 쪽에서 이 모델의 서비스가 내려가 있습니다 (키·주소는 정상). 2026-11-16부터 EXAONE 4.5(exaone-v4.5_33b)가 응답하지 않습니다 "
+              "→ 팀플래너 AI 설정 → EXAONE → 모델 이름을 k-exaone_v2 로 바꾸세요 (지금 키·주소 그대로 됨). "
+              f"새 플랫폼({NEW_PLATFORM_URL}, docs.exaone.ai 키)을 쓴다면 모델 이름은 k-exaone_v2.5 입니다.")
 
 
 def call_exaone(target_url: str, api_key: str, body: bytes, timeout: int = 0) -> tuple[int, bytes]:
