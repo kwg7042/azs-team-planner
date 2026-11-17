@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-17a">
+    <meta name="app-version" content="2026-11-17b">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -4919,9 +4919,9 @@
                         </div>
                         <div style="margin-top: 15px;">
                             <label style="display: block; margin-bottom: 8px; font-size: 13px;"><i class="fas fa-microchip" style="color: #00d4ff;"></i> EXAONE 모델 이름 (선택 · 팀 전체 적용)</label>
-                            <input type="text" id="exaoneModelName" maxlength="80" placeholder="비워 두면 기본값 exaone-v4.5_33b"
+                            <input type="text" id="exaoneModelName" maxlength="80" placeholder="비워 두면 기본값 exaone-v4.5_33b · 새 플랫폼(api.exaone.ai)은 k-exaone_v2.5"
                                    style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 13px;">
-                            <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 8px;">EXAONE 쪽에서 모델 이름이 바뀌었을 때만 고치세요. 위의 <b>연결 테스트</b>로 먼저 확인한 뒤 저장하면 팀원 모두에게 적용됩니다.</p>
+                            <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 8px;">EXAONE 쪽에서 모델 이름이 바뀌었을 때만 고치세요. 위의 <b>연결 테스트</b>로 먼저 확인한 뒤 저장하면 팀원 모두에게 적용됩니다.<br>새 플랫폼 모델 <b>k-exaone_v2.5</b>는 글자 전용이라 특허 모션의 도면 이미지는 읽지 못하고 본문 글만 씁니다.</p>
                         </div>
                     </div>
 
@@ -6944,6 +6944,33 @@
         let exaoneTeamModel = '';
         function exaoneModel() { return exaoneTeamModel || EXAONE_MODEL_DEFAULT; }
         window.exaoneModel = exaoneModel;
+        // K-EXAONE 2.5 (2026-11-09 새 플랫폼 https://api.exaone.ai, 모델 k-exaone_v2.5) 규칙에 맞게 요청을 바꿈
+        //  · 글자 전용: 이미지(도면)는 못 읽어서 빼고 글만 보냄
+        //  · 항상 추론함: enable_thinking 대신 reasoning_effort(low/high), 추론 토큰도 max_tokens에 포함 → 넉넉히
+        //  EXAONE 4.5(exaone-v4.5_33b)는 그대로 보냄. 모든 EXAONE 호출이 exaoneFetch를 지나므로 여기 한 곳만 고치면 됨
+        const exaoneTextOnly = (m) => /^k-exaone/i.test(String(m || ''));
+        function exaoneAdaptPayload(p) {
+            if (!p || !exaoneTextOnly(p.model)) return p;
+            const q = Object.assign({}, p), kw = Object.assign({}, q.chat_template_kwargs || {});
+            const think = !!kw.enable_thinking;
+            delete kw.enable_thinking;
+            if (Object.keys(kw).length) q.chat_template_kwargs = kw; else delete q.chat_template_kwargs;
+            if (!q.reasoning_effort) q.reasoning_effort = think ? 'high' : 'low';
+            q.max_tokens = Math.max(q.max_tokens || 0, think ? 16000 : 4000);
+            let dropped = 0;
+            q.messages = (q.messages || []).map(m => {
+                if (!m || !Array.isArray(m.content)) return m;
+                const texts = m.content.filter(c => { const t = c && c.type === 'text'; if (!t) dropped++; return t; }).map(c => c.text);
+                return Object.assign({}, m, { content: texts.join('\n') });
+            });
+            if (dropped) {
+                console.warn(`EXAONE: ${q.model}은(는) 글자 전용이라 이미지 ${dropped}장을 빼고 보냈어요.`);
+                const last = q.messages[q.messages.length - 1];
+                if (last && typeof last.content === 'string') last.content += `\n\n(참고: 이미지 ${dropped}장은 이 모델이 볼 수 없어 빠졌다. 글로 된 내용만으로 판단하라.)`;
+            }
+            return q;
+        }
+        window.exaoneAdaptPayload = exaoneAdaptPayload;
         const EXAONE_PROXY_KIT = 'tools/exaone-proxy/';
         function exaoneRoutes(override) {
             const o = override || {};
@@ -7045,7 +7072,10 @@
             const t = String(text || ''), mdl = model || exaoneModel();
             // 2026-11-16 장애: 키·주소·모델 이름은 모두 맞는데 EXAONE 서버 안쪽에서 그 모델의 서비스를 못 찾아 500을 돌려줌
             //  (없는 모델 이름이면 422 'unsupported model'이 나오므로 이름 문제와 구분됨)
-            if (/Failed to find matching model/i.test(t)) return `EXAONE 서버에서 모델(${mdl}) 서비스가 내려가 있습니다. 우리 쪽 키·주소·프록시 문제가 아니라 EXAONE 쪽 장애이고, 서버가 복구되면 그대로 다시 됩니다. 오래 계속되면 EXAONE 담당 부서에 문의하세요.`;
+            //  → 11/17 확인: 공식 문서(docs.exaone.ai)에서 EXAONE 4.5 페이지가 사라짐(404). 새 플랫폼은 K-EXAONE 2.5(api.exaone.ai)만 제공
+            if (/Failed to find matching model/i.test(t)) return exaoneTextOnly(mdl)
+                ? `EXAONE 서버에서 모델(${mdl}) 서비스가 내려가 있습니다. 우리 쪽 키·주소·프록시 문제가 아니라 EXAONE 쪽 장애입니다. 오래 계속되면 EXAONE 담당 부서에 문의하세요.`
+                : `EXAONE 쪽에서 모델(${mdl}) 서비스가 내려갔습니다 (2026-11-16부터, 공식 문서에서도 EXAONE 4.5가 빠지고 새 플랫폼의 K-EXAONE 2.5만 남음). 우리 키·주소·코드 문제가 아닙니다. → 공유 PC에서 새 플랫폼 키(docs.exaone.ai 발급)로 프록시를 다시 설정(주소 https://api.exaone.ai/v1)하고, AI 설정 → EXAONE → 모델 이름을 k-exaone_v2.5 로 바꾸세요.`;
             if (/unsupported model/i.test(t)) return `EXAONE이 모델 이름(${mdl})을 지원하지 않는다고 합니다. 모델 이름이 바뀌었는지 확인하고 AI 설정 → EXAONE → 모델 이름을 고치세요.`;
             if (/Forbidden origin|허용되지 않은 주소/i.test(t)) return '프록시가 이 주소를 허용하지 않습니다. 최신 로컬 프록시(AI 설정 > 로컬 프록시 내려받기)로 다시 실행하세요.';
             // 응답 대기 시간 초과: 서버 연결은 됐는데 답이 늦어서 프록시가 끊은 경우 (연결 실패와 구분)
@@ -7055,7 +7085,7 @@
                 if (sec && sec < 300) return `EXAONE 서버에는 연결됐지만 답이 ${sec}초 안에 오지 않아 프록시가 끊었습니다. 지금 켜 둔 프록시는 예전 버전(대기 ${sec}초)입니다 → 그 프록시 창을 닫고, AI 설정 > EXAONE에서 새 로컬 프록시(exaone_proxy.py + EXAONE_proxy_start.bat, 대기 15분)를 내려받아 실행하세요.`;
                 return `EXAONE의 답이 ${sec ? sec + '초' : '프록시 대기 시간'} 안에 오지 않았습니다. 도면 수를 줄이거나 '깊게 생각하기'를 끄고 다시 시도하세요.`;
             }
-            if (status === 401) return 'EXAONE이 API 키를 거부했습니다 (키가 틀렸거나 만료, 또는 키에 맞지 않는 주소). 프록시를 켠 PC(팀 공유면 공유 PC)에서 프록시 창을 닫고 최신 exaone_proxy.py로 다시 실행하면 시작할 때 키를 확인하고 다시 입력받아요.';
+            if (status === 401) return 'EXAONE이 API 키를 거부했습니다 (키가 틀렸거나 만료, 또는 키에 맞지 않는 주소). 새 플랫폼(docs.exaone.ai) 키는 발급 후 30일이 지나면 자동으로 만료되니, 새 키를 받아 프록시를 켠 PC(팀 공유면 공유 PC)에서 python exaone_proxy.py --reset 으로 다시 넣으세요. 최신 exaone_proxy.py는 시작할 때 키를 확인하고 다시 입력받아요.';
             if (status === 403) return '이 키로 EXAONE 접근이 허용되지 않았습니다.';
             if (status === 404) return '엔드포인트 주소나 모델명이 맞지 않습니다.';
             if (status === 413) return '보내는 내용이 너무 큽니다. 도면(이미지) 수를 줄여 보세요.';
@@ -7067,6 +7097,7 @@
         // 공통 호출: 연결이 안 되는 경로는 건너뛰고 다음 경로로. 응답을 받으면 { res, route }
         async function exaoneFetch(payload, opt) {
             const o = opt || {};
+            payload = exaoneAdaptPayload(payload);
             const routes = exaoneRoutes(o.override);
             const tried = [];
             for (const r of routes) {
