@@ -16,7 +16,7 @@
     pdfWorker: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
   };
   const EXAONE_URL = 'https://api.lgresearch.ai/v1/chat/completions';
-  const EXAONE_MODEL = 'k-exaone_v2';   // 2026-11-17: exaone-v4.5_33b 종료. 보통은 앱 공통 설정(window.exaoneModel)을 씀
+  const EXAONE_MODEL = 'exaone-v4.5_33b';   // 보통은 앱 공통 설정(window.exaoneModel)을 씀. 4.5가 내려가면 exaoneFetch가 예비 모델(k-exaone_v2)로 자동 전환
   const TYPES = ['rotary_notch', 'press_notch', 'laser_notch', 'rotary_cut'];
   const TYPE_LABEL = {
     rotary_notch: '롤러 노칭', press_notch: '금형 프레스 노칭',

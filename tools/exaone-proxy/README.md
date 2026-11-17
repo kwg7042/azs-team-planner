@@ -45,14 +45,14 @@ API 키가 있는 사람 **한 명만** 아래처럼 켜 두면, 팀원은 아�
 | 401 | EXAONE이 키를 거부했습니다. 키가 틀렸거나, 키에 맞지 않는 엔드포인트 주소입니다. 프록시를 다시 실행하면 시작할 때 키를 확인하고, 거부되면 그 자리에서 키·주소를 다시 입력받습니다. 키가 거부되면 내 문서 폴더 아래에서 예전 ExaOne 폴더(`exaone_client.py`가 있는 곳의 `.env`나 `exaone_config.json`)를 자동으로 찾아서 그 설정을 쓸지 물어봅니다. 찾지 못하면 키와 주소를 직접 입력합니다. |
 | 403 Forbidden origin | 예전 프록시입니다. 이 폴더의 최신 프록시로 실행하세요. |
 | 502 | 프록시는 켜졌지만 EXAONE 서버에 닿지 않습니다. 회사망이나 인터넷 연결을 확인하세요. |
-| 500 `Failed to find matching model` | 키·주소는 맞는데 EXAONE 쪽에서 그 모델의 서비스가 내려간 상태입니다. 2026-11-16부터 EXAONE 4.5(`exaone-v4.5_33b`)가 이렇게 응답합니다. 팀플래너 AI 설정 → EXAONE → 모델 이름을 `k-exaone_v2`로 바꾸면 지금 키·주소 그대로 됩니다 (2026-11-17 팀 설정 변경 완료). |
+| 500 `Failed to find matching model` | 키·주소는 맞는데 EXAONE 쪽에서 그 모델의 서비스가 내려간 상태입니다. 2026-11-16~17 하루 동안 EXAONE 4.5(`exaone-v4.5_33b`)가 이렇게 응답했습니다 (11/18 다시 정상). 팀플래너는 이때 같은 키·주소의 `k-exaone_v2`로 자동으로 바꿔 묻습니다. 오래 계속되면 AI 설정 → EXAONE → 모델 이름을 `k-exaone_v2`로 바꾸세요. |
 | 500 `not a multimodal model` | 글자 전용 모델(`k-exaone_v2`, `k-exaone_v2.5`)에 이미지를 보냈습니다. 팀플래너는 이미지를 자동으로 빼고 보냅니다. |
 | 422 `unsupported model` | 주소와 모델 이름이 맞지 않습니다. 지금 주소(`api.lgresearch.ai`)는 `k-exaone_v2`, 새 주소(`api.exaone.ai`)는 `k-exaone_v2.5` 입니다. 팀플래너 AI 설정 → EXAONE → 모델 이름을 맞추세요. |
 | 포트 8787을 열 수 없음 | 이미 프록시 창이 켜져 있습니다. 켜진 창을 그대로 쓰면 됩니다. |
 
 ## 새 플랫폼(K-EXAONE 2.5)으로 옮기기 (선택)
 
-지금은 기존 주소·키로 `k-exaone_v2`를 쓰고 있어 옮길 필요가 없습니다. 기존 주소가 막히면 아래 순서로 옮기세요.
+지금은 기존 주소·키로 `exaone-v4.5_33b`(예비 `k-exaone_v2`)를 쓰고 있어 옮길 필요가 없습니다. 기존 주소가 막히면 아래 순서로 옮기세요.
 
 1. [docs.exaone.ai](https://docs.exaone.ai) 에 로그인해서 API 키를 받습니다. **키는 발급 후 30일이 지나면 자동으로 만료**되니, 그때마다 새로 받아 2번을 다시 하면 됩니다.
 2. 공유 PC에서 프록시 창을 닫고 `python exaone_proxy.py --reset` 실행 → 새 키 입력 → 주소에 `https://api.exaone.ai/v1` 입력. 그다음 평소처럼 `EXAONE_proxy_share_start.bat` 으로 켭니다.
