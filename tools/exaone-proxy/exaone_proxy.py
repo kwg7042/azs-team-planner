@@ -45,7 +45,7 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-VERSION = 5
+VERSION = 6
 BACKGROUND = False  # --background: 창 없이 실행, 사용자에게 묻지 않음
 LOG_PATH = Path(__file__).with_name("exaone_proxy.log")
 HOST = "127.0.0.1"
@@ -75,7 +75,28 @@ def normalize_url(base_url: str) -> str:
     return url if url.endswith("/chat/completions") else url + "/chat/completions"
 
 
-CHECK_MODEL = os.environ.get("EXAONE_CHECK_MODEL", "exaone-v4.5_33b")
+CHECK_MODEL = os.environ.get("EXAONE_CHECK_MODEL", "")
+NEW_PLATFORM_URL = "https://api.exaone.ai/v1"  # 2026-11-09 새 EXAONE API Platform (키는 docs.exaone.ai 에서 발급, 30일마다 만료)
+
+
+def check_model_for(url: str) -> str:
+    """시작할 때 확인용으로 부를 모델: 새 플랫폼은 K-EXAONE 2.5, 예전 주소는 EXAONE 4.5"""
+    if CHECK_MODEL:
+        return CHECK_MODEL
+    return "k-exaone_v2.5" if "api.exaone.ai" in (url or "") else "exaone-v4.5_33b"
+
+
+def check_body(model: str) -> bytes:
+    if model.lower().startswith("k-exaone"):  # 항상 추론하는 모델: enable_thinking 대신 reasoning_effort
+        return json.dumps({"model": model, "messages": [{"role": "user", "content": "ping"}], "max_tokens": 16,
+                           "reasoning_effort": "low"}).encode("utf-8")
+    return json.dumps({"model": model, "messages": [{"role": "user", "content": "ping"}], "max_tokens": 1,
+                       "chat_template_kwargs": {"enable_thinking": False}}).encode("utf-8")
+
+
+MODEL_GONE = ("EXAONE 쪽에서 이 모델의 서비스가 내려가 있습니다 (키·주소는 정상). 2026-11-16부터 EXAONE 4.5가 응답하지 않고, "
+              f"공식 문서에는 새 플랫폼의 K-EXAONE 2.5만 남아 있습니다 → docs.exaone.ai 에서 키를 받아 --reset 으로 주소 {NEW_PLATFORM_URL} 와 함께 넣고, "
+              "팀플래너 AI 설정 → EXAONE → 모델 이름을 k-exaone_v2.5 로 바꾸세요.")
 
 
 def call_exaone(target_url: str, api_key: str, body: bytes, timeout: int = 0) -> tuple[int, bytes]:
@@ -93,6 +114,8 @@ def call_exaone(target_url: str, api_key: str, body: bytes, timeout: int = 0) ->
                 403: "이 키로 접근이 허용되지 않았습니다",
                 404: "엔드포인트 주소나 모델명이 맞지 않습니다",
                 429: "요청이 너무 많습니다. 잠시 후 다시 시도하세요"}.get(exc.code)
+        if b"Failed to find matching model" in data:
+            hint = MODEL_GONE
         if hint:
             print(f"[EXAONE] {exc.code}: {hint}")
         return exc.code, data
@@ -205,6 +228,7 @@ def ask_key(cfg: dict) -> dict:
         sys.exit(1)
     cur = cfg.get("base_url") or DEFAULT_BASE_URL
     print(" 엔드포인트 주소: 회사에서 받은 안내(또는 예전 ExaOne 폴더 .env 의 EXAONE_BASE_URL)에 적힌 주소")
+    print(f" 새 EXAONE API Platform(docs.exaone.ai 에서 받은 키)이면: {NEW_PLATFORM_URL}  (키는 발급 후 30일마다 새로 받아야 함)")
     base = input(f" 엔드포인트 주소 (그냥 Enter = {cur}): ").strip()
     cfg = dict(cfg, api_key=key, base_url=base or cur)
     save_config(cfg)
@@ -244,12 +268,17 @@ def check_key(cfg: dict) -> dict:
     """시작할 때 아주 짧은 요청으로 키·주소 확인. 401/403/404면 그 자리에서 다시 입력 (최대 3번)"""
     for attempt in range(4):
         url = normalize_url(cfg.get("base_url"))
-        print(f" EXAONE 연결 확인 중… (주소 {url}, 키 {mask(cfg['api_key'])})")
-        body = json.dumps({"model": CHECK_MODEL, "messages": [{"role": "user", "content": "ping"}], "max_tokens": 1,
-                           "chat_template_kwargs": {"enable_thinking": False}}).encode("utf-8")
-        code, data = call_exaone(url, cfg["api_key"], body, timeout=60)
+        model = check_model_for(url)
+        print(f" EXAONE 연결 확인 중… (주소 {url}, 모델 {model}, 키 {mask(cfg['api_key'])})")
+        code, data = call_exaone(url, cfg["api_key"], check_body(model), timeout=60)
         if 200 <= code < 300:
             print(" ✅ EXAONE 연결 확인 완료")
+            return cfg
+        if code == 422 and b"unsupported model" in data:
+            print(f" ✅ 키·주소는 맞습니다. 다만 이 주소는 모델 {model} 을(를) 지원하지 않아요 → 팀플래너 AI 설정 → EXAONE → 모델 이름을 이 주소에 맞게 바꾸세요.")
+            return cfg
+        if b"Failed to find matching model" in data:
+            print(f" ⚠️ {MODEL_GONE}")
             return cfg
         if code in (401, 403, 404) and attempt < 3:
             why = {401: "API 키가 맞지 않습니다 (키가 틀렸거나 만료, 또는 이 키에 맞는 주소가 아님)",
