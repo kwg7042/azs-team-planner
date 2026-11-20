@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-18d">
+    <meta name="app-version" content="2026-11-20a">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -4253,6 +4253,50 @@
             .soup-item .si-ans { margin-left: auto; }
         }
 
+        /* ===== 🔤 초성 퀴즈 ===== */
+        .cho-area { padding: 16px; background: linear-gradient(160deg, #2a2350, #141a2e); border-radius: 20px; border: 3px solid rgba(167,139,250,0.4); margin-bottom: 20px; text-align: center; }
+        .cho-head { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; font-size: 16px; margin-bottom: 10px; }
+        .cho-head .cho-date { font-size: 12px; color: #ddd6fe; padding: 2px 9px; border-radius: 10px; background: rgba(167,139,250,0.18); }
+        .cho-head .cho-score { font-size: 12px; color: #ffd166; padding: 2px 9px; border-radius: 10px; background: rgba(255,209,102,0.12); }
+        .cho-nav { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
+        .cho-nav button { width: 34px; height: 34px; padding: 0; border-radius: 50%; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.06); color: #fff; font-size: 13px; cursor: pointer; font-family: inherit; }
+        .cho-nav button.ok { background: rgba(74,222,128,0.2); border-color: rgba(74,222,128,0.6); }
+        .cho-nav button.no { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.5); color: #fca5a5; }
+        .cho-nav button.on { outline: 2px solid #ffd166; outline-offset: 1px; font-weight: bold; }
+        .cho-card { max-width: 720px; margin: 0 auto 10px; padding: 18px 14px; border-radius: 16px; background: rgba(0,0,0,0.32); border: 1px solid rgba(167,139,250,0.35); }
+        .cho-card.shake { animation: choShake 0.35s; }
+        @keyframes choShake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+        .cho-cat { font-size: 15px; font-weight: bold; color: #ddd6fe; margin-bottom: 12px; }
+        .cho-cat small { font-weight: normal; font-size: 12px; color: rgba(255,255,255,0.55); margin-left: 6px; }
+        .cho-letters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; }
+        .cho-word { display: inline-flex; gap: 4px; }
+        .cho-ch { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 48px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.22); font-size: 24px; font-weight: bold; color: #fff; }
+        .cho-ch.open { background: rgba(255,209,102,0.2); border-color: rgba(255,209,102,0.6); color: #ffe7a8; }
+        .cho-ch.ok { background: rgba(74,222,128,0.2); border-color: rgba(74,222,128,0.6); color: #bbf7d0; }
+        .cho-ch.no { background: rgba(248,113,113,0.14); border-color: rgba(248,113,113,0.45); color: #fecaca; }
+        .cho-hint { display: inline-block; margin-top: 12px; padding: 7px 12px; border-radius: 10px; background: rgba(255,209,102,0.1); border: 1px dashed rgba(255,209,102,0.45); color: #ffe7a8; font-size: 13px; }
+        .cho-result { margin-top: 10px; font-size: 14px; }
+        .cho-result.ok { color: #86efac; }
+        .cho-result.no, .cho-result.bad { color: #fca5a5; }
+        .cho-row { display: flex; gap: 6px; max-width: 520px; margin: 0 auto 8px; }
+        .cho-row input { flex: 1; min-width: 0; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.08); color: #fff; font-size: 15px; font-family: inherit; }
+        .cho-row input::placeholder { color: rgba(255,255,255,0.4); }
+        .cho-row button { flex: 0 0 96px; padding: 10px 6px; border-radius: 12px; border: none; background: #a78bfa; color: #1b1333; font-weight: bold; font-size: 14px; cursor: pointer; font-family: inherit; white-space: nowrap; }
+        .cho-row button:disabled, .cho-tools button:disabled { opacity: 0.45; cursor: not-allowed; }
+        .cho-tools { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 4px 0 10px; }
+        .cho-tools button { padding: 6px 14px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.06); color: #fff; font-size: 12px; cursor: pointer; font-family: inherit; }
+        .cho-my { font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 10px; }
+        .cho-my b { color: #ddd6fe; }
+        .cho-today { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; font-size: 12px; margin-bottom: 4px; }
+        .cho-today span.ct { padding: 3px 10px; border-radius: 12px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14); }
+        .cho-today span.ct.me { border-color: rgba(255,209,102,0.6); }
+        .cho-today small { color: rgba(255,255,255,0.55); align-self: center; }
+        @media (max-width: 520px) {
+            .cho-ch { width: 32px; height: 40px; font-size: 19px; border-radius: 8px; }
+            .cho-letters { gap: 6px 12px; }
+            .cho-row button { flex-basis: 76px; }
+        }
+
         .dq-area { padding: 16px; background: linear-gradient(160deg, #1e2a44, #141a2e); border-radius: 20px; border: 3px solid rgba(255,214,102,0.35); margin-bottom: 20px; }
         .dq-top { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
         .dq-new-btn { padding: 11px 26px; font-size: 16px; font-weight: bold; border: none; border-radius: 24px; cursor: pointer; color: #1a1a2e; background: linear-gradient(135deg, #ffd166, #ff9f1c); font-family: inherit; }
@@ -5260,7 +5304,7 @@
                 <!-- 코인 획득 방법 안내 -->
                 <div class="coin-guide">
                     <span class="coin-guide-icon">💡</span>
-                    <span class="coin-guide-text">코인 얻는 법: 신기술 검토 등록 <strong>3</strong> · 특허 모션 생성 <strong>3</strong> (PDF당 1번) · QnA 안건 <strong>2</strong> (하루 최대 2개) · 학습 링크 공유 <strong>1</strong> (하루 최대 3개) · 매일 출첵 <strong>1</strong> · 그림 퀴즈 1등 <strong>1</strong> (하루 최대 3개) · 거북이 수프 정답 <strong>1</strong> (하루 최대 3개)</span>
+                    <span class="coin-guide-text">코인 얻는 법: 신기술 검토 등록 <strong>3</strong> · 특허 모션 생성 <strong>3</strong> (PDF당 1번) · QnA 안건 <strong>2</strong> (하루 최대 2개) · 학습 링크 공유 <strong>1</strong> (하루 최대 3개) · 매일 출첵 <strong>1</strong> · 그림 퀴즈 1등 <strong>1</strong> (하루 최대 3개) · 거북이 수프 정답 <strong>1</strong> (하루 최대 3개) · 초성 퀴즈 정답 3개마다 <strong>1</strong> (하루 최대 3개)</span>
                 </div>
 
                 <!-- 게임 선택 -->
@@ -5271,6 +5315,7 @@
                     <button class="minigame-tab" onclick="switchMinigame('raid')">🐲 레이드</button>
                     <button class="minigame-tab" onclick="switchMinigame('drawquiz')">🎨 그림 퀴즈</button>
                     <button class="minigame-tab" onclick="switchMinigame('soup')">🐢 거북이 수프</button>
+                    <button class="minigame-tab" onclick="switchMinigame('cho')">🔤 초성 퀴즈</button>
                     <button class="minigame-tab" onclick="switchMinigame('omok')">⚫ 오목</button>
                     <button class="minigame-tab" onclick="switchMinigame('omokai')">🤖 AI 오목</button>
                     <button class="minigame-tab" onclick="switchMinigame('chessai')">🤖 AI 체스</button>
@@ -5687,6 +5732,31 @@
                     <div class="leaderboard dodge-ranking">
                         <h4>🏆 이번 주 거북이 수프 랭킹 <small style="font-weight: normal; opacity: 0.6; font-size: 11px;">(월~일 · 컬렉션 아이콘을 지정한 사람만)</small></h4>
                         <div id="soupRank" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
+                    </div>
+                </div>
+
+                <!-- 🔤 초성 퀴즈 (오늘의 10문제: 초성만 보고 영화·노래·드라마 제목 등을 맞히기) -->
+                <div class="minigame-panel" id="panel-cho">
+                    <div class="cho-area">
+                        <div class="cho-head" id="choHead">초성 퀴즈를 불러오는 중…</div>
+                        <div class="cho-nav" id="choNav"></div>
+                        <div class="cho-card" id="choCard"></div>
+                        <div class="cho-row">
+                            <input type="text" id="choInput" maxlength="40" autocomplete="off" placeholder="정답을 적어 주세요 (띄어쓰기는 안 맞아도 돼요)" onkeydown="if (event.key === 'Enter' && !event.isComposing) choSubmit()">
+                            <button id="choBtn" onclick="choSubmit()">확인</button>
+                        </div>
+                        <div class="cho-tools">
+                            <button id="choHintBtn" onclick="choHint()">💡 힌트</button>
+                            <button id="choGiveBtn" onclick="choGiveUp()">🏳️ 포기 (정답 보기)</button>
+                            <button id="choNextBtn" onclick="choNext()">다음 문제 ▶</button>
+                        </div>
+                        <div class="cho-my" id="choMy"></div>
+                        <div class="cho-today" id="choToday"></div>
+                        <div class="pika-help">🔤 초성만 보고 <b>영화 · 노래 · 드라마·예능 · 만화 · 동화 · 속담 · 음식 · 나라 이름</b>을 맞히는 게임이에요<br>📅 매일 <b>10문제</b>가 나와요 (팀 전체가 같은 문제 · 자정에 바뀜) · 틀려도 몇 번이든 다시 도전할 수 있어요<br>🏆 점수: 힌트 없이 맞히면 3점 · 💡 힌트를 보면 2점 · 🔎 첫 글자까지 보면 1점 · 🏳️ 포기하면 0점<br>🪙 코인: 정답 <b>3개마다 1개</b>, 하루 3개까지</div>
+                    </div>
+                    <div class="leaderboard dodge-ranking">
+                        <h4>🏆 이번 주 초성 퀴즈 랭킹 <small style="font-weight: normal; opacity: 0.6; font-size: 11px;">(월~일 · 컬렉션 아이콘을 지정한 사람만)</small></h4>
+                        <div id="choRank" class="game-stats-table"><div class="gs-empty">아직 기록이 없어요</div></div>
                     </div>
                 </div>
 
@@ -9746,6 +9816,7 @@ ${text}
             setupRaid();
             setupDrawQuiz();
             setupSoup();
+            setupCho();
             setupWeeklyRankings();
             setupQnaListener();
             setupMafia();
@@ -11321,6 +11392,8 @@ ${text}
                 renderRaid();
             } else if (panel === 'soup') {
                 renderSoup();
+            } else if (panel === 'cho') {
+                renderCho();
             } else if (panel === 'cross') {
                 if (crossG && crossG.state === 'playing' && crossG.paused) crossLastTs = 0;
                 drawCross();
@@ -18804,6 +18877,233 @@ ${keys}
             set('soupRank', rows.length ? `<table><tr><th>순위</th><th>이름</th><th>점수</th><th>정답</th><th>⭕ 질문</th><th>질문</th><th>출제</th></tr>${rows.map(([k, x], i) => `
                     <tr class="${k === key ? 'dodge-me' : ''}"><td>${medal(i)}</td><td>${nameWithIcon(x.name || k)}</td><td class="dodge-best">${x.score || 0}</td><td>${x.solved || 0}</td><td>${x.yes || 0}</td><td>${x.asked || 0}</td><td>${x.made || 0}</td></tr>`).join('')}</table>`
                 : `<div class="gs-empty">${Object.keys(soupWeekly).length ? RANK_ICON_NOTICE : '아직 기록이 없어요'}</div>`);
+        }
+
+        // =====================================================
+        // 🔤 초성 퀴즈 (오늘의 10문제): 영화·노래·드라마·만화·동화·속담·음식·나라 이름을 초성만 보고 맞히기 — 2026-11-20
+        //  문제는 날짜로 정해져서 팀 전체가 같은 날 같은 10문제를 봄 (100문제를 10일 동안 한 바퀴, 바퀴마다 섞는 순서가 달라짐)
+        //  점수: 힌트 없이 3점 · 힌트를 보면 2점 · 첫 글자까지 보면 1점 · 포기(정답 보기) 0점 · 틀려도 다시 도전 가능
+        //  코인: 정답 3개마다 1개, 하루 3개까지
+        //  데이터: choquiz/users/{key} {day, name, a: {q0~q9: {r, h, p}}, coin, score} · choquiz_weekly/{주}/{key} {name, score, solved}
+        //  정답과 힌트는 살짝 가려서 넣음 (개발자 도구로 바로 안 보이는 정도 — 그림 퀴즈와 같은 방식)
+        // =====================================================
+        const CHO_DAY = 10, CHO_COIN_PER = 3, CHO_COIN_DAY = 3, CHO_EPOCH = '2026-11-20';
+        const CHO_CATS = { movie: ['🎬', '영화'], song: ['🎵', '노래'], tv: ['📺', '드라마·예능'], ani: ['🧸', '만화·애니'], tale: ['📚', '동화·고전'], say: ['💬', '속담·사자성어'], food: ['🍜', '음식'], place: ['🗺️', '나라·명소'] };
+        // [분류, 가린 '정답|힌트'] — 영화 20 · 노래 20 · 드라마·예능 14 · 만화·애니 10 · 동화·고전 8 · 속담·사자성어 12 · 음식 8 · 나라·명소 8
+        const CHO_BANK = [
+            ['movie', '=EbosDIsqDClKuOrCyOIQeJ7YWZ7AeK7YC76gcrwgU4jrDJsqDCuY2Ogkyei0uOfpaL7dOI7wir6'], ['movie', '=Q6krzqgsXJmtDCsmuOqwyOIE2J7ReK7oKY7YmL7gA6sqTKorjZltzqgsjJisDStzuOoeyOfFeJ7BeK7cWZ75er6'], ['movie', '=ALsrDCmdyemyyOIQG560eJ7gw7sqDbtqXqnsDCoLyOnIyOtdyOfJ+56Fq66'],
+            ['movie', '=QYurDoosDChnyOvN2OIQeJ7IWJ7ggKssT7lsDClKuOrmuOrLuOfJaZ7wKI7Aa76'], ['movie', 'sKI7Ay46EiZ7ggZnsn5jrnqsqDCuCuOIEWJ70KI7gAIsqD4psTosrTYlsDCnV2Ofl6J7cuI7cCK7tWr6'], ['movie', '==ArCyelY2OIUq46YWZ7wKr60WZ7gwZorzLnsnLqrz7osDytCDSnEyemPuOinuOfcuI7E+46EOK7UK76'],
+            ['movie', '==AkeyOqCuOIA2J75i66gw4prDZkrz4prDbtqDCgY2+hwqOIIWJ7Z+46gQYhrXTMgcrwgU4jrDJsqDSsayOrwyelwuOf02J70O76cO56siJ7'], ['movie', '==ArCyelY2OI4qJ7cSI7gAYmszqgsXJmtDCqzqOnLyOI3KMIF+46QCr6ggLmtDIpsnItrzXtWyOl2yOIY2J742J70KI7'], ['movie', '4ir61Or6gw7sq35gsXqnsDCgMuek0qOIAy46cuI7gAKhsDboszHkeyOqCuOIY2J7VmJ7'],
+            ['movie', '=wJosXJmtDCkRuOIECr6kC66MG46gA5lsDLhtH4nsTIosDSNycrw2wHspuOrmuOoCuOmc2OIwir65er6cOY7'], ['movie', 'QyY7s6J7ggZnsjosrDSszqOvdyOIUq46bC76ggYlsn5jrDCvdyeO0ACnEyOkXyeuKyOggyOfYur6oWZ78Or6guI7'], ['movie', '=QJlrj7rrTZvsDSsL2OqnuOnhuOIY2J7EiZ7cOY7oCL7gcrwgQImtD4psTIoszHgFuOu3qOI42J7BCK7wir69eJ7'],
+            ['movie', 'IaK7cG66gw7sq3qnsDCnCuOjnuOIcSI7QeJ7gSI7dCr6seJ7gQZmtjLmtDClKueiVyOvduOgwqOfJu46AOY702J7AOY7'], ['movie', '==AmCuOiVyOIdOI7Z+46gAYmszqgsj5lsDCiLuOuWyOIUq46wOJ7gQYnsXpsrj4prDCjdyOvWyOftWr6VmJ74qJ7oKr6'], ['movie', 'AeK7EK76EWJ7gQpirjIhrTbsqDChdyOgZ2OnbyOIEWJ7+CL7gQYnsHLhsnoltDCiDyOf8256UWY7kqI7wSY742J7'],
+            ['movie', '=AIjtDCnV2OIACr6sGY7QeZ7gcrwgQbprDqhtDytCDCqnuOuWyOtdyOhVyOfkqI74CK7kK760aJ7'], ['movie', '==ArCyelyuOinuOIEW46MaI7gQpirjonsDCgwqOsE2eid2OIcCr6IK76gA5lsj4prTbnszHsE2OrP2OIsa660WZ7'], ['movie', 'E+46cG66ESZ7gcZurjLmtDClKuOmCuOoWuOIs+56gWJ7GeJ7gwbprD4psjJsrDIjrjIoszXlZyOngyOIY2J7AeK7YC76'],
+            ['movie', '==Ai5uOg8yOIIe66syr6gAYnsjqgrDCkeyOvY2OIQeJ7kqI7Ie66kqI7sa66sGY78B5lsH5psDCnhuOgZ2OIYK46'], ['movie', '==ArB2OjM2OinuOjF2OIY2J7kO56hO661Or6gwpgrTYlsTrgsjJkrzHkbyetzqOIwir68256sWK7'], ['song', '=QqtsD5prDytCDCtdyOuLyOf82J7AOY7kqI7oK46VCr6'],
+            ['song', 'Y6564W46gQpirTKmsTYlsz4jrDCpLuOinuOh0uOI3KMIkuL7kqI7EK76gQ6usTqisTosrzXqUuOlXyOID2r6aK76'], ['song', '==AuK2OnhuOuK2OIUq46YK46guI7gcrwgApnsD7lsDYuqzHsL2OjM2OI0W66oq66EWJ7'], ['song', '=wYnsD6sqDCqLu+MgcrwgAKnsTbnsTYlszHoCuOIA2J7LKK7'],
+            ['song', '==AnTuOvduOnwuOIAOY7wir61aY7gwZltTpnsTpnsDytCDCocyOtdyOhVyOfAeK746Y7kC76'], ['song', 'Ea66Aa76gw5isT6irDCtdyehxueh5uOI3KMIhOr6QuJ7ggLhsjLrrTbnszHhdyOuFuOIA2J7Ja76'], ['song', '==QozqOl3uOsNuOIAy46cuI7AW46MaI78R4sqjLhsDCnCuOjnuOIcuI7ku46'],
+            ['song', 'hOr64qY7I6Z7gwZktDIjrDCmdyehxueh5uOfQe66TeK7wGr6'], ['song', '=0JhsHJtqDYuqzHkXyOjdyOimyOI4W66cSI7'], ['song', '==AhmuOg2uOIcuI7ku46gwJhsD5lsj4przbnrz5krDCtdyeggyOtdyOI3KMIhOr6QuJ7gwotqjbnsTIoszHgMuOu3qOIUqJ7EWJ7Qe66VCK7xGr6'],
+            ['song', '==AmeuOuFuOIACr60yZ7Ea66seJ7gcrwgQYltnqmsDboszHlayOmCuOoWuOIE2J7JaZ7seJ7'], ['song', '==QhquOocyOIE+46cG66ACr6QuJ7R2J7gUqnszatqzblsDytCDCrd2OmIyOg5qOfoCL70eJ7JaZ7oK46'], ['song', 'hOr6Ue76w246gEImsT4ps3YmtzHrmuOsE2OswuOIY2J7R656sKI7'],
+            ['song', '==QozqOuK2Oie2OIJaZ78OK7teJ7gcrwggZltTKnszHoEyeiP2OgnyOIY2J70Gr6sKI7'], ['song', '==AhmuOtdyOIduI7ECr6gwZltTavsz6irDytCDCh5uOh5uOfxCr6RaJ7kC76'], ['song', '=w5krzbnrzJsrDChzuOtdyOI3KMIVCK79CL7E6J78RpnsDCnV2OI8OK7MaI7'],
+            ['song', '==QswuOozqOIwa66Mm76gQYnsTrmsDLuqDKisDytCDCja2OjeuOhgyOf0u46EeK7RSK7oeL7'], ['song', '==AjdyOozqOIcWZ7QuJ7cuI7gcrwgALhtTYltzqprTrsszHtdyekWyOozqOIMe66tK46'], ['song', '==QozqOI9CL78a56gkKsrjpnrjbhrDytCDymEueieyOvduOrB2OfQ6J7sa66su46Qe66'],
+            ['song', '4qY7cG664qY7gQpirjpgrD6isDytCDCoyyegDyelwuOf0Gr6wGK70y66'], ['tv', '==AtdyOgGuOIICK7cuI7gArprTrlsDCsmuOuxqOI02J7QuJ7gUrlsbTN0wHheyOjyqOI0aJ7VeK7kiJ7'], ['tv', 'Q6J7oK46gwontLYvqDCtdyOgyqOIQeJ70qI7ACr6gcrwgAYnsD6sqDYuqDytCDCocyetzqOfEm76omr6E+46'],
+            ['tv', '=wqgsjZnsDCvzqOudyOs1qOI3KMIQWr6ciZ7haI7gcrwgALuqHJpsHqhszHiYyOhb2OIY2J7RaJ7cOY7'], ['tv', '=AIpsz7rrT4jrDCudyOhzqOuZyOIoiJ7gA5lszatqD4psDChgyOIEW46wADN8BIjrj7tqDCqYyOIcSI7QeJ7EO76'], ['tv', '==AgFuejGyegDyOIMK76s6J7gQ4psTrlsjqlrDCkXyOnV2eg2uOIcG66gOr6sKI7gkKlrTbnszbnrDIuqz6nrjKjtzXqwyOnLyOi2uOIY2J7R656sKI7'],
+            ['tv', '=ICpKyOhcyOpKyOIgaY7Ie66gaY7gALuqz6nrDLuqLCI3KMIF6J7guI7gwqnszpssDClKuOmV2OhVy+iiyOI8W66Y656gOr68BrmsHImsDrmsDCrCyOuY2OgzuOIcWZ7BOI702J7'], ['tv', '==AhwqOvduOmIyOIAy46cuI7gAKhsDbosDytCDCoVyegYyOtdyOfIir6l6J7Ay46'], ['tv', '=ArmsD4pszZtsDytCDCgkyeqayOswuOfACr6weJ74qJ7oKr6'],
+            ['tv', '==AnTuOtwuOIQuJ7RO76gw7sqXoqrDyrEyOpLuOIwir6Z+46gAIjrjZnszHnZ2enDyOrCyOmdyOI0qJ7cG66wir6sqI7'], ['tv', '=wZmt35gsDCtE2OudyOIY2J7Y6564er6l6J7ggZjrDZkrDCjnuekRuOlwuOfdOI74+66'], ['tv', '=UqirjImsDSgFuOggyOI82J7UqJ7gaY7gcrwggJisXoqrXJsrDytCDSnEyOreyOocyOfECK7E+46cWZ70y66'],
+            ['tv', '=ALuqzrlrDCnR2OhmuOtdyOfoe66du46w+56'], ['tv', 'QuJ7MqZ7gwJsqD4psTLrrDytCDSpKuOiYyOIwCL7ASr6gE4gszbnsDCmdyOpTuOudyOiYyOsXyOIAir6xuI78R6irDrgsDCkeyOvY2OIYK46'], ['tv', 'Vy46Z+46pS56gcrwg4qgrDCvdyOlayOvdyOfR656Q6J7Y6564W46tWr6ECK7'],
+            ['ani', '==QojuetzqOIdG66ISL7gQpirzqgsDCkXyeknyOIoSJ7ACK7EWJ7gk5jrjLuqD6sqzHrmuOmRuOIhO661Or6wir6EWJ7'], ['ani', '=g5ir35gsDKhsDCq5qOkRuejZ2OIAmJ7AW46MaI7gALuqzqprz6irzHiLuOmV2OI8256kC66su46'], ['ani', '==AngyelY2OI02J7gKL7wir6gAYmsTbnsHImsDLuqzHoLyOtsuOozqOIVCK7AKr6'],
+            ['ani', '=ALuqz6nrjrvq3bjsD5prDCtCyOIvSI7ku46ggZnsTYnsj4pr7onsHqlrzHpguOknu+uquOIUq46sWr6xeK7'], ['ani', '=UJosD5gtDSnDyemV2esTuOozqOIEeK7EWJ7R6J7gQbnsjrqrzHnCuOl9yOIVCK7QOY7Fq66'], ['ani', 'Aa76sWr6Na46gA6sqDrgsHotrDCgZyOuY2eswuelwqOfsGY7p246o656sqI7'],
+            ['ani', '==AmX2OqquOIUq46YK46ga56gg5uqjaltDCgZyOh4yOt5yOvU2OfwSY7kqI7sq66TyL7s+Y7'], ['ani', '=QqisTosrDCtdyekWyOozqOI8Or6VCK7UqJ7ggZnsLLiszHnhuOoG2OoG2OIReK7DuJ702J7'], ['ani', '==AgFuOjGyOIcC56gwosqjZltzbnsDCnEyOkXyelD2elayeqquOIY2J7kO56guI78VoqrjotrnKsrnoltDCmdyOnhuOie2Om5yOI8Or68SI7'],
+            ['ani', '=Q4tq3qjtDCinuOr8qOI0OJ7g0rsqjYlszHnhuOnhuOg9uOIxG66A276xG66A276'], ['tale', '==AqUyelwuOIAmJ7sa66ku46gQYurzJoszHg2uOgGuOIAmJ7Aa76l2Z7'], ['tale', '==Ah5uOv6qOkRuOI8Or6F+46gQ4psDaurDSkwuOfQWK7lyY7QWK7p2L7'],
+            ['tale', '==gIAeK75i66EWJ7h6J7ggYlsDCtpuOvjyOIYK46YWZ7gEqlrLCf02J7Ei46kiJ7gwJkrDCtdyOrLuOIAmJ70WZ7'], ['tale', '==wtYyOnwqOoCuOIUG56ggqsqjKiszHv+qOtsuOmCuOIAmJ7AW46gSI7'], ['tale', 'pWZ7cuI7gALuqzqprz6irDChnyOIACr6ku46Q6J7gAqns7qgrzHtdyeg2uOsxqOIAmJ78G46gaY7'],
+            ['tale', '=QbnsHqhsDCnV2OI4+66l6J7gw7sqTYhrzohsDCqYyOIcSI7QeJ7EO76gAYnsHpnszHkeyelZyOIwa660aJ7'], ['tale', '8Or6sKI7F+46gAYmsTbnsH4nszpgrDSszqOvdyOf8OK71Or6kSI7xC76'], ['tale', '=kLorD6isDrgsDCgZyOvBuOhPuOIEeK7gm76gA5lsvrqrD7lszHvBuOhPuOgdyOI8G46E+46Iir6'],
+            ['say', 'ku46EeK7kuL7gQbqrzLnsjqqrDChPu+gyqOIA2J7R6J78Brgsz5gtDChVyOqquOIMG46wuY7'], ['say', '=wbnsDCtayOrJyOI8OK7EWJ78BLuqnLqrDSoWuOIcSI7MuJ7Ei46'], ['say', '=Q6irT7ksDChdyOkGyOI8WJ7QeJ7kK56gwJkrvrqrjpnsDCtdyOvdyOfku46cmL7gOr6gQIsqHplsjbmsDCozq+geyOIMaI7'],
+            ['say', '=Q6irjonsDCgwqOjVuOIgWZ7YiI7kuI7gQ4jrzonrzqgsDClKuOmV2OmeyOIsa660y66EWJ78R6irT4psTrlsjqlrDCnEyOkXyOtsuOmCuOIE+4602J7tiI7QuJ7'], ['say', '==ApLuOnV2OmeyOIE+46oK46gwblsTbltjpnsDCggyOvouOIACr60K468R6irH7sqDCtdyOknuOIUq46kiJ7gwblsDYmsD6sqDCtdyOknuOIUq46ACr6'], ['say', '==ApLuetguOtWyOIwir6YmL7gOr6gAYnsDItqXrisDCoTuOIMW56gQrprTrlszHpLuOhwqOIAeK7Mmr6gO56seJ7gcoprTosrDCtCyOI4SI7'],
+            ['say', 'ku464O76gwbprTbltzLltDCtdyevqyOIcWZ79WJ7gA5lsXrhtDClKuOrI2OpLuOI02J7kO5602J7gwLhsjpntzHpLuOhnyOsE2OIxO56gArmsj4gsDCkXyOgbyOuLyOIY656gOr6'], ['say', '==ArLyOshyOknuOIYK46cCK74aJ78R6irTpirP6krDCgwqOklyOIA2J7Qe66kC76gA6sqP6krDCgwqOiDyOIA2J7Qe66uK46'], ['say', '=wqprj4prDCkRuOIIOI7gwZorjpgrjZltDCjPuOfwGK702J7dSI782J7'],
+            ['say', '==ApLuOhwqOI7q66gQYnsjZntzqgsDCtdyOrLyOsyqOf82J78KI7suI7R6J7'], ['say', '==QtLuOgMuOIcWZ7xq56JeJ7gA5lsD5prDClKu+usuOf1u46cSI74y66Z+46'], ['say', 'ku46I+46gA6sqz4jrDCgdyOvdyOIcGI7YK46gw7sqzbnsDCgdy+iiyOfIe66AeK75iJ7IOI7'],
+            ['food', '8y66tWr6gQIsqjaurDClKuOtdy+kBuOIgOr6jS46gwbprjZusjLssDCmCuOs4qOozqOgnyOvPuOfcCr6MCL7YmL7Amr6'], ['food', '0m46Um66gwZktDIjrDSknyenLyOh2uOf02J72O76ha56'], ['food', '==QsTyesTyOIgOr6jS46gQYnsXqnsTptsD6sqDCvzqOvsuOmCuOflC76Um76Em76'],
+            ['food', '==ArmuOrCyOI0m668256gcrwgA4psz5iszohsDytCDChW2OfcCr6MCL7Ay46Aa76'], ['food', '=A5grTbnsnLqr3IssDCkDuOtdyeuouOg2uOfhyJ7YiI7VOY7'], ['food', 'Ha664er6gwZltDCnV2OiBuOqcuOIUq4602J7kO56BOr6gQYnsPJosDrmsj4gsDCgZyOqjuOgwq+u5qOpTuOflC76tWr6Ay46ciI7'],
+            ['food', 'duI7RaJ70O76gQpirnLqrDCkXyOoCuetzuOfVOY7EOr68KI7'], ['food', 'xSI7EmJ7gQbqrzqprzKmsDCvluOtdyOvduOhU2OgxqOrLuOflC76M2J72O76YmL7Amr6'], ['place', '0mL7sa66Um66EWJ7oK46gcrwgwatqXptsDCgZyOozqesD2OfYK46wuY7oeZ70W66EWJ7'],
+            ['place', '8256YK46ggZnszbnrzYlsTZvsDCgZyOqjuOsxqep6yOfEWJ7sa6682J7IC664qY7kqI7kiJ7'], ['place', '=0rprTqitDCgZyOqwyejS2OfcO56A656c246kS46'], ['place', '=QqiszagtHZltTqisDCgZyOnTuOuvuOvduOvU2Of4qY7ReK702J7'],
+            ['place', '==QvyuesEyOI0ir6gw7osTYlsDCmdyer1qekkyOfxSI7l6J7sa66Me66'], ['place', '=E4gsn5jrDCoTuOIE2J7Ia76DqZ7gcrwgUpmsTbirzXgDyOoLyOrXyOIY2J7gyJ7Q6J7'], ['place', '==Ak2qeg2qOIgSI7wGK7ggZnsTqkrDCusuOlZ2ek0qOfBar61O769Kr6'],
+            ['place', '0u46dG66xC76gcrwgAbjrTrmsDIsqzZltDChPuOvjyOngyOfwKI78256cWZ7']
+        ];
+        let choUsers = {}, choWeekly = {}, choWeekKey = '', choReady = false, choBusy = false;
+        let choCur = -1, choNote = null, choDayShown = '', choSetCache = null, choAuto = 0;
+        const choToday = () => getLocalDateKey(new Date());
+        const choItem = (i) => { const q = CHO_BANK[i], t = dqDec(q[1]), k = t.indexOf('|'); return { c: q[0], a: k < 0 ? t : t.slice(0, k), h: k < 0 ? '' : t.slice(k + 1) }; };
+        function choRng(seed) {   // 날짜만으로 같은 순서가 나오게 하는 난수 (mulberry32)
+            let t = seed >>> 0;
+            return () => { t = (t + 0x6D2B79F5) >>> 0; let r = Math.imul(t ^ (t >>> 15), 1 | t); r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r; return ((r ^ (r >>> 14)) >>> 0) / 4294967296; };
+        }
+        // 한 바퀴 순서: 분류마다 섞은 뒤 분류가 고르게 퍼지도록 끼워 넣음 → 하루 10문제에 여러 분류가 섞임
+        function choOrder(cycle) {
+            const rnd = choRng(20261120 + cycle * 7919), by = {}, keyed = [];
+            CHO_BANK.forEach((q, i) => (by[q[0]] = by[q[0]] || []).push(i));
+            Object.keys(by).sort().forEach(c => {
+                const list = by[c];
+                for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
+                list.forEach((idx, j) => keyed.push([(j + rnd()) / list.length, idx]));
+            });
+            return keyed.sort((a, b) => a[0] - b[0]).map(x => x[1]);
+        }
+        function choSet(day = choToday()) {
+            if (choSetCache && choSetCache.day === day) return choSetCache.ids;
+            const toDay = (s) => { const [y, m, d] = s.split('-').map(Number); return Math.round(Date.UTC(y, m - 1, d) / 86400000); };
+            const n = Math.max(0, toDay(day) - toDay(CHO_EPOCH)), per = Math.floor(CHO_BANK.length / CHO_DAY), pos = n % per;
+            const ids = choOrder(Math.floor(n / per)).slice(pos * CHO_DAY, pos * CHO_DAY + CHO_DAY);
+            choSetCache = { day, ids };
+            return ids;
+        }
+        function choMine() {
+            const u = choUsers[statKey(myGameName())];
+            return u && u.day === choToday() ? { a: u.a || {}, coin: u.coin || 0, score: u.score || 0 } : { a: {}, coin: 0, score: 0 };
+        }
+        // 내 오늘 기록 고치기 (날짜가 바뀌었으면 새로 시작). fn이 false를 돌려주면 아무것도 안 바꿈
+        const choTxn = (day, fn) => raidTxn(db.ref(`choquiz/users/${statKey(myGameName())}`), cur => {
+            if (choToday() !== day) return;
+            cur = cur && cur.day === day ? cur : { day, coin: 0, score: 0 };
+            cur.a = cur.a || {}; cur.name = myGameName();
+            return fn(cur) === false ? undefined : cur;
+        });
+        function setupCho() {
+            if (!db || choReady) return;
+            choReady = true;
+            db.ref('choquiz/users').on('value', snap => { choUsers = snap.val() || {}; renderCho(); });
+            choBindWeekly();
+            setInterval(() => { choBindWeekly(); if (isMinigamePanelVisible('cho')) renderCho(); }, 60000);
+        }
+        function choBindWeekly() {
+            const wk = weekKeyOf();
+            if (!db || wk === choWeekKey) return;
+            if (choWeekKey) db.ref(`choquiz_weekly/${choWeekKey}`).off();
+            choWeekKey = wk; choWeekly = {};
+            db.ref(`choquiz_weekly/${wk}`).on('value', snap => { if (choWeekKey === wk) { choWeekly = snap.val() || {}; renderCho(); } });
+        }
+        function choCanPlay() {
+            if (!db) { alert('서버에 연결된 뒤에 할 수 있어요.'); return false; }
+            if (!localStorage.getItem('chat_nickname')) { alert('먼저 상단에서 이름을 입력해 주세요.'); return false; }
+            return !choBusy;
+        }
+        function choGo(i) {
+            clearTimeout(choAuto);
+            choCur = Math.max(0, Math.min(CHO_DAY - 1, i)); choNote = null;
+            const inp = document.getElementById('choInput');
+            if (inp) inp.value = '';
+            renderCho();
+            if (inp && !inp.disabled) inp.focus();
+        }
+        // 아직 안 푼 다음 문제로 (없으면 그대로)
+        function choNext() {
+            const my = choMine();
+            for (let k = 1; k <= CHO_DAY; k++) { const i = (Math.max(0, choCur) + k) % CHO_DAY; if (!(my.a['q' + i] || {}).r) { choGo(i); return; } }
+            renderCho();
+        }
+        async function choSubmit() {
+            if (!choCanPlay()) return;
+            const i = choCur, day = choToday(), it = choItem(choSet(day)[i]), inp = document.getElementById('choInput'), text = String(inp.value || '').trim();
+            if ((choMine().a['q' + i] || {}).r) { choNext(); return; }   // 끝난 문제에서 Enter → 다음 문제
+            if (!text) return;
+            if (dqNorm(text) !== dqNorm(it.a)) {
+                choNote = { i, bad: text.slice(0, 40) }; inp.select(); renderCho();
+                const card = document.getElementById('choCard');
+                if (card) { card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); }
+                return;
+            }
+            choBusy = true; renderCho();
+            try {
+                let pts = 0, grant = 0;
+                const after = await choTxn(day, cur => {
+                    const s = cur.a['q' + i] || {};
+                    pts = 0; grant = 0;
+                    if (s.r) return false;   // 다른 창에서 이미 끝낸 문제
+                    pts = Math.max(1, 3 - (s.h || 0));
+                    cur.a['q' + i] = { r: 'ok', h: s.h || 0, p: pts };
+                    cur.score = (cur.score || 0) + pts;
+                    const ok = Object.values(cur.a).filter(x => x && x.r === 'ok').length, due = Math.min(CHO_COIN_DAY, Math.floor(ok / CHO_COIN_PER));
+                    if (due > (cur.coin || 0)) { grant = due - (cur.coin || 0); cur.coin = due; }
+                });
+                if (!after) return;
+                const me = myGameName();
+                db.ref(`choquiz_weekly/${weekKeyOf()}/${statKey(me)}`).transaction(cur => { cur = cur || {}; cur.name = me; cur.score = (cur.score || 0) + pts; cur.solved = (cur.solved || 0) + 1; return cur; });
+                let got = 0;
+                if (grant > 0) {
+                    const paid = await raidTxn(db.ref(`minigame/${me}`), cur => {
+                        cur = cur || { coins: 0, weaponLevel: 0, weaponVer: 2, collection: [], gachaHistory: [] };
+                        cur.coins = (cur.coins || 0) + grant;
+                        return cur;
+                    });
+                    if (paid) got = grant;
+                }
+                showCoinNotification(got, '', `⭕ 정답! '${it.a}' +${pts}점${got ? ` · 코인 +${got}` : ''}`);
+                choNote = null; inp.value = '';
+                // 잠깐 정답을 보여 준 뒤 안 푼 다음 문제로
+                clearTimeout(choAuto);
+                choAuto = setTimeout(() => { if (choCur === i && isMinigamePanelVisible('cho')) choNext(); }, 1400);
+            } catch (e) {
+                alert('정답을 기록하지 못했어요. 다시 시도해 주세요.');
+            } finally { choBusy = false; renderCho(); }
+        }
+        async function choHint() {
+            if (!choCanPlay()) return;
+            const i = choCur, day = choToday();
+            choBusy = true; renderCho();
+            try {
+                await choTxn(day, cur => { const s = cur.a['q' + i] || {}; if (s.r || (s.h || 0) >= 2) return false; cur.a['q' + i] = { h: (s.h || 0) + 1 }; });
+            } finally { choBusy = false; renderCho(); }
+        }
+        async function choGiveUp() {
+            if (!choCanPlay()) return;
+            const i = choCur, day = choToday();
+            if ((choMine().a['q' + i] || {}).r) return;
+            if (!confirm('이 문제를 포기하고 정답을 볼까요? (0점)')) return;
+            choBusy = true; renderCho();
+            try {
+                await choTxn(day, cur => { const s = cur.a['q' + i] || {}; if (s.r) return false; cur.a['q' + i] = { r: 'no', h: s.h || 0, p: 0 }; });
+                choNote = null;
+            } finally { choBusy = false; renderCho(); }
+        }
+        function renderCho() {
+            const head = document.getElementById('choHead');
+            if (!head || !isMinigamePanelVisible('cho')) return;
+            const set = (id, html) => { const el = document.getElementById(id); if (el && el.dataset.html !== html) { el.innerHTML = html; el.dataset.html = html; } return el; };
+            if (!db) { head.textContent = '서버에 연결되면 초성 퀴즈가 열려요.'; return; }
+            const today = choToday(), me = myGameName(), key = statKey(me);
+            if (choDayShown !== today) { choDayShown = today; choCur = -1; choNote = null; }
+            const ids = choSet(today), my = choMine(), st = (i) => my.a['q' + i] || {};
+            if (choCur < 0) { choCur = ids.findIndex((_, i) => !st(i).r); if (choCur < 0) choCur = 0; }
+            const okN = ids.filter((_, i) => st(i).r === 'ok').length, doneN = ids.filter((_, i) => st(i).r).length;
+            set('choHead', `<b>🔤 초성 퀴즈</b> <span class="cho-date">오늘의 ${CHO_DAY}문제</span> <span class="cho-score">⭕ ${okN}/${CHO_DAY} · ${my.score}점</span>`);
+            set('choNav', ids.map((_, i) => `<button class="${i === choCur ? 'on ' : ''}${st(i).r || ''}" onclick="choGo(${i})">${st(i).r === 'ok' ? '⭕' : st(i).r === 'no' ? '✖' : i + 1}</button>`).join(''));
+            const it = choItem(ids[choCur]), s = st(choCur), cat = CHO_CATS[it.c] || ['❓', ''], done = !!s.r, h = s.h || 0;
+            // 초성 칸: 끝난 문제는 정답 글자, 첫 글자 힌트를 열었으면 맨 앞 칸만 글자
+            const cells = it.a.split(' ').map((w, wi) => `<span class="cho-word">${[...w].map((ch, ci) => {
+                const open = !done && h >= 2 && wi === 0 && ci === 0;
+                return `<span class="cho-ch${done ? ' ' + s.r : open ? ' open' : ''}">${escapeHtml(done || open ? ch : dqCho(ch))}</span>`;
+            }).join('')}</span>`).join('');
+            set('choCard', `<div class="cho-cat">${cat[0]} ${cat[1]}<small>${choCur + 1} / ${CHO_DAY} · ${[...it.a.replace(/\s/g, '')].length}글자</small></div><div class="cho-letters">${cells}</div>`
+                + (h >= 1 || done ? `<div><span class="cho-hint">💡 ${escapeHtml(it.h)}</span></div>` : '')
+                + (done ? `<div class="cho-result ${s.r}">${s.r === 'ok' ? `⭕ 정답! <b>+${s.p || 0}점</b>` : '✖ 포기한 문제예요 (0점)'}</div>`
+                    : choNote && choNote.i === choCur && choNote.bad ? `<div class="cho-result bad">❌ "${escapeHtml(choNote.bad)}" — 아니에요. 다시 도전해 보세요!</div>` : ''));
+            const inp = document.getElementById('choInput'), btn = document.getElementById('choBtn'), hBtn = document.getElementById('choHintBtn'), gBtn = document.getElementById('choGiveBtn'), nBtn = document.getElementById('choNextBtn');
+            const allDone = doneN >= CHO_DAY;
+            inp.placeholder = done ? (allDone ? '오늘 문제를 다 풀었어요!' : 'Enter를 누르면 다음 문제로 가요') : '정답을 적어 주세요 (띄어쓰기는 안 맞아도 돼요)';
+            btn.disabled = choBusy || (done && allDone); btn.textContent = choBusy ? '확인 중…' : done ? '다음 ▶' : '확인';
+            hBtn.disabled = choBusy || done || h >= 2;
+            hBtn.textContent = done || h >= 2 ? '💡 힌트를 다 봤어요' : h === 1 ? '🔎 첫 글자 보기 (맞히면 1점)' : '💡 힌트 보기 (맞히면 2점)';
+            if (done) hBtn.textContent = '💡 힌트';
+            gBtn.disabled = choBusy || done;
+            nBtn.disabled = choBusy || allDone || (doneN === CHO_DAY - 1 && !done);
+            set('choMy', allDone ? `🎉 오늘 문제를 다 풀었어요! <b>${okN}개</b> 정답 · <b>${my.score}점</b> · 내일 새 문제 ${CHO_DAY}개가 나와요`
+                : `정답 <b>${CHO_COIN_PER}개</b>마다 🪙 코인 1개 <small>(오늘 ${Math.min(my.coin, CHO_COIN_DAY)}/${CHO_COIN_DAY})</small> · 남은 문제 <b>${CHO_DAY - doneN}</b>개`);
+            // 오늘 팀 현황
+            const todayRows = Object.entries(choUsers).filter(([, u]) => u && u.day === today && u.a && Object.values(u.a).some(x => x && x.r))
+                .map(([k, u]) => ({ k, name: u.name || k, ok: Object.values(u.a).filter(x => x && x.r === 'ok').length, score: u.score || 0 })).sort((a, b) => b.score - a.score || b.ok - a.ok);
+            set('choToday', todayRows.length ? '<small>오늘</small>' + todayRows.map(u => `<span class="ct${u.k === key ? ' me' : ''}">${nameWithIcon(u.name)} ⭕${u.ok} · ${u.score}점</span>`).join('') : '');
+            // 이번 주 랭킹 (컬렉션 아이콘을 지정한 사람만)
+            const rows = Object.entries(choWeekly).filter(([, x]) => x && x.score > 0 && hasRankIcon(x.name || '')).sort((a, b) => (b[1].score || 0) - (a[1].score || 0) || (b[1].solved || 0) - (a[1].solved || 0));
+            const medal = (i) => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+            set('choRank', rows.length ? `<table><tr><th>순위</th><th>이름</th><th>점수</th><th>정답</th></tr>${rows.map(([k, x], i) => `
+                    <tr class="${k === key ? 'dodge-me' : ''}"><td>${medal(i)}</td><td>${nameWithIcon(x.name || k)}</td><td class="dodge-best">${x.score || 0}</td><td>${x.solved || 0}</td></tr>`).join('')}</table>`
+                : `<div class="gs-empty">${Object.keys(choWeekly).length ? RANK_ICON_NOTICE : '아직 기록이 없어요'}</div>`);
         }
 
         // =====================================================
