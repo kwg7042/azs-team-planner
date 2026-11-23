@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-23a">
+    <meta name="app-version" content="2026-11-23b">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -5754,7 +5754,7 @@
                         </div>
                         <div class="cho-my" id="choMy"></div>
                         <div class="cho-today" id="choToday"></div>
-                        <div class="pika-help">🔤 초성만 보고 <b>영화 · 노래 · 드라마·예능 · 만화 · 동화·책 · 속담·사자성어 · 음식 · 나라 · 위인 · 동물 · 스포츠 · 직업 · 상식</b>을 맞히는 게임이에요 (문제 1,300개)<br>👥 <b>팀이 다 같이 한 문제</b>를 풀어요 — 가장 먼저 맞힌 사람이 점수를 얻고, 곧바로 다음 문제가 나와요 · 틀린 답은 다 같이 보여요<br>🏆 점수: 힌트 없이 3점 · 💡 힌트가 열리면 2점 · 🔎 첫 글자까지 열리면 1점 (힌트는 누가 열어도 팀 전체에 열려요 · 문제가 나온 지 20초 · 40초 뒤부터)<br>🏳️ 힌트를 다 열고도 모르겠으면 넘길 수 있어요 (1분 뒤부터) · 🪙 코인: 내 정답 <b>3개마다 1개</b>, 하루 3개까지</div>
+                        <div class="pika-help">🔤 초성만 보고 <b>영화 · 노래 · 드라마·예능 · 만화 · 동화·책 · 속담·사자성어 · 음식 · 나라 · 위인 · 동물 · 스포츠 · 직업 · 상식</b>을 맞히는 게임이에요 (새 문제 1,100개 · 예전 200문제는 다시 안 나와요)<br>👥 <b>팀이 다 같이 한 문제</b>를 풀어요 — 가장 먼저 맞힌 사람이 점수를 얻고, 곧바로 다음 문제가 나와요 · 틀린 답은 다 같이 보여요<br>🏆 점수: 힌트 없이 3점 · 💡 힌트가 열리면 2점 · 🔎 첫 글자까지 열리면 1점 (힌트는 누가 열어도 팀 전체에 열려요 · 문제가 나온 지 20초 · 40초 뒤부터)<br>🏳️ 힌트를 다 열고도 모르겠으면 넘길 수 있어요 (1분 뒤부터) · 🪙 코인: 내 정답 <b>3개마다 1개</b>, 하루 3개까지</div>
                     </div>
                     <div class="leaderboard dodge-ranking">
                         <h4>🏆 이번 주 초성 퀴즈 랭킹 <small style="font-weight: normal; opacity: 0.6; font-size: 11px;">(월~일 · 컬렉션 아이콘을 지정한 사람만)</small></h4>
@@ -20616,6 +20616,7 @@ ${keys}
         //          choquiz/feed/{id}/{push} (틀린 답) · choquiz/used/q{번호} · choquiz/users/{key} {day, ok, coin, score} · choquiz_weekly/{주}/{key}
         //  정답과 힌트는 살짝 가려서 넣음 (개발자 도구로 바로 안 보이는 정도 — 그림 퀴즈와 같은 방식)
         // =====================================================
+        const CHO_RETIRED = 200;   // 2026-11-23: 처음 200문제(0~199번)는 이미 한 바퀴 넘게 나와서 다시 내지 않음 (번호 유지를 위해 목록에는 남겨 둠)
         const CHO_COIN_PER = 3, CHO_COIN_DAY = 3, CHO_HINT_MS = [20000, 40000], CHO_PASS_MS = 60000, CHO_NEXT_MS = 4000;
         const CHO_CATS = { movie: ['🎬', '영화'], song: ['🎵', '노래'], tv: ['📺', '드라마·예능'], ani: ['🧸', '만화·애니'], tale: ['📚', '동화·책'], say: ['💬', '속담·사자성어'], food: ['🍜', '음식'], place: ['🗺️', '나라·명소'], who: ['👤', '위인'],
             animal: ['🐾', '동물'], sport: ['⚽', '스포츠'], job: ['💼', '직업'], know: ['💡', '상식'] };
@@ -21121,7 +21122,7 @@ ${keys}
             let ref = null, opened = false;
             try {
                 const used = (await db.ref('choquiz/used').once('value')).val() || {};
-                const all = CHO_BANK.map((_, i) => i), fresh = all.filter(i => !used['q' + i]);
+                const all = CHO_BANK.map((_, i) => i).filter(i => i >= CHO_RETIRED), fresh = all.filter(i => !used['q' + i]);   // 처음 200문제는 더 내지 않음
                 // 안 나온 문제 중에서, 다 나왔으면 가장 오래전에 나온 30개 중에서 (바로 앞 문제와 같은 분류는 되도록 피함)
                 const pool = fresh.length ? fresh : all.sort((a, b) => (used['q' + a] || 0) - (used['q' + b] || 0)).slice(0, 30);
                 const prevCat = prev && CHO_BANK[prev.qi] ? CHO_BANK[prev.qi][0] : '', other = pool.filter(i => CHO_BANK[i][0] !== prevCat);
@@ -21222,7 +21223,7 @@ ${keys}
             if (!db) { head.textContent = '서버에 연결되면 초성 퀴즈가 열려요.'; return; }
             const me = myGameName(), key = statKey(me), r = choRound, done = choDone(r), my = choMine(), now = Date.now();
             const inp = document.getElementById('choInput'), btn = document.getElementById('choBtn'), hBtn = document.getElementById('choHintBtn'), pBtn = document.getElementById('choPassBtn'), nBtn = document.getElementById('choNextBtn');
-            const left = CHO_BANK.filter((_, i) => !choUsed['q' + i]).length;
+            const left = CHO_BANK.filter((_, i) => i >= CHO_RETIRED && !choUsed['q' + i]).length;
             if (choStateLoaded && choState && choRoundLoaded && !r && !choMaking) choStartNext();   // 문제 내용이 사라졌으면 새로 엶
             if (!r) {
                 set('choHead', '<b>🔤 초성 퀴즈</b>');
