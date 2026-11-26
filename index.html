@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-26d">
+    <meta name="app-version" content="2026-11-26e">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -23688,7 +23688,7 @@ ${keys}
         const choToday = () => getLocalDateKey(new Date());
         const choItem = (i) => { const q = CHO_BANK[i] || ['', ''], t = dqDec(q[1]), k = t.indexOf('|'); return { c: q[0], a: k < 0 ? t : t.slice(0, k), h: k < 0 ? '' : t.slice(k + 1) }; };
         const choDone = (r) => !!(r && (r.solvedAt || r.passAt));
-        // 같은 분류에 초성까지 똑같은 다른 문제의 답 (예: 음식 ㅋㄱㅅ = 칼국수·콩국수) — 그것을 적어도 정답으로 인정
+        // 같은 분류에 초성까지 똑같은 다른 문제의 답 (예: 음식 ㅋㄱㅅ = 칼국수·콩국수) — 정답으로 인정하지는 않고 '초성은 같지만 다른 답' 안내에만 씀
         let choAltCache = null;
         function choAlts(qi) {
             if (!choAltCache) {
@@ -23779,10 +23779,12 @@ ${keys}
             if (choDone(r)) { choStartNext(); return; }
             if (!text) return;
             const me = myGameName(), key = statKey(me), it = choItem(r.qi);
-            if (dqNorm(text) !== dqNorm(it.a) && !choAlts(r.qi).includes(dqNorm(text))) {
+            // 정답은 이 문제의 답만 인정 (2026-11-26: 초성이 같은 다른 문제의 답까지 인정했더니 '아론' 문제에 '에릭'이 정답 처리됨)
+            if (dqNorm(text) !== dqNorm(it.a)) {
+                const sameCho = choAlts(r.qi).includes(dqNorm(text));   // 초성은 같지만 다른 답 → 틀림으로 하되 안내
                 // 틀린 답은 다 같이 봄 (같은 답을 연달아 올리지는 않음)
                 if (!choFeed.some(f => f.key === key && dqNorm(f.text) === dqNorm(text))) db.ref(`choquiz/feed/${id}`).push({ name: me, key, text, at: Date.now() });
-                choNote = { id, bad: text }; inp.select(); renderCho();
+                choNote = { id, bad: text, sameCho }; inp.select(); renderCho();
                 const card = document.getElementById('choCard');
                 if (card) { card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); }
                 return;
@@ -23876,7 +23878,7 @@ ${keys}
                 set('choCard', `<div class="cho-cat">${cat[0]} ${cat[1]}<small>${[...it.a.replace(/\s/g, '')].length}글자</small></div><div class="cho-letters">${cells}</div>`
                     + (h >= 1 || done ? `<div><span class="cho-hint">💡 ${escapeHtml(it.h)}</span></div>` : '')
                     + (done ? `<div class="cho-result ${r.solvedAt ? 'ok' : 'no'}">${r.solvedAt ? `🎉 ${nameWithIcon(r.solvedBy || '')}님 정답! <b>+${r.pts || 0}점</b>` : '🏳️ 아무도 못 맞혀서 넘긴 문제예요'} <small>· 곧 다음 문제가 나와요</small></div>`
-                        : choNote && choNote.id === choRoundId && choNote.bad ? `<div class="cho-result bad">❌ "${escapeHtml(choNote.bad)}" — 아니에요. 다시 도전해 보세요!</div>` : '')
+                        : choNote && choNote.id === choRoundId && choNote.bad ? `<div class="cho-result bad">❌ "${escapeHtml(choNote.bad)}" — ${choNote.sameCho ? '초성은 같지만 이 문제의 답은 아니에요. 분류와 힌트를 보고 다시 도전해 보세요!' : '아니에요. 다시 도전해 보세요!'}</div>` : '')
                     + (!done && last ? `<div class="cho-last">바로 앞 문제: <b>${escapeHtml(choItem(last.qi).a)}</b>${last.by ? ` — ${escapeHtml(last.by)}님 정답` : ' (넘김)'}</div>` : ''));
                 set('choFeed', choFeed.length ? choFeed.slice(-10).map(f => `<span class="cf${f.key === key ? ' me' : ''}">${escapeHtml(f.name || '')}: ${escapeHtml(f.text)} ❌</span>`).join('') : '');
                 inp.placeholder = done ? '곧 다음 문제가 나와요 (Enter를 누르면 바로)' : '정답을 적어 주세요 (띄어쓰기는 안 맞아도 돼요)';
