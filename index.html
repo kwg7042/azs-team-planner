@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-26a">
+    <meta name="app-version" content="2026-11-26b">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -4284,6 +4284,7 @@
         .cho-feed { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; max-width: 720px; margin: 0 auto 8px; font-size: 12px; }
         .cho-feed .cf { padding: 2px 9px; border-radius: 10px; background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: #fecaca; }
         .cho-feed .cf.me { border-color: rgba(255,209,102,0.5); }
+        .cho-reload { margin-top: 10px; padding: 8px 18px; border-radius: 12px; border: none; background: #a78bfa; color: #1b1333; font-weight: bold; cursor: pointer; font-family: inherit; }
         .cho-last { margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.55); }
         .cho-last b { color: #ddd6fe; }
         .cho-result small { color: rgba(255,255,255,0.55); }
@@ -20620,7 +20621,10 @@ ${keys}
         //  판 2 (2026-11-23): 새 문제 1,332개 · 판 3 (2026-11-26): 그동안 나온 2,632문제를 모두 빼고 겹치지 않는 새 문제 7,303개
         //  판이 다른 진행 중 문제(예전 판)는 바로 끝내고 새 판 문제로 넘어감. 문제를 통째로 바꿀 때는 CHO_VER를 1 올릴 것
         const CHO_VER = 3, CHO_USED = `choquiz/used${CHO_VER}`;
-        const choStale = (r) => !!r && (r.v || 1) !== CHO_VER;
+        // 판 비교는 한쪽 방향으로만: 예전 판 문제는 넘기고, 더 새 판 문제(새 버전 화면에서 연 것)는 건드리지 않고 새로고침을 안내함
+        //  (2026-11-26: '다르면 넘김'으로 했더니 배포 직후 옛 버전 탭과 새 버전 탭이 서로의 문제를 계속 넘겨서 문제가 저절로 바뀌는 일이 있었음)
+        const choStale = (r) => !!r && (r.v || 1) < CHO_VER;
+        const choNewer = (r) => !!r && (r.v || 1) > CHO_VER;
         const CHO_COIN_PER = 3, CHO_COIN_DAY = 3, CHO_HINT_MS = [20000, 40000], CHO_PASS_MS = 60000, CHO_NEXT_MS = 4000;
         const CHO_CATS = { movie: ['🎬', '영화'], song: ['🎵', '노래'], tv: ['📺', '드라마·예능'], ani: ['🧸', '만화·애니'], tale: ['📚', '동화·책'], say: ['💬', '속담·사자성어'], food: ['🍜', '음식'], place: ['🗺️', '나라·명소'], who: ['👤', '위인'],
             animal: ['🐾', '동물'], sport: ['⚽', '스포츠'], job: ['💼', '직업'], know: ['💡', '상식'], thing: ['🧰', '물건'],
@@ -23123,6 +23127,7 @@ ${keys}
         async function choStartNext() {
             if (!db || choMaking || !choStateLoaded) return;
             const prevId = (choState && choState.id) || null, prev = choRound;
+            if (choNewer(prev)) return;   // 새 판 문제는 이 (옛) 화면에서 넘기지 않음
             if (prevId && (!choRoundLoaded || (prev && !choDone(prev) && !choStale(prev)))) return;   // 예전 판 문제는 바로 넘김
             choMaking = true; renderCho();
             let ref = null, opened = false;
@@ -23152,7 +23157,7 @@ ${keys}
         function choCanPlay() {
             if (!db) { alert('서버에 연결된 뒤에 할 수 있어요.'); return false; }
             if (!localStorage.getItem('chat_nickname')) { alert('먼저 상단에서 이름을 입력해 주세요.'); return false; }
-            return !choBusy && !!choRound && !!choRoundId && !choStale(choRound);
+            return !choBusy && !!choRound && !!choRoundId && !choStale(choRound) && !choNewer(choRound);
         }
         async function choSubmit() {
             if (!choCanPlay()) return;
@@ -23227,9 +23232,18 @@ ${keys}
             if (!head || !isMinigamePanelVisible('cho')) return;
             const set = (id, html) => { const el = document.getElementById(id); if (el && el.dataset.html !== html) { el.innerHTML = html; el.dataset.html = html; } return el; };
             if (!db) { head.textContent = '서버에 연결되면 초성 퀴즈가 열려요.'; return; }
-            const me = myGameName(), key = statKey(me), r = choStale(choRound) ? null : choRound, done = choDone(r), my = choMine(), now = Date.now();
+            const me = myGameName(), key = statKey(me), r = choStale(choRound) || choNewer(choRound) ? null : choRound, done = choDone(r), my = choMine(), now = Date.now();
             const inp = document.getElementById('choInput'), btn = document.getElementById('choBtn'), hBtn = document.getElementById('choHintBtn'), pBtn = document.getElementById('choPassBtn'), nBtn = document.getElementById('choNextBtn');
             const left = CHO_BANK.filter((_, i) => !choUsed['q' + i]).length;
+            if (choNewer(choRound)) {
+                set('choHead', '<b>🔤 초성 퀴즈</b>');
+                set('choCard', '<div class="cho-cat">🔄 새 문제판이 열렸어요. 새로고침하면 바로 같이 풀 수 있어요!</div><div><button class="cho-reload" onclick="reloadToLatest()">지금 새로고침</button></div>');
+                set('choFeed', '');
+                inp.placeholder = '새로고침한 뒤에 풀 수 있어요';
+                btn.disabled = hBtn.disabled = pBtn.disabled = nBtn.disabled = true;
+                if (typeof checkAppUpdate === 'function') checkAppUpdate();
+                return;
+            }
             if (choStateLoaded && choState && choRoundLoaded && !r && !choMaking) choStartNext();   // 문제 내용이 사라졌으면 새로 엶
             if (!r) {
                 set('choHead', '<b>🔤 초성 퀴즈</b>');
