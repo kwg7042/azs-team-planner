@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-26c">
+    <meta name="app-version" content="2026-11-26d">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -5415,7 +5415,7 @@
                     <div class="collection-summary" id="collectionSummary"></div>
                     <details class="sell-box" id="sellBox">
                         <summary>💰 중복 인형 판매 <span class="sell-total" id="sellTotal"></span></summary>
-                        <div class="sell-note">각 인형 <b>1개는 남기고</b> 겹치는 인형만 팔아요 · 많이 겹친 인형부터 팔려요<br>브론즈 5개 · 실버 4개 · 골드 3개 · 에메랄드·블랙 1개 = <span class="coin-ico"></span> 1코인 · <b>히든은 1개 = <span class="coin-ico"></span> 3코인</b></div>
+                        <div class="sell-note">각 인형 <b>1개는 남기고</b> 겹치는 인형만 팔아요 · 많이 겹친 인형부터 팔려요<br>브론즈 5개 · 실버 4개 · 골드 3개 · 에메랄드 1개 = <span class="coin-ico"></span> 1코인 · <b>히든은 1개 = <span class="coin-ico"></span> 3코인</b> · <b>블랙은 1개 = <span class="coin-ico"></span> 7코인</b></div>
                         <div class="sell-rows" id="sellRows"></div>
                     </details>
                     <div class="collection-grid" id="collectionGrid">
@@ -11858,9 +11858,9 @@ ${text}
             }
         }
 
-        // ===== 중복 인형 판매: 각 인형 1개는 남기고 겹치는 것만 → 등급별 N개 = 1코인 (히든은 1개 = 3코인) =====
+        // ===== 중복 인형 판매: 각 인형 1개는 남기고 겹치는 것만 → 등급별 N개 = 1코인 (히든은 1개 = 3코인 · 블랙은 1개 = 7코인, 2026-11-26) =====
         const SELL_RATE = { bronze: 5, silver: 4, gold: 3, emerald: 1, hidden: 1, black: 1 };   // 한 묶음에 필요한 중복 개수
-        const SELL_COINS = { hidden: 3 };                                                       // 한 묶음에 주는 코인 (없으면 1)
+        const SELL_COINS = { hidden: 3, black: 7 };                                             // 한 묶음에 주는 코인 (없으면 1)
         const sellCoinsOf = (r) => SELL_COINS[r] || 1;
         let sellBusy = false;
 
@@ -11921,7 +11921,7 @@ ${text}
             const maxUnits = Math.floor(extra / per);
             if (!maxUnits) { alert(`${RARITY_LABEL[rarity]} 중복 인형이 ${per}개 있어야 ${sellCoinsOf(rarity)}코인으로 바꿀 수 있어요.`); return; }
             const units = mode === 'all' ? maxUnits : 1;
-            const coins = units * sellCoinsOf(rarity);   // 받을 코인 (히든은 묶음당 3개)
+            const coins = units * sellCoinsOf(rarity);   // 받을 코인 (히든은 묶음당 3개 · 블랙은 7개)
             const plan = planSale(gameData, rarity, units);
             if (!plan) return;
             const list = Object.entries(plan.take)
