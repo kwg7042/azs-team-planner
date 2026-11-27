@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="app-version" content="2026-11-27a">
+    <meta name="app-version" content="2026-11-27b">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AZS 팀 플래너</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -3946,6 +3946,22 @@
         .gacha-chip.grade-black { border-color: #000; background: #120000; box-shadow: 0 0 8px #ff1f1f; }
         .name-icon.black-icon { display: inline-block; animation: blackNameGlow 2.2s ease-in-out infinite; }
         @keyframes blackNameGlow { 0%, 100% { filter: drop-shadow(0 0 2px #ff1f1f); } 50% { filter: drop-shadow(0 0 6px #ff1f1f) drop-shadow(0 0 2px #000); } }
+        /* 🎄 크리스마스 인형 (실사풍 사진) */
+        .grade-text-xmas { color: #ff6b6b; text-shadow: 0 0 6px rgba(46,229,157,0.7); font-weight: bold; }
+        .xmas-count { color: #ff8a8a; }
+        .emo3d.xmas-img { object-fit: cover; border-radius: 22%; }
+        .collection-item.grade-xmas { border-color: #2e9e5b; }
+        .collection-item.owned.grade-xmas { border-color: #ff5a5a; box-shadow: 0 0 14px rgba(255,90,90,0.65), inset 0 0 0 2px rgba(46,158,91,0.7); background: linear-gradient(145deg, rgba(190,20,30,0.35), rgba(20,110,60,0.3)); }
+        .collection-item.grade-xmas .ci-emoji .emo3d.xmas-img { filter: drop-shadow(0 4px 6px rgba(0,0,0,0.45)); }
+        .collection-item.locked.grade-xmas .ci-emoji .emo3d.xmas-img { filter: grayscale(100%) brightness(0.5); }
+        .gacha-display.grade-xmas { border-color: #ff5a5a; box-shadow: 0 0 40px rgba(255,90,90,0.8), 0 0 70px rgba(46,229,157,0.45); }
+        .gacha-display.grade-xmas .emo-result.xmas-img { filter: drop-shadow(0 0 16px rgba(255,220,150,0.9)); }
+        .gacha-chip.grade-xmas { border-color: #ff5a5a; box-shadow: 0 0 6px rgba(46,229,157,0.6); }
+        .hidden-reveal.xmas-reveal { background: radial-gradient(circle, rgba(120,10,20,0.9), rgba(5,40,20,0.97)); }
+        .hidden-reveal.xmas-reveal .hr-rays { background: repeating-conic-gradient(rgba(255,215,120,0.22) 0deg 6deg, transparent 6deg 16deg, rgba(46,229,157,0.18) 16deg 22deg, transparent 22deg 34deg); }
+        .hidden-reveal.xmas-reveal .hr-title { font-size: 36px; letter-spacing: 4px; background: linear-gradient(90deg, #ff5a5a, #ffe28a, #2ee59d, #ff5a5a); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .hidden-reveal.xmas-reveal .hr-emoji { filter: drop-shadow(0 0 26px rgba(255,220,150,0.95)); }
+        .hidden-reveal.xmas-reveal .emo-reveal.xmas-img { width: 200px; height: 200px; }
         .hidden-reveal.black-reveal { background: radial-gradient(circle, rgba(70,0,0,0.9), rgba(0,0,0,0.98)); }
         .hidden-reveal.black-reveal .hr-rays { background: repeating-conic-gradient(rgba(255,30,30,0.3) 0deg 6deg, transparent 6deg 18deg, rgba(0,0,0,0.6) 18deg 26deg, transparent 26deg 40deg); animation-duration: 10s; }
         .hidden-reveal.black-reveal .hr-title { background: linear-gradient(90deg, #ff1f1f, #ffffff, #7a0000, #ff1f1f); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: 14px; }
@@ -5341,12 +5357,13 @@
                             <span>뽑기! (1<span class="coin-ico"></span>)</span>
                         </button>
                         <div class="gacha-rates">
-                            <span class="grade-text-bronze">🥉 브론즈 59.5%</span> ·
-                            <span class="grade-text-silver">🥈 실버 20%</span> ·
-                            <span class="grade-text-gold">🥇 골드 10%</span> ·
-                            <span class="grade-text-emerald">💚 에메랄드 6.5%</span> ·
-                            <span class="grade-text-hidden">❓ 히든 3.5%</span> ·
-                            <span class="grade-text-black">⚫ 블랙 0.5%</span>
+                            <span class="grade-text-bronze">🥉 브론즈 52.4%</span> ·
+                            <span class="grade-text-silver">🥈 실버 17.6%</span> ·
+                            <span class="grade-text-gold">🥇 골드 8.8%</span> ·
+                            <span class="grade-text-emerald">💚 에메랄드 5.7%</span> ·
+                            <span class="grade-text-hidden">❓ 히든 3.1%</span> ·
+                            <span class="grade-text-black">⚫ 블랙 0.44%</span> ·
+                            <span class="grade-text-xmas">🎄 크리스마스 12% <small>(1종당 1%)</small></span>
                         </div>
                     </div>
                     <div class="gacha-history">
@@ -5415,7 +5432,7 @@
                     <div class="collection-summary" id="collectionSummary"></div>
                     <details class="sell-box" id="sellBox">
                         <summary>💰 중복 인형 판매 <span class="sell-total" id="sellTotal"></span></summary>
-                        <div class="sell-note">각 인형 <b>1개는 남기고</b> 겹치는 인형만 팔아요 · 많이 겹친 인형부터 팔려요<br>브론즈 5개 · 실버 4개 · 골드 3개 · 에메랄드 1개 = <span class="coin-ico"></span> 1코인 · <b>히든은 1개 = <span class="coin-ico"></span> 3코인</b> · <b>블랙은 1개 = <span class="coin-ico"></span> 7코인</b></div>
+                        <div class="sell-note">각 인형 <b>1개는 남기고</b> 겹치는 인형만 팔아요 · 많이 겹친 인형부터 팔려요<br>브론즈 5개 · 실버 4개 · 골드 3개 · 에메랄드 1개 = <span class="coin-ico"></span> 1코인 · <b>히든은 1개 = <span class="coin-ico"></span> 3코인</b> · <b>블랙은 1개 = <span class="coin-ico"></span> 7코인</b> · <b>🎄 크리스마스는 1개 = <span class="coin-ico"></span> 3코인</b></div>
                         <div class="sell-rows" id="sellRows"></div>
                     </details>
                     <div class="collection-grid" id="collectionGrid">
@@ -10793,8 +10810,10 @@ ${text}
 
         // 뽑기 아이템 목록 (2026-11 개편)
         // 등급(테두리): 브론즈 20 · 실버 10 · 골드 6 · 에메랄드 4 · 히든 4
-        // 확률(등급 합계): 브론즈 59.5% · 실버 20% · 골드 10% · 에메랄드 6.5% · 히든 3.5% · 블랙 0.5%
+        // 확률(등급 합계): 브론즈 52.4% · 실버 17.6% · 골드 8.8% · 에메랄드 5.7% · 히든 3.1% · 블랙 0.44% · 크리스마스 12% (1종당 1%)
+        //  (2026-11-27 크리스마스 추가 전: 브론즈 59.5% · 실버 20% · 골드 10% · 에메랄드 6.5% · 히든 3.5% · 블랙 0.5%)
         // 화면에는 emoji3d/ 그림으로 보여주고, 그림을 못 불러올 때만 글자 이모지가 보임
+        const XMAS_RATE = 1 / 0.88;
         const GACHA_ITEMS = [
             // 브론즈: 엄청 흔한 동물 (각 2.975%)
             { emoji: '🐿️', name: '다람쥐', rarity: 'bronze', rate: 2.975 },
@@ -10852,7 +10871,21 @@ ${text}
             { emoji: '👹', name: '도철', rarity: 'black', rate: 0.125 },
             { emoji: '🐆', name: '궁기', rarity: 'black', rate: 0.125 },
             { emoji: '👺', name: '도올', rarity: 'black', rate: 0.125 },
-            { emoji: '🌀', name: '혼돈', rarity: 'black', rate: 0.125 }
+            { emoji: '🌀', name: '혼돈', rarity: 'black', rate: 0.125 },
+            // 🎄 크리스마스 (2026-11-27 추가): 따로 모으는 새 그룹 12종 · 1종당 1% (12종 합계 12%) — 그림은 xmas/ 폴더의 실사풍 사진
+            //  rate = 1/0.88 → 기존 인형 합계 100과 합치면 1종당 정확히 1% (기존 등급 비율은 그대로, 전체에서 12%만큼 줄어듦)
+            { emoji: '🎄', name: '크리스마스트리', rarity: 'xmas', rate: XMAS_RATE },
+            { emoji: '🎅', name: '산타클로스', rarity: 'xmas', rate: XMAS_RATE },
+            { emoji: '🦌', name: '루돌프', rarity: 'xmas', rate: XMAS_RATE },
+            { emoji: '⛄', name: '눈사람', rarity: 'xmas', rate: XMAS_RATE },
+            { emoji: '🎁', name: '선물 상자', rarity: 'xmas', rate: XMAS_RATE },
+            { emoji: '🔔', name: '크리스마스 종', rarity: 'xmas', rate: XMAS_RATE },
+            { emoji: '🍪', name: '진저브레드맨', rarity: 'xmas', rate: XMAS_RATE },
+            { emoji: '🧦', name: '크리스마스 양말', rarity: 'xmas', rate: XMAS_RATE },
+            { emoji: '🕯️', name: '크리스마스 촛불', rarity: 'xmas', rate: XMAS_RATE },
+            { emoji: '🛷', name: '산타 썰매', rarity: 'xmas', rate: XMAS_RATE },
+            { emoji: '🔮', name: '스노볼', rarity: 'xmas', rate: XMAS_RATE },
+            { emoji: '⭐', name: '트리 꼭대기 별', rarity: 'xmas', rate: XMAS_RATE }
         ];
         // 2026-11-04 개편: 브라키오사우루스 → 맘모스, 히든 4종 교체 (같은 등급끼리 1:1)
         const COLLECTION_V4_MAP = { '🦕': '🦣', '🐙': '🃏', '🤖': '🤡', '🧛': '⚔️', '🧙': '💀' };
@@ -10869,8 +10902,12 @@ ${text}
         const emojiCode = (e) => [...String(e)].map(c => c.codePointAt(0)).filter(c => c !== 0xfe0f).map(c => c.toString(16)).join('-');
         let EMOJI_3D = null;
         const EMOJI_3D_VER = 11; // 그림을 바꾸면 올려서 브라우저에 남은 예전 그림 대신 새 그림을 받게 함 (11: 조커·저승사자 교체, 삐에로 삭제)
+        const XMAS_IMG_VER = 1;
+        let XMAS_CODES = null;
         function emojiArt(e, cls = '') {
             if (!e) return '';
+            if (!XMAS_CODES) XMAS_CODES = new Set(GACHA_ITEMS.filter(it => it.rarity === 'xmas').map(it => emojiCode(it.emoji)));
+            if (XMAS_CODES.has(emojiCode(e))) return `<img class="emo3d xmas-img ${cls}" src="xmas/${emojiCode(e)}.webp?v=${XMAS_IMG_VER}" alt="${e}" draggable="false" onerror="this.replaceWith(document.createTextNode(this.alt))">`;
             if (!EMOJI_3D) EMOJI_3D = new Set(GACHA_ITEMS.map(it => emojiCode(it.emoji)));
             const code = emojiCode(e);
             if (!EMOJI_3D.has(code)) return escapeHtml(e);
@@ -10993,7 +11030,7 @@ ${text}
             if (!gameMine(me) || !userIconsLoaded || !gameData.iconCheckV3) return;
             const cur = userIcons[me], owned = gameData.collection || [];
             if (cur && !owned.includes(cur)) {
-                const order = ['black', 'hidden', 'emerald', 'gold', 'silver', 'bronze'];
+                const order = ['black', 'hidden', 'xmas', 'emerald', 'gold', 'silver', 'bronze'];
                 const rank = (e) => order.indexOf((GACHA_ITEMS.find(it => it.emoji === e) || {}).rarity);
                 const best = owned.slice().sort((a, b) => rank(a) - rank(b))[0] || null;
                 if (best) userIcons[me] = best; else delete userIcons[me];
@@ -11018,9 +11055,9 @@ ${text}
             if (typeof refreshIconViews === 'function') refreshIconViews();
         }
 
-        const RARITY_ORDER = ['bronze', 'silver', 'gold', 'emerald', 'hidden', 'black'];
-        const RARITY_LABEL = { bronze: '브론즈', silver: '실버', gold: '골드', emerald: '에메랄드', hidden: '히든', black: '블랙' };
-        const RARITY_BADGE = { bronze: '🥉', silver: '🥈', gold: '🥇', emerald: '💚', hidden: '❓', black: '⚫' };
+        const RARITY_ORDER = ['bronze', 'silver', 'gold', 'emerald', 'hidden', 'black', 'xmas'];
+        const RARITY_LABEL = { bronze: '브론즈', silver: '실버', gold: '골드', emerald: '에메랄드', hidden: '히든', black: '블랙', xmas: '크리스마스' };
+        const RARITY_BADGE = { bronze: '🥉', silver: '🥈', gold: '🥇', emerald: '💚', hidden: '❓', black: '⚫', xmas: '🎄' };
         const SECRET_RARITIES = ['hidden', 'black']; // 뽑기 전까지 정체를 숨기는 등급
         const RARITY_COLORS = {
             bronze: '#cd7f32',
@@ -11029,6 +11066,7 @@ ${text}
             emerald: '#2ee59d',
             hidden: '#ff4fd8',
             black: '#ff4d4d',
+            xmas: '#ff6b6b',
             // 이전 등급 이름으로 저장된 뽑기 내역 호환
             normal: '#cd7f32', rare: '#c9d1d9', epic: '#ffd700', legendary: '#2ee59d'
         };
@@ -11468,7 +11506,8 @@ ${text}
 
             // 히든은 화면 전체 연출
             if (result.rarity === 'hidden') showHiddenReveal(result);
-            else if (result.rarity === 'black') showHiddenReveal(result, { cls: 'black-reveal', title: 'BLACK', sub: '전설의 4흉수 획득! (블랙 0.5%)' });
+            else if (result.rarity === 'black') showHiddenReveal(result, { cls: 'black-reveal', title: 'BLACK', sub: '전설의 4흉수 획득! (블랙 0.44%)' });
+            else if (result.rarity === 'xmas') showHiddenReveal(result, { cls: 'xmas-reveal', title: 'MERRY CHRISTMAS', sub: '🎄 크리스마스 인형 획득! (1종당 1%)' });
 
             renderGachaHistory();
             updateMinigameUI();
@@ -11849,18 +11888,19 @@ ${text}
 
             const summary = document.getElementById('collectionSummary');
             if (summary) {
-                const total = GACHA_ITEMS.filter(it => owned.includes(it.emoji)).length;
+                const base = GACHA_ITEMS.filter(it => it.rarity !== 'xmas'), xmasItems = GACHA_ITEMS.filter(it => it.rarity === 'xmas');
+                const total = base.filter(it => owned.includes(it.emoji)).length, ownXmas = xmasItems.filter(it => owned.includes(it.emoji)).length;
                 const hiddenItems = GACHA_ITEMS.filter(it => it.rarity === 'hidden');
                 const ownHidden = hiddenItems.filter(it => owned.includes(it.emoji)).length;
                 const blackItems = GACHA_ITEMS.filter(it => it.rarity === 'black');
                 const ownBlack = blackItems.filter(it => owned.includes(it.emoji)).length;
-                summary.innerHTML = `전체 수집 <b>${total}/${GACHA_ITEMS.length}</b> · <span class="hidden-count">히든 ${ownHidden}/${hiddenItems.length}</span> · <span class="black-count">블랙 ${ownBlack}/${blackItems.length}</span>${typeof APP_FP !== 'undefined' && APP_FP ? `<span class="app-ver" title="사람마다 이 코드가 같으면 같은 버전이에요">버전 ${APP_FP}</span>` : ''}`;
+                summary.innerHTML = `전체 수집 <b>${total}/${base.length}</b> · <span class="hidden-count">히든 ${ownHidden}/${hiddenItems.length}</span> · <span class="black-count">블랙 ${ownBlack}/${blackItems.length}</span> · <span class="xmas-count">🎄 크리스마스 ${ownXmas}/${xmasItems.length}</span>${typeof APP_FP !== 'undefined' && APP_FP ? `<span class="app-ver" title="사람마다 이 코드가 같으면 같은 버전이에요">버전 ${APP_FP}</span>` : ''}`;
             }
         }
 
         // ===== 중복 인형 판매: 각 인형 1개는 남기고 겹치는 것만 → 등급별 N개 = 1코인 (히든은 1개 = 3코인 · 블랙은 1개 = 7코인, 2026-11-26) =====
-        const SELL_RATE = { bronze: 5, silver: 4, gold: 3, emerald: 1, hidden: 1, black: 1 };   // 한 묶음에 필요한 중복 개수
-        const SELL_COINS = { hidden: 3, black: 7 };                                             // 한 묶음에 주는 코인 (없으면 1)
+        const SELL_RATE = { bronze: 5, silver: 4, gold: 3, emerald: 1, hidden: 1, black: 1, xmas: 1 };   // 한 묶음에 필요한 중복 개수
+        const SELL_COINS = { hidden: 3, black: 7, xmas: 3 };                                             // 한 묶음에 주는 코인 (없으면 1)
         const sellCoinsOf = (r) => SELL_COINS[r] || 1;
         let sellBusy = false;
 
@@ -11965,7 +12005,7 @@ ${text}
                     <div class="hr-title">${o.title || 'HIDDEN'}</div>
                     <div class="hr-emoji">${emojiArt(item.emoji, 'emo-reveal')}</div>
                     <div class="hr-name">${escapeHtml(item.name)}</div>
-                    <div class="hr-sub">${o.sub || '히든 캐릭터 획득! (히든 3.5%)'}</div>
+                    <div class="hr-sub">${o.sub || '히든 캐릭터 획득! (히든 3.1%)'}</div>
                 </div>`;
             ov.onclick = () => ov.remove();
             document.body.appendChild(ov);
